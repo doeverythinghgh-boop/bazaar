@@ -29,27 +29,30 @@ export default async function handler(req, res) {
 
     // ✅ إضافة مستخدم جديد
     if (req.method === "POST") {
-      const { username, phone, user_key } = req.body;
+      const { username, phone, user_key, password, address } = req.body;
 
       if (!username || !phone || !user_key) {
         return res.status(400).json({ error: "الاسم ورقم الهاتف والرقم التسلسلي مطلوبان" });
       }
 
-      // ✅ التحقق مما إذا كان رقم الهاتف مسجلاً بالفعل
-      const existingUser = await db.execute({
-        sql: "SELECT phone FROM users WHERE phone = ?",
-        args: [phone],
-      });
-
-      if (existingUser.rows.length > 0) {
-        // إذا وجد، أرجع خطأ 409 (Conflict)
-        return res.status(409).json({ error: "رقم الهاتف هذا مسجل بالفعل." });
+      // ✅ منطق التحقق الجديد:
+      // إذا تم توفير كلمة مرور، تحقق مما إذا كان رقم الهاتف موجودًا بالفعل.
+      if (password && password.length > 0) {
+        const existingUser = await db.execute({
+          sql: "SELECT phone FROM users WHERE phone = ?",
+          args: [phone],
+        });
+        if (existingUser.rows.length > 0) {
+          return res.status(409).json({ error: "رقم الهاتف هذا مسجل بالفعل ومحمي بكلمة مرور." });
+        }
       }
+      // إذا لم يتم توفير كلمة مرور، يُسمح بوجود نفس الرقم (أو يتم إنشاء حساب جديد إذا لم يكن موجودًا).
 
       // ✅ تنفيذ الإدخال في جدول users
+      // استخدام COALESCE لتجنب إدخال قيم فارغة بدلاً من NULL
       await db.execute({
-        sql: "INSERT INTO users (username, phone, user_key) VALUES (?, ?, ?)",
-        args: [username, phone, user_key]
+        sql: "INSERT INTO users (username, phone, user_key, Password, Address) VALUES (?, ?, ?, ?, ?)",
+        args: [username, phone, user_key, password || null, address || null]
       });
 
       return res.status(201).json({ message: "تم إضافة المستخدم بنجاح ✅" });
@@ -63,13 +66,19 @@ export default async function handler(req, res) {
       // إذا تم توفير رقم هاتف، ابحث عن مستخدم معين
       if (phone) {
         const result = await db.execute({
-          sql: "SELECT username, phone, is_seller, user_key FROM users WHERE phone = ?",
+          sql: "SELECT username, phone, is_seller, user_key, Password, Address FROM users WHERE phone = ?",
           args: [phone],
         });
 
         // إذا لم يتم العثور على المستخدم، أرجع خطأ 404
         if (result.rows.length === 0) {
           return res.status(404).json({ error: "المستخدم غير موجود" });
+        }
+
+        // ✅ منطق تسجيل الدخول الجديد:
+        // إذا كان للحساب كلمة مرور، لا ترجع بيانات المستخدم مباشرة.
+        if (result.rows[0].Password) {
+          return res.status(200).json({ passwordRequired: true });
         }
         // أرجع بيانات المستخدم الذي تم العثور عليه
         return res.status(200).json(result.rows[0]);
@@ -78,6 +87,27 @@ export default async function handler(req, res) {
       // إذا لم يتم توفير رقم هاتف، أرجع جميع المستخدمين
       const allUsers = await db.execute("SELECT * FROM users");
       return res.status(200).json(allUsers.rows);
+    }
+
+    // ✅ نقطة نهاية جديدة للتحقق من كلمة المرور
+    if (req.method === 'POST' && req.url.includes('/api/users/verify')) {
+      const { phone, password } = req.body;
+
+      if (!phone || !password) {
+        return res.status(400).json({ error: 'رقم الهاتف وكلمة المرور مطلوبان.' });
+      }
+
+      const result = await db.execute({
+        sql: "SELECT * FROM users WHERE phone = ? AND Password = ?",
+        args: [phone, password],
+      });
+
+      if (result.rows.length === 0) {
+        return res.status(401).json({ error: 'كلمة المرور غير صحيحة.' });
+      }
+
+      // أرجع بيانات المستخدم كاملة عند النجاح
+      return res.status(200).json(result.rows[0]);
     }
 
     // ✅ تحديث المستخدمين (مثل is_seller)

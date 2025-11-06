@@ -71,6 +71,19 @@
             <input type="tel" id="phone" name="phone" required />
             <div id="phone-error" class="error-message"></div>
           </div>
+          <div class="form-group">
+            <label for="password"><i class="fas fa-lock"></i> كلمة المرور (اختياري)</label>
+            <input type="password" id="password" name="password" />
+            <div id="password-error" class="error-message"></div>
+            <small class="form-hint">اختياري. إذا قمت بتعيينها، لن يتمكن أي شخص آخر من استخدام رقم هاتفك.
+            </small>
+          </div>
+          <div class="form-group">
+            <label for="address"><i class="fas fa-map-marker-alt"></i> العنوان (اختياري)</label>
+            <input type="text" id="address" name="address" />
+            <div id="address-error" class="error-message"></div>
+            <small class="form-hint">اختياري. يُستخدم لتسهيل عملية توصيل المنتجات إليك.</small>
+          </div>
 
           <button type="submit" class="button login-btn">إنشاء الحساب</button>
           <div class="form-footer">
@@ -89,6 +102,8 @@
       const form = document.getElementById("register-form");
       const username = document.getElementById("username");
       const phone = document.getElementById("phone");
+      const password = document.getElementById("password");
+      const address = document.getElementById("address");
 
       /**
        * يقوم بإنشاء رقم تسلسلي فريد مكون من 4 أحرف صغيرة و 4 أرقام عشوائية.
@@ -187,6 +202,8 @@
             username: username.value.trim(),
             phone: phone.value.trim(),
             user_key: userKey, // إضافة الرقم التسلسلي للبيانات
+            password: password.value, // قد تكون فارغة
+            address: address.value.trim(), // قد تكون فارغة
           };
 
           // إظهار رسالة انتظار باستخدام SweetAlert2
@@ -205,7 +222,13 @@
 
             if (result && result.message) {
               // حفظ بيانات المستخدم في التخزين المحلي لتسجيل دخوله
-              localStorage.setItem("loggedInUser", JSON.stringify(newUser));
+              // نحتاج لجلب المستخدم مرة أخرى للتأكد من حصولنا على كل البيانات المحدثة من الخادم
+              const loggedInUserData = {
+                username: newUser.username,
+                phone: newUser.phone,
+                user_key: newUser.user_key,
+              };
+              localStorage.setItem("loggedInUser", JSON.stringify(loggedInUserData));
 
               // إظهار رسالة ترحيب قبل التوجيه إلى الصفحة الرئيسية
               Swal.fire({

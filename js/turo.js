@@ -40,6 +40,8 @@ async function fetchUsers() {
  * @param {object} userData - بيانات المستخدم المراد إضافته.
  * @param {string} userData.username - اسم المستخدم.
  * @param {string} userData.phone - رقم هاتف المستخدم.
+ * @param {string} [userData.password] - كلمة المرور (اختياري).
+ * @param {string} [userData.address] - العنوان (اختياري).
  * @param {string} userData.user_key - الرقم التسلسلي الفريد للمستخدم.
  * @returns {Promise<Object|null>} الكائن الذي تم إنشاؤه أو null في حالة الفشل.
  */
@@ -221,6 +223,35 @@ async function getUserByPhone(phone) {
   } catch (error) {
     console.error("فشل في جلب المستخدم عن طريق رقم الهاتف:", error);
     return null; // إرجاع null للإشارة إلى فشل العملية
+  }
+}
+
+/**
+ * يتحقق من صحة كلمة المرور للمستخدم.
+ * @param {string} phone - رقم هاتف المستخدم.
+ * @param {string} password - كلمة المرور للتحقق منها.
+ * @returns {Promise<Object|null>} كائن بيانات المستخدم عند النجاح، أو كائن خطأ عند الفشل.
+ */
+async function verifyUserPassword(phone, password) {
+  try {
+    const response = await fetch(`${baseURL}/api/users/verify`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ phone, password }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      // إذا كان هناك خطأ، استخدم رسالة الخطأ من الخادم
+      return { error: data.error || `HTTP error! status: ${response.status}` };
+    }
+
+    console.log("تم التحقق من المستخدم بنجاح:", data);
+    return data;
+  } catch (error) {
+    console.error("فشل في التحقق من المستخدم:", error);
+    return { error: "فشل الاتصال بالخادم." };
   }
 }
 
