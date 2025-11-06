@@ -773,6 +773,9 @@
           // تحديث الواجهة لتعكس تسجيل الدخول قبل إظهار الرسالة
           updateViewForLoggedInUser(user);
 
+          // ✅ إضافة: تحديث شارة السلة فور تسجيل الدخول
+          if (window.updateCartBadge) window.updateCartBadge();
+
           // إظهار رسالة نجاح مع خيار الانتقال
           Swal.fire({
             icon: "success",

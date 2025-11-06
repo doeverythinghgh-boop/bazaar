@@ -315,14 +315,33 @@ window.showProductDetails = async function(productData) {
   // --- جديد: منطق إضافة المنتج إلى السلة ---
   const addToCartBtn = document.getElementById('product-modal-add-to-cart');
   addToCartBtn.addEventListener('click', () => {
-    const quantity = parseInt(document.getElementById('product-modal-selected-quantity').value, 10);
-    const productInfoForCart = {
-      product_key: productData.product_key,
-      productName: productData.productName,
-      price: productData.price,
-      image: productData.image
-    };
-    addToCart(productInfoForCart, quantity);
-    // closeModal(); // ✅ تم التعطيل: لن يتم إغلاق النافذة بعد الإضافة للسماح للمستخدم بإضافة المزيد.
+    // ✅ إضافة: التحقق مما إذا كان المستخدم قد سجل دخوله
+    const loggedInUser = localStorage.getItem("loggedInUser");
+
+    if (loggedInUser) {
+      // إذا كان المستخدم مسجلاً، استمر في عملية الإضافة للسلة
+      const quantity = parseInt(document.getElementById('product-modal-selected-quantity').value, 10);
+      const productInfoForCart = {
+        product_key: productData.product_key,
+        productName: productData.productName,
+        price: productData.price,
+        image: productData.image
+      };
+      addToCart(productInfoForCart, quantity);
+    } else {
+      // إذا لم يكن المستخدم مسجلاً، أظهر رسالة تنبيه
+      Swal.fire({
+        icon: 'warning',
+        title: 'يجب تسجيل الدخول',
+        text: 'لإضافة منتجات إلى السلة، يرجى تسجيل الدخول أولاً.',
+        showCancelButton: true,
+        confirmButtonText: 'تسجيل الدخول',
+        cancelButtonText: 'إلغاء'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          window.location.href = 'login.html'; // توجيه المستخدم لصفحة تسجيل الدخول
+        }
+      });
+    }
   });
 };

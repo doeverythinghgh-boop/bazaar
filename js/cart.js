@@ -6,13 +6,29 @@
  * تشمل العمليات: الإضافة، الحذف، تحديث الكمية، جلب محتويات السلة، وحساب الإجمالي.
  */
 
-const CART_STORAGE_KEY = 'userShoppingCart';
+/**
+ * ✅ جديد: ينشئ مفتاح تخزين فريد للسلة بناءً على المستخدم المسجل دخوله.
+ * @returns {string|null} مفتاح السلة (مثل 'cart_abcd1234') أو null إذا لم يكن هناك مستخدم.
+ */
+function getCartStorageKey() {
+  const loggedInUser = localStorage.getItem("loggedInUser");
+  if (loggedInUser) {
+    const user = JSON.parse(loggedInUser);
+    if (user && user.user_key) {
+      return `cart_${user.user_key}`; // ربط السلة بالـ user_key
+    }
+  }
+  return null; // لا يوجد مستخدم، لا توجد سلة
+}
 
 /**
  * يجلب السلة الحالية من LocalStorage.
  * @returns {Array<Object>} مصفوفة من منتجات السلة.
  */
 function getCart() {
+  const CART_STORAGE_KEY = getCartStorageKey();
+  if (!CART_STORAGE_KEY) return []; // لا ترجع أي سلة إذا لم يكن المستخدم مسجلاً
+
   try {
     const cartJson = localStorage.getItem(CART_STORAGE_KEY);
     return cartJson ? JSON.parse(cartJson) : [];
@@ -27,6 +43,9 @@ function getCart() {
  * @param {Array<Object>} cart - مصفوفة منتجات السلة.
  */
 function saveCart(cart) {
+  const CART_STORAGE_KEY = getCartStorageKey();
+  if (!CART_STORAGE_KEY) return; // لا تحفظ أي سلة إذا لم يكن المستخدم مسجلاً
+
   try {
     localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart));
     // إرسال حدث مخصص لإعلام أجزاء أخرى من التطبيق بتحديث السلة

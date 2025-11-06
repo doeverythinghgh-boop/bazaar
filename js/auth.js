@@ -52,6 +52,8 @@ function logout() {
     if (result.isConfirmed) {
       // إزالة بيانات المستخدم من التخزين المحلي
       localStorage.removeItem("loggedInUser");
+      // ✅ تعديل: لم نعد نحذف السلة عند تسجيل الخروج،
+      // لأنها الآن مرتبطة بالمستخدم وستبقى محفوظة لزيارته القادمة.
       // إعادة توجيه المستخدم إلى الصفحة الرئيسية لتحديث حالته
       window.location.href = "index.html";
     }
