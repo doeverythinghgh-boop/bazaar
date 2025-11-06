@@ -55,6 +55,7 @@ export default async function handler(req, res) {
   if (req.method === "POST") {
     try {
       const {
+        productName, // جديد
         user_key,
         product_key,
         product_description,
@@ -63,19 +64,19 @@ export default async function handler(req, res) {
         user_message,
         user_note,
         ImageName,
-        MainCategory, // جديد
-        SubCategory,  // جديد
-        ImageIndex    // جديد
+        MainCategory,
+        SubCategory,
+        ImageIndex
       } = req.body;
 
       // تحقق بسيط من وجود البيانات الأساسية
-      if (!user_key || !product_key || !product_price || !product_quantity || !MainCategory) {
+      if (!user_key || !product_key || !product_price || !product_quantity || !MainCategory || !productName) {
         return res.status(400).json({ error: "البيانات الأساسية للمنتج مطلوبة." });
       }
 
       await db.execute({
-        sql: "INSERT INTO marketplace_products (user_key, product_key, product_description, product_price, product_quantity, user_message, user_note, ImageName, MainCategory, SubCategory, ImageIndex) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-        args: [user_key, product_key, product_description, parseFloat(product_price), parseInt(product_quantity), user_message, user_note, ImageName, parseInt(MainCategory), parseInt(SubCategory) || null, parseInt(ImageIndex)]
+        sql: "INSERT INTO marketplace_products (productName, user_key, product_key, product_description, product_price, product_quantity, user_message, user_note, ImageName, MainCategory, SubCategory, ImageIndex) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        args: [productName, user_key, product_key, product_description, parseFloat(product_price), parseInt(product_quantity), user_message, user_note, ImageName, parseInt(MainCategory), parseInt(SubCategory) || null, parseInt(ImageIndex)]
       });
 
       return res.status(201).json({ message: "تم إضافة المنتج إلى قاعدة البيانات بنجاح." });
@@ -90,6 +91,7 @@ export default async function handler(req, res) {
   if (req.method === "PUT") {
     try {
       const {
+        productName, // جديد
         product_key,
         product_description,
         product_price,
@@ -108,8 +110,8 @@ export default async function handler(req, res) {
       }
 
       await db.execute({
-        sql: "UPDATE marketplace_products SET product_description = ?, product_price = ?, product_quantity = ?, user_message = ?, user_note = ?, ImageName = ?, MainCategory = ?, SubCategory = ?, ImageIndex = ? WHERE product_key = ?",
-        args: [product_description, parseFloat(product_price), parseInt(product_quantity), user_message, user_note, ImageName, parseInt(MainCategory), parseInt(SubCategory) || null, parseInt(ImageIndex), product_key]
+        sql: "UPDATE marketplace_products SET productName = ?, product_description = ?, product_price = ?, product_quantity = ?, user_message = ?, user_note = ?, ImageName = ?, MainCategory = ?, SubCategory = ?, ImageIndex = ? WHERE product_key = ?",
+        args: [productName, product_description, parseFloat(product_price), parseInt(product_quantity), user_message, user_note, ImageName, parseInt(MainCategory), parseInt(SubCategory) || null, parseInt(ImageIndex), product_key]
       });
 
       return res.status(200).json({ message: "تم تحديث المنتج بنجاح." });
