@@ -135,6 +135,10 @@
     .cart-item img { width: 80px; height: 80px; object-fit: cover; border-radius: 8px; }
     .cart-item-details { flex-grow: 1; }
     .cart-total { text-align: left; font-size: 1.2rem; font-weight: bold; margin-top: 20px; }
+    /* ✅ إصلاح: ضمان ظهور رسالة التأكيد فوق نافذة السلة */
+    .swal2-container {
+      z-index: 2000 !important;
+    }
   </style>
       <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 

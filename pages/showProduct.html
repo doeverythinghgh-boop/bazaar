@@ -128,6 +128,10 @@
     border: 2px solid transparent;
     transition: border-color 0.3s;
   }
+  /* ✅ إصلاح: ضمان ظهور رسالة التأكيد فوق نافذة تفاصيل المنتج */
+  .swal2-container {
+    z-index: 3000 !important; /* استخدام قيمة z-index عالية جدًا */
+  }
 </style>
 
 <div class="modal-content product-modal-content" id="product-modal-content">

@@ -323,6 +323,6 @@ window.showProductDetails = async function(productData) {
       image: productData.image
     };
     addToCart(productInfoForCart, quantity);
-    closeModal(); // إغلاق النافذة بعد الإضافة
+    // closeModal(); // ✅ تم التعطيل: لن يتم إغلاق النافذة بعد الإضافة للسماح للمستخدم بإضافة المزيد.
   });
 };

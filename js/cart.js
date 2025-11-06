@@ -55,15 +55,12 @@ function addToCart(product, quantity) {
 
   saveCart(cart);
 
-  // إظهار رسالة تأكيد للمستخدم
+  // ✅ تعديل: إظهار رسالة منبثقة قياسية بدلاً من رسالة "toast"
   Swal.fire({
-    toast: true,
-    position: 'top-start',
     icon: 'success',
     title: `تمت إضافة "${product.productName}" إلى السلة`,
-    showConfirmButton: false,
-    timer: 2500,
-    timerProgressBar: true
+    text: 'يمكنك متابعة التسوق.',
+    confirmButtonText: 'موافق'
   });
 }
 
