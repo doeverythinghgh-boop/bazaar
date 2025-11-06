@@ -197,6 +197,29 @@
         }
 
         if (isValid) {
+          // ✅ جديد: التحقق مما إذا كان المستخدم قد أدخل كلمة مرور
+          if (password.value.trim() !== "") {
+            const { value: confirmedPassword } = await Swal.fire({
+              title: 'تأكيد كلمة المرور',
+              input: 'password',
+              inputLabel: 'الرجاء إعادة إدخال كلمة المرور للتأكيد',
+              inputPlaceholder: 'أعد إدخال كلمة المرور',
+              showCancelButton: true,
+              confirmButtonText: 'تأكيد',
+              cancelButtonText: 'إلغاء',
+              inputValidator: (value) => {
+                if (value !== password.value) {
+                  return 'كلمتا المرور غير متطابقتين!'
+                }
+              }
+            });
+
+            // إذا ألغى المستخدم، أوقف عملية التسجيل
+            if (!confirmedPassword) {
+              return;
+            }
+          }
+
           const userKey = generateSerialNumber(); // 🔑 توليد الرقم التسلسلي
           const newUser = {
             username: username.value.trim(),
