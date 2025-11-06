@@ -20,15 +20,16 @@ export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-
+  
+  // ✅ معالجة جميع طلبات OPTIONS أولاً
   if (req.method === "OPTIONS") {
     return res.status(200).end();
   }
 
   try {
-
     // ✅ إضافة مستخدم جديد
-    if (req.method === "POST") {
+    // تعديل الشرط للتعامل مع المسار الأساسي فقط
+    if (req.method === "POST" && req.url === '/api/users') {
       const { username, phone, user_key, password, address } = req.body;
 
       if (!username || !phone || !user_key) {
@@ -106,12 +107,6 @@ export default async function handler(req, res) {
 
       // أرجع بيانات المستخدم كاملة عند النجاح
       return res.status(200).json(result.rows[0]);
-    }
-
-    // ✅ معالجة طلب OPTIONS لنقطة نهاية التحقق من كلمة المرور
-    if (req.method === 'OPTIONS' && req.url.includes('/api/users/verify')) {
-      // الاستجابة بنجاح لطلب الـ preflight الخاص بـ CORS
-      return res.status(200).end();
     }
 
     // ✅ تحديث المستخدمين (مثل is_seller)
