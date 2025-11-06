@@ -35,18 +35,16 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: "الاسم ورقم الهاتف والرقم التسلسلي مطلوبان" });
       }
 
-      // ✅ منطق التحقق الجديد:
-      // إذا تم توفير كلمة مرور، تحقق مما إذا كان رقم الهاتف موجودًا بالفعل.
-      if (password && password.length > 0) {
-        const existingUser = await db.execute({
-          sql: "SELECT phone FROM users WHERE phone = ?",
-          args: [phone],
-        });
-        if (existingUser.rows.length > 0) {
-          return res.status(409).json({ error: "رقم الهاتف هذا مسجل بالفعل ومحمي بكلمة مرور." });
-        }
+      // ✅ التحقق دائمًا مما إذا كان رقم الهاتف مسجلاً بالفعل
+      const existingUser = await db.execute({
+        sql: "SELECT phone FROM users WHERE phone = ?",
+        args: [phone],
+      });
+
+      if (existingUser.rows.length > 0) {
+        // إذا وجد، أرجع خطأ 409 (Conflict)
+        return res.status(409).json({ error: "رقم الهاتف هذا مسجل بالفعل." });
       }
-      // إذا لم يتم توفير كلمة مرور، يُسمح بوجود نفس الرقم (أو يتم إنشاء حساب جديد إذا لم يكن موجودًا).
 
       // ✅ تنفيذ الإدخال في جدول users
       // استخدام COALESCE لتجنب إدخال قيم فارغة بدلاً من NULL
