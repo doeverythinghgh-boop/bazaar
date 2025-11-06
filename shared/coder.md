@@ -81,6 +81,8 @@ CREATE TABLE users (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   username TEXT NOT NULL,
   phone TEXT NOT NULL UNIQUE,
+  Password TEXT ,
+  Address TEXT,
   user_key TEXT NOT NULL UNIQUE,
   is_seller INTEGER DEFAULT 0
 );
