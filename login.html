@@ -173,11 +173,11 @@
           class="button logout-btn-small"
           style="display: none"
         ><i class="fas fa-store"></i> عرض منتجاتي</button>
-        <button id="logout-btn-alt" class="button logout-btn-small">
+        <button id="view-cart-btn" class="button logout-btn-small" style="display: none;">
           <i class="fas fa-shopping-cart"></i> عرض السلة
         </button>
         <button
-          id="view-cart-btn"
+          id="logout-btn-alt"
           class="button logout-btn-small">
           <i class="fas fa-sign-out-alt"></i> تسجيل الخروج
         </button>
@@ -247,7 +247,12 @@
       ).textContent = `أهلاً بك، ${user.username}`;
 
       // إضافة وظيفة لزر تسجيل الخروج
-      document.getElementById("logout-btn-alt").addEventListener("click", logout);
+      document.getElementById("logout-btn-alt").addEventListener("click", logout); // هذا الزر الآن هو زر تسجيل الخروج الصحيح
+
+      // ✅ تصحيح: إظهار زر "عرض السلة" لجميع المستخدمين المسجلين
+      const viewCartBtn = document.getElementById("view-cart-btn");
+      viewCartBtn.style.display = "inline-flex";
+      viewCartBtn.addEventListener("click", showCartModal);
 
       // التحقق مما إذا كان المستخدم بائعًا
       if (user.is_seller === 1) {
@@ -259,11 +264,6 @@
         const viewMyProductsBtn = document.getElementById("view-my-products-btn");
         viewMyProductsBtn.style.display = "inline-flex";
         viewMyProductsBtn.addEventListener("click", () => showMyProducts(user.user_key));
-
-        // جديد: إظهار زر "عرض السلة" وإضافة حدث النقر
-        const viewCartBtn = document.getElementById("view-cart-btn");
-        viewCartBtn.style.display = "inline-flex";
-        viewCartBtn.addEventListener("click", showCartModal);
 
       }
 

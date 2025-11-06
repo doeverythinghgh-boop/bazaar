@@ -276,6 +276,42 @@ window.showProductDetails = async function(productData) {
     if (event.target == modal) closeModal();
   };
 
+  // --- ✅ إصلاح: إضافة منطق التحكم بالكمية والسعر الإجمالي ---
+  const decreaseBtn = document.getElementById('product-modal-decrease-quantity');
+  const increaseBtn = document.getElementById('product-modal-increase-quantity');
+  const selectedQuantityInput = document.getElementById('product-modal-selected-quantity');
+  const totalPriceEl = document.getElementById('product-modal-total-price');
+
+  // تعيين الحد الأقصى للكمية
+  selectedQuantityInput.max = productData.availableQuantity;
+
+  // دالة لتحديث السعر الإجمالي
+  function updateTotalPrice() {
+    const price = parseFloat(productData.pricePerItem);
+    const quantity = parseInt(selectedQuantityInput.value, 10);
+    const total = price * quantity;
+    totalPriceEl.textContent = `${total.toFixed(2)} جنيه`;
+  }
+
+  // إضافة الأحداث للأزرار
+  decreaseBtn.addEventListener('click', () => {
+    if (selectedQuantityInput.value > 1) {
+      selectedQuantityInput.value--;
+      updateTotalPrice();
+    }
+  });
+
+  increaseBtn.addEventListener('click', () => {
+    const max = parseInt(selectedQuantityInput.max, 10);
+    if (parseInt(selectedQuantityInput.value, 10) < max) {
+      selectedQuantityInput.value++;
+      updateTotalPrice();
+    }
+  });
+
+  selectedQuantityInput.addEventListener('change', updateTotalPrice);
+  updateTotalPrice(); // حساب السعر المبدئي عند فتح النافذة
+
   // --- جديد: منطق إضافة المنتج إلى السلة ---
   const addToCartBtn = document.getElementById('product-modal-add-to-cart');
   addToCartBtn.addEventListener('click', () => {
