@@ -108,6 +108,12 @@ export default async function handler(req, res) {
       return res.status(200).json(result.rows[0]);
     }
 
+    // ✅ معالجة طلب OPTIONS لنقطة نهاية التحقق من كلمة المرور
+    if (req.method === 'OPTIONS' && req.url.includes('/api/users/verify')) {
+      // الاستجابة بنجاح لطلب الـ preflight الخاص بـ CORS
+      return res.status(200).end();
+    }
+
     // ✅ تحديث المستخدمين (مثل is_seller)
     if (req.method === "PUT") {
       const updates = req.body;
