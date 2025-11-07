@@ -8,37 +8,42 @@
  * - PUT: تحديث بيانات مجموعة من المستخدمين (مثل ترقيتهم إلى بائعين).
  * - OPTIONS: معالجة طلبات CORS Preflight.
  */
-import { createClient } from "@libsql/client";
+import { createClient } from "@libsql/client/web";
+
+export const config = {
+  runtime: 'edge',
+};
 
 const db = createClient({
   url: process.env.DATABASE_URL,
   authToken: process.env.TURSO_AUTH_TOKEN
 });
 
-export default async function handler(req, res) {  
-  // ✅ CORS
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET, POST, PUT, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+};
 
-  // ✅ معالجة جميع طلبات OPTIONS أولاً
-  if (req.method === "OPTIONS") {
-    console.log(`[CORS] Handled OPTIONS request for: ${req.url}`);
-    return res.status(200).end();
+export default async function handler(request) {
+  if (request.method === "OPTIONS") {
+    console.log(`[CORS] Handled OPTIONS request for: ${request.url}`);
+    return new Response(null, { status: 204, headers: corsHeaders });
   }
 
   try {
-    console.log(`[Request Start] Method: ${req.method}, URL: ${req.url}`);
-    // ✅ إضافة مستخدم جديد
-    // تعديل الشرط للتعامل مع المسار الأساسي فقط
-    if (req.method === "POST") {
-      const { action, phone, password, username, user_key, address } = req.body;
+    console.log(`[Request Start] Method: ${request.method}, URL: ${request.url}`);
+
+    if (request.method === "POST") {
+      const { action, phone, password, username, user_key, address } = await request.json();
 
       // ✅ الحالة 1: التحقق من كلمة المرور
       if (action === 'verify') {
         console.log("[Logic] Entered: Verify user password.");
         if (!phone || !password) {
-          return res.status(400).json({ error: 'رقم الهاتف وكلمة المرور مطلوبان.' });
+          return new Response(JSON.stringify({ error: 'رقم الهاتف وكلمة المرور مطلوبان.' }), {
+            status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          });
         }
 
         const result = await db.execute({
@@ -47,17 +52,23 @@ export default async function handler(req, res) {
         });
 
         if (result.rows.length === 0) {
-          return res.status(401).json({ error: 'كلمة المرور غير صحيحة.' });
+          return new Response(JSON.stringify({ error: 'كلمة المرور غير صحيحة.' }), {
+            status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          });
         }
 
         // أرجع بيانات المستخدم كاملة عند النجاح
-        return res.status(200).json(result.rows[0]);
+        return new Response(JSON.stringify(result.rows[0]), {
+          status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
       }
 
       // ✅ الحالة 2: إنشاء مستخدم جديد (السلوك الافتراضي)
       console.log("[Logic] Entered: Add new user.");
       if (!username || !phone || !user_key) {
-        return res.status(400).json({ error: "الاسم ورقم الهاتف والرقم التسلسلي مطلوبان" });
+        return new Response(JSON.stringify({ error: "الاسم ورقم الهاتف والرقم التسلسلي مطلوبان" }), {
+          status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
       }
 
       const existingUser = await db.execute({
@@ -65,7 +76,9 @@ export default async function handler(req, res) {
         args: [phone],
       });
       if (existingUser.rows.length > 0) {
-        return res.status(409).json({ error: "رقم الهاتف هذا مسجل بالفعل." });
+        return new Response(JSON.stringify({ error: "رقم الهاتف هذا مسجل بالفعل." }), {
+          status: 409, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
       }
 
       await db.execute({
@@ -73,9 +86,12 @@ export default async function handler(req, res) {
         args: [username, phone, user_key, password || null, address || null]
       });
 
-      return res.status(201).json({ message: "تم إضافة المستخدم بنجاح ✅" });
-    } else if (req.method === "GET") {
-      const { phone } = req.query;
+      return new Response(JSON.stringify({ message: "تم إضافة المستخدم بنجاح ✅" }), {
+        status: 201, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    } else if (request.method === "GET") {
+      const { searchParams } = new URL(request.url);
+      const phone = searchParams.get('phone');
 
       // إذا تم توفير رقم هاتف، ابحث عن مستخدم معين
       if (phone) {
@@ -84,31 +100,37 @@ export default async function handler(req, res) {
           args: [phone],
         });
 
-        // إذا لم يتم العثور على المستخدم، أرجع خطأ 404
         if (result.rows.length === 0) {
-          return res.status(404).json({ error: "المستخدم غير موجود" });
+          return new Response(JSON.stringify({ error: "المستخدم غير موجود" }), {
+            status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          });
         }
 
-        // ✅ منطق تسجيل الدخول الجديد:
-        // إذا كان للحساب كلمة مرور، لا ترجع بيانات المستخدم مباشرة.
         if (result.rows[0].Password) {
-          return res.status(200).json({ passwordRequired: true });
+          return new Response(JSON.stringify({ passwordRequired: true }), {
+            status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          });
         }
-        // أرجع بيانات المستخدم الذي تم العثور عليه
-        return res.status(200).json(result.rows[0]);
+        return new Response(JSON.stringify(result.rows[0]), {
+          status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
       }
 
       // إذا لم يتم توفير رقم هاتف، أرجع جميع المستخدمين
       const allUsers = await db.execute("SELECT id, username, phone, is_seller, user_key, Address FROM users");
-      return res.status(200).json(allUsers.rows);
-    } else if (req.method === "PUT") {
-      const updatesData = req.body;
+      return new Response(JSON.stringify(allUsers.rows), {
+        status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    } else if (request.method === "PUT") {
+      const updatesData = await request.json();
 
       // الحالة 1: تحديث مجموعة مستخدمين (مثل ترقية البائعين)
       if (Array.isArray(updatesData)) {
         console.log("[Logic] Entered: Bulk update users (is_seller).");
         if (updatesData.length === 0) {
-          return res.status(400).json({ error: "البيانات المرسلة غير صالحة." });
+          return new Response(JSON.stringify({ error: "البيانات المرسلة غير صالحة." }), {
+            status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          });
         }
 
         const tx = await db.transaction("write");
@@ -120,7 +142,9 @@ export default async function handler(req, res) {
             });
           }
           await tx.commit();
-          return res.status(200).json({ message: "تم تحديث المستخدمين بنجاح." });
+          return new Response(JSON.stringify({ message: "تم تحديث المستخدمين بنجاح." }), {
+            status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          });
         } catch (e) {
           await tx.rollback();
           throw e;
@@ -138,7 +162,9 @@ export default async function handler(req, res) {
             args: [phone, user_key],
           });
           if (existingUser.rows.length > 0) {
-            return res.status(409).json({ error: "رقم الهاتف هذا مستخدم بالفعل من قبل حساب آخر." });
+            return new Response(JSON.stringify({ error: "رقم الهاتف هذا مستخدم بالفعل من قبل حساب آخر." }), {
+              status: 409, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+            });
           }
         }
 
@@ -156,19 +182,28 @@ export default async function handler(req, res) {
 
         // التحقق من وجود حقول للتحديث قبل تنفيذ الاستعلام
         if (args.length <= 1) {
-          return res.status(400).json({ error: "لا توجد بيانات لتحديثها." });
+          return new Response(JSON.stringify({ error: "لا توجد بيانات لتحديثها." }), {
+            status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          });
         }
 
         await db.execute({ sql, args });
-        return res.status(200).json({ message: "تم تحديث بياناتك بنجاح." });
+        return new Response(JSON.stringify({ message: "تم تحديث بياناتك بنجاح." }), {
+          status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
       }
     }
 
-    console.log(`[Warning] No logic matched for ${req.method} ${req.url}.`);
-    return res.status(405).json({ error: "الطريقة غير مدعومة" });
+    console.log(`[Warning] No logic matched for ${request.method} ${request.url}.`);
+    return new Response(JSON.stringify({ error: "الطريقة غير مدعومة" }), {
+      status: 405, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    });
 
   } catch (err) {
     console.error("[FATAL ERROR]", err);
-    return res.status(500).json({ error: err.message });
+    return new Response(JSON.stringify({ error: err.message }), {
+      status: 500,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
   }
 }

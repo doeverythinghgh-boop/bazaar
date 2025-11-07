@@ -1,24 +1,31 @@
-import { createClient } from "@libsql/client";
+import { createClient } from "@libsql/client/web";
+
+export const config = {
+  runtime: 'edge',
+};
 
 const db = createClient({
   url: process.env.DATABASE_URL,
   authToken: process.env.TURSO_AUTH_TOKEN
 });
 
-export default async function handler(req, res) {
-  // ✅ CORS Headers
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-control-allow-methods", "GET, POST, PUT, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET, POST, PUT, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type',
+};
 
-  if (req.method === "OPTIONS") {
-    return res.status(200).end();
+export default async function handler(request) {
+  if (request.method === "OPTIONS") {
+    return new Response(null, { status: 204, headers: corsHeaders });
   }
 
-  // ✅ جلب منتجات خاصة بمستخدم معين
-  if (req.method === "GET") {
+  if (request.method === "GET") {
     try {
-      const { user_key, MainCategory, SubCategory } = req.query;
+      const { searchParams } = new URL(request.url);
+      const user_key = searchParams.get('user_key');
+      const MainCategory = searchParams.get('MainCategory');
+      const SubCategory = searchParams.get('SubCategory');
 
       let sql = "SELECT * FROM marketplace_products WHERE 1=1";
       const args = [];
@@ -43,16 +50,16 @@ export default async function handler(req, res) {
         args: args,
       });
 
-      return res.status(200).json(rows);
+      return new Response(JSON.stringify(rows), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     } catch (err) {
-      return res
-        .status(500)
-        .json({ error: "حدث خطأ أثناء جلب المنتجات: " + err.message });
+      return new Response(JSON.stringify({ error: "حدث خطأ أثناء جلب المنتجات: " + err.message }), {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
   }
 
-  // ✅ إضافة منتج جديد
-  if (req.method === "POST") {
+  if (request.method === "POST") {
     try {
       const {
         productName, // جديد
@@ -67,11 +74,14 @@ export default async function handler(req, res) {
         MainCategory,
         SubCategory,
         ImageIndex
-      } = req.body;
+      } = await request.json();
 
       // تحقق بسيط من وجود البيانات الأساسية
       if (!user_key || !product_key || !product_price || !product_quantity || !MainCategory || !productName) {
-        return res.status(400).json({ error: "البيانات الأساسية للمنتج مطلوبة." });
+        return new Response(JSON.stringify({ error: "البيانات الأساسية للمنتج مطلوبة." }), {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
       }
 
       await db.execute({
@@ -79,16 +89,21 @@ export default async function handler(req, res) {
         args: [productName, user_key, product_key, product_description, parseFloat(product_price), parseInt(product_quantity), user_message, user_note, ImageName, parseInt(MainCategory), parseInt(SubCategory) || null, parseInt(ImageIndex)]
       });
 
-      return res.status(201).json({ message: "تم إضافة المنتج إلى قاعدة البيانات بنجاح." });
+      return new Response(JSON.stringify({ message: "تم إضافة المنتج إلى قاعدة البيانات بنجاح." }), {
+        status: 201,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
 
     } catch (err) {
       console.error("Database insertion error:", err);
-      return res.status(500).json({ error: "حدث خطأ أثناء حفظ المنتج: " + err.message });
+      return new Response(JSON.stringify({ error: "حدث خطأ أثناء حفظ المنتج: " + err.message }), {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
   }
 
-  // ✅ تحديث منتج موجود
-  if (req.method === "PUT") {
+  if (request.method === "PUT") {
     try {
       const {
         productName, // جديد
@@ -102,11 +117,14 @@ export default async function handler(req, res) {
         MainCategory,
         SubCategory,
         ImageIndex
-      } = req.body;
+      } = await request.json();
 
       // التحقق من وجود مفتاح المنتج
       if (!product_key) {
-        return res.status(400).json({ error: "مفتاح المنتج مطلوب للتحديث." });
+        return new Response(JSON.stringify({ error: "مفتاح المنتج مطلوب للتحديث." }), {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
       }
 
       // بناء جملة التحديث ديناميكيًا
@@ -125,7 +143,10 @@ export default async function handler(req, res) {
 
       const updateEntries = Object.entries(fieldsToUpdate).filter(([key, value]) => value !== undefined);
       if (updateEntries.length === 0) {
-        return res.status(400).json({ error: "لا توجد بيانات لتحديثها." });
+        return new Response(JSON.stringify({ error: "لا توجد بيانات لتحديثها." }), {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
       }
 
       const setClause = updateEntries.map(([key]) => `${key} = ?`).join(', ');
@@ -135,13 +156,21 @@ export default async function handler(req, res) {
         args: args
       });
 
-      return res.status(200).json({ message: "تم تحديث المنتج بنجاح." });
+      return new Response(JSON.stringify({ message: "تم تحديث المنتج بنجاح." }), {
+        status: 200,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
 
     } catch (err) {
       console.error("Database update error:", err);
-      return res.status(500).json({ error: "حدث خطأ أثناء تحديث المنتج: " + err.message });
+      return new Response(JSON.stringify({ error: "حدث خطأ أثناء تحديث المنتج: " + err.message }), {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
   }
 
-  return res.status(405).json({ error: "الطريقة غير مدعومة" });
+  return new Response(JSON.stringify({ error: "الطريقة غير مدعومة" }), {
+    status: 405, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+  });
 }
