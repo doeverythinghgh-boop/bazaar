@@ -68,6 +68,7 @@ export default async function handler(request) {
         product_description,
         product_price,
         product_quantity,
+        original_price, // ✅ إضافة: استقبال السعر الأصلي
         user_message,
         user_note,
         ImageName,
@@ -85,8 +86,8 @@ export default async function handler(request) {
       }
 
       await db.execute({
-        sql: "INSERT INTO marketplace_products (productName, user_key, product_key, product_description, product_price, product_quantity, user_message, user_note, ImageName, MainCategory, SubCategory, ImageIndex) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-        args: [productName, user_key, product_key, product_description, parseFloat(product_price), parseInt(product_quantity), user_message, user_note, ImageName, parseInt(MainCategory), parseInt(SubCategory) || null, parseInt(ImageIndex)]
+        sql: "INSERT INTO marketplace_products (productName, user_key, product_key, product_description, product_price, original_price, product_quantity, user_message, user_note, ImageName, MainCategory, SubCategory, ImageIndex) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        args: [productName, user_key, product_key, product_description, parseFloat(product_price), original_price ? parseFloat(original_price) : null, parseInt(product_quantity), user_message, user_note, ImageName, parseInt(MainCategory), parseInt(SubCategory) || null, parseInt(ImageIndex)]
       });
 
       return new Response(JSON.stringify({ message: "تم إضافة المنتج إلى قاعدة البيانات بنجاح." }), {
@@ -111,6 +112,7 @@ export default async function handler(request) {
         product_description,
         product_price,
         product_quantity,
+        original_price, // ✅ إضافة: استقبال السعر الأصلي
         user_message,
         user_note,
         ImageName,
@@ -132,6 +134,7 @@ export default async function handler(request) {
         productName,
         product_description,
         product_price: product_price !== undefined ? parseFloat(product_price) : undefined,
+        original_price: original_price !== undefined ? (original_price ? parseFloat(original_price) : null) : undefined, // ✅ إضافة: معالجة السعر الأصلي
         product_quantity: product_quantity !== undefined ? parseInt(product_quantity) : undefined,
         user_message,
         user_note,

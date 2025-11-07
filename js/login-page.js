@@ -579,16 +579,6 @@ async function showMyProducts(userKey) {
       // تحويل كائن المنتج إلى نص JSON لاستخدامه في زر التعديل
       const productJson = JSON.stringify(p);
 
-      // جديد: بناء جزء التاريخ فقط إذا كان الحقل موجودًا وصالحًا
-      let dateHtml = '';
-      if (p.created_at) {
-        const date = new Date(p.created_at);
-        // التحقق من أن التاريخ صالح قبل عرضه
-        if (!isNaN(date.getTime())) {
-          dateHtml = `<p><strong>تاريخ الإضافة:</strong> ${date.toLocaleDateString('ar-EG')}</p>`;
-        }
-      }
-
       // جديد: بناء جزء السعر مع السعر الأصلي إذا كان موجودًا
       let priceHtml = `<p><strong>السعر:</strong> ${p.product_price} جنيه</p>`;
       if (p.original_price && parseFloat(p.original_price) > 0) {
@@ -606,7 +596,6 @@ async function showMyProducts(userKey) {
             ${priceHtml}
             <p><strong>الكمية:</strong> ${p.product_quantity}</p>
             <p><strong>ملاحظات خاصة:</strong> ${p.user_note || 'لا يوجد'}</p>
-            ${dateHtml}
           </td>
           <td class="actions-cell">
             <button class="button logout-btn-small edit-product-btn" data-product='${productJson}'>
