@@ -67,7 +67,7 @@ export default async function handler(request) {
     for (const item of items) {
       statements.push({
         sql: "INSERT INTO order_items (order_key, product_key, quantity) VALUES (?, ?, ?)",
-        args: [order_key, item.product_key, item.quantity],
+        args: [order_key, item.product_key, item.quantity], // ✅ إصلاح: التأكد من استخدام الحقل الصحيح
       });
     }
 

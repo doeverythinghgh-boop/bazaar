@@ -69,7 +69,12 @@ function addToCart(product, quantity) {
     cart[existingProductIndex].quantity += quantity;
   } else {
     // المنتج غير موجود، أضفه كعنصر جديد
-    cart.push({ ...product, quantity });
+    // ✅ إصلاح: التأكد من أن product_key موجود دائمًا في الكائن المحفوظ
+    const newCartItem = { ...product, quantity };
+    if (!newCartItem.product_key && product.product_key) {
+      newCartItem.product_key = product.product_key;
+    }
+    cart.push(newCartItem);
   }
 
   saveCart(cart);

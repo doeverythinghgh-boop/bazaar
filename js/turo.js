@@ -410,9 +410,9 @@ window.showProductDetails = async function(productData) {
       const quantity = parseInt(document.getElementById('product-modal-selected-quantity').value, 10);
       const productInfoForCart = {
         product_key: productData.product_key,
-        productName: productData.productName,
-        price: productData.price,
-        image: productData.image
+        productName: productData.productName, // اسم المنتج
+        price: productData.pricePerItem,      // ✅ إصلاح: استخدام السعر الصحيح
+        image: productData.imageSrc[0]        // ✅ إصلاح: استخدام الصورة الأولى كصورة للسلة
       };
       addToCart(productInfoForCart, quantity);
     } else {
