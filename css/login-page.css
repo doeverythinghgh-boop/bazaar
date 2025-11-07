@@ -1,0 +1,156 @@
+/*
+  @file login-page.css
+  @description أنماط خاصة بصفحة تسجيل الدخول ولوحة تحكم المستخدم.
+
+  هذه الأنماط كانت مضمنة في ملف login.html وتم نقلها هنا لتحسين التنظيم.
+*/
+
+/* جديد: تنسيق حاوية كلمة المرور مع أيقونة العين */
+.swal2-password-container {
+  position: relative;
+}
+.swal2-password-container .swal2-input {
+  padding-left: 2.5rem; /* مساحة للأيقونة */
+}
+.swal2-password-toggle-icon {
+  position: absolute;
+  left: 10px; /* لليمين في RTL */
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #7066e0;
+}
+/* Custom style for the smaller logout button */
+.logout-btn-small {
+  width: auto; /* Override full width */
+  padding: 10px 20px; /* Smaller padding */
+  font-size: 16px; /* Adjust font size */
+  display: inline-flex; /* To align icon and text */
+  align-items: center;
+  gap: 8px; /* Space between icon and text */
+  justify-content: center;
+}
+.action-buttons {
+  display: flex;
+  gap: 15px; /* Space between buttons */
+  margin-top: 20px;
+  justify-content: center;
+  flex-wrap: wrap; /* Allow buttons to wrap on smaller screens */
+}
+/* Center the table container */
+#users-table-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+/* تحديد عرض أقصى للجدول وتوسيطه */
+.users-table {
+  width: 100%;
+  max-width: 600px; /* يمكنك تعديل هذا العرض حسب الحاجة */
+  margin: 20px auto 0 auto; /* توسيط الجدول تلقائيًا */
+}
+/* Custom styles for smaller SweetAlert2 modals */
+/* جديد: تنسيق جدول المنتجات */
+#my-products-container {
+  width: 100%;
+  max-width: 900px; /* عرض أكبر لجدول المنتجات */
+  margin-top: 20px;
+  display: none; /* إخفاء مبدئي */
+}
+.products-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+.products-table th, .products-table td {
+  border: 1px solid #e0e0e0;
+  padding: 12px;
+  text-align: right;
+  vertical-align: middle; /* تعديل: توسيط المحتوى عمودياً */
+}
+/* جديد: تنسيق خاص لعمود الإجراءات */
+.products-table td.actions-cell {
+  text-align: center; /* توسيط الأزرار */
+  border: 1px solid #e0e0e0;
+  padding: 12px;
+  text-align: right;
+  vertical-align: top;
+}
+.products-table th {
+  background-color: #f7f7f7;
+}
+.products-table img {
+  max-width: 100px;
+  border-radius: 8px;
+}
+.product-details p {
+  margin: 0 0 8px 0;
+}
+.product-details strong {
+  color: #333;
+}
+/* جديد: تنسيق حاوية الصور المصغرة في جدول المنتجات */
+.product-images-container {
+  display: flex;
+  flex-wrap: wrap; /* السماح للصور بالالتفاف */
+  gap: 8px; /* مسافة بين الصور */
+  justify-content: flex-start; /* محاذاة الصور من اليمين */
+}
+.product-images-container img {
+  max-width: 80px; /* تصغير حجم الصور لتناسب المساحة */
+  height: auto;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+}
+
+.swal2-popup {
+  width: auto !important;
+  max-width: 480px; /* عرض أقصى للرسالة */
+  font-size: 0.9rem; /* تصغير حجم الخط العام داخل الرسالة */
+}
+.swal2-title {
+  font-size: 1.25rem !important; /* تصغير حجم العنوان */
+}
+.swal2-html-container {
+  font-size: 1rem !important; /* التحكم في حجم خط المحتوى */
+}
+.swal2-styled {
+  padding: 8px 16px !important; /* تصغير حجم الأزرار */
+  font-size: 0.9rem !important;
+  margin: 5px;
+}
+/* تعديل خاص للشاشات الصغيرة جداً */
+@media (max-width: 500px) {
+  .swal2-popup {
+    width: 90% !important; /* استخدام نسبة مئوية من عرض الشاشة */
+  }
+}
+/* جديد: أنماط مودال السلة */
+#cart-modal-container .modal-content { max-width: 800px; }
+.cart-item { display: flex; align-items: center; gap: 15px; padding: 10px 0; border-bottom: 1px solid #eee; }
+.cart-item img { width: 80px; height: 80px; object-fit: cover; border-radius: 8px; }
+.cart-item-details { flex-grow: 1; }
+.cart-total { text-align: left; font-size: 1.2rem; font-weight: bold; margin-top: 20px; }
+/* ✅ إصلاح: ضمان ظهور رسالة التأكيد فوق نافذة السلة */
+.swal2-container {
+  z-index: 2000 !important;
+}
+/* جديد: تنسيق موديول المشتريات */
+#purchases-modal-container .modal-content { max-width: 800px; }
+.purchase-item {
+  display: flex;
+  gap: 15px;
+  padding: 15px;
+  border: 1px solid #eee;
+  border-radius: 12px;
+  margin-bottom: 15px;
+  background-color: #f9f9f9;
+  animation: slide-fade-in 0.5s ease-out forwards;
+}
+.purchase-item img { width: 100px; height: 100px; object-fit: cover; border-radius: 8px; }
+.purchase-item-details { flex-grow: 1; }
+.purchase-item-details p { margin: 0 0 8px 0; }
+.purchase-status { font-weight: bold; padding: 4px 8px; border-radius: 6px; color: white; }
+.status-pending { background-color: #f39c12; } /* قيد المعالجة */
+.status-shipped { background-color: #3498db; } /* جارٍ الشحن */
+.status-delivered { background-color: #2ecc71; } /* تم التسليم */
