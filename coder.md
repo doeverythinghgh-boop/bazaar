@@ -135,12 +135,14 @@ CREATE TABLE IF NOT EXISTS orders (
 ### جدول `order_items`
 ```sql
 CREATE TABLE order_items (
-  order_key TEXT NOT NULL,                 -- لربط هذا العنصر بالطلب الرئيسي في جدول `orders`
-  product_key TEXT NOT NULL,               -- لربط العنصر بالمنتج في جدول `marketplace_products`
-  quantity INTEGER NOT NULL,               -- الكمية التي طلبها العميل من هذا المنتج
+  order_key TEXT NOT NULL,
+  product_key TEXT NOT NULL,
+  quantity INTEGER NOT NULL,
+  seller_key TEXT,  -- البائع (نفس user_key من جدول المنتجات)
 
   FOREIGN KEY (order_key) REFERENCES orders(order_key) ON DELETE CASCADE ON UPDATE CASCADE,
-  FOREIGN KEY (product_key) REFERENCES marketplace_products(product_key) ON DELETE CASCADE ON UPDATE CASCADE
+  FOREIGN KEY (product_key) REFERENCES marketplace_products(product_key) ON DELETE CASCADE ON UPDATE CASCADE,
+  FOREIGN KEY (seller_key) REFERENCES users(user_key) ON DELETE CASCADE ON UPDATE CASCADE
 );
 ```
 

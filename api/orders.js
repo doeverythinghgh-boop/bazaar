@@ -66,8 +66,8 @@ export default async function handler(request) {
     // 2. إضافة كل عنصر من عناصر السلة إلى جدول `order_items`
     for (const item of items) {
       statements.push({
-        sql: "INSERT INTO order_items (order_key, product_key, quantity) VALUES (?, ?, ?)",
-        args: [order_key, item.product_key, item.quantity], // ✅ إصلاح: التأكد من استخدام الحقل الصحيح
+        sql: "INSERT INTO order_items (order_key, product_key, quantity, seller_key) VALUES (?, ?, ?, ?)",
+        args: [order_key, item.product_key, item.quantity, item.seller_key], // ✅ إضافة: حفظ مفتاح البائع
       });
     }
 

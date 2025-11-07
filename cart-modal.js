@@ -137,7 +137,11 @@ async function handleCheckout() {
     order_key: orderKey,
     user_key: loggedInUser.user_key,
     total_amount: totalAmount,
-    items: cart.map(item => ({ product_key: item.product_key, quantity: item.quantity }))
+    items: cart.map(item => ({
+      product_key: item.product_key,
+      quantity: item.quantity,
+      seller_key: item.seller_key // ✅ إضافة: إرسال مفتاح البائع مع كل عنصر
+    }))
   };
   console.log('[Checkout] جاري إرسال بيانات الطلب:', orderData);
 
