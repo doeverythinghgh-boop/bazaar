@@ -280,11 +280,13 @@
 
             if (result && result.message) {
               // حفظ بيانات المستخدم في التخزين المحلي لتسجيل دخوله
-              // نحتاج لجلب المستخدم مرة أخرى للتأكد من حصولنا على كل البيانات المحدثة من الخادم
+              // ✅ إصلاح: التأكد من حفظ جميع البيانات التي أدخلها المستخدم، بما في ذلك العنوان
               const loggedInUserData = {
                 username: newUser.username,
                 phone: newUser.phone,
                 user_key: newUser.user_key,
+                Address: newUser.address, // إضافة العنوان إلى الكائن المحفوظ
+                is_seller: 0 // إضافة قيمة افتراضية لحالة البائع
               };
               localStorage.setItem("loggedInUser", JSON.stringify(loggedInUserData));
 

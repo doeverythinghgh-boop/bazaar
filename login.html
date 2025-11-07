@@ -471,7 +471,7 @@
           togglePasswordVisibility('swal-password', 'swal-toggle-password');
           togglePasswordVisibility('swal-confirm-password', 'swal-toggle-confirm-password');
         },
-        preConfirm: () => {
+        preConfirm: async () => { // تحويل الدالة إلى async
           const username = document.getElementById('swal-username').value;
           const phone = document.getElementById('swal-phone').value;
           const address = document.getElementById('swal-address').value;
@@ -490,6 +490,41 @@
           if (password && password !== confirmPassword) {
             Swal.showValidationMessage('كلمتا المرور غير متطابقتين.');
             return false;
+          }
+
+          // جديد: إذا تم إدخال كلمة مرور جديدة، تحقق من القديمة أولاً
+          if (password) {
+            const { value: oldPassword } = await Swal.fire({
+              title: 'التحقق من الهوية',
+              text: 'لتغيير كلمة المرور، الرجاء إدخال كلمة المرور القديمة.',
+              input: 'password',
+              inputPlaceholder: 'أدخل كلمة المرور القديمة',
+              inputAttributes: { autocapitalize: 'off', autocorrect: 'off' },
+              showCancelButton: true,
+              confirmButtonText: 'تحقق',
+              cancelButtonText: 'إلغاء',
+              showLoaderOnConfirm: true,
+              preConfirm: async (enteredOldPassword) => {
+                if (!enteredOldPassword) {
+                  Swal.showValidationMessage('يجب إدخال كلمة المرور القديمة.');
+                  return false;
+                }
+                // استدعاء الواجهة البرمجية للتحقق من كلمة المرور القديمة
+                const verificationResult = await verifyUserPassword(currentUser.phone, enteredOldPassword);
+                if (verificationResult.error) {
+                  Swal.showValidationMessage(`كلمة المرور القديمة غير صحيحة.`);
+                  return false;
+                }
+                return true; // كلمة المرور صحيحة
+              },
+              allowOutsideClick: () => !Swal.isLoading()
+            });
+
+            // إذا لم يقم المستخدم بالتحقق أو ألغى العملية، أوقف التحديث
+            if (!oldPassword) {
+              Swal.showValidationMessage('تم إلغاء تغيير كلمة المرور.');
+              return false;
+            }
           }
 
           // تجميع البيانات التي تغيرت فقط
@@ -670,7 +705,7 @@
         modalContent += `
           <div class="action-buttons" style="margin-top: 20px;">
             <button id="clear-cart-btn" class="button logout-btn-small" style="background-color: #e74c3c;">إفراغ السلة</button>
-            <button class="button logout-btn-small" style="background-color: #2ecc71;">إتمام الشراء</button>
+            <button id="checkout-btn" class="button logout-btn-small" style="background-color: #2ecc71;">إتمام الشراء</button>
           </div>`;
       } else {
         modalContent += '<p style="text-align: center; padding: 2rem 0;">سلة المشتريات فارغة.</p>';
@@ -718,8 +753,84 @@
           });
         });
       }
+
+      // جديد: حدث النقر على زر "إتمام الشراء"
+      const checkoutBtn = document.getElementById('checkout-btn');
+      if (checkoutBtn) {
+        checkoutBtn.addEventListener('click', handleCheckout);
+      }
     }
 
+    /**
+     * جديد: دالة لتوليد مفتاح فريد للطلب (3 أرقام و 3 أحرف).
+     * @returns {string} مفتاح الطلب.
+     */
+    function generateOrderKey() {
+      const chars = "abcdefghijklmnopqrstuvwxyz";
+      const nums = "0123456789";
+      let key = "";
+      for (let i = 0; i < 3; i++) {
+        key += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      for (let i = 0; i < 3; i++) {
+        key += nums.charAt(Math.floor(Math.random() * nums.length));
+      }
+      // خلط الحروف والأرقام
+      return key.split('').sort(() => 0.5 - Math.random()).join('');
+    }
+
+    /**
+     * جديد: يعالج عملية إتمام الشراء.
+     */
+    async function handleCheckout() {
+      // 1. جلب البيانات
+      const loggedInUser = JSON.parse(localStorage.getItem("loggedInUser"));
+      const cart = getCart();
+
+      // التحقق من الشروط
+      if (!loggedInUser || !loggedInUser.user_key) {
+        Swal.fire('خطأ', 'يرجى تسجيل الدخول أولاً لإتمام عملية الشراء.', 'warning');
+        return;
+      }
+      if (cart.length === 0) {
+        Swal.fire('السلة فارغة', 'لا توجد منتجات في السلة لإتمام الشراء.', 'info');
+        return;
+      }
+
+      // 2. حساب المبلغ الإجمالي وإنشاء مفتاح الطلب
+      const totalAmount = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+      const orderKey = generateOrderKey();
+
+      const orderData = {
+        order_key: orderKey,
+        user_key: loggedInUser.user_key,
+        total_amount: totalAmount,
+        items: cart.map(item => ({ product_key: item.product_key, quantity: item.quantity }))
+      };
+
+      // إظهار رسالة تأكيد
+      const result = await Swal.fire({
+        title: 'تأكيد الطلب',
+        text: `المبلغ الإجمالي هو ${totalAmount.toFixed(2)} جنيه. هل تريد المتابعة؟`,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'نعم، أرسل الطلب!',
+        cancelButtonText: 'إلغاء',
+        showLoaderOnConfirm: true,
+        preConfirm: async () => {
+          return await createOrder(orderData);
+        },
+        allowOutsideClick: () => !Swal.isLoading()
+      });
+
+      if (result.isConfirmed && result.value && !result.value.error) {
+        clearCart(); // هذه الدالة تحذف السلة وتطلق حدث 'cartUpdated'
+        closeCartModal(); // إغلاق نافذة السلة
+        Swal.fire('تم إتمام طلبك بنجاح 🎉', `رقم الطلب: ${result.value.order_key}`, 'success');
+      } else if (result.value && result.value.error) {
+        Swal.fire('حدث خطأ', `فشل إرسال الطلب: ${result.value.error}`, 'error');
+      }
+    }
 
     /**
      * جديد: يعرض جدولاً بمنتجات المستخدم الحالي.

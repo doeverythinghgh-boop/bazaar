@@ -282,6 +282,36 @@ async function verifyUserPassword(phone, password) {
 }
 
 /**
+ * جديد: ينشئ طلبًا جديدًا في قاعدة البيانات.
+ * @param {object} orderData - بيانات الطلب.
+ * @param {string} orderData.order_key - المفتاح الفريد للطلب.
+ * @param {string} orderData.user_key - مفتاح المستخدم.
+ * @param {number} orderData.total_amount - المبلغ الإجمالي.
+ * @param {Array<object>} orderData.items - مصفوفة عناصر السلة.
+ * @returns {Promise<Object>} كائن الاستجابة من الخادم.
+ */
+async function createOrder(orderData) {
+  try {
+    const response = await fetch(`${baseURL}/api/orders`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(orderData),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      return { error: data.error || `HTTP error! status: ${response.status}` };
+    }
+
+    return data;
+  } catch (error) {
+    console.error("فشل في إنشاء الطلب:", error);
+    return { error: "فشل الاتصال بالخادم عند إنشاء الطلب." };
+  }
+}
+
+/**
  * @file js/turo.js
  * @description ... (بقية الوصف كما هو)
  * ... (بقية الدوال كما هي)

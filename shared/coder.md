@@ -106,6 +106,33 @@ CREATE TABLE marketplace_products (
   ImageIndex INTEGER,
   FOREIGN KEY (user_key) REFERENCES users (user_key)
 );
+
+### جدول `orders`
+```sql
+CREATE TABLE orders (
+  order_key TEXT NOT NULL UNIQUE,          -- مفتاح فريد لتمييز الطلب (مثل ord_a1b2c3) يمكن إنشاؤه برمجياً
+  user_key TEXT NOT NULL,                  -- لربط الطلب بالمستخدم الذي قام به
+  total_amount REAL NOT NULL,              -- المبلغ الإجمالي للطلب
+  order_status TEXT NOT NULL DEFAULT 'pending', -- حالة الطلب (pending, processing, shipped, delivered, cancelled)
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- تاريخ ووقت إنشاء الطلب
+
+  -- العلاقة مع جدول المستخدمين
+  FOREIGN KEY (user_key) REFERENCES users(user_key)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+);
+```
+
+### جدول `order_items`
+```sql
+CREATE TABLE order_items (
+  order_key TEXT NOT NULL,                 -- لربط هذا العنصر بالطلب الرئيسي في جدول `orders`
+  product_key TEXT NOT NULL,               -- لربط العنصر بالمنتج في جدول `marketplace_products`
+  quantity INTEGER NOT NULL,               -- الكمية التي طلبها العميل من هذا المنتج
+
+  FOREIGN KEY (order_key) REFERENCES orders(order_key) ON DELETE CASCADE ON UPDATE CASCADE,
+  FOREIGN KEY (product_key) REFERENCES marketplace_products(product_key) ON DELETE CASCADE ON UPDATE CASCADE
+);
 ```
 
 ## 6. هيكل الملفات وشرحها (File Structure & Breakdown)
@@ -129,9 +156,10 @@ CREATE TABLE marketplace_products (
 
 - **`api/users.js`**: لإدارة بيانات المستخدمين (إنشاء، جلب، تحديث).
   - `POST /api/users`: إنشاء مستخدم جديد.
+  - `POST /api/users` (مع `action: 'verify'`): للتحقق من صحة كلمة مرور المستخدم.
   - `GET /api/users`: جلب كل المستخدمين.
   - `GET /api/users?phone={phone}`: جلب مستخدم معين.
-  - `PUT /api/users`: تحديث مجموعة مستخدمين (مثل ترقيتهم لبائعين).
+  - `PUT /api/users`: تحديث بيانات مستخدم واحد (تعديل الملف الشخصي) أو مجموعة مستخدمين (مثل ترقيتهم لبائعين).
 
 - **`api/products.js`**: لإدارة بيانات المنتجات.
   - `POST /api/products`: إنشاء منتج جديد.
@@ -161,7 +189,7 @@ CREATE TABLE marketplace_products (
     - `turo.js` يرسل طلب `POST` إلى `api/users.js` مع بيانات المستخدم الجديد (`username`, `phone`, `user_key`).
 5.  **قاعدة البيانات**: `api/users.js` يقوم بحفظ المستخدم الجديد في جدول `users`. إذا كان رقم الهاتف موجودًا بالفعل، يتم إرجاع خطأ.
 6.  **تسجيل الدخول التلقائي**: بعد النجاح، يتم حفظ بيانات المستخدم في `LocalStorage` وتوجيهه إلى الصفحة الرئيسية كـ "مسجل دخوله".
-
+ 
 ### تسجيل الدخول
 
 1.  **الواجهة الأمامية**: المستخدم يدخل رقم هاتفه في `login.html`.
@@ -174,6 +202,24 @@ CREATE TABLE marketplace_products (
 6.  **تحديث الواجهة**:
     - يتم تحديث الواجهة في `login.html` لإظهار رسالة ترحيب وأزرار التحكم (مثل "إضافة منتج").
     - يتم استدعاء `updateCartBadge()` لتحميل شارة السلة الخاصة بالمستخدم.
+
+### تعديل بيانات المستخدم
+
+1.  **الواجهة الأمامية**: بعد تسجيل الدخول، يضغط المستخدم على زر "تعديل البيانات" في `login.html`.
+2.  **عرض النموذج**: تظهر نافذة منبثقة (`SweetAlert2`) تعرض بيانات المستخدم الحالية (الاسم، رقم الهاتف، العنوان) وتوفر حقولاً لتغيير كلمة المرور.
+3.  **التحقق من كلمة المرور القديمة (إذا لزم الأمر)**:
+    - إذا قام المستخدم بإدخال كلمة مرور جديدة، تظهر نافذة منبثقة أخرى تطلب منه إدخال كلمة المرور القديمة.
+    - يتم استدعاء `verifyUserPassword()` من `js/turo.js`، والتي ترسل طلب `POST` إلى `api/users.js` مع `action: 'verify'`.
+    - إذا كانت كلمة المرور القديمة غير صحيحة، تتوقف العملية.
+4.  **إرسال التحديثات**:
+    - بعد التحقق (أو إذا لم يتم تغيير كلمة المرور)، يتم تجميع البيانات التي تغيرت فقط.
+    - يتم استدعاء دالة `updateUser()` في `js/turo.js`.
+    - `turo.js` يرسل طلب `PUT` إلى `api/users.js` مع البيانات المحدثة و`user_key` لتحديد المستخدم.
+5.  **الواجهة الخلفية**:
+    - `api/users.js` يستقبل الطلب ويمنع تعديل `user_key`.
+    - إذا تم تغيير رقم الهاتف، يتم التحقق من عدم تكراره.
+    - يتم تنفيذ جملة `UPDATE` ديناميكية لتحديث الحقول المطلوبة فقط.
+6.  **تحديث الواجهة**: عند استلام استجابة النجاح، يتم تحديث بيانات المستخدم في `LocalStorage` فورًا وعرض رسالة نجاح.
 
 ### إضافة منتج جديد (للبائع)
 
