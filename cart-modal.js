@@ -165,8 +165,11 @@ async function handleCheckout() {
   if (result.isConfirmed && result.value && !result.value.error) {
     console.log('[Checkout] نجاح! تم تأكيد الطلب من قبل المستخدم وإنشاءه بنجاح.');
     clearCart(); // هذه الدالة تحذف السلة وتطلق حدث 'cartUpdated'
-    // لا حاجة لاستدعاء closeCartModal() هنا لأن Swal سيغلق النافذة
-    Swal.fire('تم إتمام طلبك بنجاح 🎉', `رقم الطلب: ${result.value.order_key}`, 'success');
+
+    // ✅ إصلاح: عرض رسالة النجاح، وبعد إغلاقها، يتم إعادة رسم نافذة السلة لتظهر فارغة.
+    Swal.fire('تم إتمام طلبك بنجاح 🎉', 'success').then(() => {
+      showCartModal(); // إعادة رسم المودال ليظهر فارغًا
+    });
   } else if (result.value && result.value.error) {
     console.error('[Checkout] فشل! الخادم أعاد خطأ:', result.value.error);
     Swal.fire('حدث خطأ', `فشل إرسال الطلب: ${result.value.error}`, 'error');
