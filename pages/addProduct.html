@@ -326,9 +326,9 @@
         <label for="product-price"><i class="fas fa-dollar-sign"></i>سعر القطعة</label>
         <input type="text" inputmode="decimal" id="product-price" name="product-price" placeholder="بالجنيه" required>
       </div>
-      <!-- جديد: حقل السعر الأصلي -->
+      <!-- جديد: حقل السعر قبل الخصم -->
       <div class="form-group">
-        <label for="original-price"><i class="fas fa-tag"></i>السعر الأصلي (قبل الخصم)</label>
+        <label for="original-price"><i class="fas fa-tag"></i>السعر قبل الخصم (قبل الخصم)</label>
         <input type="text" inputmode="decimal" id="original-price" name="original-price" placeholder="اختياري">
       </div>
     </div>
@@ -835,7 +835,7 @@ window.productModule = (function() {
     if (priceInput.value) clearError(priceInput);
   });
   
-  // جديد: التحقق من حقل السعر الأصلي
+  // جديد: التحقق من حقل السعر قبل الخصم
   originalPriceInput.addEventListener('input', () => {
     let value = originalPriceInput.value.replace(/[^0-9.]/g, '');
     const parts = value.split('.');

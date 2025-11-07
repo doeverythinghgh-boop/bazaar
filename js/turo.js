@@ -358,7 +358,7 @@ window.showProductDetails = async function(productData) {
   // تعبئة البيانات
   document.getElementById("product-modal-name").textContent = productData.productName || "تفاصيل المنتج";
   document.getElementById("product-modal-quantity").textContent = productData.availableQuantity;
-  // ✅ تعديل: التعامل مع السعر الأصلي
+  // ✅ تعديل: التعامل مع السعر قبل الخصم
   document.getElementById("product-modal-price").textContent = `${productData.pricePerItem} جنيه`;
   document.getElementById("product-modal-description").textContent = productData.description || "لا يوجد وصف متاح.";
   document.getElementById("product-modal-seller-message").textContent = productData.sellerMessage || "لا توجد رسالة من البائع.";
@@ -375,17 +375,20 @@ window.showProductDetails = async function(productData) {
     thumbnailsContainer.appendChild(thumb);
   });
 
-  // ✅ إضافة: عرض السعر الأصلي إذا كان موجودًا ومختلفًا عن السعر الحالي
+  // ✅ إضافة: عرض السعر قبل الخصم إذا كان موجودًا ومختلفًا عن السعر الحالي
+  const originalPriceContainer = document.getElementById("product-modal-original-price-container");
   const originalPriceEl = document.getElementById("product-modal-original-price");
   // ✅ تحسين: التحقق من وجود القيم قبل المقارنة لتجنب الأخطاء
   const originalPrice = productData.original_price ? parseFloat(productData.original_price) : 0;
   const currentPrice = productData.pricePerItem ? parseFloat(productData.pricePerItem) : 0;
 
-  if (originalPrice > 0 && originalPrice > currentPrice) {
-    originalPriceEl.textContent = `${productData.original_price} جنيه`;
-    originalPriceEl.style.display = 'inline';
+  if (originalPrice > 0 && originalPrice !== currentPrice) {
+    originalPriceEl.textContent = `${originalPrice.toFixed(2)} جنيه`;
+    originalPriceContainer.style.display = 'block'; // إظهار الحاوية بأكملها
   } else {
-    originalPriceEl.style.display = 'none';
+    // ✅ إصلاح: إفراغ المحتوى بالإضافة إلى الإخفاء لمنع ظهور "undefined"
+    originalPriceContainer.style.display = 'none'; // إخفاء الحاوية بأكملها
+    originalPriceEl.textContent = '';
   }
 
 
@@ -451,8 +454,8 @@ window.showProductDetails = async function(productData) {
       const productInfoForCart = {
         product_key: productData.product_key,
         productName: productData.productName, // اسم المنتج
-        price: productData.pricePerItem,      // ✅ إصلاح: استخدام السعر الصحيح
-        original_price: productData.original_price, // ✅ إضافة: تمرير السعر الأصلي
+        price: productData.pricePerItem,      // ✅ إصلاح: استخدام السعر الصحيح (pricePerItem)
+        original_price: productData.original_price, // ✅ إضافة: تمرير السعر قبل الخصم
         image: productData.imageSrc[0],       // ✅ إصلاح: استخدام الصورة الأولى كصورة للسلة
         seller_key: productData.user_key      // ✅ إضافة: تضمين مفتاح البائع
       };

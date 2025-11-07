@@ -70,7 +70,7 @@ export default async function handler(request) {
         product_description,
         product_price,
         product_quantity,
-        original_price, // ✅ إضافة: استقبال السعر الأصلي
+        original_price, // ✅ إضافة: استقبال السعر قبل الخصم
         user_message,
         user_note,
         ImageName,
@@ -114,7 +114,7 @@ export default async function handler(request) {
         product_description,
         product_price,
         product_quantity,
-        original_price, // ✅ إضافة: استقبال السعر الأصلي
+        original_price, // ✅ إضافة: استقبال السعر قبل الخصم
         user_message,
         user_note,
         ImageName,
@@ -136,7 +136,7 @@ export default async function handler(request) {
         productName,
         product_description,
         product_price: product_price !== undefined ? parseFloat(product_price) : undefined,
-        original_price: original_price !== undefined ? (original_price ? parseFloat(original_price) : null) : undefined, // ✅ إضافة: معالجة السعر الأصلي
+        original_price: original_price !== undefined ? (original_price ? parseFloat(original_price) : null) : undefined, // ✅ إضافة: معالجة السعر قبل الخصم
         product_quantity: product_quantity !== undefined ? parseInt(product_quantity) : undefined,
         user_message,
         user_note,

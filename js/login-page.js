@@ -579,10 +579,10 @@ async function showMyProducts(userKey) {
       // تحويل كائن المنتج إلى نص JSON لاستخدامه في زر التعديل
       const productJson = JSON.stringify(p);
 
-      // جديد: بناء جزء السعر مع السعر الأصلي إذا كان موجودًا
+      // جديد: بناء جزء السعر مع السعر قبل الخصم إذا كان موجودًا
       let priceHtml = `<p><strong>السعر:</strong> ${p.product_price} جنيه</p>`;
       if (p.original_price && parseFloat(p.original_price) > 0) {
-        priceHtml += `<p><strong>السعر الأصلي:</strong> <span style="text-decoration: line-through; color: #7f8c8d;">${p.original_price} جنيه</span></p>`;
+        priceHtml += `<p><strong>السعر قبل الخصم:</strong> <span style="text-decoration: line-through; color: #7f8c8d;">${p.original_price} جنيه</span></p>`;
       }
 
 

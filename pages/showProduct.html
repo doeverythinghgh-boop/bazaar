@@ -133,7 +133,7 @@
     z-index: 3000 !important; /* استخدام قيمة z-index عالية جدًا */
   }
 
-  /* ✅ إضافة: تنسيق السعر الأصلي المشطوب */
+  /* ✅ إضافة: تنسيق السعر قبل الخصم المشطوب */
   #product-modal-original-price {
     text-decoration: line-through;
     color: #95a5a6;
@@ -162,9 +162,13 @@
       الكمية المتاحة:
       <span id="product-modal-quantity"></span>
     </p>
+    <!-- ✅ تعديل: فصل السعر قبل الخصم في سطر خاص به -->
+    <p id="product-modal-original-price-container" style="display: none;">
+      <i class="fas fa-tags" style="color: #95a5a6;"></i> السعر قبل الخصم:
+      <span id="product-modal-original-price"></span>
+    </p>
     <p id="product-modal-price-container">
       <i class="fas fa-tag" id="product-modal-price-icon"></i> سعر القطعة:
-      <span id="product-modal-original-price"></span> <!-- ✅ إضافة: عنصر للسعر الأصلي -->
       <span id="product-modal-price"></span>
     </p>
     <!-- ✅ إضافة: قسم وصف المنتج -->
