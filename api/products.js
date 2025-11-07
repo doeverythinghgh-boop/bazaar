@@ -109,9 +109,30 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: "مفتاح المنتج مطلوب للتحديث." });
       }
 
+      // بناء جملة التحديث ديناميكيًا
+      const fieldsToUpdate = {
+        productName,
+        product_description,
+        product_price: product_price !== undefined ? parseFloat(product_price) : undefined,
+        product_quantity: product_quantity !== undefined ? parseInt(product_quantity) : undefined,
+        user_message,
+        user_note,
+        ImageName,
+        MainCategory: MainCategory !== undefined ? parseInt(MainCategory) : undefined,
+        SubCategory: SubCategory !== undefined ? parseInt(SubCategory) || null : undefined,
+        ImageIndex: ImageIndex !== undefined ? parseInt(ImageIndex) : undefined
+      };
+
+      const updateEntries = Object.entries(fieldsToUpdate).filter(([key, value]) => value !== undefined);
+      if (updateEntries.length === 0) {
+        return res.status(400).json({ error: "لا توجد بيانات لتحديثها." });
+      }
+
+      const setClause = updateEntries.map(([key]) => `${key} = ?`).join(', ');
+      const args = [...updateEntries.map(([, value]) => value), product_key];
       await db.execute({
-        sql: "UPDATE marketplace_products SET productName = ?, product_description = ?, product_price = ?, product_quantity = ?, user_message = ?, user_note = ?, ImageName = ?, MainCategory = ?, SubCategory = ?, ImageIndex = ? WHERE product_key = ?",
-        args: [productName, product_description, parseFloat(product_price), parseInt(product_quantity), user_message, user_note, ImageName, parseInt(MainCategory), parseInt(SubCategory) || null, parseInt(ImageIndex), product_key]
+        sql: `UPDATE marketplace_products SET ${setClause} WHERE product_key = ?`,
+        args: args
       });
 
       return res.status(200).json({ message: "تم تحديث المنتج بنجاح." });

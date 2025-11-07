@@ -80,7 +80,7 @@ export default async function handler(req, res) {
       // إذا تم توفير رقم هاتف، ابحث عن مستخدم معين
       if (phone) {
         const result = await db.execute({
-          sql: "SELECT username, phone, is_seller, user_key, Password, Address FROM users WHERE phone = ?",
+          sql: "SELECT id, username, phone, is_seller, user_key, Password, Address FROM users WHERE phone = ?",
           args: [phone],
         });
 
@@ -99,7 +99,7 @@ export default async function handler(req, res) {
       }
 
       // إذا لم يتم توفير رقم هاتف، أرجع جميع المستخدمين
-      const allUsers = await db.execute("SELECT * FROM users");
+      const allUsers = await db.execute("SELECT id, username, phone, is_seller, user_key, Address FROM users");
       return res.status(200).json(allUsers.rows);
     } else if (req.method === "PUT") {
       const updatesData = req.body;
@@ -153,6 +153,11 @@ export default async function handler(req, res) {
         sql = sql.slice(0, -2); // إزالة الفاصلة الأخيرة
         sql += " WHERE user_key = ?";
         args.push(user_key);
+
+        // التحقق من وجود حقول للتحديث قبل تنفيذ الاستعلام
+        if (args.length <= 1) {
+          return res.status(400).json({ error: "لا توجد بيانات لتحديثها." });
+        }
 
         await db.execute({ sql, args });
         return res.status(200).json({ message: "تم تحديث بياناتك بنجاح." });

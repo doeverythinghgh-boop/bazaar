@@ -77,20 +77,23 @@
 
 ### جدول `users`
 ```sql
-CREATE TABLE users (
+CREATE TABLE IF NOT EXISTS users (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   username TEXT NOT NULL,
   phone TEXT NOT NULL UNIQUE,
-  Password TEXT ,
+  Password TEXT,
   Address TEXT,
   user_key TEXT NOT NULL UNIQUE,
   is_seller INTEGER DEFAULT 0
 );
+
+-- فهرس فريد على user_key (مطلوب لتفعيل العلاقات الخارجية)
+CREATE UNIQUE INDEX IF NOT EXISTS idx_users_user_key ON users(user_key);
 ```
 
 ### جدول `products`
 ```sql
-CREATE TABLE marketplace_products (
+CREATE TABLE IF NOT EXISTS marketplace_products (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   productName TEXT NOT NULL,
   product_key TEXT NOT NULL UNIQUE,
@@ -104,19 +107,23 @@ CREATE TABLE marketplace_products (
   MainCategory INTEGER,
   SubCategory INTEGER,
   ImageIndex INTEGER,
-  FOREIGN KEY (user_key) REFERENCES users (user_key)
+  FOREIGN KEY (user_key) REFERENCES users(user_key)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
 );
+
+-- فهرس فريد على product_key (مطلوب للعلاقات الخارجية)
+CREATE UNIQUE INDEX IF NOT EXISTS idx_products_product_key ON marketplace_products(product_key);
+```
 
 ### جدول `orders`
 ```sql
-CREATE TABLE orders (
-  order_key TEXT NOT NULL UNIQUE,          -- مفتاح فريد لتمييز الطلب (مثل ord_a1b2c3) يمكن إنشاؤه برمجياً
-  user_key TEXT NOT NULL,                  -- لربط الطلب بالمستخدم الذي قام به
-  total_amount REAL NOT NULL,              -- المبلغ الإجمالي للطلب
-  order_status TEXT NOT NULL DEFAULT 'pending', -- حالة الطلب (pending, processing, shipped, delivered, cancelled)
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- تاريخ ووقت إنشاء الطلب
-
-  -- العلاقة مع جدول المستخدمين
+CREATE TABLE IF NOT EXISTS orders (
+  order_key TEXT NOT NULL UNIQUE,
+  user_key TEXT NOT NULL,
+  total_amount REAL NOT NULL,
+  order_status TEXT NOT NULL DEFAULT 'pending',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (user_key) REFERENCES users(user_key)
     ON DELETE CASCADE
     ON UPDATE CASCADE
