@@ -306,7 +306,7 @@ async function createOrder(orderData) {
 
     return data;
   } catch (error) {
-    console.error("فشل في إنشاء الطلب:", error);
+    console.error("فشل في إنشاء الطلب (مشكلة في الاتصال أو CORS):", error);
     return { error: "فشل الاتصال بالخادم عند إنشاء الطلب." };
   }
 }

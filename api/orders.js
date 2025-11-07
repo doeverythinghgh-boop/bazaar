@@ -15,21 +15,37 @@ export const config = {
 };
 
 export default async function handler(request) {
+  // ✅ جديد: إضافة ترويسات CORS للسماح بالطلبات من أي مصدر
+  const corsHeaders = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type',
+  };
+
+  // ✅ جديد: معالجة طلبات OPTIONS (preflight) التي يرسلها المتصفح
+  if (request.method === 'OPTIONS') {
+    console.log('[CORS] تمت معالجة طلب OPTIONS لـ /api/orders');
+    return new Response(null, { status: 204, headers: corsHeaders });
+  }
+
   if (request.method !== 'POST') {
     return new Response(JSON.stringify({ error: 'Method Not Allowed' }), {
       status: 405,
-      headers: { 'Content-Type': 'application/json' },
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   }
 
   try {
+    console.log('[API: /api/orders] بدء معالجة طلب إنشاء طلب جديد...');
     const { order_key, user_key, total_amount, items } = await request.json();
+    console.log('[API: /api/orders] البيانات المستلمة:', { order_key, user_key, total_amount, items_count: items.length });
 
     // التحقق من وجود البيانات الأساسية
     if (!order_key || !user_key || !total_amount || !items || items.length === 0) {
+      console.error('[API: /api/orders] خطأ: بيانات الطلب غير مكتملة.');
       return new Response(JSON.stringify({ error: 'بيانات الطلب غير مكتملة.' }), {
         status: 400,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
@@ -56,18 +72,20 @@ export default async function handler(request) {
     }
 
     // تنفيذ جميع الاستعلامات دفعة واحدة
+    console.log('[API: /api/orders] جاري تنفيذ عملية الإدخال في قاعدة البيانات...');
     await db.batch(statements, 'write');
+    console.log('[API: /api/orders] نجاح! تم إنشاء الطلب في قاعدة البيانات.');
 
     return new Response(JSON.stringify({ success: true, message: 'تم إنشاء الطلب بنجاح.', order_key }), {
       status: 201, // 201 Created
-      headers: { 'Content-Type': 'application/json' },
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
 
   } catch (error) {
-    console.error('فشل في إنشاء الطلب:', error);
+    console.error('[API: /api/orders] فشل فادح في إنشاء الطلب:', error);
     return new Response(JSON.stringify({ error: 'حدث خطأ في الخادم أثناء إنشاء الطلب.' }), {
       status: 500,
-      headers: { 'Content-Type': 'application/json' },
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   }
 }

@@ -807,6 +807,7 @@
         total_amount: totalAmount,
         items: cart.map(item => ({ product_key: item.product_key, quantity: item.quantity }))
       };
+      console.log('[Checkout] جاري إرسال بيانات الطلب:', orderData);
 
       // إظهار رسالة تأكيد
       const result = await Swal.fire({
@@ -818,16 +819,20 @@
         cancelButtonText: 'إلغاء',
         showLoaderOnConfirm: true,
         preConfirm: async () => {
-          return await createOrder(orderData);
+          const response = await createOrder(orderData);
+          console.log('[Checkout] الاستجابة من الخادم:', response);
+          return response;
         },
         allowOutsideClick: () => !Swal.isLoading()
       });
 
       if (result.isConfirmed && result.value && !result.value.error) {
+        console.log('[Checkout] نجاح! تم تأكيد الطلب من قبل المستخدم وإنشاءه بنجاح.');
         clearCart(); // هذه الدالة تحذف السلة وتطلق حدث 'cartUpdated'
-        closeCartModal(); // إغلاق نافذة السلة
+        // لا حاجة لاستدعاء closeCartModal() هنا لأن Swal سيغلق النافذة
         Swal.fire('تم إتمام طلبك بنجاح 🎉', `رقم الطلب: ${result.value.order_key}`, 'success');
       } else if (result.value && result.value.error) {
+        console.error('[Checkout] فشل! الخادم أعاد خطأ:', result.value.error);
         Swal.fire('حدث خطأ', `فشل إرسال الطلب: ${result.value.error}`, 'error');
       }
     }
