@@ -312,6 +312,31 @@ async function createOrder(orderData) {
 }
 
 /**
+ * جديد: يجلب سجل مشتريات المستخدم.
+ * @param {string} userKey - المفتاح الفريد للمستخدم.
+ * @returns {Promise<Array|null>} مصفوفة من عناصر المشتريات أو null في حالة الفشل.
+ */
+async function getUserPurchases(userKey) {
+  try {
+    const response = await fetch(`${baseURL}/api/purchases?user_key=${userKey}`);
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log("تم جلب سجل المشتريات بنجاح:", data);
+    return data;
+
+  } catch (error) {
+    console.error("فشل في جلب سجل المشتريات:", error);
+    return null;
+  }
+}
+
+
+/**
  * @file js/turo.js
  * @description ... (بقية الوصف كما هو)
  * ... (بقية الدوال كما هي)

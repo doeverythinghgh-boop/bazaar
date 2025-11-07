@@ -154,6 +154,25 @@
     .swal2-container {
       z-index: 2000 !important;
     }
+    /* جديد: تنسيق موديول المشتريات */
+    #purchases-modal-container .modal-content { max-width: 800px; }
+    .purchase-item {
+      display: flex;
+      gap: 15px;
+      padding: 15px;
+      border: 1px solid #eee;
+      border-radius: 12px;
+      margin-bottom: 15px;
+      background-color: #f9f9f9;
+      animation: slide-fade-in 0.5s ease-out forwards;
+    }
+    .purchase-item img { width: 100px; height: 100px; object-fit: cover; border-radius: 8px; }
+    .purchase-item-details { flex-grow: 1; }
+    .purchase-item-details p { margin: 0 0 8px 0; }
+    .purchase-status { font-weight: bold; padding: 4px 8px; border-radius: 6px; color: white; }
+    .status-pending { background-color: #f39c12; } /* قيد المعالجة */
+    .status-shipped { background-color: #3498db; } /* جارٍ الشحن */
+    .status-delivered { background-color: #2ecc71; } /* تم التسليم */
   </style>
       <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
@@ -194,6 +213,9 @@
         ><i class="fas fa-store"></i> عرض منتجاتي</button>
         <button id="view-cart-btn" class="button logout-btn-small" style="display: none;">
           <i class="fas fa-shopping-cart"></i> عرض السلة
+        </button>
+        <button id="view-purchases-btn" class="button logout-btn-small" style="display: none;">
+          <i class="fas fa-history"></i> المشتريات
         </button>
         <!-- جديد: زر تعديل البيانات -->
         <button id="edit-profile-btn" class="button logout-btn-small" style="display: none;">
@@ -246,6 +268,10 @@
   <div id="cart-modal-container" class="modal">
     <!-- سيتم ملء محتوى السلة هنا -->
   </div>
+  <!-- جديد: حاوية النافذة المنبثقة للمشتريات -->
+  <div id="purchases-modal-container" class="modal">
+    <!-- سيتم ملء محتوى المشتريات هنا -->
+  </div>
   <script src="cloudflare-workers/cloudFileManager.js"></script>
   <script src="js/cart.js"></script> <!-- ✅ إضافة: تحميل ملف السلة -->
   <script src="js/auth.js"></script>
@@ -276,6 +302,12 @@
       const viewCartBtn = document.getElementById("view-cart-btn");
       viewCartBtn.style.display = "inline-flex";
       viewCartBtn.addEventListener("click", showCartModal);
+
+      // جديد: إظهار زر "المشتريات" لجميع المستخدمين المسجلين
+      const viewPurchasesBtn = document.getElementById("view-purchases-btn");
+      viewPurchasesBtn.style.display = "inline-flex";
+      viewPurchasesBtn.addEventListener("click", () => showPurchasesModal(user.user_key));
+
 
       // جديد: إظهار زر "تعديل البيانات" وإضافة حدث النقر
       const editProfileBtn = document.getElementById("edit-profile-btn");
@@ -778,6 +810,92 @@
       // خلط الحروف والأرقام
       return key.split('').sort(() => 0.5 - Math.random()).join('');
     }
+
+    /**
+     * جديد: يعرض نافذة منبثقة بسجل مشتريات المستخدم.
+     * @param {string} userKey - المفتاح الفريد للمستخدم.
+     */
+    async function showPurchasesModal(userKey) {
+      const purchasesModal = document.getElementById("purchases-modal-container");
+      
+      // عرض النافذة مع مؤشر تحميل
+      purchasesModal.innerHTML = `
+        <div class="modal-content">
+          <span class="close-button" id="purchases-modal-close-btn">&times;</span>
+          <h2><i class="fas fa-history"></i> سجل المشتريات</h2>
+          <div class="loader" style="margin: 2rem auto;"></div>
+        </div>`;
+      
+      document.body.classList.add("modal-open");
+      purchasesModal.style.display = "block";
+
+      // وظيفة الإغلاق
+      const closePurchasesModal = () => {
+        purchasesModal.style.display = "none";
+        document.body.classList.remove("modal-open");
+      };
+
+      document.getElementById("purchases-modal-close-btn").onclick = closePurchasesModal;
+      window.addEventListener('click', (event) => {
+        if (event.target == purchasesModal) closePurchasesModal();
+      }, { once: true });
+
+      // جلب البيانات
+      const purchases = await getUserPurchases(userKey);
+      const modalContentEl = purchasesModal.querySelector('.modal-content');
+
+      // بناء المحتوى بعد جلب البيانات
+      let contentHTML = `
+        <span class="close-button" id="purchases-modal-close-btn">&times;</span>
+        <h2><i class="fas fa-history"></i> سجل المشتريات</h2>`;
+
+      if (purchases && purchases.length > 0) {
+        contentHTML += '<div id="purchases-list">';
+        purchases.forEach(item => {
+          const firstImage = item.ImageName ? item.ImageName.split(',')[0] : '';
+          const imageUrl = firstImage 
+            ? `https://pub-e828389e2f1e484c89d8fb652c540c12.r2.dev/${firstImage}`
+            : 'data:image/svg+xml,...'; // صورة افتراضية
+          
+          const purchaseDate = new Date(item.created_at).toLocaleDateString('ar-EG', {
+            year: 'numeric', month: 'long', day: 'numeric'
+          });
+
+          // تحديد تنسيق حالة الطلب
+          let statusText = 'قيد المعالجة';
+          let statusClass = 'status-pending';
+          if (item.order_status === 'shipped') {
+            statusText = 'جارٍ الشحن';
+            statusClass = 'status-shipped';
+          } else if (item.order_status === 'delivered') {
+            statusText = 'تم التسليم';
+            statusClass = 'status-delivered';
+          }
+
+          contentHTML += `
+            <div class="purchase-item">
+              <img src="${imageUrl}" alt="${item.productName}">
+              <div class="purchase-item-details">
+                <strong>${item.productName}</strong>
+                <p><strong>السعر:</strong> ${item.product_price} جنيه</p>
+                <p><strong>الكمية:</strong> ${item.quantity}</p>
+                <p><strong>تاريخ الشراء:</strong> ${purchaseDate}</p>
+                <p><strong>حالة الطلب:</strong> <span class="purchase-status ${statusClass}">${statusText}</span></p>
+              </div>
+            </div>`;
+        });
+        contentHTML += '</div>';
+      } else if (purchases) {
+        contentHTML += '<p style="text-align: center; padding: 2rem 0;">لا توجد مشتريات سابقة.</p>';
+      } else {
+        contentHTML += '<p style="text-align: center; padding: 2rem 0; color: red;">حدث خطأ أثناء تحميل سجل المشتريات.</p>';
+      }
+
+      modalContentEl.innerHTML = contentHTML;
+      // إعادة ربط حدث الإغلاق بعد تحديث المحتوى
+      modalContentEl.querySelector('#purchases-modal-close-btn').onclick = closePurchasesModal;
+    }
+
 
     /**
      * جديد: يعالج عملية إتمام الشراء.
