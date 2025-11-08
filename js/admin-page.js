@@ -294,13 +294,16 @@ async function checkAndDisplayNotificationStatus() {
           title: 'الإشعارات محظورة',
           icon: 'info',
           html: `
-            <div style="text-align: right; line-height: 1.6;">
-              لقد قمت بحظر الإشعارات لهذا الموقع سابقًا. لإعادة تفعيلها، يرجى اتباع الخطوات التالية:
-              <ol style="padding-right: 20px; margin-top: 10px; text-align: right;">
-                <li>انقر على أيقونة القفل <i class="fas fa-lock" style="color: #555;"></i> بجوار عنوان الموقع في الأعلى.</li>
-                <li>ابحث عن خيار "الإشعارات" وقم بتغييره إلى "سماح".</li>
-                <li>قد تحتاج إلى إعادة تحميل الصفحة بعد ذلك.</li>
-              </ol>
+            <div style="text-align: right; line-height: 1.7;">
+              لقد قمت بحظر الإشعارات لهذا الموقع سابقًا. لإعادة تفعيلها، اتبع الخطوات الخاصة بمتصفحك:
+              <ul style="padding-right: 20px; margin-top: 15px; text-align: right; list-style-type: none;">
+                <li style="margin-bottom: 10px;"><strong><i class="fas fa-desktop" style="color: #555;"></i> على الكمبيوتر أو أندرويد:</strong><br>
+                  انقر على أيقونة القفل <i class="fas fa-lock" style="color: #555;"></i> بجوار عنوان الموقع، ثم اختر "الأذونات" أو "إعدادات الموقع" وقم بتغيير "الإشعارات" إلى "سماح".
+                </li>
+                <li><strong><i class="fas fa-mobile-alt" style="color: #555;"></i> على أجهزة أخرى:</strong><br>
+                  اذهب إلى إعدادات المتصفح، ثم "إعدادات المواقع"، وابحث عن موقعنا لتعديل أذونات الإشعارات.</li>
+              </ul>
+              <p style="margin-top: 15px;">قد تحتاج إلى إعادة تحميل الصفحة بعد تغيير الإعداد.</p>
             </div>`,
           confirmButtonText: 'حسنًا، فهمت'
         });
