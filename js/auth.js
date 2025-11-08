@@ -63,32 +63,50 @@ async function setupFCM() {
     if (permission === "granted") {
       console.log('%c[FCM] تم الحصول على إذن إرسال الإشعارات.', 'color: #28a745');
 
-      // 1. التحقق من وجود توكن مخزن محليًا
-      let storedToken = localStorage.getItem('fcm_token');
-      if (!storedToken) {
-        // 2. إذا لم يوجد توكن، اطلب واحدًا جديدًا
+      // 1. التحقق من وجود توكن مخزن محليًا.
+      let fcmToken = localStorage.getItem('fcm_token');
+
+      // 2. إذا لم يوجد توكن، اطلب واحدًا جديدًا.
+      if (!fcmToken) {
         console.log('[FCM] لا يوجد توكن مخزن، جاري طلب توكن جديد من Firebase...');
-        const fcmToken = await getToken(messaging, { vapidKey: "BK1_lxS32198GdKm0Gf89yk1eEGcKvKLu9bn1sg9DhO8_eUUhRCAW5tjynKGRq4igNhvdSaR0-eL74V3ACl3AIY" });
-        if (fcmToken) {
-          console.log('%c[FCM] تم الحصول على توكن جديد:', 'color: #007bff', fcmToken);
-          // 3. خزّن التوكن الجديد محليًا
-          localStorage.setItem('fcm_token', fcmToken);
-          storedToken = fcmToken; // استخدم التوكن الجديد في الخطوة التالية
+        try {
+          const newFcmToken = await getToken(messaging, { vapidKey: "BK1_lxS32198GdKm0Gf89yk1eEGcKvKLu9bn1sg9DhO8_eUUhRCAW5tjynKGRq4igNhvdSaR0-eL74V3ACl3AIY" });
+          if (newFcmToken) {
+            console.log('%c[FCM] تم الحصول على توكن جديد:', 'color: #007bff', newFcmToken);
+            // 3. خزّن التوكن الجديد محليًا.
+            localStorage.setItem('fcm_token', newFcmToken);
+            fcmToken = newFcmToken; // استخدم التوكن الجديد في الخطوة التالية.
+          } else {
+            console.error('[FCM] فشل في الحصول على توكن جديد من Firebase.');
+          }
+        } catch (err) {
+          console.error('[FCM] خطأ عند طلب التوكن من Firebase:', err);
+          return; // إيقاف التنفيذ إذا فشل الحصول على التوكن
         }
       }
 
-      // 4. ✅ إصلاح: إرسال التوكن (سواء كان جديدًا أو مخزنًا) إلى الخادم دائمًا
-      if (storedToken) {
-        console.log(`%c[FCM] جاري إرسال التوكن (المصدر: ${localStorage.getItem('fcm_token') === storedToken ? 'LocalStorage' : 'جديد'}) إلى الخادم...`, 'color: #fd7e14');
-        const response = await fetch("/api/save-token", {
+      // 4. ✅ إصلاح: إرسال التوكن (سواء كان جديدًا أو مخزنًا) إلى الخادم دائمًا عند كل تحميل للصفحة.
+      // هذا يضمن أن الخادم لديه دائمًا أحدث توكن للمستخدم.
+      if (fcmToken) {
+        console.log(`%c[FCM] جاري إرسال التوكن إلى الخادم...`, 'color: #fd7e14');
+        console.log(`[FCM] User Key: ${loggedInUser.user_key}`);
+        console.log(`[FCM] FCM Token: ${fcmToken}`);
+        
+        try {
+          const response = await fetch("/api/tokens", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ user_key: loggedInUser.user_key, token: storedToken })
+            body: JSON.stringify({ user_key: loggedInUser.user_key, token: fcmToken })
         });
-        if (response.ok) {
-          console.log('%c[FCM] نجح الخادم في حفظ/تحديث التوكن.', 'color: #28a745');
-        } else {
-          console.error('[FCM] فشل الخادم في حفظ التوكن. الاستجابة:', await response.json());
+
+          const responseData = await response.json();
+          if (response.ok) {
+            console.log('%c[FCM] نجح الخادم في حفظ/تحديث التوكن.', 'color: #28a745', responseData);
+          } else {
+            console.error('[FCM] فشل الخادم في حفظ التوكن. الحالة:', response.status, 'الاستجابة:', responseData);
+          }
+        } catch (networkError) {
+          console.error('%c[FCM] حدث خطأ في الشبكة أثناء إرسال التوكن:', 'color: #dc3545', networkError);
         }
       } else {
         console.error('[FCM] لم يتمكن من الحصول على توكن لإرساله إلى الخادم.');
@@ -148,10 +166,10 @@ function logout() {
     cancelButtonText: "إلغاء",
   }).then((result) => {
     if (result.isConfirmed) {
-      // ✅ جديد: حذف توكن FCM من التخزين المحلي عند تسجيل الخروج
+      // ✅ إصلاح: حذف توكن FCM من التخزين المحلي عند تسجيل الخروج
       // هذا يضمن أن المستخدم التالي الذي يسجل دخوله على نفس الجهاز سيحصل على توكن جديد خاص به.
       localStorage.removeItem("fcm_token");
-      console.log('[Auth] تم حذف توكن FCM من التخزين المحلي.');
+      console.log('[FCM] تم حذف توكن FCM من التخزين المحلي عند تسجيل الخروج.');
 
       // إزالة بيانات المستخدم من التخزين المحلي
       localStorage.removeItem("loggedInUser");
