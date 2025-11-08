@@ -100,6 +100,30 @@
           const data = await response.json();
           const categories = data.categories;
 
+          // ✅ تحسين: ربط الأيقونات بمعرف الفئة (ID) بدلاً من النص لزيادة الموثوقية
+           const iconMap = {
+            1: "fas fa-tshirt", // الملابس والأزياء
+            2: "fas fa-utensils", // الصناعات الغذائية والمأكولات
+            3: "fas fa-laptop-house", // التقنية والالكترونيات
+            4: "fas fa-spa", // الصحة والجمال
+            5: "fas fa-couch", // المنزل والأثاث
+            6: "fas fa-briefcase", // الخدمات المهنية
+            7: "fas fa-car", // المركبات
+            8: "fas fa-basketball-ball", // الرياضة والترفيه
+            9: "fas fa-baby-carriage", // الأطفال والمواليد
+            10: "fas fa-gem", // المجوهرات والساعات
+            11: "fas fa-tools", // الأدوات والمعدات
+            12: "fas fa-paw", // الحيوانات الأليفة
+            13: "fas fa-paint-brush", // الفنون والحرف اليدوية
+            14: "fas fa-seedling", // الزراعة
+            15: "fas fa-graduation-cap", // التعليم والتدريب
+            16: "fas fa-city", // العقارات
+            17: "fas fa-gift", // المناسبات والهدايا
+            18: "fas fa-trophy", // المقتنيات والنوادر
+            19: "fas fa-money-bill-wave", // الخدمات المالية
+            20: "fas fa-plane-departure", // السياحة والسفر
+          };
+
           tbody.innerHTML = ""; // مسح المحتوى القديم
 
           // تجميع الفئات في مجموعات من 3
@@ -113,10 +137,12 @@
 
             chunk.forEach((category) => {
               const cell = document.createElement("td");
-              const iconHtml = category.icon
-                ? `<i class="${category.icon}"></i>`
-                : "";
               cell.dataset.categoryId = category.id; // ✅ إصلاح: تخزين معرف الفئة الرئيسية هنا
+
+              // ✅ تحسين: البحث عن الأيقونة باستخدام معرف الفئة (ID)
+              const iconClass = iconMap[category.id] || "fas fa-store";
+              const iconHtml = `<i class="${iconClass}"></i>`;
+
               cell.innerHTML = `
                 <div class="category-cell-content">
                   ${iconHtml}

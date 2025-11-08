@@ -152,7 +152,8 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  user-select: none; /* Prevent text selection on click */
+  -webkit-user-select: none; /* For Safari */
+  user-select: none; /* Standard syntax */
 }
 
 .quantity-btn:active {
@@ -170,11 +171,11 @@
   height: 38px;
   /* Hide arrows for number input in Chrome, Safari, Edge, Opera */
   -webkit-appearance: none;
-  margin: 0;
-}
-/* Hide arrows for number input in Firefox */
-#selected-quantity {
+  /* Hide arrows for number input in Firefox */
   -moz-appearance: textfield;
+  /* Standard property to hide arrows in modern browsers */
+  appearance: none;
+  margin: 0;
 }
 
 /* "Add to Cart" button style */
