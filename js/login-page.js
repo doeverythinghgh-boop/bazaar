@@ -602,12 +602,15 @@ document.addEventListener("DOMContentLoaded", () => {
         // إذا كان الحساب يتطلب كلمة مرور
         Swal.close(); // إغلاق رسالة التحميل
         const { value: passwordResult } = await Swal.fire({
-          title: 'كلمة المرور مطلوبة',
+          title: 'التحقق من الهوية',
           html: `
-            <p>هذا الحساب محمي. الرجاء إدخال كلمة المرور</p>
-            <div class="swal2-password-container">
-              <input type="password" id="swal-password-input" class="swal2-input" placeholder="ادخل كلمة المرور">
-              <i class="fas fa-eye swal2-password-toggle-icon" id="swal-toggle-password"></i>
+            <div class="swal-password-prompt">
+              <i class="fas fa-shield-alt swal-password-prompt-icon"></i>
+              <p class="swal-password-prompt-text">هذا الحساب محمي بكلمة مرور</p>
+              <div class="swal2-password-container">
+                <input type="password" id="swal-password-input" class="swal2-input" placeholder="ادخل كلمة المرور">
+                <i class="fas fa-eye swal2-password-toggle-icon" id="swal-toggle-password"></i>
+              </div>
             </div>
           `,
           showCancelButton: true,

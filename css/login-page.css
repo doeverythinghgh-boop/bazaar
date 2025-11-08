@@ -8,10 +8,14 @@
 /* جديد: تنسيق حاوية كلمة المرور مع أيقونة العين */
 .swal2-password-container {
   position: relative;
+  width: 100%; /* ✅ إصلاح: جعل الحاوية تأخذ العرض الكامل المتاح لها لتتناسب مع الهوامش */
 }
 .swal2-password-container .swal2-input {
   padding-left: 2.5rem; /* مساحة للأيقونة */
-  width: 100%; /* جديد: ضمان أن الحقل يأخذ العرض الكامل */
+  width: calc(100% - 20px); /* ✅ إصلاح: تقليل العرض لترك مساحة للهوامش */
+  box-sizing: border-box; /* ✅ إصلاح: لضمان أن الحشو لا يزيد من العرض الكلي */
+  display: block; /* ✅ إصلاح إضافي: ضمان أن الحقل يتصرف كعنصر كتلة ويحترم عرض الحاوية */
+  margin: 0 auto; /* ✅ جديد: توسيط الحقل تلقائيًا لإنشاء هوامش متساوية */
 }
 .swal2-password-toggle-icon {
   position: absolute;
@@ -204,6 +208,7 @@
 }
 .swal2-html-container {
   font-size: 1rem !important; /* التحكم في حجم خط المحتوى */
+  overflow-x: hidden; /* ✅ إصلاح: منع ظهور شريط التمرير الأفقي بشكل نهائي */
   word-break: break-word; /* جديد: منع النصوص الطويلة من الخروج عن الإطار */
 }
 .swal2-styled {
@@ -246,3 +251,24 @@
 .status-pending { background-color: #f39c12; } /* قيد المعالجة */
 .status-shipped { background-color: #3498db; } /* جارٍ الشحن */
 .status-delivered { background-color: #2ecc71; } /* تم التسليم */
+
+/* --- جديد: تصميم محسّن لنافذة طلب كلمة المرور --- */
+.swal-password-prompt {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 10px 0;
+}
+.swal-password-prompt-icon {
+  font-size: 3rem;
+  color: #3498db; /* لون أزرق مميز */
+  margin-bottom: 0.5rem;
+}
+.swal-password-prompt-text {
+  font-size: 1rem;
+  color: #5a6a7b;
+  margin: 0;
+  text-align: center;
+  line-height: 1.5;
+}
