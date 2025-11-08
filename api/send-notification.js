@@ -34,13 +34,17 @@ if (!admin.apps.length) {
 }
 
 export default async function handler(req, res) {
+  // ✅ إصلاح: التعامل مع طلبات OPTIONS (preflight) أولاً لمنع أخطاء CORS
+  if (req.method === 'OPTIONS') {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    return res.status(204).end();
+  }
+
   res.setHeader('Access-Control-Allow-Origin', corsHeaders['Access-Control-Allow-Origin']);
   res.setHeader('Access-Control-Allow-Methods', corsHeaders['Access-Control-Allow-Methods']);
   res.setHeader('Access-Control-Allow-Headers', corsHeaders['Access-Control-Allow-Headers']);
-
-  if (req.method === 'OPTIONS') {
-    return res.status(204).end();
-  }
 
   const { token, title, body } = req.body;
   console.log(`[API: /api/send-notification] استلام طلب لإرسال إشعار إلى توكن: ...${token ? token.slice(-10) : 'N/A'}`);

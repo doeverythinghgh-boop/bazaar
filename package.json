@@ -1,5 +1,6 @@
 {
   "dependencies": {
-    "@libsql/client": "^0.15.15"
+    "@libsql/client": "^0.15.15",
+    "firebase-admin": "^12.1.1"
   }
 }
