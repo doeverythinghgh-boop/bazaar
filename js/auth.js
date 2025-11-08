@@ -61,14 +61,10 @@ async function setupFCM() {
       const { title, body } = payload.data;
       // ✅ تحديث: عرض الإشعار باستخدام SweetAlert2 بدلاً من إشعار المتصفح.
       Swal.fire({
-        title: title,
-        text: body,
-        icon: 'info',
-        toast: true, // اجعلها رسالة صغيرة (toast)
-        position: 'top-start', // تظهر في أعلى اليسار (أعلى اليمين في RTL)
-        showConfirmButton: false,
-        timer: 5000, // تختفي بعد 5 ثوانٍ
-        timerProgressBar: true
+        title: title, // عنوان الرسالة
+        text: body,   // نص الرسالة
+        icon: 'info', // أيقونة معلومات
+        confirmButtonText: 'موافق' // زر واحد للإغلاق
       });
     });
 
