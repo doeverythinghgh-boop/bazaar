@@ -58,12 +58,17 @@ async function setupFCM() {
     // استقبال الإشعارات أثناء فتح الموقع (Foreground)
     onMessage(messaging, (payload) => {
       console.log('%c[FCM] تم استقبال إشعار أثناء فتح الموقع (Foreground):', 'color: #17a2b8', payload);
-      // ✅ إصلاح: قراءة العنوان والنص من `payload.data`
-      // هذا يطابق التغيير الذي تم في الخادم (api/send-notification.js)
       const { title, body } = payload.data;
-      new Notification(title, {
-        body: body,
-        icon: '/images/icons/icon-192x192.png'
+      // ✅ تحديث: عرض الإشعار باستخدام SweetAlert2 بدلاً من إشعار المتصفح.
+      Swal.fire({
+        title: title,
+        text: body,
+        icon: 'info',
+        toast: true, // اجعلها رسالة صغيرة (toast)
+        position: 'top-start', // تظهر في أعلى اليسار (أعلى اليمين في RTL)
+        showConfirmButton: false,
+        timer: 5000, // تختفي بعد 5 ثوانٍ
+        timerProgressBar: true
       });
     });
 
