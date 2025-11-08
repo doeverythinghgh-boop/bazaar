@@ -117,7 +117,14 @@ export default async function handler(request) {
       }
 
       // إذا لم يتم توفير رقم هاتف، أرجع جميع المستخدمين
-      const allUsers = await db.execute("SELECT id, username, phone, is_seller, user_key, Address FROM users");
+      // ✅ إصلاح: استخدام LEFT JOIN لجلب fcm_token مع كل مستخدم إن وجد.
+      const allUsers = await db.execute(`
+        SELECT 
+          u.id, u.username, u.phone, u.is_seller, u.user_key, u.Address,
+          ut.fcm_token
+        FROM users u
+        LEFT JOIN user_tokens ut ON u.user_key = ut.user_key
+      `);
       return new Response(JSON.stringify(allUsers.rows), {
         status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
