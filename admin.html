@@ -15,6 +15,28 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
   <!-- Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <!-- جديد: تنسيقات خاصة بحالة الإشعارات -->
+  <style>
+    .notification-status {
+      width: 100%;
+      padding: 12px 15px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+      background-color: #f8f9fa;
+      border: 1px solid #dee2e6;
+      text-align: center;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .notification-status i {
+      font-size: 1.2rem;
+    }
+  </style>
 </head>
 
 <body>
@@ -36,6 +58,10 @@
   <div id="admin-panel-container" class="login-page-wrapper" style="display: none;">
     <div class="login-container">
       <h2 id="welcome-message"></h2>
+
+      <!-- ✅ جديد: إضافة هذه الحاوية هنا لعرض حالة الإشعارات -->
+      <div id="notification-status-container" class="notification-status"></div>
+
       <!-- Action Buttons -->
       <div class="action-buttons" id="admin-action-buttons">
         <!-- سيتم إضافة الأزرار هنا بواسطة JavaScript -->

@@ -220,6 +220,13 @@ function checkAndDisplayNotificationStatus() {
   const statusContainer = document.getElementById("notification-status-container");
   if (!statusContainer) return;
 
+  // ✅ جديد: التحقق أولاً مما إذا كان المتصفح يدعم الإشعارات من الأساس
+  if (!('Notification' in window) || !('serviceWorker' in navigator)) {
+    statusContainer.innerHTML = `<i class="fas fa-exclamation-circle" style="color: #ffc107;"></i> <span>حالة الإشعارات: <strong>غير مدعومة</strong> (هذا المتصفح لا يدعم استقبال الإشعارات)</span>`;
+    return;
+  }
+
+
   let statusHTML = '';
   const permission = Notification.permission;
   const fcmToken = localStorage.getItem('fcm_token');
