@@ -254,10 +254,10 @@ function initializeAdminPanel(user) {
 }
 
 /**
- * يتحقق من حالة إذن الإشعارات ووجود توكن FCM ويعرض رسالة للمسؤول.
+ * يتحقق من حالة إذن الإشعارات ووجود توكن FCM ويعرض رسالة وزر تفعيل عند الحاجة.
  */
-function checkAndDisplayNotificationStatus() {
-  const statusContainer = document.getElementById("notification-status-container");
+async function checkAndDisplayNotificationStatus() {
+  const statusContainer = document.getElementById('notification-status-container');
   if (!statusContainer) return;
 
   // ✅ جديد: التحقق أولاً مما إذا كان المتصفح يدعم الإشعارات من الأساس
@@ -266,26 +266,65 @@ function checkAndDisplayNotificationStatus() {
     return;
   }
 
-
   let statusHTML = '';
   const permission = Notification.permission;
   const fcmToken = localStorage.getItem('fcm_token');
 
   if (permission === 'granted') {
     if (fcmToken) {
-      // الحالة المثالية: الإذن ممنوح والتوكن موجود
       statusHTML = `<i class="fas fa-check-circle" style="color: #28a745;"></i> <span>حالة الإشعارات: <strong>مفعّلة</strong> (أنت تستقبل الإشعارات حاليًا)</span>`;
     } else {
-      // الإذن ممنوح ولكن لا يوجد توكن (قد يحدث عند أول تحميل)
-      statusHTML = `<i class="fas fa-exclamation-triangle" style="color: #ffc107;"></i> <span>حالة الإشعارات: <strong>قيد التفعيل.</strong> (حاول إعادة تحميل الصفحة لتسجيل الجهاز)</span>`;
+      statusHTML = `<i class="fas fa-exclamation-triangle" style="color: #ffc107;"></i> <span>حالة الإشعارات: <strong>قيد التفعيل.</strong> (حاول إعادة تحميل الصفحة لتسجيل الجهاز)</span> <button id="request-notif-btn" class="button-small-action">إعادة المحاولة</button>`;
     }
   } else if (permission === 'denied') {
-    // تم رفض الإذن من قبل المستخدم
-    statusHTML = `<i class="fas fa-times-circle" style="color: #dc3545;"></i> <span>حالة الإشعارات: <strong>معطّلة</strong> (لقد قمت برفض إذن استقبال الإشعارات)</span>`;
-  } else { // 'default'
-    // لم يتم طلب الإذن بعد
-    statusHTML = `<i class="fas fa-question-circle" style="color: #6c757d;"></i> <span>حالة الإشعارات: <strong>غير محددة</strong> (سيتم طلب الإذن عند الحاجة)</span>`;
+    statusHTML = `<i class="fas fa-times-circle" style="color: #dc3545;"></i> <span>حالة الإشعارات: <strong>معطّلة</strong> (لقد قمت برفض الإذن)</span> <button id="request-notif-btn" class="button-small-action">إعادة التفعيل</button>`;
+  } else {
+    statusHTML = `<i class="fas fa-question-circle" style="color: #6c757d;"></i> <span>حالة الإشعارات: <strong>غير محددة</strong></span> <button id="request-notif-btn" class="button-small-action">تفعيل الإشعارات</button>`;
   }
 
   statusContainer.innerHTML = statusHTML;
+
+  // إضافة وظيفة للزر الجديد
+  const requestBtn = document.getElementById('request-notif-btn');
+  if (requestBtn) {
+    requestBtn.addEventListener('click', async () => {
+      // إذا كان الإذن مرفوضًا، يجب على المستخدم تغييره يدويًا
+      if (Notification.permission === 'denied') {
+        Swal.fire({
+          title: 'الإشعارات محظورة',
+          icon: 'info',
+          html: `
+            <div style="text-align: right; line-height: 1.6;">
+              لقد قمت بحظر الإشعارات لهذا الموقع سابقًا. لإعادة تفعيلها، يرجى اتباع الخطوات التالية:
+              <ol style="padding-right: 20px; margin-top: 10px; text-align: right;">
+                <li>انقر على أيقونة القفل <i class="fas fa-lock" style="color: #555;"></i> بجوار عنوان الموقع في الأعلى.</li>
+                <li>ابحث عن خيار "الإشعارات" وقم بتغييره إلى "سماح".</li>
+                <li>قد تحتاج إلى إعادة تحميل الصفحة بعد ذلك.</li>
+              </ol>
+            </div>`,
+          confirmButtonText: 'حسنًا، فهمت'
+        });
+        return;
+      }
+
+      // إذا لم يكن الإذن ممنوحًا، اطلب الإذن
+      if (typeof setupFCM === 'function') {
+        requestBtn.disabled = true;
+        requestBtn.textContent = 'جاري...';
+        try {
+          await setupFCM(); // استدعاء دالة طلب الإذن من auth.js
+          // إعادة التحقق من الحالة بعد محاولة التفعيل
+          await checkAndDisplayNotificationStatus();
+        } catch (error) {
+          console.error("فشل في إعداد FCM:", error);
+          Swal.fire('خطأ', 'حدث خطأ أثناء محاولة تفعيل الإشعارات.', 'error');
+          requestBtn.disabled = false;
+          requestBtn.textContent = 'إعادة المحاولة';
+        }
+      } else {
+        console.error('الدالة setupFCM غير موجودة.');
+        Swal.fire('خطأ فني', 'لا يمكن طلب إذن الإشعارات حاليًا.', 'error');
+      }
+    });
+  }
 }
