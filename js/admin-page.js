@@ -46,6 +46,9 @@ document.addEventListener("DOMContentLoaded", () => {
  */
 function initializeAdminPanel(user) {
   document.getElementById("welcome-message").textContent = `لوحة تحكم المسؤول | ${user.username}`;
+  // جديد: التحقق من حالة الإشعارات وعرضها
+  checkAndDisplayNotificationStatus();
+
   const actionButtonsContainer = document.getElementById("admin-action-buttons");
 
   // 1. إنشاء زر "عرض المستخدمين"
@@ -208,4 +211,34 @@ function initializeAdminPanel(user) {
       }
     });
   });
+}
+
+/**
+ * يتحقق من حالة إذن الإشعارات ووجود توكن FCM ويعرض رسالة للمسؤول.
+ */
+function checkAndDisplayNotificationStatus() {
+  const statusContainer = document.getElementById("notification-status-container");
+  if (!statusContainer) return;
+
+  let statusHTML = '';
+  const permission = Notification.permission;
+  const fcmToken = localStorage.getItem('fcm_token');
+
+  if (permission === 'granted') {
+    if (fcmToken) {
+      // الحالة المثالية: الإذن ممنوح والتوكن موجود
+      statusHTML = `<i class="fas fa-check-circle" style="color: #28a745;"></i> <span>حالة الإشعارات: <strong>مفعّلة</strong> (أنت تستقبل الإشعارات حاليًا)</span>`;
+    } else {
+      // الإذن ممنوح ولكن لا يوجد توكن (قد يحدث عند أول تحميل)
+      statusHTML = `<i class="fas fa-exclamation-triangle" style="color: #ffc107;"></i> <span>حالة الإشعارات: <strong>قيد التفعيل.</strong> (حاول إعادة تحميل الصفحة لتسجيل الجهاز)</span>`;
+    }
+  } else if (permission === 'denied') {
+    // تم رفض الإذن من قبل المستخدم
+    statusHTML = `<i class="fas fa-times-circle" style="color: #dc3545;"></i> <span>حالة الإشعارات: <strong>معطّلة</strong> (لقد قمت برفض إذن استقبال الإشعارات)</span>`;
+  } else { // 'default'
+    // لم يتم طلب الإذن بعد
+    statusHTML = `<i class="fas fa-question-circle" style="color: #6c757d;"></i> <span>حالة الإشعارات: <strong>غير محددة</strong> (سيتم طلب الإذن عند الحاجة)</span>`;
+  }
+
+  statusContainer.innerHTML = statusHTML;
 }
