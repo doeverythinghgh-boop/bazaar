@@ -28,12 +28,19 @@ const messaging = firebase.messaging();
 // التعامل مع الإشعارات الواردة في الخلفية (v8)
 messaging.onBackgroundMessage((payload) => {
   console.log('[firebase-messaging-sw.js] تم استقبال رسالة في الخلفية: ', payload);
-
-  // ✅ إصلاح: قراءة العنوان والنص من `payload.data` بدلاً من `payload.notification`.
-  // هذا ضروري لأننا الآن نرسل حمولة بيانات فقط من الخادم.
+  
+  // التحقق من وجود حمولة البيانات `data`
+  if (!payload.data) {
+    console.error('[SW] لم يتم العثور على حمولة البيانات (payload.data) في الرسالة.');
+    return;
+  }
+  console.log('[SW] جاري استخراج العنوان والنص من payload.data...');
   const notificationTitle = payload.data.title;
   const notificationBody = payload.data.body;
-
-  const notificationOptions = { body, icon: '/images/icons/icon-192x192.png' };
-  self.registration.showNotification(notificationTitle, { body: notificationBody, icon: '/images/icons/icon-192x192.png' });
+  console.log(`[SW] العنوان: ${notificationTitle}, النص: ${notificationBody}`);
+  
+  // ✅ إصلاح: استخدام المتغير الصحيح `notificationBody` بدلاً من `body` غير المعرّف.
+  const notificationOptions = { body: notificationBody, icon: '/images/icons/icon-192x192.png' };
+  console.log('[SW] جاري عرض الإشعار المنبثق...');
+  return self.registration.showNotification(notificationTitle, notificationOptions);
 });
