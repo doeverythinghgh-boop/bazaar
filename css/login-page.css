@@ -367,6 +367,33 @@ input:checked + .slider:before { transform: translateX(22px); }
     width: 90% !important; /* استخدام نسبة مئوية من عرض الشاشة */
   }
 }
+
+/* --- جديد: تنسيق حقل البحث في نافذة "منتجاتي" --- */
+.my-products-search-container {
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+
+.my-products-search-container .search-icon {
+  position: absolute;
+  top: 50%;
+  right: 15px; /* لليمين في RTL */
+  transform: translateY(-50%);
+  color: #95a5a6;
+}
+
+#my-products-search-input {
+  width: 100%;
+  padding: 12px 40px 12px 15px; /* مساحة للأيقونة على اليمين */
+  border: 1px solid #bdc3c7;
+  border-radius: 8px;
+  font-family: "Tajawal", sans-serif;
+  font-size: 1rem;
+  box-sizing: border-box;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+
 /* جديد: أنماط مودال السلة */
 #cart-modal-container .modal-content {
   max-width: 800px;

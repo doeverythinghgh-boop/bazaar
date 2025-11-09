@@ -525,6 +525,40 @@ async function showMyProducts(userKey) {
       });
     });
 
+    // 7. جديد: ربط حدث البحث بحقل الإدخال
+    const searchInput = document.getElementById('my-products-search-input');
+    const productCards = contentWrapper.querySelectorAll('.product-card');
+
+    searchInput.addEventListener('input', (event) => {
+      const searchTerm = event.target.value.toLowerCase().trim();
+      let visibleCount = 0;
+
+      productCards.forEach(card => {
+        const productName = card.querySelector('h4').textContent.toLowerCase();
+        if (productName.includes(searchTerm)) {
+          card.style.display = 'flex';
+          visibleCount++;
+        } else {
+          card.style.display = 'none';
+        }
+      });
+
+      // إظهار أو إخفاء رسالة "لا توجد نتائج"
+      let noResultsMsg = contentWrapper.querySelector('.no-results-message');
+      if (visibleCount === 0) {
+        if (!noResultsMsg) {
+          noResultsMsg = document.createElement('p');
+          noResultsMsg.className = 'no-results-message';
+          noResultsMsg.style.textAlign = 'center';
+          noResultsMsg.style.padding = '2rem 0';
+          contentWrapper.appendChild(noResultsMsg);
+        }
+        noResultsMsg.textContent = `لا توجد منتجات تطابق البحث: "${event.target.value}"`;
+      } else if (noResultsMsg) {
+        noResultsMsg.remove();
+      }
+    });
+
   } else if (products) {
     contentWrapper.innerHTML = "<p style='text-align: center; padding: 2rem 0;'>لم تقم بإضافة أي منتجات بعد.</p>";
   } else {
