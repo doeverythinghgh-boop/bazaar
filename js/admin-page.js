@@ -80,8 +80,8 @@ function initializeAdminPanel(user) {
     tableContentWrapper.innerHTML = '<div class="loader"></div>';
     const users = await fetchUsers();
     if (users && users.length > 0) {
-      // تعديل: إضافة عمود جديد لإرسال الإشعارات
-      let tableHTML = `<table class="users-table"><thead><tr><th>الاسم</th><th>رقم الهاتف</th><th>بائع؟</th><th>إرسال إشعار</th></tr></thead><tbody>`;
+      // جديد: استخدام تصميم البطاقات بدلاً من الجدول
+      let usersHTML = '<div class="user-cards-container">';
       users.forEach(u => {
         // إضافة حقل إدخال وزر إرسال لكل مستخدم يمتلك توكن
         const notificationUI = u.fcm_token
@@ -90,15 +90,27 @@ function initializeAdminPanel(user) {
                <button class="send-notif-btn" data-token="${u.fcm_token}" data-user-key="${u.user_key}" title="إرسال"><i class="fas fa-paper-plane"></i></button>
              </div>`
           : '<span class="no-token">لا يستقبل إشعارات</span>';
-        tableHTML += `<tr>
-            <td>${u.username || 'غير متوفر'}</td>
-            <td>${u.phone}</td>
-            <td><input type="checkbox" class="seller-checkbox" data-phone="${u.phone}" data-original-state="${u.is_seller}" ${u.is_seller === 1 ? 'checked' : ''}></td>
-            <td>${notificationUI}</td>
-          </tr>`;
+
+        usersHTML += `
+          <div class="user-card" data-phone="${u.phone}">
+            <div class="user-card-header">
+              <span class="user-name">${u.username || 'غير متوفر'}</span>
+              <span class="user-phone">${u.phone}</span>
+            </div>
+            <div class="user-card-body">
+              <div class="user-card-field">
+                <label>بائع؟</label>
+                <input type="checkbox" class="seller-checkbox" data-phone="${u.phone}" data-original-state="${u.is_seller}" ${u.is_seller === 1 ? 'checked' : ''}>
+              </div>
+              <div class="user-card-field">
+                <label>إرسال إشعار</label>
+                ${notificationUI}
+              </div>
+            </div>
+          </div>`;
       });
-      tableHTML += `</tbody></table>`;
-      tableContentWrapper.innerHTML = tableHTML;
+      usersHTML += `</div>`;
+      tableContentWrapper.innerHTML = usersHTML;
     } else {
       tableContentWrapper.innerHTML = "<p>لم يتم العثور على مستخدمين.</p>";
     }
@@ -167,7 +179,7 @@ function initializeAdminPanel(user) {
       const originalState = parseInt(cb.dataset.originalState, 10);
       updates.push({ phone: cb.dataset.phone, is_seller: isSellerNow });
       if (isSellerNow !== originalState) {
-        const userName = cb.closest('tr').querySelector('td:first-child').textContent;
+        const userName = cb.closest('.user-card').querySelector('.user-name').textContent;
         changedUsersNames.push(userName);
       }
     });

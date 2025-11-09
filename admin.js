@@ -41,20 +41,25 @@ function initializeAdminPanel(user) {
     const users = await fetchUsers(); // جلب المستخدمين
 
     if (users && users.length > 0) {
-      let tableHTML = `
-        <table class="users-table">
-          <thead><tr><th>الاسم</th><th>رقم الهاتف</th><th>بائع؟</th></tr></thead>
-          <tbody>`;
+      // جديد: استخدام تصميم البطاقات بدلاً من الجدول
+      let usersHTML = '<div class="user-cards-container">';
       users.forEach(u => {
-        tableHTML += `
-          <tr>
-            <td>${u.username || 'غير متوفر'}</td>
-            <td>${u.phone}</td>
-            <td><input type="checkbox" class="seller-checkbox" data-phone="${u.phone}" data-original-state="${u.is_seller}" ${u.is_seller === 1 ? 'checked' : ''}></td>
-          </tr>`;
+        usersHTML += `
+          <div class="user-card" data-phone="${u.phone}">
+            <div class="user-card-header">
+              <span class="user-name">${u.username || 'غير متوفر'}</span>
+              <span class="user-phone">${u.phone}</span>
+            </div>
+            <div class="user-card-body">
+              <div class="user-card-field">
+                <label>بائع؟</label>
+                <input type="checkbox" class="seller-checkbox" data-phone="${u.phone}" data-original-state="${u.is_seller}" ${u.is_seller === 1 ? 'checked' : ''}>
+              </div>
+            </div>
+          </div>`;
       });
-      tableHTML += `</tbody></table>`;
-      tableContentWrapper.innerHTML = tableHTML;
+      usersHTML += `</div>`;
+      tableContentWrapper.innerHTML = usersHTML;
     } else {
       tableContentWrapper.innerHTML = "<p>لم يتم العثور على مستخدمين.</p>";
     }
@@ -110,7 +115,7 @@ function initializeAdminPanel(user) {
 
       // التحقق مما إذا كانت الحالة قد تغيرت
       if (isSellerNow !== originalState) {
-        const userName = cb.closest('tr').querySelector('td:first-child').textContent;
+        const userName = cb.closest('.user-card').querySelector('.user-name').textContent;
         changedUsersNames.push(userName);
       }
     });
