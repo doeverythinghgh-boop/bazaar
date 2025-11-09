@@ -293,6 +293,7 @@ input:checked + .slider:before { transform: translateX(22px); }
   display: flex;
   align-items: center;
   justify-content: flex-end; /* جديد: محاذاة الأزرار إلى النهاية (اليسار في RTL) */
+  justify-content: center; /* تعديل: توسيط الأزرار */
   gap: 0.75rem; /* جديد: إضافة مسافة بين الأزرار */
   padding: 15px 20px; /* تعديل: تقليل الحشو العمودي */
   background-color: #f8f9fa;
@@ -310,13 +311,22 @@ input:checked + .slider:before { transform: translateX(22px); }
 }
 
 /* جديد: تخصيص لون زر التعديل */
+/* تعديل: تخصيص لون زر التعديل إلى لون رمادي محايد */
 .button.edit-product-btn {
   background-color: #3498db; /* أزرق هادئ */
   border-color: #3498db;
+  background-color: #7f8c8d; /* رمادي هادئ */
+  border-color: #7f8c8d;
+  color: white;
+}
+
+/* جديد: جعل أيقونة التعديل بيضاء لتتناسب مع الخلفية */
+.button.edit-product-btn i {
   color: white;
 }
 .button.edit-product-btn:hover {
   background-color: #2980b9;
+  background-color: #95a5a6;
 }
 
 /* جديد: تخصيص لون زر الحذف */
