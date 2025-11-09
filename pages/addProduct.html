@@ -10,7 +10,9 @@
 -->
 
 <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="addProductTitle">
-  <span class="close-button" id="add-product-modal-close-btn" aria-label="إغلاق">&times;</span>
+  <!-- ✅ تعديل: تحويل زر الإغلاق إلى أيقونة داخل زر -->
+  <button class="close-button" id="add-product-modal-close-btn" aria-label="إغلاق"><i class="fas fa-times"></i></button>
+
   <h2 id="addProductTitle"><i class="fas fa-cart-plus"></i> إضافة منتج جديد</h2>
 
   <form id="add-product-form" novalidate>
@@ -96,7 +98,7 @@
       </div>
       <!-- جديد: حقل السعر قبل الخصم -->
       <div class="form-group">
-        <label for="original-price"><i class="fas fa-tag"></i>السعر قبل الخصم (قبل الخصم)</label>
+        <label for="original-price"><i class="fas fa-tag"></i>السعر قبل الخصم</label>
         <input type="text" inputmode="decimal" id="original-price" name="original-price" placeholder="اختياري">
       </div>
     </div>

@@ -16,26 +16,39 @@
     if (galleryContainer && galleryContainer.children.length === 0) {
       // حلقة for لإنشاء وإضافة كل صورة
       for (let i = 1; i <= numberOfImages; i++) {
+        // ✅ إضافة: إنشاء حاوية لكل منتج (صورة + اسم)
+        const productItem = document.createElement("div");
+        productItem.className = "product-item";
+        productItem.id = `product-item-${i}`;
+
         const img = document.createElement("img");
-        img.src = `https://pub-f477060f80b14c5dba6a15f717aef8c4.r2.dev/pic (${i}).jpg`; // Load images from the cloud
-        img.alt = `صورة ${i}`;
-        img.addEventListener("click", () => {
+        img.src = `https://pub-f477060f80b14c5dba6a15f717aef8c4.r2.dev/pic (${i}).jpg`;
+        img.alt = `منتج رقم ${i}`;
+
+        // ✅ إضافة: إنشاء عنصر لاسم المنتج
+        const productName = document.createElement("p");
+        productName.className = "product-name";
+        productName.textContent = `منتج رقم ${i}`;
+
+        // إضافة الصورة والاسم إلى حاوية المنتج
+        productItem.appendChild(img);
+        productItem.appendChild(productName);
+
+        productItem.addEventListener("click", () => {
           // Dummy data for the product. In a real app, this would come from an API.
           const productData = {
+            productName: `منتج رقم ${i}`, // ✅ إضافة: اسم المنتج
             imageSrc: img.src,
             availableQuantity: 150,
             pricePerItem: 25,
-            sellerMessage:
-              "هذا المنتج مصنوع يدويًا بحب وعناية. الكمية محدودة، سارع بالشراء!",
-            description: "وصف تجريبي للمنتج يوضح تفاصيله ومميزاته. هذا النص هو مثال ويمكن استبداله بالوصف الفعلي للمنتج.", // ✅ إضافة: وصف تجريبي
+            sellerMessage: "هذا المنتج مصنوع يدويًا بحب وعناية. الكمية محدودة، سارع بالشراء!",
+            description: "وصف تجريبي للمنتج يوضح تفاصيله ومميزاته. هذا النص هو مثال ويمكن استبداله بالوصف الفعلي للمنتج.",
           };
 
           // Call the global function from main.js to show the modal
-          if (window.showProductDetails) {
-            window.showProductDetails(productData);
-          }
+          window.showProductDetails?.(productData);
         });
-        galleryContainer.appendChild(img);
+        galleryContainer.appendChild(productItem);
       }
     }
   }

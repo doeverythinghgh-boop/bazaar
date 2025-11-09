@@ -31,6 +31,55 @@
     />
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- ✅ إضافة: تنسيقات خاصة بعناصر المنتجات في المعرض -->
+    <style>
+      /* --- تصميم جديد ومحسّن لبطاقة المنتج --- */
+      .product-item {
+        cursor: pointer;
+        text-align: center;
+        background-color: #fff;
+        border-radius: 12px; /* زيادة دائرية الحواف */
+        overflow: hidden;
+        border: 1px solid #f0f0f0; /* إضافة إطار ناعم */
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); /* ظل أكثر نعومة */
+        transition: transform 0.3s ease, box-shadow 0.3s ease; /* انتقال أكثر سلاسة */
+        display: flex; /* جديد: استخدام flex لتنظيم المحتوى */
+        flex-direction: column; /* جديد: ترتيب المحتوى عمودياً */
+        background-color: transparent;
+      }
+      .product-item:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1); /* ظل أعمق عند المرور */
+      }
+      /* جديد: تنسيق الصورة داخل البطاقة */
+      .product-item img {
+        width: 100%;
+        height: 12vh; /* نفس ارتفاع الحاوية للحفاظ على الشكل */
+        object-fit: cover; /* ضمان ملء الصورة للمساحة دون تشويه */
+        display: block;
+      }
+      .product-item .product-name {
+        margin: 0; /* إزالة الهوامش الافتراضية */
+        padding: 2px; /* تعديل: زيادة الحشو لتحسين القراءة والمظهر */
+        font-size: 0.65rem; /* تكبير حجم الخط قليلاً */
+        font-weight: 600; /* جعل الخط أعرض قليلاً */
+        color: #333; /* لون أغمق وأكثر وضوحًا */
+        line-height: 1.2; /* ✅ تعديل: تحسين تباعد الأسطر */
+        flex-grow: 1; /* جديد: السماح لهذا العنصر بالتمدد لملء المساحة المتبقية */
+        background-color: transparent;
+        /* --- ✅ جديد: التحكم في النص الطويل وعرضه في سطرين مع (...) --- */
+        overflow: hidden; /* إخفاء النص الزائد */
+        text-overflow: ellipsis; /* إضافة علامة الحذف */
+        display: -webkit-box;
+        -webkit-line-clamp: 2; /* تحديد عدد الأسطر بسطرين */
+        -webkit-box-orient: vertical;
+      }
+      /* ✅ إضافة: تحديد عرض ثابت لعناصر المنتج للحفاظ على التناسق */
+      .gallery-container .product-item {
+        width: 12vh; /* عرض ثابت لجعل العنصر مربع الشكل */
+        flex-shrink: 0; /* منع العنصر من التقلص */
+      }
+    </style>
   </head>
   <body style="position: relative">
     <!-- 
@@ -289,7 +338,7 @@
           currentGalleryCell.appendChild(galleryContainer);
 
           // دالة لتحميل صورة واحدة وإضافتها للمعرض
-          const loadImage = (product) => {
+          const loadProductItem = (product) => { // ✅ تعديل: تغيير اسم الدالة ليعكس أنها تحمل عنصر منتج كامل
             return new Promise((resolve) => {
               // console.log(`[Products] جاري تحميل صورة للمنتج: ${product.productName}`);
               if (!product.ImageName) return resolve();
@@ -297,16 +346,22 @@
               const firstImage = product.ImageName.split(",")[0];
               if (!firstImage) return resolve();
 
+              // ✅ إضافة: إنشاء حاوية المنتج الرئيسية
+              const productItem = document.createElement("div");
+              productItem.className = "product-item";
+
               const img = document.createElement("img");
               const imageUrl = `https://pub-e828389e2f1e484c89d8fb652c540c12.r2.dev/${firstImage}`;
               img.alt = product.product_description;
               img.title = product.product_description;
-              img.style.opacity = "0"; // إخفاء الصورة مبدئياً
-              img.style.transform = "translateY(20px)";
-              img.style.transition = "opacity 0.5s ease, transform 0.5s ease";
+              
+              // ✅ تعديل: إضافة التأثيرات للحاوية بدلاً من الصورة فقط
+              productItem.style.opacity = "0";
+              productItem.style.transform = "translateY(20px)";
+              productItem.style.transition = "opacity 0.5s ease, transform 0.5s ease";
 
-              // ✅ إضافة: عند النقر على الصورة، يتم عرض تفاصيل المنتج
-              img.addEventListener("click", () => {
+              // ✅ تعديل: حدث النقر يكون على حاوية المنتج بأكملها
+              productItem.addEventListener("click", () => {
                 console.log(`%c[Products] تم النقر على المنتج: ${product.productName}`, 'color: darkcyan');
                 // التأكد من أن الدالة العالمية متاحة
                 if (window.showProductDetails) {
@@ -331,11 +386,20 @@
               });
 
               img.onload = () => {
-                galleryContainer.appendChild(img);
+                // ✅ إضافة: إنشاء عنصر اسم المنتج هنا لضمان الترتيب الصحيح
+                const productName = document.createElement("p");
+                productName.className = "product-name";
+                productName.id = `product-name-${product.product_key}`; // ✅ إضافة: ID فريد
+                productName.textContent = product.productName || 'منتج غير مسمى';
+
+                productItem.appendChild(img);
+                productItem.appendChild(productName);
+                galleryContainer.appendChild(productItem);
+
                 setTimeout(() => {
                   // تأخير بسيط قبل إظهار الصورة
-                  img.style.opacity = "1";
-                  img.style.transform = "translateY(0)";
+                  productItem.style.opacity = "1";
+                  productItem.style.transform = "translateY(0)";
                   resolve();
                 }, 50); // 50ms delay
               };
@@ -349,7 +413,7 @@
 
           // تحميل الصور واحدة تلو الأخرى
           for (const product of products) {
-            await loadImage(product);
+            await loadProductItem(product); // ✅ تعديل: استدعاء الدالة الجديدة
           }
         } else {
           console.log('[Products] لا توجد منتجات في هذه الفئة.');

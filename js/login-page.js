@@ -333,7 +333,8 @@ async function showPurchasesModal(userKey) {
   // عرض النافذة مع مؤشر تحميل
   purchasesModal.innerHTML = `
     <div class="modal-content">
-      <span class="close-button" id="purchases-modal-close-btn">&times;</span>
+      <!-- ✅ تعديل: تحويل زر الإغلاق إلى أيقونة -->
+      <button class="close-button" id="purchases-modal-close-btn" aria-label="إغلاق"><i class="fas fa-times"></i></button>
       <h2><i class="fas fa-history"></i> سجل المشتريات</h2>
       <div class="loader" style="margin: 2rem auto;"></div>
     </div>`;
@@ -358,7 +359,8 @@ async function showPurchasesModal(userKey) {
 
   // بناء المحتوى بعد جلب البيانات
   let contentHTML = `
-    <span class="close-button" id="purchases-modal-close-btn">&times;</span>
+    <!-- ✅ تعديل: تحويل زر الإغلاق إلى أيقونة -->
+    <button class="close-button" id="purchases-modal-close-btn" aria-label="إغلاق"><i class="fas fa-times"></i></button>
     <h2><i class="fas fa-history"></i> سجل المشتريات</h2>`;
 
   if (purchases && purchases.length > 0) {
@@ -425,7 +427,8 @@ async function showMyProducts(userKey) {
   // 1. تحميل هيكل النافذة المنبثقة وعرضها مع مؤشر تحميل
   const response = await fetch("pages/myProductsModal.html");
   modalContainer.innerHTML = await response.text();
-  const contentWrapper = modalContainer.querySelector("#my-products-content-wrapper");
+  // ✅ إصلاح: التأكد من أننا نستهدف الحاوية الصحيحة
+  const contentWrapper = modalContainer.querySelector("#my-products-content-wrapper") || modalContainer.querySelector(".modal-content");
   contentWrapper.innerHTML = '<div class="loader" style="margin: 2rem auto;"></div>';
 
   document.body.classList.add("modal-open");

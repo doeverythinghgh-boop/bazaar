@@ -12,13 +12,14 @@
 
 /* Horizontal gallery container */
 .gallery-container {
-  height: 10vh; /* تحديد ارتفاع الحاوية بنسبة 25% من ارتفاع الشاشة */
+  /* ✅ إزالة: تم حذف الارتفاع الثابت للسماح للحاوية بالتمدد */
   display: flex; /* تفعيل نظام Flexbox للعرض الأفقي */
   overflow-x: auto; /* إضافة شريط تمرير أفقي عند الحاجة */
   overflow-y: hidden; /* إخفاء شريط التمرير العمودي */
+  gap: 15px; /* ✅ إضافة: تحديد مسافة 15 بكسل بين عناصر المنتجات */
   white-space: nowrap; /* منع الصور من النزول لسطر جديد */
-  padding: 20px 10px;
-  background-color: #ffffff;
+  padding: 15px 10px; /* ✅ تعديل: تقليل الحشو العمودي قليلاً */
+  background-color: #f9f9f9; /* ✅ تعديل: تغيير الخلفية لتتناسب مع الصفحة */
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   -webkit-overflow-scrolling: touch; /* لتحسين التمرير على أجهزة اللمس */
@@ -26,14 +27,14 @@
 
 /* Styles for images inside the gallery */
 .gallery-container img {
-  height: 100%; /* جعل ارتفاع الصورة يملأ الحاوية */
-  width: 10vh; /* تحديد عرض ثابت للصورة بنفس قيمة ارتفاع الحاوية لجعلها مربعة */
+  /* ✅ تعديل: تم نقل هذه الأنماط إلى .product-item img لتكون أكثر تحديدًا */
+  width: 100%; /* جعل الصورة تملأ عرض حاويتها (product-item) */
+  height: 12vh; /* ✅ إضافة: تحديد ارتفاع ثابت للصور للحفاظ على التناسق */
   object-fit: cover; /* يضمن ملء الصورة للمساحة دون تشويه */
-  margin: 0 10px; /* مسافة بين الصور */
-  border-radius: 8px;
+  border-radius: 0; /* ✅ إزالة: سيتم تطبيق الانحناء على الحاوية الأب */
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.07);
   transition: transform 0.3s ease;
-  cursor: pointer;
+  display: block; /* ✅ إضافة: لإزالة أي مسافات إضافية أسفل الصورة */
   flex-shrink: 0; /* يمنع الصور من التقلص إذا كانت الحاوية ضيقة */
 }
 
@@ -189,14 +190,9 @@
 }
 
 /* Close button for the full-size image view */
+/* ✅ تعديل: توحيد تصميم زر الإغلاق مع بقية الأزرار */
 .close-full-view {
-  position: absolute;
-  top: 10px;
-  right: 20px;
-  font-size: 30px;
-  color: #555;
-  cursor: pointer;
-  line-height: 1;
-  font-weight: bold;
-  transition: color 0.2s;
+  /* استخدام نفس الفئة العامة للأزرار */
+  top: 15px;
+  right: 15px;
 }

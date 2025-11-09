@@ -144,7 +144,9 @@
 </style>
 
 <div class="modal-content product-modal-content" id="product-modal-content">
-  <span class="close-button" id="product-modal-close-btn">&times;</span>
+  <!-- ✅ تعديل: تحويل زر الإغلاق إلى أيقونة داخل زر -->
+  <button class="close-button" id="product-modal-close-btn" aria-label="إغلاق"><i class="fas fa-times"></i></button>
+
   <div class="product-modal-image-container" id="product-modal-image-container">
     <img id="product-modal-image" src="" alt="صورة المنتج" />
     <div class="product-modal-thumbnails" id="product-modal-thumbnails">

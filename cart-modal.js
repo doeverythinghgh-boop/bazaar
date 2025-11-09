@@ -13,7 +13,8 @@ function showCartModal() {
 
   let modalContent = `
     <div class="modal-content">
-      <span class="close-button" id="cart-modal-close-btn">&times;</span>
+      <!-- ✅ تعديل: تحويل زر الإغلاق إلى أيقونة داخل زر -->
+      <button class="close-button" id="cart-modal-close-btn" aria-label="إغلاق"><i class="fas fa-times"></i></button>
       <h2><i class="fas fa-shopping-cart"></i> سلة المشتريات</h2>`;
 
   if (cart.length > 0) {
