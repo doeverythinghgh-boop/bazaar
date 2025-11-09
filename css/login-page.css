@@ -290,12 +290,40 @@ input:checked + .slider:before { transform: translateX(22px); }
 }
 
 .product-card-actions {
-  padding: 20px;
   display: flex;
   align-items: center;
-  justify-content: center;
-  background-color: #f8f9fa; /* تعديل: توحيد لون الخلفية */
-  border-top: 1px solid #eef2f7; /* تعديل: توحيد لون الحدود */
+  justify-content: flex-end; /* جديد: محاذاة الأزرار إلى النهاية (اليسار في RTL) */
+  gap: 0.75rem; /* جديد: إضافة مسافة بين الأزرار */
+  padding: 15px 20px; /* تعديل: تقليل الحشو العمودي */
+  background-color: #f8f9fa;
+  border-top: 1px solid #eef2f7;
+}
+
+/* جديد: تنسيق عام للأزرار الصغيرة (تعديل وحذف) */
+.button.logout-btn-small.edit-product-btn,
+.button.delete-btn-small.delete-product-btn {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  border-radius: 8px;
+  flex-grow: 0; /* منع الأزرار من التمدد */
+  min-width: auto; /* إلغاء العرض الأدنى */
+}
+
+/* جديد: تخصيص لون زر التعديل */
+.button.edit-product-btn {
+  background-color: #3498db; /* أزرق هادئ */
+  border-color: #3498db;
+  color: white;
+}
+.button.edit-product-btn:hover {
+  background-color: #2980b9;
+}
+
+/* جديد: تخصيص لون زر الحذف */
+.button.delete-product-btn {
+  background-color: #e74c3c; /* أحمر تحذيري */
+  border-color: #e74c3c;
+  color: white;
 }
 
 /* جديد: تنسيق حاوية محتوى نافذة منتجاتي */

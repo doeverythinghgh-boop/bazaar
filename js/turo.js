@@ -130,6 +130,33 @@ async function updateProduct(productData) {
 }
 
 /**
+ * جديد: يحذف منتجًا موجودًا عبر واجهة برمجة التطبيقات.
+ * @param {string} productKey - المفتاح الفريد للمنتج المراد حذفه.
+ * @returns {Promise<Object>} كائن الاستجابة من الخادم.
+ */
+async function deleteProduct(productKey) {
+  console.log(`%c[API] Starting deleteProduct for product_key: ${productKey}`, 'color: blue;');
+  try {
+    const response = await fetch(`${baseURL}/api/products?product_key=${productKey}`, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      return { error: data.error || `HTTP error! status: ${response.status}` };
+    }
+
+    console.log('%c[API] deleteProduct successful.', 'color: green;', data);
+    return data;
+  } catch (error) {
+    console.error('%c[API] deleteProduct failed:', 'color: red;', error);
+    return { error: "فشل الاتصال بالخادم عند حذف المنتج." };
+  }
+}
+
+/**
  * يجلب المنتجات بناءً على الفئة الرئيسية والفرعية.
  * @param {string} mainCatId - معرف الفئة الرئيسية.
  * @param {string} subCatId - معرف الفئة الفرعية.

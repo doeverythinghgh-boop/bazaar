@@ -11,7 +11,7 @@ const db = createClient({
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'GET, POST, PUT, OPTIONS',
+  'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type',
 };
 
@@ -171,6 +171,37 @@ export default async function handler(request) {
       return new Response(JSON.stringify({ error: "حدث خطأ أثناء تحديث المنتج: " + err.message }), {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+  }
+
+  if (request.method === "DELETE") {
+    try {
+      const { searchParams } = new URL(request.url);
+      const product_key = searchParams.get('product_key');
+
+      if (!product_key) {
+        return new Response(JSON.stringify({ error: "مفتاح المنتج مطلوب للحذف." }), {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+
+      const { rowsAffected } = await db.execute({
+        sql: "DELETE FROM marketplace_products WHERE product_key = ?",
+        args: [product_key],
+      });
+
+      if (rowsAffected === 0) {
+        return new Response(JSON.stringify({ message: "المنتج غير موجود أو تم حذفه بالفعل." }), { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+      }
+
+      return new Response(JSON.stringify({ message: "تم حذف المنتج بنجاح." }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+
+    } catch (err) {
+      console.error("Database delete error:", err);
+      return new Response(JSON.stringify({ error: "حدث خطأ أثناء حذف المنتج: " + err.message }), {
+        status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
     }
   }

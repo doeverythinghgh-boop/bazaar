@@ -333,8 +333,7 @@ async function showPurchasesModal(userKey) {
   // عرض النافذة مع مؤشر تحميل
   purchasesModal.innerHTML = `
     <div class="modal-content">
-      <!-- ✅ تعديل: تحويل زر الإغلاق إلى أيقونة -->
-      <button class="close-button" id="purchases-modal-close-btn" aria-label="إغلاق"><i class="fas fa-times"></i></button>
+      <span class="close-button" id="purchases-modal-close-btn">&times;</span>
       <h2><i class="fas fa-history"></i> سجل المشتريات</h2>
       <div class="loader" style="margin: 2rem auto;"></div>
     </div>`;
@@ -359,8 +358,7 @@ async function showPurchasesModal(userKey) {
 
   // بناء المحتوى بعد جلب البيانات
   let contentHTML = `
-    <!-- ✅ تعديل: تحويل زر الإغلاق إلى أيقونة -->
-    <button class="close-button" id="purchases-modal-close-btn" aria-label="إغلاق"><i class="fas fa-times"></i></button>
+    <span class="close-button" id="purchases-modal-close-btn">&times;</span>
     <h2><i class="fas fa-history"></i> سجل المشتريات</h2>`;
 
   if (purchases && purchases.length > 0) {
@@ -427,8 +425,7 @@ async function showMyProducts(userKey) {
   // 1. تحميل هيكل النافذة المنبثقة وعرضها مع مؤشر تحميل
   const response = await fetch("pages/myProductsModal.html");
   modalContainer.innerHTML = await response.text();
-  // ✅ إصلاح: التأكد من أننا نستهدف الحاوية الصحيحة
-  const contentWrapper = modalContainer.querySelector("#my-products-content-wrapper") || modalContainer.querySelector(".modal-content");
+  const contentWrapper = modalContainer.querySelector("#my-products-content-wrapper");
   contentWrapper.innerHTML = '<div class="loader" style="margin: 2rem auto;"></div>';
 
   document.body.classList.add("modal-open");
@@ -492,6 +489,9 @@ async function showMyProducts(userKey) {
             <button class="button logout-btn-small edit-product-btn" data-product='${productJson}'>
               <i class="fas fa-edit"></i> تعديل
             </button>
+            <button class="button delete-btn-small delete-product-btn" data-product='${productJson}'>
+              <i class="fas fa-trash-alt"></i> إزالة
+            </button>
           </div>
         </div>`;
     });
@@ -515,6 +515,16 @@ async function showMyProducts(userKey) {
       });
     });
 
+    // 6. جديد: ربط الأحداث بأزرار الحذف
+    const deleteButtons = contentWrapper.querySelectorAll('.delete-product-btn');
+    deleteButtons.forEach(button => {
+      button.addEventListener('click', (event) => {
+        const productData = JSON.parse(event.currentTarget.dataset.product);
+        // استدعاء دالة الحذف الجديدة
+        deleteProductAndImages(productData, userKey);
+      });
+    });
+
   } else if (products) {
     contentWrapper.innerHTML = "<p style='text-align: center; padding: 2rem 0;'>لم تقم بإضافة أي منتجات بعد.</p>";
   } else {
@@ -522,6 +532,63 @@ async function showMyProducts(userKey) {
   }
 }
 
+/**
+ * جديد: يتعامل مع عملية حذف منتج وصوره المرتبطة به.
+ * @param {object} product - كائن المنتج المراد حذفه.
+ * @param {string} userKey - مفتاح المستخدم الحالي لتحديث العرض بعد الحذف.
+ */
+async function deleteProductAndImages(product, userKey) {
+  Swal.fire({
+    title: 'هل أنت متأكد؟',
+    text: `سيتم حذف المنتج "${product.productName}" بشكل نهائي. لا يمكن التراجع عن هذا الإجراء.`,
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#3085d6',
+    confirmButtonText: 'نعم، احذفه!',
+    cancelButtonText: 'إلغاء',
+    showLoaderOnConfirm: true,
+    preConfirm: async () => {
+      try {
+        console.log(`[Delete] Starting deletion for product: ${product.product_key}`);
+
+        // الخطوة 1: حذف الصور من Cloudflare R2
+        if (product.ImageName) {
+          const imageNames = product.ImageName.split(',').filter(name => name);
+          if (imageNames.length > 0) {
+            console.log(`[Delete] Deleting ${imageNames.length} images from Cloudflare...`);
+            // تنفيذ الحذف بالتوازي
+            await Promise.all(imageNames.map(name =>
+              deleteFile2cf(name).catch(err => {
+                // تسجيل الخطأ ولكن عدم إيقاف العملية بأكملها
+                console.error(`[Delete] Failed to delete image ${name}:`, err);
+              })
+            ));
+            console.log('[Delete] Image deletion process completed.');
+          }
+        }
+
+        // الخطوة 2: حذف المنتج من قاعدة البيانات
+        console.log(`[Delete] Deleting product record from database...`);
+        const dbResult = await deleteProduct(product.product_key);
+        if (dbResult && dbResult.error) {
+          throw new Error(dbResult.error);
+        }
+        console.log('[Delete] Product record deleted successfully.');
+        return true; // إشارة إلى نجاح العملية
+      } catch (error) {
+        Swal.showValidationMessage(`فشل الحذف: ${error.message}`);
+        return false;
+      }
+    },
+    allowOutsideClick: () => !Swal.isLoading()
+  }).then((result) => {
+    if (result.isConfirmed) {
+      Swal.fire('تم الحذف!', 'تم حذف المنتج بنجاح ✅.', 'success');
+      showMyProducts(userKey); // تحديث عرض المنتجات لإزالة المنتج المحذوف
+    }
+  });
+}
 
 // التحقق من حالة تسجيل الدخول عند تحميل الصفحة
 document.addEventListener("DOMContentLoaded", () => {
