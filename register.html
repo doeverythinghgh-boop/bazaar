@@ -189,6 +189,7 @@
 
       form.addEventListener("submit", async function (e) {
         e.preventDefault(); // Prevent form from submitting
+        console.log('%c[Register] Form submitted.', 'color: blue;');
         let isValid = true;
 
         // --- Validation ---
@@ -196,6 +197,7 @@
         // 1. Username validation
         clearError(username);
         const usernameValue = username.value.trim();
+        console.log('[Register] Validating username...');
         if (usernameValue === "") {
           showError(username, "الاسم مطلوب.");
           isValid = false;
@@ -207,6 +209,7 @@
         // 2. Phone validation
         clearError(phone);
         const phoneValue = phone.value.trim();
+        console.log('[Register] Validating phone number...');
         if (phoneValue === "") {
           showError(phone, "رقم الهاتف مطلوب.");
           isValid = false;
@@ -215,9 +218,15 @@
           isValid = false;
         }
 
+        if (!isValid) {
+          console.warn('[Register] Validation failed.');
+          return;
+        }
+
         if (isValid) {
           // ✅ جديد: التحقق مما إذا كان المستخدم قد أدخل كلمة مرور
           if (password.value.trim() !== "") {
+            console.log('[Register] Password entered. Prompting for confirmation...');
             const { value: confirmedPassword } = await Swal.fire({
               title: "تأكيد كلمة المرور",
               html: `
@@ -251,11 +260,13 @@
 
             // إذا ألغى المستخدم، أوقف عملية التسجيل
             if (!confirmedPassword) {
+              console.log('[Register] Password confirmation cancelled by user.');
               return;
             }
           }
 
           const userKey = generateSerialNumber(); // 🔑 توليد الرقم التسلسلي
+          console.log(`[Register] Generated new user_key: ${userKey}`);
           const newUser = {
             username: username.value.trim(),
             phone: phone.value.trim(),
@@ -264,6 +275,7 @@
             address: address.value.trim(), // قد تكون فارغة
           };
 
+          console.log('[Register] Sending new user data to API...', newUser);
           // إظهار رسالة انتظار باستخدام SweetAlert2
           Swal.fire({
             title: "جاري إنشاء الحساب...",
@@ -279,6 +291,7 @@
             Swal.close(); // إغلاق رسالة الانتظار
 
             if (result && result.message) {
+              console.log('%c[Register] Registration successful.', 'color: green;', result);
               // حفظ بيانات المستخدم في التخزين المحلي لتسجيل دخوله
               // ✅ إصلاح: التأكد من حفظ جميع البيانات التي أدخلها المستخدم، بما في ذلك العنوان
               const loggedInUserData = {
@@ -289,6 +302,7 @@
                 is_seller: 0 // إضافة قيمة افتراضية لحالة البائع
               };
               localStorage.setItem("loggedInUser", JSON.stringify(loggedInUserData));
+              console.log('[Register] User data saved to localStorage. Redirecting to index.html...');
 
               // إظهار رسالة ترحيب قبل التوجيه إلى الصفحة الرئيسية
               Swal.fire({
@@ -303,16 +317,18 @@
                 }
               });
             } else if (result && result.error) {
+              console.warn('[Register] API returned an error:', result.error);
               // إذا كان هناك خطأ من الخادم (مثل رقم هاتف مكرر)
               showError(phone, result.error);
 
             } else {
+              console.error('[Register] Unknown API failure.');
               // في حالة فشل غير معروف السبب من الخادم
               showError(form, "حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى.");
             }
           } catch (error) {
             Swal.close(); // تأكد من إغلاق الرسالة في حالة حدوث خطأ
-            console.error("Error during registration:", error);
+            console.error("%c[Register] Critical error during registration:", 'color: red; font-weight: bold;', error);
             // هذا الخطأ يحدث إذا كانت هناك مشكلة في الاتصال بالخادم أو الكود
             showError(form, "حدث خطأ في التطبيق. يرجى المحاولة لاحقاً.");
           }

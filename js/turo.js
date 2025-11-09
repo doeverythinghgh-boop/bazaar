@@ -14,6 +14,7 @@
  * @returns {Promise<Object|null>} كائن يحتوي على بيانات المستخدمين أو null في حالة حدوث خطأ
  */
 async function fetchUsers() {
+  console.log('%c[API] Starting fetchUsers...', 'color: blue;');
   try {
     // إرسال طلب لجلب البيانات من الرابط المحدد
     const response = await fetch(`${baseURL}/api/users`);
@@ -25,12 +26,12 @@ async function fetchUsers() {
 
     // تحويل الاستجابة إلى كائن JSON وإرجاعها
     const data = await response.json();
-    console.log("تم جلب بيانات المستخدمين بنجاح.", data);
+    console.log('%c[API] fetchUsers successful.', 'color: green;', data);
     return data;
 
   } catch (error) {
     // في حالة حدوث أي خطأ أثناء جلب البيانات، يتم طباعته هنا
-    console.error("فشل جلب بيانات المستخدمين:", error);
+    console.error('%c[API] fetchUsers failed:', 'color: red;', error);
     return null; // إرجاع null للإشارة إلى فشل العملية
   }
 }
@@ -46,6 +47,7 @@ async function fetchUsers() {
  * @returns {Promise<Object|null>} الكائن الذي تم إنشاؤه أو null في حالة الفشل.
  */
 async function addUser(userData) {
+  console.log('%c[API] Starting addUser with data:', 'color: blue;', userData);
   try {
     const response = await fetch(`${baseURL}/api/users`, {
       method: "POST",
@@ -62,10 +64,10 @@ async function addUser(userData) {
       return { error: data.error || `HTTP error! status: ${response.status}` };
     }
 
-    console.log("تمت إضافة المستخدم بنجاح:", data);
+    console.log('%c[API] addUser successful.', 'color: green;', data);
     return data;
   } catch (error) {
-    console.error("فشل في إضافة المستخدم:", error);
+    console.error('%c[API] addUser failed:', 'color: red;', error);
     // إرجاع كائن خطأ عام في حالة فشل الشبكة أو أخطاء أخرى
     return { error: "فشل الاتصال بالخادم." };
   }
@@ -77,6 +79,7 @@ async function addUser(userData) {
  * @returns {Promise<Object|null>} الكائن الذي تم إنشاؤه أو null في حالة الفشل.
  */
 async function addProduct(productData) {
+  console.log('%c[API] Starting addProduct with data:', 'color: blue;', productData);
   try {
     const response = await fetch(`${baseURL}/api/products`, {
       method: "POST",
@@ -90,10 +93,10 @@ async function addProduct(productData) {
       return { error: data.error || `HTTP error! status: ${response.status}` };
     }
 
-    console.log("تمت إضافة المنتج بنجاح:", data);
+    console.log('%c[API] addProduct successful.', 'color: green;', data);
     return data;
   } catch (error) {
-    console.error("فشل في إضافة المنتج:", error);
+    console.error('%c[API] addProduct failed:', 'color: red;', error);
     return { error: "فشل الاتصال بالخادم عند إضافة المنتج." };
   }
 }
@@ -104,6 +107,7 @@ async function addProduct(productData) {
  * @returns {Promise<Object|null>} الكائن الذي تم تحديثه أو null في حالة الفشل.
  */
 async function updateProduct(productData) {
+  console.log('%c[API] Starting updateProduct with data:', 'color: blue;', productData);
   try {
     const response = await fetch(`${baseURL}/api/products`, {
       method: "PUT",
@@ -117,10 +121,10 @@ async function updateProduct(productData) {
       return { error: data.error || `HTTP error! status: ${response.status}` };
     }
 
-    console.log("تم تحديث المنتج بنجاح:", data);
+    console.log('%c[API] updateProduct successful.', 'color: green;', data);
     return data;
   } catch (error) {
-    console.error("فشل في تحديث المنتج:", error);
+    console.error('%c[API] updateProduct failed:', 'color: red;', error);
     return { error: "فشل الاتصال بالخادم عند تحديث المنتج." };
   }
 }
@@ -132,6 +136,7 @@ async function updateProduct(productData) {
  * @returns {Promise<Array|null>} مصفوفة من المنتجات أو null في حالة الفشل.
  */
 async function getProductsByCategory(mainCatId, subCatId) {
+  console.log(`%c[API] Starting getProductsByCategory (Main: ${mainCatId}, Sub: ${subCatId})`, 'color: blue;');
   try {
     const response = await fetch(`${baseURL}/api/products?MainCategory=${mainCatId}&SubCategory=${subCatId}`);
 
@@ -140,9 +145,11 @@ async function getProductsByCategory(mainCatId, subCatId) {
       throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
     }
 
-    return await response.json();
+    const data = await response.json();
+    console.log('%c[API] getProductsByCategory successful.', 'color: green;', data);
+    return data;
   } catch (error) {
-    console.error("فشل في جلب المنتجات حسب الفئة:", error);
+    console.error('%c[API] getProductsByCategory failed:', 'color: red;', error);
     return null;
   }
 }
@@ -153,6 +160,7 @@ async function getProductsByCategory(mainCatId, subCatId) {
  * @returns {Promise<Array|null>} مصفوفة من المنتجات أو null في حالة الفشل.
  */
 async function getProductsByUser(userKey) {
+  console.log(`%c[API] Starting getProductsByUser for user_key: ${userKey}`, 'color: blue;');
   try {
     const response = await fetch(`${baseURL}/api/products?user_key=${userKey}`);
 
@@ -162,10 +170,10 @@ async function getProductsByUser(userKey) {
     }
 
     const data = await response.json();
-    console.log("تم جلب منتجات المستخدم بنجاح:", data);
+    console.log('%c[API] getProductsByUser successful.', 'color: green;', data);
     return data;
   } catch (error) {
-    console.error("فشل في جلب منتجات المستخدم:", error);
+    console.error('%c[API] getProductsByUser failed:', 'color: red;', error);
     return null;
   }
 }
@@ -176,6 +184,7 @@ async function getProductsByUser(userKey) {
  * @returns {Promise<Object|null>}
  */
 async function updateUsers(updates) {
+  console.log('%c[API] Starting updateUsers with data:', 'color: blue;', updates);
   try {
     const response = await fetch(`${baseURL}/api/users`, {
       method: "PUT",
@@ -189,10 +198,10 @@ async function updateUsers(updates) {
       return { error: data.error || `HTTP error! status: ${response.status}` };
     }
 
-    console.log("تم تحديث المستخدمين بنجاح:", data);
+    console.log('%c[API] updateUsers successful.', 'color: green;', data);
     return data;
   } catch (error) {
-    console.error("فشل في تحديث المستخدمين:", error);
+    console.error('%c[API] updateUsers failed:', 'color: red;', error);
     return { error: "فشل الاتصال بالخادم." };
   }
 }
@@ -203,6 +212,7 @@ async function updateUsers(updates) {
  * @returns {Promise<Object>}
  */
 async function updateUser(userData) {
+  console.log('%c[API] Starting updateUser with data:', 'color: blue;', userData);
   try {
     const response = await fetch(`${baseURL}/api/users`, {
       method: "PUT",
@@ -216,10 +226,10 @@ async function updateUser(userData) {
       return { error: data.error || `HTTP error! status: ${response.status}` };
     }
 
-    console.log("تم تحديث المستخدم بنجاح:", data);
+    console.log('%c[API] updateUser successful.', 'color: green;', data);
     return data;
   } catch (error) {
-    console.error("فشل في تحديث المستخدم:", error);
+    console.error('%c[API] updateUser failed:', 'color: red;', error);
     return { error: "فشل الاتصال بالخادم." };
   }
 }
@@ -229,13 +239,14 @@ async function updateUser(userData) {
  * @returns {Promise<Object|null>} كائن يحتوي على بيانات المستخدم (الاسم، الهاتف، user_key، حالة البائع) أو null إذا لم يتم العثور عليه أو في حالة حدوث خطأ.
  */
 async function getUserByPhone(phone) {
+  console.log(`%c[API] Starting getUserByPhone for phone: ${phone}`, 'color: blue;');
   try {
     // بناء الرابط مع رقم الهاتف كمعامل استعلام
     const response = await fetch(`${baseURL}/api/users?phone=${phone}`);
 
     // إذا كان المستخدم غير موجود (404)، لا تعتبره خطأ فادحًا، بل أرجع null
     if (response.status === 404) {
-      console.log("المستخدم غير موجود.");
+      console.warn('[API] getUserByPhone: User not found (404).');
       return null;
     }
 
@@ -245,9 +256,11 @@ async function getUserByPhone(phone) {
     }
 
     // تحويل الاستجابة إلى JSON وإرجاعها
-    return await response.json();
+    const data = await response.json();
+    console.log('%c[API] getUserByPhone successful.', 'color: green;', data);
+    return data;
   } catch (error) {
-    console.error("فشل في جلب المستخدم عن طريق رقم الهاتف:", error);
+    console.error('%c[API] getUserByPhone failed:', 'color: red;', error);
     return null; // إرجاع null للإشارة إلى فشل العملية
   }
 }
@@ -259,6 +272,7 @@ async function getUserByPhone(phone) {
  * @returns {Promise<Object|null>} كائن بيانات المستخدم عند النجاح، أو كائن خطأ عند الفشل.
  */
 async function verifyUserPassword(phone, password) {
+  console.log(`%c[API] Starting verifyUserPassword for phone: ${phone}`, 'color: blue;');
   try {
     const response = await fetch(`${baseURL}/api/users`, {
       method: "POST",
@@ -273,10 +287,10 @@ async function verifyUserPassword(phone, password) {
       return { error: data.error || `HTTP error! status: ${response.status}` };
     }
 
-    console.log("تم التحقق من المستخدم بنجاح:", data);
+    console.log('%c[API] verifyUserPassword successful.', 'color: green;', data);
     return data;
   } catch (error) {
-    console.error("فشل في التحقق من المستخدم:", error);
+    console.error('%c[API] verifyUserPassword failed:', 'color: red;', error);
     return { error: "فشل الاتصال بالخادم." };
   }
 }
@@ -291,6 +305,7 @@ async function verifyUserPassword(phone, password) {
  * @returns {Promise<Object>} كائن الاستجابة من الخادم.
  */
 async function createOrder(orderData) {
+  console.log('%c[API] Starting createOrder with data:', 'color: blue;', orderData);
   try {
     const response = await fetch(`${baseURL}/api/orders`, {
       method: "POST",
@@ -304,9 +319,10 @@ async function createOrder(orderData) {
       return { error: data.error || `HTTP error! status: ${response.status}` };
     }
 
+    console.log('%c[API] createOrder successful.', 'color: green;', data);
     return data;
   } catch (error) {
-    console.error("فشل في إنشاء الطلب (مشكلة في الاتصال أو CORS):", error);
+    console.error('%c[API] createOrder failed:', 'color: red;', error);
     return { error: "فشل الاتصال بالخادم عند إنشاء الطلب." };
   }
 }
@@ -317,6 +333,7 @@ async function createOrder(orderData) {
  * @returns {Promise<Array|null>} مصفوفة من عناصر المشتريات أو null في حالة الفشل.
  */
 async function getUserPurchases(userKey) {
+  console.log(`%c[API] Starting getUserPurchases for user_key: ${userKey}`, 'color: blue;');
   try {
     const response = await fetch(`${baseURL}/api/purchases?user_key=${userKey}`);
 
@@ -326,11 +343,11 @@ async function getUserPurchases(userKey) {
     }
 
     const data = await response.json();
-    console.log("تم جلب سجل المشتريات بنجاح:", data);
+    console.log('%c[API] getUserPurchases successful.', 'color: green;', data);
     return data;
 
   } catch (error) {
-    console.error("فشل في جلب سجل المشتريات:", error);
+    console.error('%c[API] getUserPurchases failed:', 'color: red;', error);
     return null;
   }
 }
@@ -343,6 +360,7 @@ async function getUserPurchases(userKey) {
  * @returns {Promise<Object>} كائن الاستجابة من الخادم.
  */
 async function sendNotification(token, title, body) {
+  console.log(`%c[API] Starting sendNotification to token: ${token.substring(0, 10)}...`, 'color: blue;');
   try {
     const response = await fetch(`${baseURL}/api/send-notification`, {
       method: "POST",
@@ -356,9 +374,10 @@ async function sendNotification(token, title, body) {
       return { error: data.error || `HTTP error! status: ${response.status}` };
     }
 
+    console.log('%c[API] sendNotification successful.', 'color: green;', data);
     return data;
   } catch (error) {
-    console.error("فشل في إرسال الإشعار (مشكلة في الاتصال):", error);
+    console.error('%c[API] sendNotification failed:', 'color: red;', error);
     return { error: "فشل الاتصال بخادم الإشعارات." };
   }
 }
@@ -376,10 +395,13 @@ async function sendNotification(token, title, body) {
  * @param {object} productData - بيانات المنتج الكاملة.
  */
 window.showProductDetails = async function(productData) {
+  console.log('%c[Modal] Opening product details modal for:', 'color: darkcyan', productData.productName);
   const modal = document.getElementById("product-details-modal");
 
   // تحميل محتوى النافذة من الملف
+  console.log('[Modal] Fetching showProduct.html content...');
   const response = await fetch("pages/showProduct.html");
+  if (!response.ok) { console.error('[Modal] Failed to fetch showProduct.html'); return; }
   modal.innerHTML = await response.text();
 
   // تعبئة البيانات
@@ -393,12 +415,14 @@ window.showProductDetails = async function(productData) {
   // تعبئة معرض الصور
   const mainImage = document.getElementById("product-modal-image");
   const thumbnailsContainer = document.getElementById("product-modal-thumbnails");
+  console.log('[Modal] Populating product data and images.');
   mainImage.src = productData.imageSrc[0]; // عرض الصورة الأولى
   thumbnailsContainer.innerHTML = ''; // مسح الصور المصغرة القديمة
   productData.imageSrc.forEach(src => {
     const thumb = document.createElement('img');
     thumb.src = src;
     thumb.onclick = () => { mainImage.src = src; };
+    thumb.onerror = () => { console.warn('[Modal] Thumbnail image failed to load:', src); };
     thumbnailsContainer.appendChild(thumb);
   });
 
@@ -410,9 +434,11 @@ window.showProductDetails = async function(productData) {
   const currentPrice = productData.pricePerItem ? parseFloat(productData.pricePerItem) : 0;
 
   if (originalPrice > 0 && originalPrice !== currentPrice) {
+    console.log('[Modal] Displaying original price.');
     originalPriceEl.textContent = `${originalPrice.toFixed(2)} جنيه`;
     originalPriceContainer.style.display = 'block'; // إظهار الحاوية بأكملها
   } else {
+    console.log('[Modal] Hiding original price.');
     // ✅ إصلاح: إفراغ المحتوى بالإضافة إلى الإخفاء لمنع ظهور "undefined"
     originalPriceContainer.style.display = 'none'; // إخفاء الحاوية بأكملها
     originalPriceEl.textContent = '';
@@ -425,6 +451,7 @@ window.showProductDetails = async function(productData) {
 
   // وظيفة الإغلاق
   const closeModal = () => {
+    console.log('[Modal] Closing product details modal.');
     modal.style.display = "none";
     document.body.classList.remove("modal-open");
   };
@@ -439,6 +466,7 @@ window.showProductDetails = async function(productData) {
   const selectedQuantityInput = document.getElementById('product-modal-selected-quantity');
   const totalPriceEl = document.getElementById('product-modal-total-price');
 
+  console.log('[Modal] Initializing quantity controls.');
   // تعيين الحد الأقصى للكمية
   selectedQuantityInput.max = productData.availableQuantity;
 
@@ -476,6 +504,7 @@ window.showProductDetails = async function(productData) {
     const loggedInUser = localStorage.getItem("loggedInUser");
 
     if (loggedInUser) {
+      console.log('[Modal] Add to cart button clicked by logged in user.');
       // إذا كان المستخدم مسجلاً، استمر في عملية الإضافة للسلة
       const quantity = parseInt(document.getElementById('product-modal-selected-quantity').value, 10);
       const productInfoForCart = {
@@ -488,6 +517,7 @@ window.showProductDetails = async function(productData) {
       };
       addToCart(productInfoForCart, quantity);
     } else {
+      console.warn('[Modal] Add to cart button clicked by guest. Prompting for login.');
       // إذا لم يكن المستخدم مسجلاً، أظهر رسالة تنبيه
       Swal.fire({
         icon: 'warning',
@@ -498,6 +528,7 @@ window.showProductDetails = async function(productData) {
         cancelButtonText: 'إلغاء'
       }).then((result) => {
         if (result.isConfirmed) {
+          console.log('[Modal] User chose to log in. Redirecting...');
           window.location.href = 'login.html'; // توجيه المستخدم لصفحة تسجيل الدخول
         }
       });

@@ -127,6 +127,7 @@
  * دالة لتهيئة نموذج إضافة المنتج، بما في ذلك تحميل الفئات.
  */
 async function initializeAddProductForm(editProductData = null) {
+  console.log('%c[ProductForm] Initializing form...', 'color: blue;');
   const mainCategorySelect = document.getElementById("main-category");
   const subCategorySelect = document.getElementById("sub-category");
   let originalImageNames = []; // جديد: لتخزين أسماء الصور الأصلية في وضع التعديل
@@ -140,12 +141,15 @@ async function initializeAddProductForm(editProductData = null) {
   // تحديد ما إذا كنا في وضع التعديل
   const isEditMode = editProductData !== null;
   form.dataset.mode = isEditMode ? 'edit' : 'add';
+  console.log(`[ProductForm] Mode: ${form.dataset.mode}`);
   window.productModule.originalImageNames = []; // إعادة تعيين عند كل تهيئة
   if (isEditMode) {
     form.dataset.productKey = editProductData.product_key;
+    console.log(`[ProductForm] Editing product with key: ${editProductData.product_key}`);
   }
 
   try {
+    console.log('[ProductForm] Loading categories from ../shared/list.json');
     // تحميل بيانات الفئات من ملف JSON
     // المسار ../shared/list.json صحيح لأن هذا الملف يُحمّل من داخل /pages/
     const response = await fetch("../shared/list.json");
@@ -158,6 +162,7 @@ async function initializeAddProductForm(editProductData = null) {
       const option = new Option(category.title, category.id);
       mainCategorySelect.add(option);
     });
+    console.log('%c[ProductForm] Main categories loaded successfully.', 'color: green;');
 
     // إضافة مستمع للتغيير على الفئة الرئيسية
     mainCategorySelect.addEventListener("change", (event) => {
@@ -188,11 +193,12 @@ async function initializeAddProductForm(editProductData = null) {
       }
     });
   } catch (error) {
-    console.error("فشل في تحميل الفئات:", error);
+    console.error("%c[ProductForm] Failed to load categories:", 'color: red;', error);
   }
 
   // إذا كنا في وضع التعديل، قم بتعبئة الحقول
   if (isEditMode) {
+    console.log('[ProductForm] Populating form with existing product data.');
     // تغيير عنوان النافذة وزر الإرسال
     document.getElementById('addProductTitle').innerHTML = '<i class="fas fa-edit"></i> تعديل المنتج';
     document.querySelector('.submit-container .btn').textContent = 'حفظ التعديلات';
@@ -208,6 +214,7 @@ async function initializeAddProductForm(editProductData = null) {
 
     // جديد: تعبئة الصور الموجودة مسبقًا
     if (editProductData.ImageName) {
+      console.log('[ProductForm] Loading existing images:', editProductData.ImageName);
       const imageNames = editProductData.ImageName.split(',');
       originalImageNames = [...imageNames]; // تخزين الأسماء الأصلية
       window.productModule.originalImageNames = originalImageNames; // جعلها متاحة لنطاق أوسع
@@ -236,6 +243,7 @@ async function initializeAddProductForm(editProductData = null) {
 
   // جديد: تحديد الفئات في وضع التعديل (يجب أن يكون بعد تعبئة الفئات وقبل نهاية الدالة)
   if (isEditMode && editProductData.ImageName) {
+    console.log('[ProductForm] Setting selected categories for editing.');
     // الطريقة الجديدة: استخدام الحقول المباشرة من قاعدة البيانات
     const mainCatId = editProductData.MainCategory;
     const subCatId = editProductData.SubCategory;
@@ -414,6 +422,7 @@ window.productModule = (function() {
 
   // --- حذف صورة ---
   function removeImage(id) {
+    console.log(`[ImageUploader] Attempting to remove image with id: ${id}`);
     Swal.fire({
       title: 'هل أنت متأكد؟',
       text: "هل تريد بالتأكيد حذف هذه الصورة؟",
@@ -431,6 +440,7 @@ window.productModule = (function() {
           const state = images[idx];
           // 2. قم بإزالة عنصر الصورة من واجهة المستخدم (DOM)
           if (state._el) state._el.remove();
+          console.log(`[ImageUploader] Image ${id} (${state.fileName || 'new file'}) removed from view.`);
           // 3. قم بإزالة الصورة من مصفوفة الحالة
           images.splice(idx, 1);
           // ملاحظة: لا يتم استدعاء أي دالة حذف من السحابة هنا.
@@ -442,6 +452,7 @@ window.productModule = (function() {
 
   // --- إعادة تعيين الكل ---
   function clearAll() {
+    console.log('[ImageUploader] Attempting to clear all images.');
     if (images.length === 0) return; // لا تفعل شيئًا إذا لم تكن هناك صور
 
     Swal.fire({
@@ -457,6 +468,7 @@ window.productModule = (function() {
       if (result.isConfirmed) {
         // حذف العناصر من الواجهة
         previewsEl.innerHTML = '';
+        console.log('[ImageUploader] All images cleared.');
         // إفراغ مصفوفة الصور
         images.length = 0;
       }
@@ -466,6 +478,7 @@ window.productModule = (function() {
   // --- معالجة ملفات عند اختيارها أو إفلاتها ---
   async function handleNewFiles(fileList){
     // إخفاء رسالة الخطأ الخاصة بالصور بمجرد محاولة إضافة صور جديدة
+    console.log(`[ImageUploader] Handling ${fileList.length} new files.`);
     clearError(uploaderEl);
 
     const filesArr = Array.from(fileList).slice(0, MAX_FILES - images.length);
@@ -477,16 +490,18 @@ window.productModule = (function() {
       createPreviewItem(state);
       // ضغط الصورة (غير متزامن، تحدث التحديثات على واجهة المعاينة)
       try{
+        console.log(`[ImageUploader] Compressing image: ${file.name}`);
         state.status = 'compressing';
         const compressed = await compressImage(file);
         state.compressedBlob = compressed;
         state.status = 'ready';
+        console.log(`%c[ImageUploader] Image compressed successfully: ${file.name} -> ${formatBytes(compressed.size)}`, 'color: green;');
         // تحديث واجهة المستخدم بحجم الصورة بعد الضغط
         if (state._metaEl) {
           state._metaEl.textContent = formatBytes(compressed.size);
         }
       }catch(err){
-        console.error('خطأ أثناء ضغط الصورة', err);
+        console.error('%c[ImageUploader] Error compressing image:', 'color: red;', err);
         state.status = 'error';
         if (state._metaEl) {
           state._metaEl.textContent = 'خطأ';
@@ -633,9 +648,11 @@ window.productModule = (function() {
   // إرسال النموذج: مثال يضغط الملفات ويقوم بالرفع
   form.addEventListener('submit', async (e)=>{
     e.preventDefault();
+    console.log('%c[ProductForm] Submit event triggered.', 'color: blue;');
     let isValid = true;
 
     // --- التحقق من صحة المدخلات ---
+    console.log('[ProductForm] Starting validation...');
 
     // 1. التحقق من وجود صورة واحدة على الأقل
     clearError(uploaderEl);
@@ -697,9 +714,13 @@ window.productModule = (function() {
     }
 
 
-    if (!isValid) return; // إيقاف التنفيذ إذا كانت البيانات غير صالحة
+    if (!isValid) {
+      console.warn('[ProductForm] Validation failed. Submission aborted.');
+      return; // إيقاف التنفيذ إذا كانت البيانات غير صالحة
+    }
 
     // إذا كانت جميع البيانات صالحة، استمر في عملية الرفع
+    console.log('%c[ProductForm] Validation passed. Starting submission process.', 'color: green;');
     Swal.fire({
       title: 'جاري إضافة المنتج...',
       text: 'الرجاء الانتظار قليلاً بينما يتم رفع الصور.',
@@ -719,12 +740,12 @@ window.productModule = (function() {
         const finalImageNames = images.map(state => state.fileName).filter(Boolean);
         
         const imagesToDelete = originalImageNames.filter(name => !finalImageNames.includes(name));
-
+        
         if (imagesToDelete.length > 0) {
-          console.log("سيتم حذف الصور التالية:", imagesToDelete);
+          console.log("[ProductForm] Deleting old images:", imagesToDelete);
           // تنفيذ الحذف بالتوازي
           await Promise.all(imagesToDelete.map(name => 
-            deleteFile2cf(name, (msg) => console.log('[Delete]', msg))
+            deleteFile2cf(name, (msg) => console.log('[CloudflareDelete]', msg))
               .catch(err => console.error(`فشل حذف الملف ${name}:`, err)) // منع خطأ واحد من إيقاف العملية كلها
           ));
         }
@@ -733,6 +754,7 @@ window.productModule = (function() {
 
       // 2. رفع الصور بالتسلسل
       const uploadedImageUrls = [];
+      console.log(`[ProductForm] Uploading ${images.filter(s => s.status === 'ready').length} new images...`);
       for (let i = 0; i < images.length; i++) {
         const state = images[i];
         if (state.status !== 'ready' || !state.compressedBlob) continue;
@@ -742,7 +764,8 @@ window.productModule = (function() {
         const fileName = `${i + 1}_${productSerial}.webp`;
 
         // 4. استدعاء دالة الرفع من cloudFileManager.js
-        const result = await uploadFile2cf(state.compressedBlob, fileName, (msg) => console.log('[Upload]', msg));
+        const result = await uploadFile2cf(state.compressedBlob, fileName, (msg) => console.log('[CloudflareUpload]', msg));
+        console.log(`[ProductForm] Image uploaded: ${result.file}`);
         uploadedImageUrls.push(result.file); // أو result.url إذا كانت الـ API تعيده
       }
 
@@ -752,6 +775,7 @@ window.productModule = (function() {
         .map(state => state.fileName);
       finalImageNames.push(...uploadedImageUrls); // إضافة الصور الجديدة
 
+      console.log('[ProductForm] Assembling final product data for API.');
       // 5. تجميع بيانات المنتج لإرسالها إلى قاعدة البيانات
       const user = JSON.parse(localStorage.getItem("loggedInUser"));
       if (!user || !user.user_key) {
@@ -781,11 +805,13 @@ window.productModule = (function() {
 
       if (mode === 'edit') {
         // في وضع التعديل، أضف مفتاح المنتج وأرسل طلب تحديث
+        console.log('[ProductForm] Sending UPDATE request to backend...');
         productData.product_key = form.dataset.productKey;
         dbResult = await updateProduct(productData);
         successMessage = 'تم تحديث المنتج بنجاح.';
       } else {
         // في وضع الإضافة، أرسل طلب إضافة
+        console.log('[ProductForm] Sending ADD request to backend...');
         dbResult = await addProduct(productData);
         successMessage = 'تم إضافة المنتج بنجاح.';
       }
@@ -795,6 +821,7 @@ window.productModule = (function() {
         throw new Error(`فشل حفظ بيانات المنتج: ${dbResult.error}`);
       }
 
+      console.log('%c[ProductForm] Product saved to DB successfully.', 'color: green; font-weight: bold;');
       // 7. عرض رسالة النجاح، إغلاق نافذة التعديل، وتحديث قائمة المنتجات
       Swal.fire('تم بنجاح!', successMessage, 'success').then(() => {
         // إغلاق النافذة المنبثقة
@@ -809,7 +836,8 @@ window.productModule = (function() {
       });
 
     } catch (error) {
-      Swal.fire('خطأ!', `فشل في رفع المنتج: ${error.message}`, 'error');
+      console.error('%c[ProductForm] Submission failed with critical error:', 'color: red; font-weight: bold;', error);
+      Swal.fire('خطأ!', `فشل في حفظ المنتج: ${error.message}`, 'error');
     }
   });
 
