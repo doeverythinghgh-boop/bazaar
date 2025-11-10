@@ -1,0 +1,315 @@
+<!--
+  @file pages/Advertiesment.html
+  @description نموذج إدارة إعلانات الصور (HTML Fragment) للمدير.
+
+  هذا الملف هو جزء من واجهة المستخدم يتم تحميله ديناميكيًا داخل نافذة منبثقة (modal)
+  عندما ينقر المسؤول على زر "إدارة الإعلانات". يحتوي على نموذج لإدارة صور الإعلان:
+  - موديول متقدم لرفع الصور مع ضغطها من جهة العميل.
+  - تحميل وعرض الصور الموجودة مسبقًا من Cloudflare R2.
+  - إمكانية حذف الصور القديمة وإضافة صور جديدة.
+  - شيفرة JavaScript مدمجة للتحقق من صحة النموذج، ومعالجة الصور، ورفع/حذف البيانات من R2.
+-->
+
+<div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="adverTitle">
+  <button class="close-button" id="adver-modal-close-btn" aria-label="إغلاق"><i class="fas fa-times"></i></button>
+
+  <h2 id="adverTitle"><i class="fas fa-bullhorn"></i> إضافة إعلان جديد</h2>
+
+  <form id="adver-form" novalidate>
+    <!-- موديول رفع الصور -->
+    <section class="form-group" aria-labelledby="imagesHeading">
+      <label id="imagesHeading"><i class="fas fa-images"></i> صور الإعلان</label>
+
+      <div class="image-uploader" id="image-uploader" tabindex="0" role="group" aria-label="منطقة رفع الصور">
+
+        <div class="uploader-actions">
+          <input class="hidden-file" id="file-input" type="file" accept="image/*" multiple aria-hidden="true">
+          <button type="button" class="btn btn-ghost btn-icon" id="pick-files-btn" title="اختر صورًا"><i class="fas fa-folder-open"></i></button>
+          <button type="button" class="btn btn-ghost btn-icon" id="take-photo-btn" title="التقاط من الكاميرا"><i class="fas fa-camera"></i></button>
+          <button type="button" class="btn btn-ghost btn-icon" id="clear-all-btn" title="مسح الكل"><i class="fas fa-trash-alt"></i></button>
+        </div>
+
+        <div class="hint">يمكنك إضافة صور جديدة أو حذف الصور الحالية.</div>
+
+        <div class="previews" id="previews" aria-live="polite" aria-atomic="false">
+            <div class="loader" id="images-loader" style="margin: 20px auto; display: none;"></div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- زر إرسال النموذج -->
+    <div class="submit-container">
+      <button type="submit" class="btn btn-primary">نشر الإعلان الآن</button>
+    </div>
+  </form>
+</div>
+
+<script>
+/**
+ * دالة لتهيئة نموذج إدارة الإعلان.
+ */
+async function initializeAdvertiesmentForm() {
+  console.log('%c[AdverForm] Initializing form...', 'color: #20c997;');
+  
+  // الوصول إلى مصفوفة الصور وحالة الموديول من النطاق الخارجي
+  const images = window.adverModule.images;
+  images.length = 0; // إفراغ مصفوفة الصور عند كل تهيئة
+  window.adverModule.originalImageNames = []; // إعادة تعيين عند كل تهيئة
+
+  // تحميل الصور الموجودة مسبقًا
+  await window.adverModule.loadExistingAdverImages();
+}
+
+// جعل الدوال والمتغيرات متاحة عالميًا ضمن نطاق النافذة
+window.adverModule = (function() {
+  const IMAGE_MAX_WIDTH = 1600;
+  const IMAGE_MAX_HEIGHT = 1600;
+  const IMAGE_QUALITY = 0.75;
+  const MAX_FILES = 10;
+  const R2_PUBLIC_URL = 'https://pub-e828389e2f1e484c89d8fb652c540c12.r2.dev';
+
+  const fileInput = document.getElementById('file-input');
+  const pickFilesBtn = document.getElementById('pick-files-btn');
+  const takePhotoBtn = document.getElementById('take-photo-btn');
+  const clearAllBtn = document.getElementById('clear-all-btn');
+  const previewsEl = document.getElementById('previews');
+  const uploaderEl = document.getElementById('image-uploader');
+  const form = document.getElementById('adver-form');
+  const imagesLoader = document.getElementById('images-loader');
+
+  const images = [];
+  let originalImageNames = [];
+  let idCounter = 1;
+
+  function genId() { return 'ad_img_' + (Date.now() + idCounter++); }
+
+  async function supportsWebP() {
+    if (!self.createImageBitmap) return false;
+    const blob = await fetch('data:image/webp;base64,UklGRiIAAABXRUJQVlA4TAYAAAAvAAAAAAfQ//73v/+BiOh/AAA=')
+      .then(r => r.blob()).catch(()=>null);
+    if (!blob) return false;
+    try { await createImageBitmap(blob); return true; } catch(e) { return false; }
+  }
+  const WEBP_SUPPORTED_PROMISE = supportsWebP();
+
+  async function compressImage(file) {
+    const imgBitmap = await createImageBitmap(file);
+    let { width, height } = imgBitmap;
+    const ratio = Math.min(1, IMAGE_MAX_WIDTH / width, IMAGE_MAX_HEIGHT / height);
+    const newWidth = Math.round(width * ratio);
+    const newHeight = Math.round(height * ratio);
+    const canvas = Object.assign(document.createElement('canvas'), { width: newWidth, height: newHeight });
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0,0,newWidth,newHeight);
+    ctx.drawImage(imgBitmap, 0, 0, newWidth, newHeight);
+    const webpSupported = await WEBP_SUPPORTED_PROMISE;
+    const mime = webpSupported ? 'image/webp' : 'image/jpeg';
+    const blob = await new Promise((res) => canvas.toBlob(res, mime, IMAGE_QUALITY));
+    try { imgBitmap.close(); } catch(e){}
+    return blob;
+  }
+
+  function createPreviewItem(state, existingImageUrl = null) {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'preview';
+    wrapper.setAttribute('data-id', state.id);
+
+    const removeBtn = document.createElement('button');
+    removeBtn.type = "button";
+    removeBtn.className = 'remove';
+    removeBtn.setAttribute('title', 'إزالة الصورة');
+    removeBtn.innerHTML = '<i class="fas fa-trash-alt"></i>';
+    removeBtn.addEventListener('click', () => removeImage(state.id));
+
+    const img = document.createElement('img');
+    const meta = document.createElement('div');
+    meta.className = 'meta';
+
+    wrapper.appendChild(removeBtn);
+    wrapper.appendChild(img);
+    wrapper.appendChild(meta);
+
+    if (existingImageUrl) {
+      img.src = existingImageUrl;
+      meta.textContent = 'صورة حالية';
+    } else {
+      const reader = new FileReader();
+      reader.onload = (e) => { img.src = e.target.result; };
+      reader.readAsDataURL(state.file);
+      meta.textContent = 'جاري الضغط...';
+    }
+
+    previewsEl.appendChild(wrapper);
+    state._el = wrapper;
+    state._metaEl = meta;
+  }
+
+  function removeImage(id) {
+    Swal.fire({
+      title: 'هل أنت متأكد؟',
+      text: "هل تريد بالتأكيد حذف هذه الصورة؟",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'نعم، احذفها!',
+      cancelButtonText: 'إلغاء'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        const idx = images.findIndex(i => i.id === id);
+        if (idx > -1) {
+          const state = images[idx];
+          if (state._el) state._el.remove();
+          images.splice(idx, 1);
+        }
+      }
+    });
+  }
+
+  function clearAll() {
+    if (images.length === 0) return;
+    Swal.fire({
+      title: 'هل أنت متأكد؟',
+      text: "سيتم حذف جميع الصور المضافة!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'نعم، احذف الكل!',
+      cancelButtonText: 'إلغاء'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        previewsEl.innerHTML = '';
+        images.length = 0;
+      }
+    });
+  }
+
+  async function handleNewFiles(fileList){
+    const filesArr = Array.from(fileList).slice(0, MAX_FILES - images.length);
+    for(const file of filesArr){
+      if(!file.type.startsWith('image/')) continue;
+      const id = genId();
+      const state = { id, file, compressedBlob: null, status:'pending' };
+      images.push(state);
+      createPreviewItem(state);
+      try{
+        state.status = 'compressing';
+        const compressed = await compressImage(file);
+        state.compressedBlob = compressed;
+        state.status = 'ready';
+        if (state._metaEl) state._metaEl.textContent = 'جاهزة للرفع';
+      } catch(err){
+        state.status = 'error';
+        if (state._metaEl) state._metaEl.textContent = 'خطأ';
+      }
+    }
+    fileInput.value = '';
+  }
+
+  async function loadExistingAdverImages() {
+    console.log('[AdverForm] Loading existing advertisement images...');
+    imagesLoader.style.display = 'block';
+    previewsEl.innerHTML = '';
+    images.length = 0;
+    originalImageNames = [];
+
+    // محاولة جلب الصور بالتسلسل
+    for (let i = 1; i <= MAX_FILES; i++) {
+        const imageName = `pic${i}.webp`;
+        const imageUrl = `${R2_PUBLIC_URL}/${imageName}`;
+        try {
+            const response = await fetch(imageUrl, { method: 'HEAD' });
+            if (response.ok) {
+                console.log(`[AdverForm] Found existing image: ${imageName}`);
+                originalImageNames.push(imageName);
+                const id = genId();
+                const state = { id, file: null, compressedBlob: null, status: 'uploaded', fileName: imageName };
+                images.push(state);
+                createPreviewItem(state, imageUrl);
+            } else {
+                // نتوقف عند أول صورة غير موجودة
+                break;
+            }
+        } catch (error) {
+            console.warn(`[AdverForm] Could not check for image ${imageName}, stopping search.`, error);
+            break;
+        }
+    }
+    window.adverModule.originalImageNames = originalImageNames;
+    imagesLoader.style.display = 'none';
+  }
+
+  pickFilesBtn.addEventListener('click', () => {
+    fileInput.removeAttribute('capture');
+    fileInput.click();
+  });
+  takePhotoBtn.addEventListener('click', () => {
+    fileInput.setAttribute('capture', 'environment');
+    fileInput.click();
+  });
+  clearAllBtn.addEventListener('click', clearAll);
+  fileInput.addEventListener('change', (e) => handleNewFiles(e.target.files));
+  uploaderEl.addEventListener('dragover', (e)=>{ e.preventDefault(); uploaderEl.style.borderColor = '#007bff'; });
+  uploaderEl.addEventListener('dragleave', (e)=>{ uploaderEl.style.borderColor = ''; });
+  uploaderEl.addEventListener('drop', (e)=>{ e.preventDefault(); uploaderEl.style.borderColor = ''; handleNewFiles(e.dataTransfer.files); });
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    console.log('%c[AdverForm] Submit event triggered.', 'color: #20c997;');
+
+    Swal.fire({
+      title: 'جاري نشر الإعلان...',
+      text: 'الرجاء الانتظار بينما يتم تحديث الصور.',
+      allowOutsideClick: false,
+      didOpen: () => { Swal.showLoading(); },
+    });
+
+    try {
+      // 1. تحديد الصور التي يجب حذفها
+      const initialImageNames = window.adverModule.originalImageNames || [];
+      const finalImageNamesInUI = images.map(state => state.fileName).filter(Boolean);
+      const imagesToDelete = initialImageNames.filter(name => !finalImageNamesInUI.includes(name));
+
+      // 2. إعادة ترتيب الصور النهائية لتحديد الأسماء الجديدة
+      const finalImages = images.filter(img => img.status === 'uploaded' || img.status === 'ready');
+
+      // 3. تنفيذ عمليات الحذف
+      if (imagesToDelete.length > 0) {
+        console.log("[AdverForm] Deleting old images:", imagesToDelete);
+        await Promise.all(imagesToDelete.map(name => 
+          deleteFile2cf(name).catch(err => console.error(`فشل حذف الملف ${name}:`, err))
+        ));
+      }
+
+      // 4. تنفيذ عمليات الرفع للصور الجديدة والمرتبة
+      console.log(`[AdverForm] Uploading/Re-uploading images...`);
+      await Promise.all(finalImages.map(async (state, index) => {
+          const finalName = `pic${index + 1}.webp`;
+          // نرفع فقط إذا كانت صورة جديدة جاهزة للرفع
+          if (state.status === 'ready' && state.compressedBlob) {
+              await uploadFile2cf(state.compressedBlob, finalName);
+          }
+      }));
+
+      Swal.fire('تم بنجاح!', 'تم نشر الإعلان بنجاح.', 'success').then(() => {
+        // إعادة تحميل المعاينة لتحديث الحالة
+        initializeAdvertiesmentForm();
+      });
+
+    } catch (error) {
+      console.error('%c[AdverForm] Submission failed with critical error:', 'color: red; font-weight: bold;', error);
+      Swal.fire('خطأ!', `فشل في نشر الإعلان: ${error.message}`, 'error');
+    }
+  });
+
+  return {
+    images,
+    originalImageNames: [],
+    genId,
+    createPreviewItem,
+    loadExistingAdverImages
+  };
+
+})();
+</script>

@@ -68,6 +68,24 @@ function initializeAdminPanel(user) {
   clearBrowserDataButton.innerHTML = '<i class="fas fa-broom"></i> مسح بيانات المتصفح';
   actionButtonsContainer.appendChild(clearBrowserDataButton);
 
+  // 3. إنشاء زر "إدارة الإعلانات"
+  const manageAdButton = document.createElement("button");
+  manageAdButton.id = "manage-ad-btn";
+  manageAdButton.className = "button logout-btn-small";
+  manageAdButton.innerHTML = '<i class="fas fa-bullhorn"></i> إدارة الإعلانات';
+  manageAdButton.addEventListener('click', showAdvertiesmentModal);
+
+  // إنشاء مجموعة أزرار خاصة بالإعلانات
+  const adButtonGroup = document.createElement('div');
+  adButtonGroup.className = 'button-group';
+  adButtonGroup.style.animationDelay = '0.1s';
+  adButtonGroup.innerHTML = `<h3><i class="fas fa-ad"></i> الإعلانات</h3>`;
+  const adButtonRow = document.createElement('div');
+  adButtonRow.className = 'button-row';
+  adButtonRow.appendChild(manageAdButton);
+  adButtonGroup.appendChild(adButtonRow);
+  actionButtonsContainer.appendChild(adButtonGroup);
+
   // --- إضافة منطق الأزرار ---
 
   // منطق زر "عرض المستخدمين"
@@ -269,6 +287,55 @@ function initializeAdminPanel(user) {
       }
     });
   });
+}
+
+/**
+ * جديد: يعرض نافذة منبثقة لإدارة الإعلان.
+ */
+async function showAdvertiesmentModal() {
+  const adverModal = document.getElementById("adver-modal");
+  if (!adverModal) {
+    console.error("Error: Modal container #adver-modal not found.");
+    return;
+  }
+
+  // تحميل محتوى نموذج الإعلان
+  const response = await fetch("pages/Advertiesment.html");
+  const modalContent = await response.text();
+  adverModal.innerHTML = modalContent;
+
+  // إظهار النافذة المنبثقة
+  document.body.classList.add("modal-open");
+  adverModal.style.display = "block";
+
+  // استخراج وتنفيذ السكريبت من المحتوى المحمل
+  const scriptElement = adverModal.querySelector("script");
+  if (scriptElement) {
+    const newScript = document.createElement("script");
+    newScript.innerHTML = scriptElement.innerHTML;
+    document.body.appendChild(newScript);
+    // استدعاء دالة التهيئة مباشرة بعد إضافة السكريبت
+    if (typeof initializeAdvertiesmentForm === "function") {
+        initializeAdvertiesmentForm();
+    }
+    document.body.removeChild(newScript); // تنظيف
+  }
+
+  // وظيفة لإغلاق النافذة
+  const closeModal = () => {
+    adverModal.style.display = "none";
+    adverModal.innerHTML = ""; // تنظيف المحتوى
+    document.body.classList.remove("modal-open");
+  };
+
+  // إضافة حدث النقر لزر الإغلاق
+  const closeBtn = document.getElementById("adver-modal-close-btn");
+  if (closeBtn) closeBtn.onclick = closeModal;
+
+  // إغلاق النافذة عند النقر خارجها
+  window.addEventListener('click', (event) => {
+    if (event.target == adverModal) closeModal();
+  }, { once: true });
 }
 
 /**
