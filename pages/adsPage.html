@@ -1,54 +1,35 @@
 <div class="gallery-container" id="gallery">
   <!-- 
-    سيتم إضافة الصور هنا ديناميكيًا باستخدام جافاسكريبت
+    سيتم إضافة صور الإعلان هنا ديناميكيًا باستخدام جافاسكريبت
   -->
 </div>
 
 <script>
-  // We wrap the script in a check to avoid re-running it if it's already loaded.
+  // ✅ تعديل: تبسيط السكريبت لعرض صور الإعلانات فقط
   if (typeof galleryScriptLoaded === "undefined") {
     const galleryScriptLoaded = true; // Flag to prevent re-execution
 
     const galleryContainer = document.getElementById("gallery");
-    const numberOfImages = 38; // عدد الصور الإجمالي
+    const numberOfImages = 10; // ✅ تعديل: عدد الصور الإجمالي للإعلانات
 
     // Check if gallery is already populated
     if (galleryContainer && galleryContainer.children.length === 0) {
       // حلقة for لإنشاء وإضافة كل صورة
       for (let i = 1; i <= numberOfImages; i++) {
-        // ✅ إضافة: إنشاء حاوية لكل منتج (صورة + اسم)
-        const productItem = document.createElement("div");
-        productItem.className = "product-item";
-        productItem.id = `product-item-${i}`;
-
+        // ✅ تعديل: إنشاء عنصر الصورة مباشرة
         const img = document.createElement("img");
-        img.src = `https://pub-f477060f80b14c5dba6a15f717aef8c4.r2.dev/pic (${i}).jpg`;
-        img.alt = `منتج رقم ${i}`;
+        
+        // ✅ تعديل: استخدام الرابط العام لصور الإعلانات بالأسماء التسلسلية
+        img.src = `https://pub-e828389e2f1e484c89d8fb652c540c12.r2.dev/pic${i}.webp`;
+        img.alt = `إعلان رقم ${i}`;
+        img.className = "gallery-image"; // إضافة كلاس لتنسيق الصورة
 
-        // ✅ إضافة: إنشاء عنصر لاسم المنتج
-        const productName = document.createElement("p");
-        productName.className = "product-name";
-        productName.textContent = `منتج رقم ${i}`;
-
-        // إضافة الصورة والاسم إلى حاوية المنتج
-        productItem.appendChild(img);
-        productItem.appendChild(productName);
-
-        productItem.addEventListener("click", () => {
-          // Dummy data for the product. In a real app, this would come from an API.
-          const productData = {
-            productName: `منتج رقم ${i}`, // ✅ إضافة: اسم المنتج
-            imageSrc: img.src,
-            availableQuantity: 150,
-            pricePerItem: 25,
-            sellerMessage: "هذا المنتج مصنوع يدويًا بحب وعناية. الكمية محدودة، سارع بالشراء!",
-            description: "وصف تجريبي للمنتج يوضح تفاصيله ومميزاته. هذا النص هو مثال ويمكن استبداله بالوصف الفعلي للمنتج.",
-          };
-
-          // Call the global function from main.js to show the modal
-          window.showProductDetails?.(productData);
-        });
-        galleryContainer.appendChild(productItem);
+        // التعامل مع الصور غير الموجودة
+        img.onerror = () => {
+          img.style.display = 'none'; // إخفاء الصورة إذا فشل تحميلها
+        };
+        
+        galleryContainer.appendChild(img);
       }
     }
   }

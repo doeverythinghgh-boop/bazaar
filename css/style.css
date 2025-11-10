@@ -226,7 +226,7 @@ button,
 
 /* === Categories Section === */
 .categories-section {
-  padding: 40px 0; /* إزالة الحشو الأفقي لجعل الجدول يمتد بعرض الشاشة */
+  padding: 0px 0 40px 0; /* ✅ تعديل: تقليل الحشو العلوي إلى 0px */
   background-color: #f9f9f9; /* Slightly off-white background */
   text-align: center;
 }
@@ -275,7 +275,7 @@ button,
   width: 100%;
   border-collapse: separate; /* للسماح بالمسافات بين الخلايا */
   border-spacing: 15px; /* تقليل المسافة بين الخلايا لتناسب العرض الكامل */
-  margin-top: 20px;
+  margin-top: 0px;
   table-layout: fixed; /* لضمان توزيع الأعمدة بالتساوي */
 }
 
@@ -661,4 +661,21 @@ button,
     transform: translateY(0);
     opacity: 1;
   }
+}
+
+/* --- ✅ جديد: تنسيقات معرض المنتجات الأفقي --- */
+.gallery-container {
+  display: flex; /* تفعيل نظام Flexbox للعرض الأفقي */
+  overflow-x: auto; /* إضافة شريط تمرير أفقي عند الحاجة */
+  overflow-y: hidden; /* إخفاء شريط التمرير العمودي */
+  gap: 15px; /* مسافة بين عناصر المنتجات */
+  white-space: nowrap; /* منع الصور من النزول لسطر جديد */
+  padding: 15px; /* حشو داخلي للمعرض */
+  -webkit-overflow-scrolling: touch; /* لتحسين التمرير على أجهزة اللمس */
+}
+
+/* تنسيق شريط التمرير ليكون أنعم */
+.gallery-container::-webkit-scrollbar { height: 6px; }
+.gallery-container::-webkit-scrollbar-track { background: transparent; }
+.gallery-container::-webkit-scrollbar-thumb { background-color: #d1d9e6; border-radius: 10px; }
 }

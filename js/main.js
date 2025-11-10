@@ -2,7 +2,6 @@ document.addEventListener("DOMContentLoaded", () => {
   // --- DOM Elements ---
   const animatedTextElement = document.getElementById("animated-text");
   const taglineElement = document.getElementById("tagline");
-  const contentPlaceholder = document.getElementById("content-placeholder");
 
   // --- Animation Configuration ---
   const fullText = "Suez Bazaar";
@@ -102,31 +101,21 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       const loader = document.getElementById("content-loader");
       if (loader) loader.style.display = "block"; // إظهار مؤشر التحميل
-
+  
       const response = await fetch(url);
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const text = await response.text();
       if (loader) loader.style.display = "none"; // إخفاء مؤشر التحميل
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(text, "text/html");
-
-      // Get content from the body of the fetched page
-      const pageContent = doc.body.innerHTML;
-
+  
       // Place the content into our placeholder and make it visible
-      contentPlaceholder.innerHTML = pageContent;
-
-      // Find and execute scripts from the loaded content.
-      // This is necessary for the gallery's interactivity.
-      const scripts = doc.body.querySelectorAll("script");
-      scripts.forEach((script) => {
-        // We create a function to pass parameters (like the base path) to the loaded script.
-        // This makes the gallery script more reusable and robust.
+      contentPlaceholder.innerHTML = text;
+  
+      // ✅ تحسين: تنفيذ السكريبتات المضمنة بطريقة أكثر أمانًا
+      const scripts = contentPlaceholder.querySelectorAll("script");
+      scripts.forEach(script => {
         const newScript = document.createElement("script");
-        // Pass the base path for images to the gallery script.
-        // The path is relative to index.html.
         newScript.textContent = script.textContent;
         document.body.appendChild(newScript).remove(); // A trick to execute the script
       });
@@ -259,8 +248,6 @@ document.addEventListener("DOMContentLoaded", () => {
   // Start the first cycle
   startAnimationCycle();
 
-  // Load the gallery content immediately when the page loads
-  loadPageContent("pages/adsPage.html");
   loadCategories(); // Load categories
 
   // The `window.showProductDetails` function is already defined globally in `js/turo.js`.

@@ -3,34 +3,37 @@
   <!--
     @file index.html
     @description الصفحة الرئيسية لموقع "بازار السويس".
-    
+
     هذه هي الصفحة المقصودة (Landing Page) التي يراها الزائر أولاً.
     - تعرض العنوان والشعار.
     - تتحقق من حالة تسجيل دخول المستخدم وتعرض اسمه أو زر "تسجيل الدخول".
-    - تحتوي على حاويات ديناميكية (`content-placeholder`, `categories-grid`) يتم ملؤها بالمحتوى (مثل الإعلانات والفئات) باستخدام JavaScript.
+    - تحتوي على حاويات ديناميكية (`categories-grid`) يتم ملؤها بالمحتوى (مثل الإعلانات والفئات) باستخدام JavaScript.
   -->
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Suez Bazaar</title>
     <link rel="stylesheet" href="css/style.css" />
-    <link rel="stylesheet" href="css/adsPage.css" />
+    <link rel="stylesheet" href="css/adverModule.css" /> <!-- ✅ جديد: إضافة ملف أنماط الإعلانات -->
     <!-- Link to Google Fonts for a more stylish look (Optional) -->
     <link
+      id="font-tajawal"
       href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap"
       rel="stylesheet"
     />
     <link
+      id="font-orbitron"
       href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap"
       rel="stylesheet"
     />
     <!-- Font Awesome for icons -->
     <link
+      id="font-awesome"
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
     />
     <!-- SweetAlert2 -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script id="sweetalert2-script" src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- ✅ إضافة: تنسيقات خاصة بعناصر المنتجات في المعرض -->
     <style>
       /* --- تصميم جديد ومحسّن لبطاقة المنتج --- */
@@ -89,28 +92,29 @@
     <div class="container" id="header-container">
       <!-- مجموعة العنوان والشعار -->
       <a
+        id="header-logo-link"
         href="index.html"
         class="header-title-group"
         style="text-decoration: none; color: inherit"
       >
-      <table> 
-        <tr>
-          <td> <h1 id="animated-text" class="bazaar-title"></h1></td>
-          <td>  <p id="tagline" class="tagline"></p></td>
+      <table id="header-logo-table">
+        <tr id="header-logo-row">
+          <td id="header-logo-cell-title"> <h1 id="animated-text" class="bazaar-title"></h1></td>
+          <td id="header-logo-cell-tagline">  <p id="tagline" class="tagline"></p></td>
         </tr>
       </table>
       </a>
       <!-- جديد: حاوية جديدة لتجميع عناصر التحكم اليسرى (بحث، مستخدم) -->
       <div class="header-controls">
         <!-- جديد: قسم البحث -->
-        <div class="search-container" id="search-container">
+        <div id="search-container" class="search-container">
           <button class="search-icon-btn" id="search-icon-btn" title="بحث عن منتج"><i class="fas fa-search"></i></button>
         </div>
-        <div class="user-profile-container">
-          <div class="user-profile" id="user-profile-button">
-            <a href="login.html" class="user-profile-link">
+        <div id="user-profile-container" class="user-profile-container">
+          <div id="user-profile-button" class="user-profile">
+            <a id="user-profile-link" href="login.html" class="user-profile-link">
               <span class="fas fa-user-circle user-icon" id="user-icon"></span>
-              <span class="user-text">تسجيل الدخول</span>
+              <span id="user-text" class="user-text">تسجيل الدخول</span>
             </a>
             <span id="cart-badge" class="cart-badge" style="display: none;">0</span>
           </div>
@@ -118,14 +122,11 @@
       </div>
     </div>
 
-    <!-- حاوية لعرض المحتوى الديناميكي (مثل معرض الصور) -->
-    <div id="content-placeholder">
-      <!-- مؤشر التحميل سيظهر هنا -->
-      <div class="loader" id="content-loader"></div>
-    </div>
-
+    <!-- ✅ جديد: حاوية شريط الإعلانات -->
+    <div id="advertisement-section"></div>
+    
     <!-- قسم جديد لعرض الفئات الرئيسية -->
-    <div class="categories-section">
+    <div id="categories-section" class="categories-section">
       <table id="categories-table" class="categories-table">
         <tbody id="categories-tbody">
           <!-- سيتم ملء صفوف الفئات هنا بواسطة جافاسكريبت -->
@@ -139,23 +140,25 @@
     </div>
     <!-- ✅ جديد: نافذة البحث المنبثقة -->
     <div id="search-modal" class="modal">
-      <div class="search-modal-content">
+      <div id="search-modal-content" class="search-modal-content">
         <button id="search-modal-close-btn" class="close-button" aria-label="إغلاق"><i class="fas fa-times"></i></button>
-        <h2><i class="fas fa-search"></i> ابحث في بازار السويس</h2>
-        <p>اصبر شويه يا حسام باشا عشان تاخد حاجه حلوه
+        <h2 id="search-modal-title"><i class="fas fa-search"></i> ابحث في بازار السويس</h2>
+        <p id="search-modal-subtitle">اصبر شويه يا حسام باشا عشان تاخد حاجه حلوه
         </p>
-        <div class="search-modal-input-container">
+        <div id="search-modal-input-container" class="search-modal-input-container">
           <input type="search" id="search-modal-input" placeholder="اكتب اسم المنتج، الفئة، أو البائع..." />
           <button id="search-modal-submit-btn" class="button" aria-label="بحث" title="بحث"><i class="fas fa-search"></i></button>
         </div>
         <div id="search-results-container"></div>
       </div>
     </div>
-    <script src="js/config.js"></script> <!-- ✅ إضافة: تحميل ملف الإعدادات أولاً -->
-    <script src="js/cart.js"></script> <!-- ✅ إضافة: تحميل ملف السلة -->
+    <script id="config-script" src="js/config.js"></script> <!-- ✅ إضافة: تحميل ملف الإعدادات أولاً -->
+    <script id="cart-script" src="js/cart.js"></script> <!-- ✅ إضافة: تحميل ملف السلة -->
+    <script id="adver-module-script" src="js/adverModule.js"></script> <!-- ✅ جديد: إضافة ملف موديول الإعلانات -->
     <!-- ✅ إضافة: تحميل ملف الإعدادات أولاً -->
-    <script src="js/main.js"></script>
-    <script src="js/auth.js"></script>
+    <script id="main-script" src="js/main.js"></script>
+    <script id="auth-script" src="js/auth.js"></script>
+
     <script>
       /**
        * يقوم بتحميل الفئات من ملف JSON ويبني جدولاً ديناميكياً.
@@ -492,6 +495,11 @@
             closeModal();
           }
         });
+
+        // ✅ جديد: تهيئة موديول الإعلانات بعد تحميل محتوى الصفحة
+        if (typeof initAdverModule === 'function') {
+          initAdverModule('advertisement-section');
+        }
 
       });
     </script>
