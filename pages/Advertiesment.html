@@ -56,20 +56,30 @@
 
   /* تحسين شبكة عرض الصور */
   #adver-form .previews {
+    /* ✅ إصلاح شامل: استخدام CSS Grid لشبكة متجاوبة */
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-    gap: 1rem;
-    margin-top: 1.5rem;
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    gap: 10px;
+    padding: 10px;
+    margin-top: 1rem;
+    /* ✅ جديد: تحديد أبعاد ثابتة مع تمكين التمرير وتوسيط الصندوق */
+    width: 100%;
+    height: 300px;
+    overflow: auto; /* تمكين التمرير الأفقي والرأسي عند الحاجة */
+    background-color: #f0f2f5; /* لون خلفية لتمييز الصندوق */
+    border: 1px solid #dee2e6; /* إطار بسيط */
   }
 
   /* تحسين بطاقة الصورة المصغرة */
   #adver-form .preview {
     position: relative;
-    border-radius: 8px;
+    width: 100%;
+    max-width: 120px;
+    aspect-ratio: 1 / 1; /* ✅ يجعل العنصر مربع الشكل دائمًا */
+    border-radius: 8px; /* ✅ تعديل: توحيد دائرية الحواف */
     overflow: hidden;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.07);
-    transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
-    background-color: #e9ecef;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+    background-color: #f0f0f0; /* لون خلفية احتياطي */
   }
 
   #adver-form .preview:hover {
@@ -77,36 +87,40 @@
     box-shadow: 0 8px 16px rgba(0,0,0,0.1);
   }
 
-  #adver-form .preview img {
-    width: 100%;
-    height: 120px;
-    object-fit: cover;
-    display: block;
-  }
-
-  /* زر الحذف الأنيق */
+  /* ✅ جديد: إخفاء زر الحذف بشكل افتراضي */
   #adver-form .preview .remove {
     position: absolute;
     top: 5px;
-    right: 5px;
-    background-color: rgba(239, 68, 68, 0.8);
+    right: 5px; /* مناسب للواجهة العربية */
+    background-color: rgba(220, 53, 69, 0.8);
     color: white;
     border: none;
     border-radius: 50%;
     width: 28px;
     height: 28px;
-    font-size: 14px;
     display: flex;
     align-items: center;
     justify-content: center;
-    opacity: 0;
-    transform: scale(0.8);
+    cursor: pointer;
+    opacity: 0; /* إخفاء الزر */
+    pointer-events: none; /* منع التفاعل معه وهو مخفي */
     transition: opacity 0.2s, transform 0.2s;
+    z-index: 10;
   }
 
-  #adver-form .preview:hover .remove {
+  /* ✅ جديد: إظهار زر الحذف عند تحديد الصورة */
+  #adver-form .preview.selected .remove {
     opacity: 1;
+    pointer-events: auto;
     transform: scale(1);
+  }
+
+  /* ✅ إصلاح: جعل الصورة تملأ الحاوية المربعة بالكامل */
+  #adver-form .preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* يضمن ملء الصورة للمساحة دون تشويه */
+    display: block;
   }
 
   /* حالة التحميل */
@@ -126,6 +140,26 @@
   #adver-form .hidden-file {
     position: absolute; left: -9999px;
   }
+
+  /* ✅ جديد: أنماط خاصة بالسحب وإعادة الترتيب */
+  #adver-form .preview.dragging {
+    opacity: 0.7;
+    transform: scale(0.95);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2); /* ظل أوضح أثناء السحب */
+  }
+
+  /* خط فاصل يوضح مكان الإفلات */
+  .drop-indicator {
+    height: 100%;
+    width: 4px;
+    background-color: #007bff;
+  }
+
+  /* ✅ إصلاح: منع ظهور شريط التمرير الأفقي في النافذة */
+  #adver-modal .modal-content {
+    overflow-x: hidden;
+  }
+
 </style>
 
 <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="adverTitle">
@@ -141,8 +175,8 @@
       <div class="image-uploader" id="image-uploader" tabindex="0" role="group" aria-label="منطقة رفع الصور">
         <!-- ✅ جديد: هيكل منطقة السحب والإفلات -->
         <div class="dropzone-content">
-          <i class="fas fa-cloud-upload-alt dropzone-icon"></i>
-          <p class="dropzone-text">اسحب وأفلت الصور هنا، أو انقر للاختيار</p>
+          <i class="fas fa-sort dropzone-icon"></i>
+          <p class="dropzone-text">انقر لاختيار الصور أو اسحبها لإعادة الترتيب</p>
           <p class="hint">يمكنك إضافة صور جديدة أو حذف الصور الحالية.</p>
         </div>
         
@@ -201,15 +235,9 @@ window.adverModule = (function() {
   const form = document.getElementById('adver-form');
   const imagesLoader = document.getElementById('images-loader');
   
-  // ✅ جديد: ربط النقر على منطقة الرفع بأكملها
-  uploaderEl.addEventListener('click', (e) => {
-    // تجنب تفعيل النقر إذا كان الهدف هو زر أو عنصر تفاعلي آخر
-    if (e.target.closest('button') || e.target.closest('.preview')) return;
-    fileInput.click();
-  });
-
   const images = [];
   let originalImageNames = [];
+  let isDragging = false; // ✅ جديد: متغير حالة لمنع التحديثات أثناء السحب
   let idCounter = 1;
 
   function genId() { return 'ad_img_' + (Date.now() + idCounter++); }
@@ -242,9 +270,33 @@ window.adverModule = (function() {
   }
 
   function createPreviewItem(state, existingImageUrl = null) {
+    console.log(`%c[DevLog] Creating preview for image ID: ${state.id}`, 'color: #888;');
     const wrapper = document.createElement('div');
     wrapper.className = 'preview';
     wrapper.setAttribute('data-id', state.id);
+
+    // ✅ جديد: إضافة منطق التحديد لإظهار زر الحذف
+    wrapper.addEventListener('click', (e) => {
+      if (e.target.closest('.remove')) return;
+      // إزالة التحديد من كل الصور الأخرى
+      document.querySelectorAll('#adver-form .preview.selected').forEach(p => p.classList.remove('selected'));
+      // إضافة التحديد للصورة الحالية
+      wrapper.classList.add('selected');
+    });
+
+
+    // ✅ جديد: جعل العنصر قابلاً للسحب وإعادة الترتيب
+    wrapper.draggable = true;
+    wrapper.addEventListener('dragstart', (e) => {
+      console.log(`%c[DevLog] Drag Start: ${state.id}`, 'color: orange;');
+      isDragging = true;
+      e.dataTransfer.setData('text/plain', state.id);
+      setTimeout(() => wrapper.classList.add('dragging'), 0);
+    });
+    wrapper.addEventListener('dragend', () => {
+      isDragging = false;
+      wrapper.classList.remove('dragging');
+    });
 
     const removeBtn = document.createElement('button');
     removeBtn.type = "button";
@@ -293,6 +345,7 @@ window.adverModule = (function() {
         if (idx > -1) {
           const state = images[idx];
           if (state._el) state._el.remove();
+          console.log(`%c[DevLog] Image removed from UI: ${id}`, 'color: red;');
           images.splice(idx, 1);
         }
       }
@@ -310,6 +363,7 @@ window.adverModule = (function() {
       cancelButtonText: 'إلغاء'
     }).then((result) => {
       if (result.isConfirmed) {
+        console.log('%c[DevLog] Clearing all images from UI.', 'color: red;');
         previewsEl.innerHTML = '';
         images.length = 0;
       }
@@ -317,6 +371,7 @@ window.adverModule = (function() {
   }
 
   async function handleNewFiles(fileList){
+    console.log(`%c[DevLog] Handling ${fileList.length} new files.`, 'color: blue;');
     const filesArr = Array.from(fileList).slice(0, MAX_FILES - images.length);
     for(const file of filesArr){
       if(!file.type.startsWith('image/')) continue;
@@ -325,13 +380,14 @@ window.adverModule = (function() {
       images.push(state);
       createPreviewItem(state);
       try{
+        console.log(`%c[DevLog] Compressing image: ${file.name}`, 'color: #888;');
         state.status = 'compressing';
         const compressed = await compressImage(file);
         state.compressedBlob = compressed;
         state.status = 'ready';
-        if (state._metaEl) state._metaEl.textContent = 'جاهزة للرفع';
+        if (state._metaEl) state._metaEl.textContent = 'جاهزة';
       } catch(err){
-        state.status = 'error';
+        state.status = 'error'; console.error(`[DevLog] Compression failed for ${file.name}`, err);
         if (state._metaEl) state._metaEl.textContent = 'خطأ';
       }
     }
@@ -339,28 +395,32 @@ window.adverModule = (function() {
   }
 
   async function loadExistingAdverImages() {
-    console.log('[AdverForm] Loading existing advertisement images...');
+    console.log('%c[DevLog] 1. Loading existing advertisement images...', 'color: blue; font-weight: bold;');
     imagesLoader.style.display = 'block';
     previewsEl.innerHTML = '';
     images.length = 0;
     originalImageNames = [];
 
-    // ✅ إصلاح: استخدام طريقة تحميل الصور مباشرة لتجنب مشاكل CORS
+    // ✅ تحسين: استخدام طريقة التحقق من وجود الصورة عبر new Image() لتجنب مشاكل CORS المعقدة
     const imagePromises = [];
     for (let i = 1; i <= MAX_FILES; i++) {
       const imageName = `pic${i}.webp`;
-      const imageUrl = `${R2_PUBLIC_URL}/${imageName}`;
+      // ✅ إصلاح: إضافة معلمة فريدة لتجاوز ذاكرة التخزين المؤقت للمتصفح وضمان جلب أحدث حالة للصورة
+      const imageUrl = `${R2_PUBLIC_URL}/${imageName}?v=${Date.now()}`;
 
       const promise = new Promise((resolve) => {
-        const img = new Image();
-        img.onload = () => {
-          console.log(`[AdverForm] Found existing image: ${imageName}`);
+        // لا نستخدم fetch هنا لتجنب مشاكل CORS عند مجرد التحقق
+        const checker = new Image();
+        checker.onload = () => { 
+          console.log(`%c[DevLog]   - Found: ${imageName}`, 'color: green;');
           resolve({ success: true, name: imageName, url: imageUrl });
         };
-        img.onerror = () => {
-          resolve({ success: false });
+        checker.onerror = () => {
+          // console.log(`%c[DevLog]   - Not Found: ${imageName}`, 'color: #aaa;');
+          // فشل التحميل يعني أن الصورة غير موجودة
+          resolve({ success: false, name: imageName });
         };
-        img.src = imageUrl;
+        checker.src = imageUrl;
       });
       imagePromises.push(promise);
     }
@@ -377,6 +437,7 @@ window.adverModule = (function() {
     });
 
     window.adverModule.originalImageNames = originalImageNames;
+    console.log(`%c[DevLog] Finished loading. Found ${originalImageNames.length} images.`, 'color: blue; font-weight: bold;');
     imagesLoader.style.display = 'none';
   }
 
@@ -390,13 +451,129 @@ window.adverModule = (function() {
   });
   clearAllBtn.addEventListener('click', clearAll);
   fileInput.addEventListener('change', (e) => handleNewFiles(e.target.files));
-  uploaderEl.addEventListener('dragover', (e)=>{ e.preventDefault(); uploaderEl.style.borderColor = '#007bff'; });
-  uploaderEl.addEventListener('dragleave', (e)=>{ uploaderEl.style.borderColor = ''; });
-  uploaderEl.addEventListener('drop', (e)=>{ e.preventDefault(); uploaderEl.style.borderColor = ''; handleNewFiles(e.dataTransfer.files); });
+
+  // --- ✅ جديد: إضافة دعم السحب والإفلات باللمس للشاشات المحمولة ---
+  let draggingElTouch = null;
+
+  previewsEl.addEventListener('touchstart', (e) => {
+    const target = e.target.closest('.preview');
+    if (!target) return;
+
+    console.log('%c[DevLog] Touch Start', 'color: orange;');
+    isDragging = true;
+    draggingElTouch = target;
+    // تأخير بسيط لإضافة الكلاس للسماح للمتصفح بالاستجابة
+    setTimeout(() => {
+      if (draggingElTouch) draggingElTouch.classList.add('dragging');
+    }, 100);
+  }, { passive: true });
+
+  // ✅ جديد: استخدام Debounce لتحسين أداء السحب
+  const debouncedTouchMove = debounce((e) => {
+    if (!isDragging || !draggingElTouch) return; // لا تفعل شيئًا إذا لم يكن هناك سحب نشط
+
+    const touch = e.touches[0];
+    // ✅ إصلاح: منع تمرير الصفحة فقط عند السحب الفعلي
+    // هذا يضمن أن التمرير العادي يعمل عندما لا يتم سحب أي عنصر
+    if (e.cancelable) e.preventDefault();
+    const afterElement = getDragAfterElement(previewsEl, touch.clientX, touch.clientY);
+
+    if (afterElement == null) {
+      previewsEl.appendChild(draggingElTouch);
+    } else {
+      previewsEl.insertBefore(draggingElTouch, afterElement);
+    }
+  }, 30);
+
+  previewsEl.addEventListener('touchmove', debouncedTouchMove, { passive: false });
+
+  previewsEl.addEventListener('touchend', (e) => {
+    if (!draggingElTouch) return;
+
+    isDragging = false;
+    // ✅ إصلاح: إزالة صنف السحب عند انتهاء اللمس
+    draggingElTouch.classList.remove('dragging');
+    draggingElTouch = null;
+
+    // تأخير بسيط للتأكد من أن الواجهة استقرت قبل تحديث المصفوفة
+    setTimeout(() => {
+      updateImageOrderFromDOM();
+      console.log('%c[DevLog] Images reordered via touch.', 'color: purple;');
+    }, 50);
+  });
+
+  // ✅ جديد: دالة مركزية لتحديث ترتيب مصفوفة الصور من الواجهة
+  function updateImageOrderFromDOM() {
+    // ✅ إصلاح: تحديث ترتيب مصفوفة `images` الداخلية ليعكس الترتيب المرئي
+    const newOrderedIds = Array.from(previewsEl.querySelectorAll('.preview')).map(el => el.dataset.id);
+    const newImagesArray = newOrderedIds.map(id => images.find(img => img.id === id));
+    // استبدال المصفوفة القديمة بالجديدة
+    images.length = 0;
+    images.push(...newImagesArray);
+    console.log(`%c[DevLog]   - New order: [${newOrderedIds.join(', ')}]`, 'color: purple;');
+  }
+
+  // ✅ جديد: منطق السحب والإفلات لإعادة الترتيب
+  const debouncedDragOver = debounce((e) => {
+    e.preventDefault();
+    if (!isDragging) return;
+    const draggingEl = document.querySelector('.preview.dragging');
+    if (!draggingEl) return;
+
+    const afterElement = getDragAfterElement(previewsEl, e.clientX, e.clientY);
+    if (afterElement == null) {
+      previewsEl.appendChild(draggingEl);
+    } else {
+      previewsEl.insertBefore(draggingEl, afterElement);
+    }
+  }, 30);
+
+  previewsEl.addEventListener('dragover', debouncedDragOver);
+
+  previewsEl.addEventListener('drop', (e) => {
+    e.preventDefault();
+    isDragging = false;
+    const draggingEl = document.querySelector('.preview.dragging');
+    if (!draggingEl) return;
+
+    updateImageOrderFromDOM();
+    console.log('%c[DevLog] Images reordered via drop.', 'color: purple;');
+  });
+
+  // ✅ جديد: دالة Debounce لتحسين الأداء
+  function debounce(fn, delay = 50) {
+    let timeout;
+    return (...args) => {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => fn(...args), delay);
+    };
+  }
+
+  // ✅ إصلاح شامل: منطق جديد للسحب والإفلات يعتمد على أقرب عنصر
+  function getDragAfterElement(container, x, y) {
+    const draggableElements = [...container.querySelectorAll('.preview:not(.dragging)')];
+
+    // البحث عن أقرب عنصر للمؤشر
+    const closest = draggableElements.reduce((acc, child) => {
+        const box = child.getBoundingClientRect();
+        // حساب المسافة من منتصف العنصر إلى المؤشر
+        const offsetX = x - (box.left + box.width / 2);
+        const offsetY = y - (box.top + box.height / 2);
+        const distance = Math.sqrt(offsetX * offsetX + offsetY * offsetY);
+
+        if (distance < acc.distance) {
+            return { distance: distance, element: child };
+        } else {
+            return acc;
+        }
+    }, { distance: Number.POSITIVE_INFINITY, element: null });
+
+    return closest.element;
+  }
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
-    console.log('%c[AdverForm] Submit event triggered.', 'color: #20c997;');
+    console.log('%c[DevLog] 2. Submit event triggered. Starting sync process...', 'color: blue; font-weight: bold;');
 
     Swal.fire({
       title: 'جاري نشر الإعلان...',
@@ -408,6 +585,7 @@ window.adverModule = (function() {
     try {
       // --- ✅ إصلاح شامل لمنطق الحفظ ---
 
+      console.groupCollapsed('%c[DevLog] Sync Plan', 'color: #0d6efd; font-weight: bold;');
       // 1. تحديد الحالة النهائية للصور في الواجهة (UI)
       const finalImagesInUI = images.map((state, index) => ({
         state: state,
@@ -415,63 +593,107 @@ window.adverModule = (function() {
       }));
       const finalImageNamesInUI = finalImagesInUI.map(item => item.newName);
 
-      // 2. تحديد الصور التي يجب حذفها من السحابة
-      // هي الصور التي كانت موجودة في البداية ولكنها غير موجودة في القائمة النهائية للأسماء
-      const allPossibleNames = Array.from({ length: MAX_FILES }, (_, i) => `pic${i + 1}.webp`);
-      const imagesToDelete = allPossibleNames.filter(name => !finalImageNamesInUI.includes(name));
+      console.log('Final UI State:', finalImageNamesInUI);
 
-      // 3. تنفيذ عمليات الحذف
+      // 2. ✅ إصلاح شامل: تحديد الصور للحذف بناءً على ما تمت إزالته من الواجهة
+      const currentUploadedFileNames = images.filter(s => s.status === 'uploaded').map(s => s.fileName);
+      const removedImageNames = window.adverModule.originalImageNames.filter(name => !currentUploadedFileNames.includes(name));
+
+      // وأيضًا، أي "خانات" لم تعد مستخدمة في الترتيب النهائي
+      const allPossibleNames = Array.from({ length: MAX_FILES }, (_, i) => `pic${i + 1}.webp`);
+      const unusedFinalSlots = allPossibleNames.filter(name => !finalImageNamesInUI.includes(name));
+      const imagesToDelete = [...new Set([...removedImageNames, ...unusedFinalSlots])];
+
+      console.log('Images to Delete:', imagesToDelete);
+
+      // جديد: تحديد الصور للرفع وإعادة الترتيب
+      const newUploadsPlan = finalImagesInUI.filter(item => item.state.status === 'ready');
+      const reorderItemsPlan = finalImagesInUI.filter(item => item.state.status === 'uploaded' && item.state.fileName !== item.newName);
+      console.log('New Images to Upload:', newUploadsPlan.map(i => i.newName));
+      console.log('Images to Reorder:', reorderItemsPlan.map(i => `${i.state.fileName} -> ${i.newName}`)); // ✅ إصلاح: تعريف المتغير قبل استخدامه
+
+      console.groupEnd();
+
+      // 3. تنفيذ عمليات الحذف أولاً وبشكل منفصل
       if (imagesToDelete.length > 0) {
-        console.log("[AdverForm] Deleting images from cloud:", imagesToDelete);
+        console.groupCollapsed(`%c[DevLog] Deletion Phase (${imagesToDelete.length} images)`, 'color: #dc3545;');
+        console.log("Deleting:", imagesToDelete);
         await Promise.all(imagesToDelete.map(name =>
           deleteFile2cf(name).catch(err => console.error(`Failed to delete ${name}:`, err))
         ));
+        console.groupEnd();
       }
 
-      // 4. تنفيذ عمليات الرفع (للصور الجديدة) وإعادة الرفع (للقديمة التي تغير ترتيبها)
-      const uploadPromises = finalImagesInUI.map(async (item) => {
-        const { state, newName } = item;
+      // --- الآن بعد أن تم الحذف بأمان، نبدأ عمليات الرفع وإعادة الترتيب ---
 
-        // الحالة أ: صورة جديدة جاهزة للرفع
-        if (state.status === 'ready' && state.compressedBlob) {
-          console.log(`Uploading new image to: ${newName}`);
-          return uploadFile2cf(state.compressedBlob, newName);
-        }
 
-        // الحالة ب: صورة قديمة موجودة بالفعل ولكن ترتيبها تغير (اسمها القديم لا يساوي اسمها الجديد)
-        if (state.status === 'uploaded' && state.fileName !== newName) {
-          console.log(`Re-ordering image from ${state.fileName} to ${newName}`);
-          try {
-            // تحميل محتوى الصورة القديمة كـ Blob
-            const blob = await downloadFile2cf(state.fileName);
-            // إعادة رفعها بالاسم الجديد
-            return uploadFile2cf(blob, newName);
-          } catch (error) {
-            console.error(`Failed to re-order image ${state.fileName}:`, error);
-            // في حالة الفشل، يمكن إرجاع Promise مرفوض أو معالجة الخطأ
-            return Promise.reject(error);
-          }
-        }
+      // 4. رفع الصور الجديدة فقط
+      const newUploads = finalImagesInUI.filter(item => item.state.status === 'ready' && item.state.compressedBlob);
+      if (newUploads.length > 0) {
+        console.groupCollapsed(`%c[DevLog] Upload Phase (${newUploads.length} new images)`, 'color: #198754;');
+        console.log("Uploading:", newUploads.map(item => item.newName));
+        await Promise.all(newUploads.map(item => 
+          uploadFile2cf(item.state.compressedBlob, item.newName)
+        ));
+        console.groupEnd();
+      }
 
-        // الحالة ج: صورة قديمة لم يتغير ترتيبها، لا تفعل شيئًا
-        if (state.status === 'uploaded' && state.fileName === newName) {
-            console.log(`Image ${newName} is already in correct position. Skipping.`);
-            return Promise.resolve(); // لا توجد عملية مطلوبة
-        }
-      });
+      // 5. التعامل مع إعادة الترتيب بأمان على مرحلتين
+      const reorderItems = finalImagesInUI.filter(item => item.state.status === 'uploaded' && item.state.fileName !== item.newName);
+      if (reorderItems.length > 0) {
+        console.groupCollapsed(`%c[DevLog] Reorder Phase (${reorderItems.length} images)`, 'color: #fd7e14; font-weight: bold;');
 
-      // انتظار اكتمال جميع عمليات الرفع وإعادة الرفع
-      await Promise.all(uploadPromises);
+        console.groupCollapsed('Step 1: Backup');
+        // المرحلة الأولى: النسخ الاحتياطي (إعادة التسمية إلى أسماء مؤقتة)
+        const backupPromises = reorderItems.map(async (item) => {
+          const tempName = `temp_${item.state.fileName}`;
+          console.log(`  - Backing up '${item.state.fileName}' to '${tempName}'`);
+          const blob = await downloadFile2cf(item.state.fileName);
+          await uploadFile2cf(blob, tempName);
+          return { tempName, finalName: item.newName }; // إرجاع الاسم المؤقت والنهائي
+        });
+        const backedUpFiles = await Promise.all(backupPromises);
+        console.groupEnd();
 
-      // --- نهاية الإصلاح ---
+        console.groupCollapsed('Step 2: Finalize');
+        // المرحلة الثانية: النشر النهائي (إعادة التسمية من المؤقت إلى النهائي)
+        const finalizePromises = backedUpFiles.map(async (file) => {
+          console.log(`  - Finalizing '${file.tempName}' to '${file.finalName}'`);
+          const blob = await downloadFile2cf(file.tempName);
+          return uploadFile2cf(blob, file.finalName);
+        });
+        await Promise.all(finalizePromises);
+        console.groupEnd();
 
+        console.groupCollapsed('Step 3: Cleanup');
+        // المرحلة الثالثة: التنظيف (حذف الملفات المؤقتة)
+        const cleanupPromises = backedUpFiles.map(file => {
+          console.log(`  - Cleaning up temp file: '${file.tempName}'`);
+          return deleteFile2cf(file.tempName).catch(err => console.error(`Cleanup failed for ${file.tempName}:`, err));
+        });
+        await Promise.all(cleanupPromises);
+
+        // وأيضًا حذف الملفات الأصلية التي تم نسخها
+        const deleteOriginalsPromises = reorderItems.map(item => {
+            console.log(`  - Cleaning up original file: '${item.state.fileName}'`);
+            return deleteFile2cf(item.state.fileName).catch(err => console.error(`Cleanup failed for original ${item.state.fileName}:`, err));
+        });
+        await Promise.all(deleteOriginalsPromises);
+        console.groupEnd();
+
+        console.groupEnd(); // End Reorder Phase
+      }
+      
+      // --- نهاية منطق المزامنة ---
+      
       Swal.fire('تم بنجاح!', 'تم نشر الإعلان بنجاح.', 'success').then(() => {
         // إعادة تحميل المعاينة لتحديث الحالة
         initializeAdvertiesmentForm();
       });
 
     } catch (error) {
-      console.error('%c[AdverForm] Submission failed with critical error:', 'color: red; font-weight: bold;', error);
+      // ✅ تحسين: تسجيل الخطأ بشكل أوضح للمطور
+      console.error('%c[DevLog] Submission failed with critical error. The operation was stopped.', 'color: red; font-weight: bold;', { errorObject: error, fullState: { images, originalImageNames } });
       Swal.fire('خطأ!', `فشل في نشر الإعلان: ${error.message}`, 'error');
     }
   });
@@ -484,5 +706,5 @@ window.adverModule = (function() {
     loadExistingAdverImages
   };
 
-})();
+})(); // نهاية الوحدة
 </script>
