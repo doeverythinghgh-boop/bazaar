@@ -686,6 +686,12 @@ window.adverModule = (function() {
       
       // --- نهاية منطق المزامنة ---
       
+      // ✅ جديد: تسجيل تاريخ التحديث في جدول updates
+      console.log('%c[DevLog] 3. Recording update timestamp...', 'color: blue; font-weight: bold;');
+      if (typeof addUpdate === 'function') {
+        await addUpdate("تم تحديث صور الإعلانات");
+      }
+
       Swal.fire('تم بنجاح!', 'تم نشر الإعلان بنجاح.', 'success').then(() => {
         // إعادة تحميل المعاينة لتحديث الحالة
         initializeAdvertiesmentForm();

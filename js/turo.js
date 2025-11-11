@@ -570,3 +570,31 @@ window.showProductDetails = async function(productData) {
     }
   });
 };
+
+/**
+ * يضيف سجلاً جديدًا إلى جدول التحديثات.
+ * @param {string} text - النص المراد تسجيله في التحديث.
+ * @returns {Promise<Object>} كائن الاستجابة من الخادم.
+ */
+async function addUpdate(text) {
+  console.log(`%c[API] Starting addUpdate with text: "${text}"`, 'color: blue;');
+  try {
+    const response = await fetch(`${baseURL}/api/updates`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ txt: text }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      return { error: data.error || `HTTP error! status: ${response.status}` };
+    }
+
+    console.log('%c[API] addUpdate successful.', 'color: green;', data);
+    return data;
+  } catch (error) {
+    console.error('%c[API] addUpdate failed:', 'color: red;', error);
+    return { error: "فشل الاتصال بالخادم عند تسجيل التحديث." };
+  }
+}

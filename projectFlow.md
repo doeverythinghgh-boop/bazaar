@@ -127,6 +127,15 @@ CREATE TABLE IF NOT EXISTS user_tokens (
 
 ملاحظة: يُستخدم هذا الجدول لحفظ توكنات Firebase Cloud Messaging (FCM) الخاصة بإشعارات المستخدمين، ويتم ربطه بالمستخدم عبر عمود user_key.
 
+جدول updates
+
+CREATE TABLE updates (
+    txt TEXT,
+    datetime DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+-- ملاحظة: يستخدم في تحديث بعض التواريخ
+
 جدول products
 
 CREATE TABLE IF NOT EXISTS marketplace_products (
