@@ -224,8 +224,7 @@ export default async function handler(request) {
 
       return new Response(JSON.stringify({ message: "تم حذف الحساب وجميع البيانات المرتبطة به بنجاح." }), {
         status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        });
-      }
+      });
     }
 
     console.log(`[Warning] No logic matched for ${request.method} ${request.url}.`);
