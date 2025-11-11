@@ -29,6 +29,9 @@ export default async function handler(request) {
       const MainCategory = searchParams.get('MainCategory');
       const SubCategory = searchParams.get('SubCategory');
 
+      // ✅ جديد: تسجيل معايير البحث المستلمة لتسهيل التصحيح
+      console.log(`[API: /api/products GET] Received search request with params: searchTerm='${searchTerm}', MainCategory='${MainCategory}', SubCategory='${SubCategory}', user_key='${user_key}'`);
+
       let sql, args;
 
       // ✅ جديد: منطق بحث ديناميكي
@@ -66,13 +69,23 @@ export default async function handler(request) {
 
       // ✅ إصلاح: إضافة جملة الترتيب هنا لضمان تطبيقها على جميع استعلامات الجلب
       sql += " ORDER BY p.id DESC";
+
+      // ✅ جديد: تسجيل جملة SQL النهائية والوسائط قبل التنفيذ
+      console.log(`[API: /api/products GET] Executing SQL: ${sql}`);
+      console.log(`[API: /api/products GET] With arguments:`, args);
+
       const { rows } = await db.execute({
         sql: sql,
         args: args,
       });
 
+      // ✅ جديد: تسجيل عدد النتائج التي تم العثور عليها
+      console.log(`[API: /api/products GET] Found ${rows.length} products.`);
+
       return new Response(JSON.stringify(rows), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     } catch (err) {
+      // ✅ جديد: تسجيل الخطأ بشكل أوضح
+      console.error('[API: /api/products GET] An error occurred:', err);
       return new Response(JSON.stringify({ error: "حدث خطأ أثناء جلب المنتجات: " + err.message }), {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
