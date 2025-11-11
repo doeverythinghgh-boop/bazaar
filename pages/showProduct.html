@@ -141,6 +141,82 @@
     margin-left: 10px;
   }
 
+  /* ✅ جديد: توسيط عناصر محدد الكمية */
+  .quantity-selector {
+    display: flex;
+    justify-content: center;
+    align-items: center; /* ✅ جديد: محاذاة عمودية للعناصر */
+    gap: 12px; /* ✅ جديد: مسافة بين العناصر */
+    margin: 1rem 0; /* ✅ جديد: إضافة هوامش علوية وسفلية */
+  }
+
+  /* ✅ جديد: تحسين تصميم أزرار الكمية */
+  .quantity-selector .quantity-btn {
+    background-color: #eaf5ff; /* خلفية زرقاء فاتحة */
+    border: 1px solid #9bc1eb;
+    color: #007bff; /* لون أزرق للأيقونة */
+    box-shadow: 0 2px 4px rgba(0, 123, 255, 0.1);
+  }
+
+  /* ✅ جديد: تحسين تصميم حقل إدخال الكمية */
+  #product-modal-selected-quantity {
+    border: none; /* إزالة الحدود التقليدية */
+    background-color: #f0f8ff; /* خلفية متناسقة */
+    color: #03478f; /* لون نص أزرق داكن */
+    border-radius: 8px; /* حواف دائرية */
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.06); /* ظل داخلي ناعم */
+    width: 60px; /* زيادة العرض قليلاً */
+    height: 40px; /* توحيد الارتفاع مع الأزرار */
+    font-size: 18px; /* تكبير حجم الخط */
+  }
+
+  /* ✅ جديد: تنسيق حاوية السعر الإجمالي */
+  .total-price-container {
+    text-align: center;
+    margin: 1rem 0;
+    padding: 1rem;
+    background-color: #f0f8ff; /* لون أزرق فاتح جدًا */
+    border-radius: 8px;
+    border: 1px solid #e0eefd;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  }
+
+  #product-modal-total-price-label {
+    font-size: 1.1rem;
+    color: #555;
+  }
+
+  #product-modal-total-price {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #007bff; /* لون أزرق مميز */
+    margin-right: 8px;
+  }
+
+  /* ✅ جديد: تحسين تصميم زر "إضافة إلى السلة" */
+  .add-to-cart-btn {
+    width: 100%; /* عرض كامل */
+    padding: 15px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #fff;
+    background: linear-gradient(45deg, #007bff, #0056b3); /* خلفية متدرجة */
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+    display: flex; /* لتوسيط المحتوى */
+    align-items: center;
+    justify-content: center;
+    gap: 10px; /* مسافة بين الأيقونة والنص */
+  }
+
+  .add-to-cart-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 123, 255, 0.4);
+  }
+
 </style>
 
 <div class="modal-content product-modal-content" id="product-modal-content">
@@ -195,6 +271,7 @@
 
     <!-- قسم جديد لإضافة المنتج للسلة -->
     <div class="cart-actions" id="product-modal-cart-actions">
+      
       <div class="quantity-selector" id="product-modal-quantity-selector">
         <button
           class="quantity-btn"
@@ -218,6 +295,7 @@
           +
         </button>
       </div>
+
       <div
         class="total-price-container"
         id="product-modal-total-price-container"

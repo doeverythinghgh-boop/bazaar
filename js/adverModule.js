@@ -149,15 +149,15 @@ function buildSlider(container, adImages) {
     const newIndex = (index + slides.length) % slides.length;
     if (newIndex === currentIndex && slides[currentIndex].classList.contains('active')) return;
 
-    currentIndex = newIndex;
+    // ✅ إصلاح: استخدام newIndex المضمون بدلاً من index الأصلي
+    currentIndex = newIndex; 
     slides.forEach((slide, i) => {
-      slide.classList.toggle('active', i === index);
+      slide.classList.toggle('active', i === currentIndex);
     });
     dots.forEach((dot, i) => {
-      dot.classList.toggle('active', i === index);
+      dot.classList.toggle('active', i === currentIndex);
     });
-    currentIndex = index;
-    // ✅ جديد: إعادة تشغيل المؤقت عند التنقل اليدوي
+
     if (slides.length > 1) {
       resetAutoPlay();
     }
