@@ -19,6 +19,7 @@
     <link rel="stylesheet" href="css/categories.css" />
     <link rel="stylesheet" href="css/products-gallery.css" />
     <link rel="stylesheet" href="css/modal.css" />
+    <link rel="stylesheet" href="css/searchModal.css" /> <!-- ✅ جديد: إضافة ملف أنماط نافذة البحث -->
     <link rel="stylesheet" href="css/adverModule.css" /> <!-- ✅ جديد: إضافة ملف أنماط الإعلانات -->
     <!-- Link to Google Fonts for a more stylish look (Optional) -->
     <link
@@ -105,25 +106,16 @@
     <div id="product-details-modal" class="modal">
       <!-- Product details will be loaded here from showProduct.html -->
     </div>
-    <!-- ✅ جديد: نافذة البحث المنبثقة -->
-    <div id="search-modal" class="modal">
-      <div id="search-modal-content" class="search-modal-content">
-        <button id="search-modal-close-btn" class="close-button" aria-label="إغلاق"><i class="fas fa-times"></i></button>
-        <h2 id="search-modal-title"><i class="fas fa-search"></i> ابحث في بازار السويس</h2>
-        <p id="search-modal-subtitle">اصبر شويه يا حسام باشا عشان تاخد حاجه حلوه
-        </p>
-        <div id="search-modal-input-container" class="search-modal-input-container">
-          <input type="search" id="search-modal-input" placeholder="اكتب اسم المنتج، الفئة، أو البائع..." />
-          <button id="search-modal-submit-btn" class="button" aria-label="بحث" title="بحث"><i class="fas fa-search"></i></button>
-        </div>
-        <div id="search-results-container"></div>
-      </div>
-    </div>
+    
+    <!-- ✅ جديد: حاوية لنافذة البحث المنبثقة (سيتم ملؤها بواسطة JS) -->
+    <div id="search-modal-container"></div>
+
     <script id="config-script" src="js/config.js"></script> <!-- ✅ إضافة: تحميل ملف الإعدادات أولاً -->
     <script id="utils-script" src="js/utils.js"></script> <!-- ✅ جديد: تحميل ملف الدوال المساعدة -->
     <script id="turo-script" src="js/turo.js"></script> <!-- ✅ إصلاح: تحميل turo.js مبكرًا لضمان توفر دوال الـ API -->
     <script id="cart-script" src="js/cart.js"></script> <!-- ✅ إضافة: تحميل ملف السلة -->
     <script id="adver-module-script" src="js/adverModule.js"></script> <!-- ✅ جديد: إضافة ملف موديول الإعلانات -->
+    <script id="search-modal-script" src="js/searchModal.js"></script> <!-- ✅ جديد: إضافة ملف نافذة البحث -->
     <script id="main-script" src="js/main.js"></script>
     <script id="auth-script" src="js/auth.js"></script>
 
@@ -444,6 +436,10 @@
       document.addEventListener("DOMContentLoaded", async function () {
         console.log('%c[DOM] اكتمل تحميل محتوى الصفحة (DOMContentLoaded).', 'color: green; font-weight: bold;');
 
+        // ✅ جديد: تشغيل الأنيميشن بشكل مستقل فورًا
+        // هذا يمنع الأنيميشن من حظر تحميل باقي مكونات الصفحة.
+        if (typeof startAnimationCycle === 'function') startAnimationCycle();
+
         // ✅ جديد: التحقق من الاتصال بالإنترنت أولاً
         console.log('[DOM] جاري التحقق من الاتصال بالإنترنت...');
         const isOnline = await checkInternetConnection();
@@ -479,37 +475,17 @@
         // جديد: الاستماع لتحديثات السلة لتحديث الشارة
         window.addEventListener('cartUpdated', updateCartBadge);
 
-        // جديد: تفعيل وظيفة البحث في الهيدر
-        const searchContainer = document.getElementById('search-container');
-        const openSearchBtn = document.getElementById('search-icon-btn');
-        const searchModal = document.getElementById('search-modal');
-        const closeSearchBtn = document.getElementById('search-modal-close-btn');
-        const searchModalInput = document.getElementById('search-modal-input');
-
-        const openModal = () => {
-          searchModal.style.display = 'block';
-          document.body.classList.add('modal-open');
-          setTimeout(() => searchModalInput.focus(), 50); // التركيز على حقل البحث
-        };
-
-        const closeModal = () => {
-          searchModal.style.display = 'none';
-          document.body.classList.remove('modal-open');
-        };
-
-        openSearchBtn.addEventListener('click', openModal);
-        closeSearchBtn.addEventListener('click', closeModal);
-        window.addEventListener('click', (event) => {
-          if (event.target == searchModal) {
-            closeModal();
-          }
-        });
+        // ✅ جديد: تهيئة نافذة البحث المنبثقة بعد تحميل محتوى الصفحة
+        if (typeof initSearchModal === 'function') {
+          console.log('[DOM] جاري تهيئة نافذة البحث...');
+          // استدعاء الدالة و تمرير معرف الحاوية و معرف زر الفتح
+          initSearchModal('search-modal-container', 'search-icon-btn');
+        }
 
         // ✅ جديد: تهيئة موديول الإعلانات بعد تحميل محتوى الصفحة
         if (typeof initAdverModule === 'function') {
           initAdverModule('advertisement-section');
         }
-
       });
     </script>
     
