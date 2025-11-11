@@ -1,0 +1,130 @@
+/*
+  @file css/modal.css
+  @description أنماط عامة للنوافذ المنبثقة (Modals) وتخصيصاتها.
+*/
+
+/* === الأنماط العامة للنوافذ المنبثقة (Modal) === */
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 2000; /* Sit on top of everything */
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgba(0, 0, 0, 0.6); /* Black w/ opacity */
+  -webkit-backdrop-filter: blur(5px); /* Frosted glass effect */
+  backdrop-filter: blur(5px);
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* محتوى النافذة المنبثقة */
+.modal-content {
+  background-color: #fefefe;
+  margin: 15% auto; /* 15% from the top and centered */
+  padding: 30px;
+  border: 1px solid #888;
+  width: 80%;
+  max-width: 600px; /* Max width */
+  border-radius: 10px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  text-align: center;
+  position: relative;
+  animation: slideIn 0.4s ease-out;
+}
+
+.modal-content h3 {
+  font-family: "Tajawal", sans-serif;
+  font-size: 24px;
+  margin-top: 0;
+  margin-bottom: 25px;
+  color: #333;
+}
+
+/* تصميم زر الإغلاق في النوافذ المنبثقة */
+.close-button {
+  position: absolute;
+  top: 15px;
+  left: 15px; /* For RTL */
+  width: 36px;
+  height: 36px;
+  background-color: #fee2e2; /* ✅ تعديل: خلفية حمراء فاتحة وناعمة */
+  color: #ef4444; /* ✅ تعديل: لون أيقونة أحمر داكن للتباين */
+  border-radius: 50%;
+  display: flex;
+  border: none; /* ✅ إضافة: إزالة الحدود الافتراضية للزر */
+  padding: 0; /* ✅ إضافة: إزالة الحشو الافتراضي للزر */
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: bold;
+  cursor: pointer;
+  line-height: 1;
+  transition: background-color 0.2s, transform 0.1s, box-shadow 0.2s; /* ✅ تعديل: إضافة انتقال للظل */
+  z-index: 10; /* ضمان ظهوره فوق المحتوى */
+}
+
+.close-button:active {
+  background-color: #fecaca; /* ✅ تعديل: لون أغمق قليلاً عند الضغط */
+  transform: scale(0.95); /* تأثير ضغط طفيف */
+}
+
+/* Animation for modal background */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Animation for modal content */
+@keyframes slideIn {
+  from {
+    transform: translateY(-50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* أنماط خاصة بنافذة البحث المنبثقة */
+.search-modal-content {
+  background-color: #fdfdfd;
+  margin: 10% auto; /* تعديل الهامش العلوي ليكون أقرب للأعلى */
+  padding: 2rem;
+  border: none;
+  width: 90%;
+  max-width: 700px; /* عرض أكبر قليلاً ليناسب البحث */
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  position: relative;
+  animation: slideIn 0.4s ease-out;
+}
+
+.search-modal-content h2 {
+  font-family: "Tajawal", sans-serif;
+  font-size: 1.75rem;
+  color: #2c3e50;
+  margin-top: 0;
+  margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+/* أنماط خاصة بنافذة عرض تفاصيل المنتج */
+.product-modal-content {
+  margin: 5% auto; /* Adjust margin for better vertical positioning */
+  max-width: 900px; /* Wider modal for product details */
+}
+
+.product-modal-content .close-button {
+  transform: none; /* إلغاء أي تحويل سابق قد يؤثر على الموضع */
+}
