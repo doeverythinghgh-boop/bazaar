@@ -6,38 +6,76 @@
  * في حاوية محددة كشريط إعلاني ينتقل تلقائيًا.
  */
 
-async function initAdverModule(containerId) {
+async function initAdverModule(containerId, forceRefresh = false) {
   const container = document.getElementById(containerId);
   if (!container) {
     console.error(`[AdverModule] لم يتم العثور على الحاوية بالمعرف: ${containerId}`);
     return;
   }
 
+  console.log('%c[AdverModule] Initializing...', 'color: #20c997');
+
+  // --- ✅ جديد: منطق التخزين المؤقت (Caching) ---
+  const CACHE_KEY_IMAGES = 'adver_images_cache';
+  const CACHE_KEY_TIMESTAMP = 'adver_timestamp_cache';
+
+  const cachedTimestamp = localStorage.getItem(CACHE_KEY_TIMESTAMP);
+  const cachedImages = JSON.parse(localStorage.getItem(CACHE_KEY_IMAGES));
+
+  // جلب آخر تاريخ تحديث من الخادم
+  const latestUpdate = await getLatestUpdate();
+  const serverTimestamp = latestUpdate ? latestUpdate.datetime : null;
+
+  console.log(`[AdverModule] Server Timestamp: ${serverTimestamp}`);
+  console.log(`[AdverModule] Cached Timestamp: ${cachedTimestamp}`);
+
+  // إذا كانت التواريخ متطابقة وهناك صور محفوظة، استخدم النسخة المحفوظة
+  if (!forceRefresh && serverTimestamp && serverTimestamp === cachedTimestamp && cachedImages && cachedImages.length > 0) {
+    console.log('%c[AdverModule] Loading ads from cache.', 'color: green; font-weight: bold;');
+    buildSlider(container, cachedImages);
+    return; // توقف هنا، لا حاجة لجلب الصور من الشبكة
+  }
+
+  // --- إذا لم تتطابق التواريخ أو لا توجد نسخة محفوظة، قم بالجلب من الشبكة ---
+  console.log('%c[AdverModule] Cache is outdated or empty. Fetching from network...', 'color: orange; font-weight: bold;');
+
   const R2_PUBLIC_URL = 'https://pub-e828389e2f1e484c89d8fb652c540c12.r2.dev';
   const MAX_ADS = 10; // أقصى عدد من الإعلانات للبحث عنه
-  const adImages = [];
+  const fetchedImages = [];
 
   // دالة للتحقق من وجود صورة
   function checkImage(url) {
     return new Promise(resolve => {
       const img = new Image();
-      img.onload = () => resolve(true);
-      img.onerror = () => resolve(false);
+      img.onload = () => resolve({ exists: true, url: url });
+      img.onerror = () => resolve({ exists: false, url: url });
       img.src = url;
     });
   }
 
-  // جلب الصور الموجودة بالتسلسل
+  // جلب الصور الموجودة بالتوازي لتحسين الأداء
+  const imageChecks = [];
   for (let i = 1; i <= MAX_ADS; i++) {
     const imageUrl = `${R2_PUBLIC_URL}/pic${i}.webp`;
-    const exists = await checkImage(imageUrl);
-    if (exists) {
-      adImages.push(imageUrl);
-    } else {
-      break; // توقف عند أول صورة غير موجودة
-    }
+    imageChecks.push(checkImage(imageUrl));
   }
 
+  const results = await Promise.all(imageChecks);
+  results.forEach(result => {
+    if (result.exists) fetchedImages.push(result.url);
+  });
+
+  // ✅ جديد: حفظ الصور الجديدة وتاريخ التحديث في localStorage
+  console.log(`[AdverModule] Fetched ${fetchedImages.length} images. Caching results.`);
+  localStorage.setItem(CACHE_KEY_IMAGES, JSON.stringify(fetchedImages));
+  if (serverTimestamp) {
+    localStorage.setItem(CACHE_KEY_TIMESTAMP, serverTimestamp);
+  }
+
+  buildSlider(container, fetchedImages);
+}
+
+function buildSlider(container, adImages) {
   // إذا لم توجد صور، اعرض رسالة
   if (adImages.length === 0) {
     container.innerHTML = '<p class="no-ads-message">لا توجد إعلانات حالياً</p>';

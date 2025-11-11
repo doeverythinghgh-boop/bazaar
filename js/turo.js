@@ -598,3 +598,29 @@ async function addUpdate(text) {
     return { error: "فشل الاتصال بالخادم عند تسجيل التحديث." };
   }
 }
+
+/**
+ * يجلب آخر تاريخ تحديث من جدول updates.
+ * @returns {Promise<Object|null>} كائن يحتوي على تاريخ التحديث أو null في حالة الفشل.
+ */
+async function getLatestUpdate() {
+  console.log(`%c[API] Starting getLatestUpdate...`, 'color: blue;');
+  try {
+    const response = await fetch(`${baseURL}/api/updates`);
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      // لا نعتبر 404 خطأ فادحًا، بل يعني عدم وجود تحديثات بعد
+      if (response.status === 404) return { datetime: null };
+      throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log('%c[API] getLatestUpdate successful.', 'color: green;', data);
+    return data;
+
+  } catch (error) {
+    console.error('%c[API] getLatestUpdate failed:', 'color: red;', error);
+    return null;
+  }
+}
