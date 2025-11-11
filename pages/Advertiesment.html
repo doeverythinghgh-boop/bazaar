@@ -586,7 +586,7 @@ window.adverModule = (function() {
       // --- ✅ إصلاح شامل لمنطق الحفظ ---
 
       console.groupCollapsed('%c[DevLog] Sync Plan', 'color: #0d6efd; font-weight: bold;');
-      // 1. تحديد الحالة النهائية للصور في الواجهة (UI)
+      // 1. تحديد الحالة النهائية للصور في الواجهة (UI) وتسميتها بالترتيب
       const finalImagesInUI = images.map((state, index) => ({
         state: state,
         newName: `pic${index + 1}.webp`
@@ -595,7 +595,7 @@ window.adverModule = (function() {
 
       console.log('Final UI State:', finalImageNamesInUI);
 
-      // 2. ✅ إصلاح شامل: تحديد الصور للحذف بناءً على ما تمت إزالته من الواجهة
+      // 2. تحديد الصور للحذف: أي صورة كانت موجودة أصلاً ولم تعد موجودة في الواجهة
       const currentUploadedFileNames = images.filter(s => s.status === 'uploaded').map(s => s.fileName);
       const removedImageNames = window.adverModule.originalImageNames.filter(name => !currentUploadedFileNames.includes(name));
 
@@ -606,15 +606,15 @@ window.adverModule = (function() {
 
       console.log('Images to Delete:', imagesToDelete);
 
-      // جديد: تحديد الصور للرفع وإعادة الترتيب
+      // 3. تحديد الصور الجديدة للرفع والصور الموجودة لإعادة الترتيب
       const newUploadsPlan = finalImagesInUI.filter(item => item.state.status === 'ready');
       const reorderItemsPlan = finalImagesInUI.filter(item => item.state.status === 'uploaded' && item.state.fileName !== item.newName);
       console.log('New Images to Upload:', newUploadsPlan.map(i => i.newName));
-      console.log('Images to Reorder:', reorderItemsPlan.map(i => `${i.state.fileName} -> ${i.newName}`)); // ✅ إصلاح: تعريف المتغير قبل استخدامه
+      console.log('Images to Reorder:', reorderItemsPlan.map(i => `${i.state.fileName} -> ${i.newName}`));
 
       console.groupEnd();
 
-      // 3. تنفيذ عمليات الحذف أولاً وبشكل منفصل
+      // 4. تنفيذ عمليات الحذف أولاً وبشكل منفصل لضمان إفراغ الخانات
       if (imagesToDelete.length > 0) {
         console.groupCollapsed(`%c[DevLog] Deletion Phase (${imagesToDelete.length} images)`, 'color: #dc3545;');
         console.log("Deleting:", imagesToDelete);
@@ -624,10 +624,7 @@ window.adverModule = (function() {
         console.groupEnd();
       }
 
-      // --- الآن بعد أن تم الحذف بأمان، نبدأ عمليات الرفع وإعادة الترتيب ---
-
-
-      // 4. رفع الصور الجديدة فقط
+      // 5. رفع الصور الجديدة فقط
       const newUploads = finalImagesInUI.filter(item => item.state.status === 'ready' && item.state.compressedBlob);
       if (newUploads.length > 0) {
         console.groupCollapsed(`%c[DevLog] Upload Phase (${newUploads.length} new images)`, 'color: #198754;');
@@ -638,25 +635,25 @@ window.adverModule = (function() {
         console.groupEnd();
       }
 
-      // 5. التعامل مع إعادة الترتيب بأمان على مرحلتين
+      // 6. التعامل مع إعادة الترتيب بأمان على ثلاث مراحل (نسخ احتياطي -> نشر -> تنظيف)
       const reorderItems = finalImagesInUI.filter(item => item.state.status === 'uploaded' && item.state.fileName !== item.newName);
       if (reorderItems.length > 0) {
         console.groupCollapsed(`%c[DevLog] Reorder Phase (${reorderItems.length} images)`, 'color: #fd7e14; font-weight: bold;');
 
-        console.groupCollapsed('Step 1: Backup');
-        // المرحلة الأولى: النسخ الاحتياطي (إعادة التسمية إلى أسماء مؤقتة)
+        // المرحلة أ: النسخ الاحتياطي (إعادة التسمية إلى أسماء مؤقتة)
+        console.groupCollapsed('Step A: Backup to Temporary');
         const backupPromises = reorderItems.map(async (item) => {
           const tempName = `temp_${item.state.fileName}`;
           console.log(`  - Backing up '${item.state.fileName}' to '${tempName}'`);
           const blob = await downloadFile2cf(item.state.fileName);
           await uploadFile2cf(blob, tempName);
-          return { tempName, finalName: item.newName }; // إرجاع الاسم المؤقت والنهائي
+          return { tempName, finalName: item.newName, originalName: item.state.fileName };
         });
         const backedUpFiles = await Promise.all(backupPromises);
         console.groupEnd();
 
-        console.groupCollapsed('Step 2: Finalize');
-        // المرحلة الثانية: النشر النهائي (إعادة التسمية من المؤقت إلى النهائي)
+        // المرحلة ب: النشر النهائي (إعادة التسمية من المؤقت إلى النهائي)
+        console.groupCollapsed('Step B: Finalize from Temporary');
         const finalizePromises = backedUpFiles.map(async (file) => {
           console.log(`  - Finalizing '${file.tempName}' to '${file.finalName}'`);
           const blob = await downloadFile2cf(file.tempName);
@@ -665,18 +662,18 @@ window.adverModule = (function() {
         await Promise.all(finalizePromises);
         console.groupEnd();
 
-        console.groupCollapsed('Step 3: Cleanup');
-        // المرحلة الثالثة: التنظيف (حذف الملفات المؤقتة)
+        // المرحلة ج: التنظيف (حذف الملفات المؤقتة والأصلية التي تم نسخها)
+        console.groupCollapsed('Step C: Cleanup');
         const cleanupPromises = backedUpFiles.map(file => {
           console.log(`  - Cleaning up temp file: '${file.tempName}'`);
           return deleteFile2cf(file.tempName).catch(err => console.error(`Cleanup failed for ${file.tempName}:`, err));
         });
         await Promise.all(cleanupPromises);
 
-        // وأيضًا حذف الملفات الأصلية التي تم نسخها
-        const deleteOriginalsPromises = reorderItems.map(item => {
-            console.log(`  - Cleaning up original file: '${item.state.fileName}'`);
-            return deleteFile2cf(item.state.fileName).catch(err => console.error(`Cleanup failed for original ${item.state.fileName}:`, err));
+        // حذف الملفات الأصلية التي تم نسخها احتياطيًا
+        const deleteOriginalsPromises = backedUpFiles.map(file => {
+            console.log(`  - Cleaning up original file: '${file.originalName}'`);
+            return deleteFile2cf(file.originalName).catch(err => console.error(`Cleanup failed for original ${file.originalName}:`, err));
         });
         await Promise.all(deleteOriginalsPromises);
         console.groupEnd();
@@ -686,7 +683,7 @@ window.adverModule = (function() {
       
       // --- نهاية منطق المزامنة ---
       
-      // ✅ جديد: تسجيل تاريخ التحديث في جدول updates
+      // 7. تسجيل تاريخ التحديث في جدول updates
       console.log('%c[DevLog] 3. Recording update timestamp...', 'color: blue; font-weight: bold;');
       if (typeof addUpdate === 'function') {
         await addUpdate("تم تحديث صور الإعلانات");

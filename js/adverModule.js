@@ -18,20 +18,32 @@ async function initAdverModule(containerId, forceRefresh = false) {
   // --- ✅ جديد: منطق التخزين المؤقت (Caching) ---
   const CACHE_KEY_IMAGES = 'adver_images_cache';
   const CACHE_KEY_TIMESTAMP = 'adver_timestamp_cache';
+  const CACHE_KEY_LAST_CHECK = 'adver_last_check_timestamp'; // ✅ جديد: لتخزين وقت آخر فحص
+  const CHECK_INTERVAL = 24 * 60 * 60 * 1000; // 24 ساعة بالمللي ثانية
 
   const cachedTimestamp = localStorage.getItem(CACHE_KEY_TIMESTAMP);
   const cachedImages = JSON.parse(localStorage.getItem(CACHE_KEY_IMAGES));
+  const lastCheckTimestamp = localStorage.getItem(CACHE_KEY_LAST_CHECK);
+
+  // ✅ جديد: التحقق مما إذا كان يجب استخدام النسخة المخبأة دون الاتصال بالخادم
+  if (!forceRefresh && lastCheckTimestamp && (Date.now() - lastCheckTimestamp < CHECK_INTERVAL) && cachedImages && cachedImages.length > 0) {
+    console.log('%c[AdverModule] Loading ads from cache (within 24h interval).', 'color: green; font-weight: bold;');
+    buildSlider(container, cachedImages);
+    return; // توقف هنا، لا حاجة للاتصال بالخادم
+  }
 
   // جلب آخر تاريخ تحديث من الخادم
+  console.log('%c[AdverModule] Checking for updates from server (interval elapsed or no cache).', 'color: #17a2b8;');
   const latestUpdate = await getLatestUpdate();
   const serverTimestamp = latestUpdate ? latestUpdate.datetime : null;
 
   console.log(`[AdverModule] Server Timestamp: ${serverTimestamp}`);
   console.log(`[AdverModule] Cached Timestamp: ${cachedTimestamp}`);
 
-  // إذا كانت التواريخ متطابقة وهناك صور محفوظة، استخدم النسخة المحفوظة
+  // إذا كانت التواريخ متطابقة وهناك صور محفوظة، استخدم النسخة المحفوظة (بعد التحقق من الخادم)
   if (!forceRefresh && serverTimestamp && serverTimestamp === cachedTimestamp && cachedImages && cachedImages.length > 0) {
     console.log('%c[AdverModule] Loading ads from cache.', 'color: green; font-weight: bold;');
+    localStorage.setItem(CACHE_KEY_LAST_CHECK, Date.now()); // ✅ جديد: تحديث وقت آخر فحص
     buildSlider(container, cachedImages);
     return; // توقف هنا، لا حاجة لجلب الصور من الشبكة
   }
@@ -71,6 +83,7 @@ async function initAdverModule(containerId, forceRefresh = false) {
   if (serverTimestamp) {
     localStorage.setItem(CACHE_KEY_TIMESTAMP, serverTimestamp);
   }
+  localStorage.setItem(CACHE_KEY_LAST_CHECK, Date.now()); // ✅ جديد: تحديث وقت آخر فحص بعد جلب الصور
 
   buildSlider(container, fetchedImages);
 }
@@ -180,6 +193,8 @@ function buildSlider(container, adImages) {
     } else {
       prevButton.style.display = 'none';
       nextButton.style.display = 'none';
+      // ✅ جديد: إخفاء حاوية النقاط إذا كانت هناك صورة واحدة فقط
+      dotsContainer.style.display = 'none';
     }
   }
 }

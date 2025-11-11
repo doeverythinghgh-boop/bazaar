@@ -153,9 +153,9 @@
       </div>
     </div>
     <script id="config-script" src="js/config.js"></script> <!-- ✅ إضافة: تحميل ملف الإعدادات أولاً -->
+    <script id="turo-script" src="js/turo.js"></script> <!-- ✅ إصلاح: تحميل turo.js مبكرًا لضمان توفر دوال الـ API -->
     <script id="cart-script" src="js/cart.js"></script> <!-- ✅ إضافة: تحميل ملف السلة -->
     <script id="adver-module-script" src="js/adverModule.js"></script> <!-- ✅ جديد: إضافة ملف موديول الإعلانات -->
-    <!-- ✅ إضافة: تحميل ملف الإعدادات أولاً -->
     <script id="main-script" src="js/main.js"></script>
     <script id="auth-script" src="js/auth.js"></script>
 
@@ -463,12 +463,6 @@
         updateCartBadge();
         // جديد: الاستماع لتحديثات السلة لتحديث الشارة
         window.addEventListener('cartUpdated', updateCartBadge);
-
-        // إضافة ملف turo.js ديناميكيًا لضمان توفر الدوال
-        console.log('[DOM] جاري إضافة turo.js إلى الصفحة...');
-        const turoScript = document.createElement("script");
-        turoScript.src = "js/turo.js";
-        document.body.appendChild(turoScript);
 
         // جديد: تفعيل وظيفة البحث في الهيدر
         const searchContainer = document.getElementById('search-container');
