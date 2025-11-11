@@ -75,7 +75,29 @@
 #search-modal-subtitle {
   font-size: 1rem;
   color: var(--primary-color); /* ✅ تحسين: استخدام اللون الأساسي لتوحيد الهوية البصرية */
-  margin-bottom: 25px;
+  margin: 0; /* إزالة الهامش السفلي لأنه سيتم التحكم به من الحاوية */
+}
+
+/* ✅ جديد: حاوية لتجميع النص التعريفي والفلاتر والترتيب */
+.subtitle-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 15px;
+  margin-bottom: 10px;
+  flex-wrap: wrap; /* للسماح بالالتفاف في الشاشات الصغيرة */
+  gap: 15px;
+}
+
+/* ✅ جديد: أنماط قائمة الترتيب */
+.sort-filter {
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  padding: 5px 10px;
+  font-family: 'Tajawal', sans-serif;
+  font-size: 0.85rem;
+  background-color: #f9f9f9;
+  cursor: pointer;
 }
 
 /* ✅ جديد: حاوية لتجميع حقل البحث وزر البحث */
@@ -133,7 +155,6 @@
 /* ✅ جديد: أنماط رابط إظهار/إخفاء الفلاتر */
 .toggle-filters-link {
   display: inline-block;
-  margin-top: 15px;
   color: var(--primary-color);
   text-decoration: none;
   font-weight: bold;

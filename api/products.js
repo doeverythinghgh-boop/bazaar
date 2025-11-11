@@ -28,12 +28,9 @@ export default async function handler(request) {
       const searchTerm = searchParams.get('searchTerm');
       const MainCategory = searchParams.get('MainCategory');
       const SubCategory = searchParams.get('SubCategory');
-      // ✅ جديد: استقبال معاملات فلترة السعر
-      const priceSort = searchParams.get('priceSort');
-      const maxPrice = searchParams.get('maxPrice');
 
       // ✅ جديد: تسجيل معايير البحث المستلمة لتسهيل التصحيح
-      console.log(`[API: /api/products GET] Received search request with params: searchTerm='${searchTerm}', MainCategory='${MainCategory}', SubCategory='${SubCategory}', user_key='${user_key}', priceSort='${priceSort}', maxPrice='${maxPrice}'`);
+      console.log(`[API: /api/products GET] Received search request with params: searchTerm='${searchTerm}', MainCategory='${MainCategory}', SubCategory='${SubCategory}', user_key='${user_key}'`);
 
       let sql, args;
 
@@ -59,11 +56,6 @@ export default async function handler(request) {
           whereClauses.push("p.SubCategory = ?");
           args.push(SubCategory);
         }
-        // ✅ جديد: إضافة شرط الحد الأقصى للسعر
-        if (maxPrice) {
-          whereClauses.push("p.product_price <= ?");
-          args.push(parseFloat(maxPrice));
-        }
         sql += " WHERE " + whereClauses.join(" AND ");
 
       } else if (user_key) {
@@ -76,15 +68,7 @@ export default async function handler(request) {
       }
 
       // ✅ إصلاح: إضافة جملة الترتيب هنا لضمان تطبيقها على جميع استعلامات الجلب
-      // ✅ جديد: منطق ترتيب ديناميكي
-      if (priceSort === 'asc') {
-        sql += " ORDER BY p.product_price ASC, p.id DESC";
-      } else if (priceSort === 'desc') {
-        sql += " ORDER BY p.product_price DESC, p.id DESC";
-      } else {
-        // الترتيب الافتراضي (الأحدث أولاً)
-        sql += " ORDER BY p.id DESC";
-      }
+      sql += " ORDER BY p.id DESC";
 
       // ✅ جديد: تسجيل جملة SQL النهائية والوسائط قبل التنفيذ
       console.log(`[API: /api/products GET] Executing SQL: ${sql}`);
