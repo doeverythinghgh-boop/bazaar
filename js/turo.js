@@ -430,6 +430,14 @@ async function sendNotification(token, title, body) {
  * @param {object} productData - بيانات المنتج الكاملة.
  */
 window.showProductDetails = async function(productData) {
+  // ✅ جديد: التحقق من الاتصال بالإنترنت أولاً
+  const isOnline = await checkInternetConnection();
+  if (!isOnline) {
+    // إذا لم يكن هناك اتصال، أبلغ المستخدم وتوقف
+    Swal.fire('لا يوجد اتصال بالإنترنت', 'يرجى التحقق من اتصالك بالشبكة لعرض تفاصيل المنتج.', 'error');
+    return;
+  }
+
   console.log('%c[Modal] Opening product details modal for:', 'color: darkcyan', productData.productName);
   const modal = document.getElementById("product-details-modal");
 

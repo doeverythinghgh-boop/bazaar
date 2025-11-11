@@ -15,6 +15,14 @@ async function initAdverModule(containerId, forceRefresh = false) {
 
   console.log('%c[AdverModule] Initializing...', 'color: #20c997');
 
+  // ✅ جديد: التحقق من الاتصال بالإنترنت أولاً
+  const isOnline = await checkInternetConnection();
+  if (!isOnline) {
+    console.warn('[AdverModule] No internet connection. Attempting to load from cache...');
+    const cachedImages = JSON.parse(localStorage.getItem('adver_images_cache'));
+    buildSlider(container, cachedImages || []);
+    return; // توقف هنا، لا تحاول الاتصال بالخادم
+  }
   // --- ✅ جديد: منطق التخزين المؤقت (Caching) ---
   const CACHE_KEY_IMAGES = 'adver_images_cache';
   const CACHE_KEY_TIMESTAMP = 'adver_timestamp_cache';

@@ -1,3 +1,14 @@
+<!-- ✅ جديد: حاوية رسالة انقطاع الاتصال -->
+<div id="offline-container-modal" class="offline-container" style="display: none; position: absolute; border-radius: 12px;">
+  <div class="offline-content">
+    <i class="fas fa-exclamation-triangle"></i>
+    <h2>لا يوجد اتصال بالإنترنت</h2>
+    <p>يرجى التحقق من اتصالك بالشبكة والمحاولة مرة أخرى.</p>
+    <button id="retry-connection-btn-modal" class="button login-btn">إعادة المحاولة</button>
+  </div>
+</div>
+
+<div id="modal-main-content">
 <!--
   @file pages/Advertiesment.html (v2 - Redesigned)
   @description نموذج إدارة إعلانات الصور (HTML Fragment) للمدير.
@@ -201,12 +212,32 @@
     </div>
   </form>
 </div>
+</div>
 
 <script>
 /**
  * دالة لتهيئة نموذج إدارة الإعلان.
  */
 async function initializeAdvertiesmentForm() {
+  // ✅ جديد: التحقق من الاتصال بالإنترنت أولاً
+  if (typeof checkInternetConnection === 'undefined') {
+    console.error("utils.js is not loaded. Cannot check internet connection.");
+    return;
+  }
+  const isOnline = await checkInternetConnection();
+  if (!isOnline) {
+    document.getElementById('offline-container-modal').style.display = 'flex';
+    document.getElementById('modal-main-content').style.display = 'none';
+    document.getElementById('retry-connection-btn-modal').addEventListener('click', () => {
+      if (typeof showAdvertiesmentModal === 'function') {
+        showAdvertiesmentModal();
+      } else {
+        window.location.reload();
+      }
+    });
+    return;
+  }
+
   console.log('%c[AdverForm] Initializing form...', 'color: #20c997;');
   
   // الوصول إلى مصفوفة الصور وحالة الموديول من النطاق الخارجي

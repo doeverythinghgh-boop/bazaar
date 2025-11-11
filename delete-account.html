@@ -38,26 +38,59 @@
     color: #e74c3c;
     font-weight: bold;
   }
+  /* ✅ جديد: استعارة أنماط من style.css للاتساق */
+  .offline-container { display: flex; justify-content: center; align-items: center; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(255, 255, 255, 0.95); z-index: 10000; text-align: center; }
+  .offline-content { max-width: 400px; padding: 20px; background-color: #fff; border-radius: 10px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); }
+  .offline-content i { font-size: 3rem; color: #f39c12; margin-bottom: 1rem; }
+  .offline-content h2 { margin-top: 0; color: #c0392b; }
+  .button.login-btn { background-color: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 1rem; }
 </style>
+<!-- Font Awesome للأيقونات -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
 </head>
 <body>
-  <div class="container">
+  <!-- ✅ جديد: حاوية رسالة انقطاع الاتصال -->
+  <div id="offline-container" class="offline-container" style="display: none;">
+    <div class="offline-content">
+      <i class="fas fa-exclamation-triangle"></i>
+      <h2>لا يوجد اتصال بالإنترنت</h2>
+      <p>يرجى التحقق من اتصالك بالشبكة والمحاولة مرة أخرى.</p>
+      <button id="retry-connection-btn" class="button login-btn">إعادة المحاولة</button>
+    </div>
+  </div>
+
+  <div class="container" id="main-content">
     <h1>حذف الحساب على SuezBazaar</h1>
     <p>يمكنك حذف حسابك وجميع البيانات المرتبطة به بسهولة. للقيام بذلك، اتبع الخطوات التالية:</p>
     <ol>
       <li>افتح التطبيق وانتقل إلى صفحة <span class="highlight">التسجيل / حسابي</span>.</li>
       <li>اختر <span class="highlight">تعديل بيانات</span> أو "إعدادات الحساب".</li>
-      <li>ابحث عن خيار <span class="highlight">حذف الحساب</span> واضغط عليه.</li>
+      <li>ابحث عن خيار <span class="highlight">حذف الحساب</span> واضغط عليه (قد يكون هذا الخيار غير متاح حاليًا بشكل مباشر وسيتم إضافته في التحديثات القادمة).</li>
       <li>سيتم حذف البيانات التالية نهائيًا:
         <ul>
           <li>اسم المستخدم</li>
           <li>رقم الهاتف</li>
+          <li>العنوان</li>
           <li>سجل الطلبات والمشتريات</li>
         </ul>
       </li>
     </ol>
     <p><span class="highlight">تنويه:</span> بعد حذف الحساب، لن تتمكن من استرجاع هذه البيانات.</p>
-    <p>إذا واجهت أي مشكلة، يمكنك التواصل مع فريق الدعم عبر البريد الإلكتروني: <a href="mailto:suezbazaar@gmail.com">suezbazaar@gmail.com</a></p>
+    <p>إذا كنت ترغب في حذف حسابك الآن أو واجهت أي مشكلة، يمكنك التواصل مع فريق الدعم عبر البريد الإلكتروني: <a href="mailto:suezbazaar@gmail.com">suezbazaar@gmail.com</a></p>
   </div>
+
+  <!-- ✅ جديد: إضافة السكريبتات اللازمة -->
+  <script src="js/config.js"></script>
+  <script src="js/utils.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", async () => {
+      const isOnline = await checkInternetConnection();
+      if (!isOnline) {
+        document.getElementById('offline-container').style.display = 'flex';
+        document.getElementById('main-content').style.display = 'none';
+        document.getElementById('retry-connection-btn').addEventListener('click', () => window.location.reload());
+      }
+    });
+  </script>
 </body>
 </html>
