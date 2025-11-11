@@ -130,6 +130,24 @@
   box-sizing: border-box; /* ✅ جديد: لضمان حساب الحشو بشكل صحيح */
 }
 
+/* ✅ جديد: أنماط رابط إظهار/إخفاء الفلاتر */
+.toggle-filters-link {
+  display: inline-block;
+  margin-top: 15px;
+  color: var(--primary-color);
+  text-decoration: none;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 0.9rem; /* ✅ جديد: تصغير حجم الخط بناءً على الطلب */
+  transition: color 0.3s ease;
+}
+
+.toggle-filters-link:hover {
+  color: var(--dark-blue);
+}
+.toggle-filters-link i {
+  transition: transform 0.3s ease;
+}
 /* ✅ جديد: أنماط أيقونة البحث داخل الحقل */
 
 /* ✅ جديد: أنماط حاوية فلاتر الفئات */

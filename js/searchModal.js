@@ -38,6 +38,14 @@ async function initSearchModal(containerId, openTriggerId) {
     const searchResultsContainer = document.getElementById('search-results-container');
     // ✅ جديد: الوصول إلى زر البحث الجديد
     const performSearchBtn = document.getElementById('perform-search-btn');
+    // ✅ جديد: الوصول إلى رابط التحكم بالفلاتر وحاوية الفلاتر
+    const toggleFiltersBtn = document.getElementById('toggle-filters-btn');
+    const filtersContainer = document.getElementById('search-filters-container');
+    // ✅ جديد: الوصول إلى عناصر فلاتر السعر
+    const togglePriceFiltersBtn = document.getElementById('toggle-price-filters-btn');
+    const priceFiltersContainer = document.getElementById('price-filters-container');
+    const priceSortFilter = document.getElementById('price-sort-filter');
+    const maxPriceFilter = document.getElementById('max-price-filter');
 
     // ✅ جديد: دالة لتأخير التنفيذ (Debounce) لتحسين أداء البحث أثناء الكتابة
     function debounce(func, delay) {
@@ -53,9 +61,11 @@ async function initSearchModal(containerId, openTriggerId) {
       const searchTerm = searchModalInput.value.trim();
       const mainCategory = mainCategoryFilter.value;
       const subCategory = subCategoryFilter.value;
+      const priceSort = priceSortFilter.value;
+      const maxPrice = maxPriceFilter.value;
 
       // ✅ جديد: تسجيل معايير البحث من الواجهة الأمامية لتسهيل التصحيح
-      console.log(`[SearchModal] Starting search with: searchTerm='${searchTerm}', mainCategory='${mainCategory}', subCategory='${subCategory}'`);
+      console.log(`[SearchModal] Starting search with: searchTerm='${searchTerm}', mainCategory='${mainCategory}', subCategory='${subCategory}', priceSort='${priceSort}', maxPrice='${maxPrice}'`);
 
       // لا تقم بالبحث إذا كان حقل البحث فارغًا ولم يتم تحديد أي فئة
       if (!searchTerm && !mainCategory) {
@@ -70,6 +80,9 @@ async function initSearchModal(containerId, openTriggerId) {
       if (searchTerm) params.append('searchTerm', searchTerm);
       if (mainCategory) params.append('MainCategory', mainCategory);
       if (subCategory) params.append('SubCategory', subCategory);
+      // ✅ جديد: إضافة فلاتر السعر إلى الطلب
+      if (priceSort) params.append('priceSort', priceSort);
+      if (maxPrice) params.append('maxPrice', maxPrice);
 
       const searchURL = `${baseURL}/api/products?${params.toString()}`;
       // ✅ جديد: تسجيل رابط الطلب الكامل قبل إرساله
@@ -170,6 +183,49 @@ async function initSearchModal(containerId, openTriggerId) {
       }
     });
 
+    // ✅ جديد: إضافة حدث النقر على رابط التحكم بالفلاتر
+    toggleFiltersBtn.addEventListener('click', (e) => {
+      e.preventDefault(); // منع السلوك الافتراضي للرابط
+      const isVisible = filtersContainer.style.display === 'flex';
+      const icon = toggleFiltersBtn.querySelector('i');
+
+      if (isVisible) {
+        filtersContainer.style.display = 'none';
+        icon.style.transform = 'rotate(0deg)';
+        // ✅ جديد: إعادة تعيين الفلاتر إلى "الكل" عند إغلاق القسم
+        if (mainCategoryFilter.value !== "") {
+          mainCategoryFilter.value = "";
+          // إعادة تعيين الفلتر الفرعي يدويًا لأن تغيير القيمة برمجيًا لا يطلق حدث 'change'
+          subCategoryFilter.innerHTML = '<option value="">كل الفئات الفرعية</option>';
+          subCategoryFilter.disabled = true;
+          subCategoryFilterGroup.style.display = 'none';
+          // إعادة تنفيذ البحث ليعكس إزالة الفلاتر
+          performSearch();
+        }
+      } else {
+        filtersContainer.style.display = 'flex';
+        icon.style.transform = 'rotate(180deg)';
+      }
+    });
+
+    // ✅ جديد: إضافة حدث النقر على رابط التحكم بفلاتر السعر
+    togglePriceFiltersBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const isVisible = priceFiltersContainer.style.display === 'flex';
+      const icon = togglePriceFiltersBtn.querySelector('i');
+
+      if (isVisible) {
+        priceFiltersContainer.style.display = 'none';
+        icon.style.transform = 'rotate(0deg)';
+        // إعادة تعيين فلاتر السعر عند الإغلاق وإعادة البحث
+        priceSortFilter.value = "";
+        maxPriceFilter.value = "";
+        performSearch();
+      } else {
+        priceFiltersContainer.style.display = 'flex';
+        icon.style.transform = 'rotate(180deg)';
+      }
+    });
     // ✅ جديد: دالة لجلب الفئات وتعبئة الفلاتر
     async function loadCategoryFilters() {
       try {
@@ -230,6 +286,9 @@ async function initSearchModal(containerId, openTriggerId) {
     subCategoryFilter.addEventListener('change', performSearch);
     // ✅ جديد: ربط حدث النقر على زر البحث لتنفيذ البحث فورًا
     performSearchBtn.addEventListener('click', performSearch);
+    // ✅ جديد: ربط أحداث فلاتر السعر
+    priceSortFilter.addEventListener('change', performSearch);
+    maxPriceFilter.addEventListener('change', performSearch);
 
   } catch (error) {
     console.error('%c[SearchModal] خطأ في تهيئة نافذة البحث:', 'color: red;', error);
