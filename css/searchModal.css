@@ -102,7 +102,7 @@
 #search-modal-input {
   flex-grow: 1;
   border: none;
-  padding: 15px 20px; /* ✅ تعديل: إزالة الحشو المخصص للأيقونة بعد إخفائها */
+  padding: 15px 50px 15px 20px; /* ✅ تعديل: إضافة حشو على اليسار لإفساح المجال للأيقونة */
   font-size: 1.1rem;
   outline: none;
   background-color: transparent;
@@ -113,9 +113,10 @@
 /* ✅ جديد: أنماط أيقونة البحث داخل الحقل */
 .search-modal-input-container .search-icon {
   position: absolute;
-  right: 15px; /* تحديد موقع الأيقونة على اليمين */
+  left: 15px; /* ✅ تعديل: تحديد موقع الأيقونة على اليسار لتناسب التصميم العربي */
   color: #aaa;
-  display: none; /* ✅ إخفاء: إخفاء أيقونة البحث بناءً على الطلب */
+  cursor: pointer; /* ✅ جديد: تغيير شكل المؤشر للإشارة إلى أنها قابلة للنقر */
+  transition: color 0.3s ease; /* ✅ جديد: إضافة تأثير انتقال للون */
 }
 
 /* ✅ جديد: أنماط حاوية فلاتر الفئات */

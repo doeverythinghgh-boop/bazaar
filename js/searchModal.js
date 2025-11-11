@@ -36,6 +36,8 @@ async function initSearchModal(containerId, openTriggerId) {
     const subCategoryFilterGroup = document.getElementById('sub-category-filter-group');
     // ✅ جديد: الوصول إلى حاوية عرض النتائج
     const searchResultsContainer = document.getElementById('search-results-container');
+    // ✅ جديد: الوصول إلى أيقونة البحث داخل حقل الإدخال
+    const searchIcon = document.querySelector('.search-modal-input-container .search-icon');
 
     // ✅ جديد: دالة لتأخير التنفيذ (Debounce) لتحسين أداء البحث أثناء الكتابة
     function debounce(func, delay) {
@@ -129,6 +131,8 @@ async function initSearchModal(containerId, openTriggerId) {
     openSearchBtn.addEventListener('click', openModal);
     closeSearchBtn.addEventListener('click', closeModal);
     window.addEventListener('click', (event) => {
+      // ✅ جديد: ربط حدث النقر على أيقونة البحث لتنفيذ البحث فورًا
+      searchIcon.addEventListener('click', performSearch);
       if (event.target === searchModal) {
         closeModal();
       }
@@ -188,8 +192,8 @@ async function initSearchModal(containerId, openTriggerId) {
     loadCategoryFilters();
 
     // ✅ جديد: ربط أحداث البحث
-    const debouncedSearch = debounce(performSearch, 400); // تأخير 400ms
-    searchModalInput.addEventListener('input', debouncedSearch);
+    // ✅ تعديل: تغيير الحدث من 'input' إلى 'change' لتنفيذ البحث عند الانتهاء من الكتابة فقط
+    searchModalInput.addEventListener('change', performSearch);
     mainCategoryFilter.addEventListener('change', performSearch);
     subCategoryFilter.addEventListener('change', performSearch);
 
