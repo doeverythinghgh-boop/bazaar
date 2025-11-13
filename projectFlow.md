@@ -169,7 +169,7 @@ CREATE TABLE IF NOT EXISTS orders (
   order_key TEXT NOT NULL UNIQUE,
   user_key TEXT NOT NULL,
   total_amount REAL NOT NULL,
-  order_status TEXT NOT NULL DEFAULT 'pending',
+  order_status TEXT NOT NULL DEFAULT '0', -- ✅ تعديل: القيمة الافتراضية هي '0' (قيد المراجعة)
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (user_key) REFERENCES users(user_key)
     ON DELETE CASCADE
@@ -666,13 +666,13 @@ api/purchases.js يستقبل الطلب ويتحقق من user_key.
 
 تُستدعى دالة createOrder() من js/turo.js.
 
-turo.js يرسل طلب POST إلى api/orders.js يحتوي على order_key, user_key, total_amount, ومصفوفة بالمنتجات المطلوبة (items)، حيث يحتوي كل عنصر في المصفوفة على product_key, quantity, و seller_key.
+turo.js يرسل طلب POST إلى api/orders.js يحتوي على order_key, user_key, total_amount, ومصفوفة بالمنتجات المطلوبة (items).
 
 الواجهة الخلفية (api/orders.js):
 
-يستقبل الطلب ويقوم بتنفيذ معاملة (Transaction) في قاعدة البيانات.
+يستقبل الطلب وينفذ معاملة (Transaction) في قاعدة البيانات.
 
-أولاً: يُدرج سجل الطلب الرئيسي في جدول orders (المفتاح، المستخدم، الإجمالي).
+أولاً: يُدرج سجل الطلب الرئيسي في جدول `orders`. سيتم تعيين `order_status` تلقائيًا إلى القيمة الافتراضية `'0'` (قيد المراجعة) من مخطط قاعدة البيانات.
 
 ثانياً: يمر على كل عنصر في مصفوفة items ويُدرجه في جدول order_items (مفتاح الطلب، مفتاح المنتج، الكمية، ومفتاح البائع seller_key).
 

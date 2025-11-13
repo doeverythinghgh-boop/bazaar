@@ -59,7 +59,8 @@ export default async function handler(request) {
 
     // 1. إضافة الطلب الرئيسي إلى جدول `orders`
     statements.push({
-      sql: "INSERT INTO orders (order_key, user_key, total_amount, order_status) VALUES (?, ?, ?, 'pending')",
+      // ✅ تعديل: الاعتماد على القيمة الافتراضية '0' في قاعدة البيانات لـ order_status
+      sql: "INSERT INTO orders (order_key, user_key, total_amount) VALUES (?, ?, ?)",
       args: [order_key, user_key, total_amount],
     });
 

@@ -57,16 +57,9 @@ async function showPurchasesModal(userKey) {
         timeZone: 'Africa/Cairo' // ✅ جديد: تحديد المنطقة الزمنية بشكل صريح
       });
 
-      // تحديد تنسيق حالة الطلب
-      let statusText = 'قيد المعالجة';
-      let statusClass = 'status-pending';
-      if (item.order_status === 'shipped') {
-        statusText = 'جارٍ الشحن';
-        statusClass = 'status-shipped';
-      } else if (item.order_status === 'delivered') {
-        statusText = 'تم التسليم';
-        statusClass = 'status-delivered';
-      }
+      // ✅ تعديل: استخدام بيانات الحالة الجاهزة من `status_details`
+      const statusText = item.status_details.state;
+      const statusClass = `status-${item.status_details.id}`; // بناء الكلاس ديناميكيًا (e.g., status-0, status-1)
 
       contentHTML += `
         <div class="purchase-item">
@@ -76,7 +69,7 @@ async function showPurchasesModal(userKey) {
             <p><strong>السعر:</strong> ${item.product_price} جنيه</p>
             <p><strong>الكمية:</strong> ${item.quantity}</p>
             <p><strong>تاريخ الشراء:</strong> ${purchaseDate}</p>
-            <p><strong>حالة الطلب:</strong> <span class="purchase-status ${statusClass}">${statusText}</span></p>
+            <p><strong>حالة الطلب:</strong> <span class="purchase-status ${statusClass}" title="${item.status_details.description}">${statusText}</span></p>
           </div>
         </div>`;
     });

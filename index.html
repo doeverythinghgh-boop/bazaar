@@ -349,10 +349,31 @@
           currentGalleryCell.appendChild(galleryContainer);
 
           // دالة لتحميل صورة واحدة وإضافتها للمعرض
-          const loadProductItem = (product) => { // ✅ تعديل: تغيير اسم الدالة ليعكس أنها تحمل عنصر منتج كامل
+          const loadProductItem = (product) => {
             return new Promise((resolve) => {
-              // console.log(`[Products] جاري تحميل صورة للمنتج: ${product.productName}`);
-              if (!product.ImageName) return resolve();
+              // ✅ تحسين: إذا لم تكن هناك صورة، لا يزال بإمكاننا عرض اسم المنتج
+              if (!product.ImageName) {
+                const productItem = document.createElement("div");
+                productItem.className = "product-item no-image"; // كلاس إضافي للتحكم بالتنسيق
+
+                const productName = document.createElement("p");
+                productName.className = "product-name";
+                productName.textContent = product.productName || 'منتج غير مسمى';
+
+                productItem.appendChild(productName);
+                galleryContainer.appendChild(productItem);
+
+                // تطبيق التأثيرات مباشرة
+                productItem.style.opacity = "0";
+                productItem.style.transform = "translateY(20px)";
+                productItem.style.transition = "opacity 0.5s ease, transform 0.5s ease";
+                setTimeout(() => {
+                  productItem.style.opacity = "1";
+                  productItem.style.transform = "translateY(0)";
+                  resolve();
+                }, 50);
+                return;
+              }
 
               const firstImage = product.ImageName.split(",")[0];
               if (!firstImage) return resolve();
@@ -424,7 +445,7 @@
 
           // تحميل الصور واحدة تلو الأخرى
           for (const product of products) {
-            await loadProductItem(product); // ✅ تعديل: استدعاء الدالة الجديدة
+            await loadProductItem(product);
           }
         } else {
           console.log('[Products] لا توجد منتجات في هذه الفئة.');

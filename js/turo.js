@@ -405,9 +405,21 @@ async function getUserPurchases(userKey) {
       throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
     }
 
-    const data = await response.json();
-    console.log('%c[API] getUserPurchases successful.', 'color: green;', data);
-    return data;
+    const purchases = await response.json();
+    console.log('%c[API] getUserPurchases successful. Raw data:', 'color: green;', purchases);
+
+    // ✅ تحسين: دمج بيانات حالة الطلب مع النتائج
+    // هذا يجعل الواجهة الأمامية أسهل في التعامل مع البيانات
+    const purchasesWithStatus = purchases.map(purchase => {
+      const statusInfo = ORDER_STATUSES.find(s => s.id === purchase.order_status) || { state: 'غير معروف', description: 'حالة الطلب غير معروفة.' };
+      return {
+        ...purchase,
+        status_details: statusInfo // إضافة كائن يحتوي على (id, state, description)
+      };
+    });
+
+    console.log('%c[API] getUserPurchases processed data with status info:', 'color: darkcyan;', purchasesWithStatus);
+    return purchasesWithStatus;
 
   } catch (error) {
     console.error('%c[API] getUserPurchases failed:', 'color: red;', error);
