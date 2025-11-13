@@ -43,8 +43,8 @@ export default async function handler(request) {
           FROM marketplace_products p
           JOIN users u ON p.user_key = u.user_key
           WHERE p.product_key = ?
-          LIMIT 1
         `;
+        sql += " ORDER BY p.id DESC LIMIT 1"; // ✅ إصلاح: إضافة الترتيب والحد معًا
         args = [product_key];
       }
       // ✅ إصلاح: التحقق من أن المعاملات ليست السلسلة 'null'
@@ -70,6 +70,7 @@ export default async function handler(request) {
           args.push(SubCategory);
         }
         sql += " WHERE " + whereClauses.join(" AND ");
+        sql += " ORDER BY p.id DESC"; // ✅ إصلاح: إضافة الترتيب هنا
 
       } else if (user_key) {
         // جلب منتجات بائع معين
@@ -78,14 +79,12 @@ export default async function handler(request) {
           SELECT p.* FROM marketplace_products p 
           WHERE p.user_key = ?
         `;
+        sql += " ORDER BY p.id DESC"; // ✅ إصلاح: إضافة الترتيب هنا
         args = [user_key];
       } else {
         // في حالة عدم وجود معاملات، أرجع مصفوفة فارغة بدلاً من كل المنتجات
         return new Response(JSON.stringify([]), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
       }
-
-      // ✅ إصلاح: إضافة جملة الترتيب هنا لضمان تطبيقها على جميع استعلامات الجلب
-      sql += " ORDER BY p.id DESC";
 
       // ✅ جديد: تسجيل جملة SQL النهائية والوسائط قبل التنفيذ
       console.log(`[API: /api/products GET] Executing SQL: ${sql}`);

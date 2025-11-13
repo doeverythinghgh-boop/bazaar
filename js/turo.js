@@ -171,7 +171,15 @@ async function getProductsByCategory(mainCatId, subCatId) {
       console.error('%c[API-Debug] متغير baseURL غير معرف أو فارغ! هذا هو سبب فشل fetch.', 'color: red; font-weight: bold;');
       throw new Error('baseURL is not defined');
     }
-    const requestURL = `${baseURL}/api/products?MainCategory=${mainCatId}&SubCategory=${subCatId}`;
+    // ✅ إصلاح: استخدام URLSearchParams لضمان عدم إرسال قيم 'null' كسلاسل نصية.
+    const params = new URLSearchParams();
+    if (mainCatId) {
+      params.append('MainCategory', mainCatId);
+    }
+    if (subCatId) {
+      params.append('SubCategory', subCatId);
+    }
+    const requestURL = `${baseURL}/api/products?${params.toString()}`;
     console.log(`%c[API-Debug] Preparing to fetch from URL: ${requestURL}`, 'color: magenta;');
     const response = await fetch(requestURL);
 
