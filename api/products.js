@@ -48,7 +48,7 @@ export default async function handler(request) {
         args = [product_key];
       }
       // ✅ إصلاح: التحقق من أن المعاملات ليست السلسلة 'null'
-      if ((searchTerm && searchTerm !== 'null') || (MainCategory && MainCategory !== 'null')) {
+      else if ((searchTerm && searchTerm !== 'null') || (MainCategory && MainCategory !== 'null')) {
         sql = `
           SELECT p.*, u.username as seller_username, u.phone as seller_phone 
           FROM marketplace_products p
