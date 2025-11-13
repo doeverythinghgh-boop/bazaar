@@ -144,7 +144,7 @@ async function showMyProducts(userKey) {
 
   // 4. بناء وعرض الجدول داخل النافذة المنبثقة
   if (products && products.length > 0) {
-    let cardsHTML = `<div class="product-cards-container">`;
+    let cardsHTML = `<div class="my-products-cards-container">`;
 
     products.forEach(product => {
       let imagesHtml = '';
@@ -171,9 +171,9 @@ async function showMyProducts(userKey) {
       const subCatData = `data-sub-category="${product.SubCategory || ''}"`;
 
       cardsHTML += `
-        <div class="product-card" ${mainCatData} ${subCatData}>
-          <div class="product-card-images">${imagesHtml}</div>
-          <div class="product-card-details">
+        <div class="my-products-card" ${mainCatData} ${subCatData}>
+          <div class="my-products-card-images">${imagesHtml}</div>
+          <div class="my-products-card-details">
             <h4>${product.productName || 'منتج بلا اسم'}</h4>
             <p><strong>الوصف:</strong> ${product.product_description || 'لا يوجد'}</p>
             <p><strong>رسالة البائع:</strong> ${product.user_message || 'لا يوجد'}</p>
@@ -181,11 +181,11 @@ async function showMyProducts(userKey) {
             <p><strong>الكمية:</strong> ${product.product_quantity}</p>
             <p><strong>ملاحظات خاصة:</strong> ${product.user_note || 'لا يوجد'}</p>
           </div>
-          <div class="product-card-actions">
-            <button class="button logout-btn-small edit-product-btn" data-product='${productJson}'>
+          <div class="my-products-card-actions">
+            <button class="button logout-btn-small my-products-edit-btn" data-product='${productJson}'>
               <i class="fas fa-edit"></i> تعديل
             </button>
-            <button class="button delete-btn-small delete-product-btn" data-product='${productJson}'>
+            <button class="button delete-btn-small my-products-delete-btn" data-product='${productJson}'>
               <i class="fas fa-trash-alt"></i> إزالة
             </button>
           </div>
@@ -196,7 +196,7 @@ async function showMyProducts(userKey) {
     contentWrapper.innerHTML = cardsHTML;
 
     // 5. ربط الأحداث بأزرار التعديل
-    contentWrapper.querySelectorAll('.edit-product-btn').forEach(button => {
+    contentWrapper.querySelectorAll('.my-products-edit-btn').forEach(button => {
       button.addEventListener('click', (event) => {
         const productData = JSON.parse(event.currentTarget.dataset.product);
         modalContainer.style.display = "none";
@@ -207,7 +207,7 @@ async function showMyProducts(userKey) {
     });
 
     // 6. ربط الأحداث بأزرار الحذف
-    contentWrapper.querySelectorAll('.delete-product-btn').forEach(button => {
+    contentWrapper.querySelectorAll('.my-products-delete-btn').forEach(button => {
       button.addEventListener('click', (event) => {
         const productData = JSON.parse(event.currentTarget.dataset.product);
         deleteProductAndImages(productData, userKey);
@@ -219,7 +219,7 @@ async function showMyProducts(userKey) {
     const subCategoryFilter = document.getElementById('my-products-sub-category');
     const subCategoryGroup = document.getElementById('my-products-sub-category-group');
     const searchInput = document.getElementById('my-products-search-input');
-    const productCards = contentWrapper.querySelectorAll('.product-card');
+    const productCards = contentWrapper.querySelectorAll('.my-products-card');
     const noResultsContainer = document.createElement('div');
     noResultsContainer.innerHTML = `<p class="no-results-message" style="text-align: center; padding: 2rem 0; display: none;"></p>`;
     contentWrapper.appendChild(noResultsContainer);
