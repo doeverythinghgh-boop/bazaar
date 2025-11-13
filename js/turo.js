@@ -214,6 +214,34 @@ async function getProductsByUser(userKey) {
 }
 
 /**
+ * ✅ جديد: يجلب منتجًا واحدًا بناءً على مفتاحه الفريد.
+ * @param {string} productKey - المفتاح الفريد للمنتج.
+ * @returns {Promise<Object|null>} كائن المنتج أو null في حالة الفشل.
+ */
+async function getProductByKey(productKey) {
+  console.log(`%c[API] Starting getProductByKey for product_key: ${productKey}`, 'color: blue;');
+  try {
+    const response = await fetch(`${baseURL}/api/products?product_key=${productKey}&single=true`);
+
+    if (response.status === 404) {
+      console.warn('[API] getProductByKey: Product not found (404).');
+      return null;
+    }
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log('%c[API] getProductByKey successful.', 'color: green;', data);
+    return data;
+  } catch (error) {
+    console.error('%c[API] getProductByKey failed:', 'color: red;', error);
+    return null;
+  }
+}
+/**
  * تحديث بيانات عدة مستخدمين (مثل حالة البائع).
  * @param {Array<Object>} updates - مصفوفة من الكائنات تحتوي على بيانات التحديث.
  * @returns {Promise<Object|null>}

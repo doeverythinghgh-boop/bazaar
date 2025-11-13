@@ -53,6 +53,7 @@ export default async function handler(request) {
           u.Address AS customer_address,
           p.productName,
           p.product_price,
+          oi.product_key AS item_product_key,
           oi.quantity
         FROM orders AS o
         JOIN users AS u ON o.user_key = u.user_key
@@ -63,7 +64,10 @@ export default async function handler(request) {
       args: [],
     });
 
-    console.log(`[API: /api/sales-movement] تم جلب ${rows.length} من سجلات المنتجات في الطلبات.`);
+    // ✅ تتبع: تسجيل البيانات الخام القادمة من قاعدة البيانات
+    console.log(`[DEV-LOG] /api/sales-movement: تم جلب ${rows.length} من سجلات المنتجات. عينة من السجل الأول:`);
+    if (rows.length > 0) console.log(rows[0]);
+
 
     // تجميع المنتجات تحت كل طلب
     const ordersMap = new Map();
@@ -84,11 +88,15 @@ export default async function handler(request) {
         productName: row.productName,
         product_price: row.product_price,
         quantity: row.quantity,
+        product_key: row.item_product_key
       });
     }
 
     const groupedOrders = Array.from(ordersMap.values());
-    console.log(`[API: /api/sales-movement] تم تجميع البيانات في ${groupedOrders.length} طلب.`);
+    // ✅ تتبع: تسجيل البيانات المجمعة قبل إرسالها
+    console.log(`[DEV-LOG] /api/sales-movement: تم تجميع البيانات في ${groupedOrders.length} طلب. عينة من الطلب الأول:`);
+    if (groupedOrders.length > 0) console.log(groupedOrders[0]);
+
 
     return new Response(JSON.stringify(groupedOrders), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
 

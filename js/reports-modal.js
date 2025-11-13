@@ -69,7 +69,7 @@ async function showSalesMovementModal() {
   const modalContainer = document.getElementById("sales-movement-modal-container");
 
   modalContainer.innerHTML = `
-    <div class="modal-content large">
+    <div class="modal-content large extra-large">
       <span class="close-button" id="sales-movement-modal-close-btn">&times;</span>
       <h2><i class="fas fa-dolly-flatbed"></i> حركة المشتريات</h2>
       <div class="loader" style="margin: 2rem auto;"></div>
@@ -89,6 +89,9 @@ async function showSalesMovementModal() {
   }, { once: true });
 
   const orders = await getSalesMovement();
+  // ✅ تتبع: تسجيل البيانات فور استلامها من الخادم
+  console.log('%c[DEV-LOG] showSalesMovementModal: البيانات المستلمة من getSalesMovement():', 'color: blue; font-weight: bold;', orders);
+
   const modalContentEl = modalContainer.querySelector('.modal-content');
 
   let contentHTML = `
@@ -98,15 +101,32 @@ async function showSalesMovementModal() {
   if (orders && orders.length > 0) {
     contentHTML += '<div id="sales-movement-list">';
     orders.forEach(order => {
+      // ✅ تتبع: تسجيل بيانات كل طلب على حدة
+      console.log(`%c[DEV-LOG] ... جاري معالجة الطلب: ${order.order_key}`, 'color: darkcyan;', order);
       const isoDateTime = order.created_at.replace(' ', 'T') + 'Z';
       const orderDate = new Date(isoDateTime).toLocaleString('ar-EG', {
         year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', timeZone: 'Africa/Cairo'
       });
 
-      let itemsTable = `<table class="order-items-table"><thead><tr><th>المنتج</th><th>الكمية</th><th>سعر القطعة</th><th>الإجمالي</th></tr></thead><tbody>`;
+      let itemsTable = `<table class="order-items-table"><thead><tr><th>المنتج</th><th>الكمية</th><th>سعر القطعة</th><th>الإجمالي</th><th>عرض</th></tr></thead><tbody>`;
       order.items.forEach(item => {
         const itemTotal = (item.product_price * item.quantity).toFixed(2);
-        itemsTable += `<tr><td>${item.productName}</td><td>${item.quantity}</td><td>${item.product_price.toFixed(2)} ج.م</td><td>${itemTotal} ج.م</td></tr>`;
+        // ✅ تتبع: تسجيل بيانات كل منتج داخل الطلب
+        console.log(`%c[DEV-LOG] ...... جاري معالجة المنتج: ${item.productName}`, 'color: grey;', item);
+
+        // ✅ إصلاح: تخزين مفتاح المنتج فقط بدلاً من الكائن الكامل
+        const productKey = item.product_key || item.productKey || (item.product_details ? item.product_details.product_key : '') || '';
+        console.log(`[DEV-LOG] ......... تم استخلاص productKey: "${productKey}"`);
+
+        itemsTable += `<tr>
+          <td data-label="المنتج">${item.productName}</td>
+          <td data-label="الكمية">${item.quantity}</td>
+          <td data-label="سعر القطعة">${item.product_price.toFixed(2)} ج.م</td>
+          <td data-label="الإجمالي">${itemTotal} ج.م</td>
+          <td data-label="عرض">
+            <button class="button icon-btn view-product-details-btn" data-product-key="${productKey}" title="عرض تفاصيل المنتج"><i class="fas fa-eye"></i></button>
+          </td>
+        </tr>`;
       });
       itemsTable += '</tbody></table>';
 
@@ -133,4 +153,40 @@ async function showSalesMovementModal() {
 
   modalContentEl.innerHTML = contentHTML;
   modalContentEl.querySelector('#sales-movement-modal-close-btn').onclick = closeModal;
+
+  // ✅ جديد: ربط حدث النقر بأزرار "عرض المنتج"
+  modalContentEl.querySelectorAll('.view-product-details-btn').forEach(button => {
+    button.addEventListener('click', async (event) => {
+      // ✅ تتبع: تسجيل الحدث عند النقر على الزر
+      console.log('%c[DEV-LOG] تم النقر على زر "عرض تفاصيل المنتج".', 'color: purple; font-weight: bold;');
+      const productKey = event.currentTarget.dataset.productKey;
+      // ✅ تتبع: تسجيل المفتاح الذي تم قراءته من الزر
+      console.log(`[DEV-LOG] المفتاح المقروء من data-product-key هو: "${productKey}"`);
+
+      if (!productKey) {
+        Swal.fire('خطأ', 'بيانات المنتج غير متوفرة لعرض التفاصيل.', 'error');
+        return;
+      }
+
+      // ✅ إصلاح: جلب بيانات المنتج الكاملة من الواجهة الخلفية باستخدام مفتاح المنتج
+      Swal.fire({ title: 'جاري تحميل تفاصيل المنتج...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+      const productData = await getProductByKey(productKey); // افتراض وجود هذه الدالة في turo.js
+      Swal.close();
+
+      if (productData) {
+        // تحويل البيانات لتتناسب مع ما تتوقعه دالة showProductDetails
+        const productDataForModal = {
+          ...productData,
+          pricePerItem: productData.product_price,
+          availableQuantity: productData.product_quantity,
+          sellerMessage: productData.user_message,
+          description: productData.product_description,
+          imageSrc: productData.ImageName ? productData.ImageName.split(',').map(name => `https://pub-e828389e2f1e484c89d8fb652c540c12.r2.dev/${name}`) : []
+        };
+        window.showProductDetails(productDataForModal);
+      } else {
+        Swal.fire('خطأ', 'فشل في جلب تفاصيل المنتج. قد يكون المنتج قد تم حذفه.', 'error');
+      }
+    });
+  });
 }
