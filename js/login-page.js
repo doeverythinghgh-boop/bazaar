@@ -670,7 +670,7 @@ async function showSalesMovementModal() {
             <p><strong>تاريخ الطلب:</strong> ${orderDate}</p>
             <p><strong>إجمالي الطلب:</strong> ${order.total_amount.toFixed(2)} جنيه</p>
             <div class="purchase-status-container">
-              ${createStatusTimelineHTML(ORDER_STATUS_MAP[order.order_status] || ORDER_STATUS_MAP[0])}
+              ${createStatusTimelineHTML(ORDER_STATUSES.find(s => s.id === order.order_status) || ORDER_STATUSES[0])}
             </div>
             <h4>المنتجات:</h4>
             ${itemsTable}

@@ -102,7 +102,7 @@ async function showEditProductModal(productData) {
  * @param {string} userKey - المفتاح الفريد للمستخدم.
  */
 async function showMyProducts(userKey) {
-  const container = document.getElementById("my-products-container");
+  const container = document.getElementById("my-products-modal-container");
   const usersContainer = document.getElementById("users-table-container"); // الحصول على حاوية المستخدمين
   
   // تبديل العرض: إذا كان الجدول ظاهراً، قم بإخفائه. وإلا، قم بتحميله وإظهاره.

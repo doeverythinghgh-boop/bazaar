@@ -35,7 +35,8 @@ export default async function handler(request) {
       let sql, args;
 
       // ✅ جديد: منطق بحث ديناميكي
-      if (searchTerm || MainCategory) {
+      // ✅ إصلاح: التحقق من أن المعاملات ليست السلسلة 'null'
+      if ((searchTerm && searchTerm !== 'null') || (MainCategory && MainCategory !== 'null')) {
         sql = `
           SELECT p.*, u.username as seller_username, u.phone as seller_phone 
           FROM marketplace_products p
@@ -60,7 +61,11 @@ export default async function handler(request) {
 
       } else if (user_key) {
         // جلب منتجات بائع معين
-        sql = "SELECT * FROM marketplace_products WHERE user_key = ?";
+        // ✅ إصلاح: إضافة JOIN والاسم المستعار 'p' لتوحيد الاستعلامات وضمان عمل الترتيب
+        sql = `
+          SELECT p.* FROM marketplace_products p 
+          WHERE p.user_key = ?
+        `;
         args = [user_key];
       } else {
         // في حالة عدم وجود معاملات، أرجع مصفوفة فارغة بدلاً من كل المنتجات
