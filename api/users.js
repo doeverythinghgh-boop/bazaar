@@ -118,14 +118,19 @@ export default async function handler(request) {
 
       // إذا لم يتم توفير رقم هاتف، أرجع جميع المستخدمين
       // ✅ إصلاح: استخدام LEFT JOIN لجلب fcm_token مع كل مستخدم إن وجد.
-      const allUsers = await db.execute(`
+      const result = await db.execute(`
         SELECT 
           u.id, u.username, u.phone, u.is_seller, u.user_key, u.Address,
           ut.fcm_token
         FROM users u
         LEFT JOIN user_tokens ut ON u.user_key = ut.user_key
       `);
-      return new Response(JSON.stringify(allUsers.rows), {
+      // ✅ جديد: إضافة حقل phone_link لتسهيل الاستخدام في الواجهة الأمامية
+      const usersWithPhoneLink = result.rows.map(user => ({
+        ...user,
+        phone_link: `tel:${user.phone}`
+      }));
+      return new Response(JSON.stringify(usersWithPhoneLink), {
         status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
     } else if (request.method === "PUT") {
@@ -209,34 +214,4 @@ export default async function handler(request) {
         });
       }
 
-      // بفضل ON DELETE CASCADE في قاعدة البيانات، سيتم حذف جميع البيانات المرتبطة
-      // (المنتجات، الطلبات، التوكنات) تلقائيًا عند حذف المستخدم.
-      const { rowsAffected } = await db.execute({
-        sql: "DELETE FROM users WHERE user_key = ?",
-        args: [user_key],
-      });
-
-      if (rowsAffected === 0) {
-        return new Response(JSON.stringify({ error: "المستخدم غير موجود أو تم حذفه بالفعل." }), {
-          status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        });
-      }
-
-      return new Response(JSON.stringify({ message: "تم حذف الحساب وجميع البيانات المرتبطة به بنجاح." }), {
-        status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      });
-    }
-
-    console.log(`[Warning] No logic matched for ${request.method} ${request.url}.`);
-    return new Response(JSON.stringify({ error: "الطريقة غير مدعومة" }), {
-      status: 405, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-    });
-
-  } catch (err) {
-    console.error("[FATAL ERROR]", err);
-    return new Response(JSON.stringify({ error: err.message }), {
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
-  }
-}
+      // بفضل ON DELETE CASCADE في قاعدة البيانات، سيتم حذف جميع ال

@@ -35,10 +35,11 @@
   cursor: pointer;
   text-align: center;
   background-color: #fff;
+  line-height: 1;
   border-radius: 12px; /* زيادة دائرية الحواف */
   overflow: hidden;
-  border: 1px solid #f0f0f0; /* إضافة إطار ناعم */
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); /* ظل أكثر نعومة */
+  border: 1px solid #b0b7bc; /* إضافة إطار ناعم */
+  box-shadow: 0px 0px 6px 0px #9eafba; /* ظل أكثر نعومة */
   transition: transform 0.3s ease, box-shadow 0.3s ease; /* انتقال أكثر سلاسة */
   display: flex; /* جديد: استخدام flex لتنظيم المحتوى */
   flex-direction: column; /* جديد: ترتيب المحتوى عمودياً */
@@ -57,4 +58,17 @@
 .gallery-container .product-item {
   width: 12vh; /* عرض ثابت لجعل العنصر مربع الشكل */
   flex-shrink: 0; /* منع العنصر من التقلص */
+}
+
+/* ✅ جديد: اسم المنتج أسفل الصورة في المعرض */
+.product-name {
+  font-family: "Tajawal", sans-serif;
+  font-size: 0.75rem; /* حجم خط صغير ومناسب للبطاقة */
+  color: #333; /* لون نص داكن للوضوح */
+  padding: 8px 5px; /* حشو داخلي بسيط */
+  margin: 0; /* إزالة الهوامش الافتراضية */
+  font-weight: 600; /* وزن خط متوسط */
+  white-space: nowrap; /* منع النص من النزول لسطر جديد */
+  overflow: hidden; /* إخفاء النص الزائد */
+  text-overflow: ellipsis; /* إضافة "..." للنص الطويل */
 }

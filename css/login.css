@@ -15,10 +15,11 @@
   background-size: 400% 400%;
   animation: gradient-animation 15s ease infinite;
   min-height: 100vh;
-  display: flex;
-  align-items: center;
+  display: flex; /* ✅ تعديل: تغيير طريقة المحاذاة العمودية */
+  align-items: flex-start; /* محاذاة المحتوى إلى الأعلى */
   justify-content: center;
-  padding: 20px;
+  padding: 20px; /* ✅ تعديل: إضافة حشو علوي لدفع النموذج للأسفل قليلًا */
+  padding-top: 10vh;
   box-sizing: border-box;
 }
 
