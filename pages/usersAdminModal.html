@@ -1,0 +1,43 @@
+<!--
+  @file pages/usersAdminModal.html
+  @description هيكل النافذة المنبثقة لإدارة المستخدمين (موديول مستقل).
+-->
+<div class="modal-content users-admin-modal-content" id="users-admin-modal-content">
+  <button class="close-button" id="users-admin-modal-close-btn" aria-label="إغلاق"><i class="fas fa-times" id="users-admin-modal-close-icon"></i></button>
+
+  <!-- رأس المودال مع عنوان وحقل بحث -->
+  <div class="users-admin-modal-header" id="users-admin-modal-header">
+    <h2 id="users-admin-modal-title"><i class="fas fa-users-cog" id="users-admin-modal-title-icon"></i> إدارة المستخدمين</h2>
+    <div class="users-admin-search-container" id="users-admin-search-container">
+      <i class="fas fa-search search-icon" id="users-admin-search-icon"></i>
+      <input type="text" id="users-admin-search-input" placeholder="ابحث بالاسم أو رقم الهاتف...">
+    </div>
+    <!-- ✅ جديد: فلاتر الأدوار (أزرار الراديو) -->
+    <div class="user-role-filter-container" id="user-role-filter-container">
+      <input type="radio" id="role-all" name="user-role-filter" value="" checked>
+      <label for="role-all" id="role-all-label">الكل</label>
+
+      <input type="radio" id="role-customer" name="user-role-filter" value="0">
+      <label for="role-customer" id="role-customer-label">عميل</label>
+
+      <input type="radio" id="role-seller" name="user-role-filter" value="1">
+      <label for="role-seller" id="role-seller-label">بائع</label>
+
+      <input type="radio" id="role-delivery" name="user-role-filter" value="2">
+      <label for="role-delivery" id="role-delivery-label">خدمة توصيل</label>
+    </div>
+  </div>
+
+  <!-- ✅ جديد: حاوية الجسم الرئيسية للمحتوى القابل للتمرير -->
+  <div class="users-admin-modal-body" id="users-admin-modal-body">
+    <div id="users-admin-modal-content-wrapper">
+      <div class="loader" id="users-admin-loader"></div>
+    </div>
+  </div>
+
+  <!-- أزرار الإجراءات (حفظ/إلغاء) -->
+  <div class="users-admin-modal-footer" id="users-admin-modal-actions" style="display: none;">
+    <button id="update-users-btn" class="button">حفظ التغييرات</button>
+    <button id="cancel-update-btn" class="button">إلغاء</button>
+  </div>
+</div>

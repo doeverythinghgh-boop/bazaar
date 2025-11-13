@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="css/login.css" />
   <link rel="stylesheet" href="css/login-page.css" />
   <link rel="stylesheet" href="css/modal.css" /> <!-- ✅ إصلاح: إضافة ملف أنماط المودال -->
+  <link rel="stylesheet" href="css/users-admin-modal.css" /> <!-- ✅ جديد: إضافة ملف أنماط موديول إدارة المستخدمين -->
   <!-- Config -->
   <script src="js/config.js"></script>
   <!-- Fonts & Icons -->
@@ -109,14 +110,6 @@
       <div class="action-buttons" id="admin-action-buttons">
         <!-- سيتم إضافة الأزرار هنا بواسطة JavaScript -->
       </div>
-      <!-- Users Table Container -->
-      <div id="users-table-container" style="width: 100%; margin-top: 20px; display: none;">
-        <div id="table-content-wrapper"></div>
-        <div id="table-actions" style="display: none; margin-top: 15px; gap: 10px;">
-          <button id="update-users-btn" class="button" style="background-color: #28a745;">حفظ التغييرات</button>
-          <button id="cancel-update-btn" class="button" style="background-color: #6c757d;">إلغاء التغييرات</button>
-        </div>
-      </div>
     </div>
   </div>
 
@@ -133,12 +126,18 @@
     <!-- سيتم تحميل محتوى نموذج الإعلان هنا -->
   </div>
 
+  <!-- ✅ جديد: حاوية النافذة المنبثقة لإدارة المستخدمين -->
+  <div id="users-modal-container" class="modal">
+    <!-- سيتم ملء محتوى إدارة المستخدمين هنا -->
+  </div>
+
   <!-- Scripts -->
   <script src="js/auth.js"></script>
   <script src="js/turo.js"></script>
   <script src="js/utils.js"></script> <!-- ✅ إصلاح: إضافة ملف الدوال المساعدة للتحقق من الاتصال -->
   <!-- ✅ إضافة: ضروري لعمل موديول الإعلان -->
   <script src="cloudflare-workers/cloudFileManager.js"></script>
+  <script src="js/users-admin-modal.js"></script> <!-- ✅ جديد: إضافة ملف منطق موديول إدارة المستخدمين -->
   <script src="js/admin-page.js"></script>
 </body>
 </html>
