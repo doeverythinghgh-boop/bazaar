@@ -108,7 +108,7 @@ CREATE TABLE IF NOT EXISTS users (
   Password TEXT,
   Address TEXT,
   user_key TEXT NOT NULL UNIQUE,
-  is_seller INTEGER DEFAULT 0
+  is_seller INTEGER DEFAULT 0 -- يحدد دور المستخدم: 0 = عميل, 1 = بائع, 2 = خدمة توصيل
 );
 
 -- فهرس فريد على user_key (مطلوب لتفعيل العلاقات الخارجية)

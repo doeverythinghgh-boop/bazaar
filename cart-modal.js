@@ -35,7 +35,7 @@ function showCartModal() {
     modalContent += '</div>';
     modalContent += `<div class="cart-total">الإجمالي: ${total.toFixed(2)} جنيه</div>`;
     modalContent += `
-      <div class="action-buttons" style="margin-top: 20px;">
+      <div class="action-buttons" style="margin-top: 20px; display: flex; justify-content: space-between; gap: 10px;">
         <button id="clear-cart-btn" class="button logout-btn-small" style="background-color: #e74c3c;">إفراغ السلة</button>
         <button id="checkout-btn" class="button logout-btn-small" style="background-color: #2ecc71;">إتمام الشراء</button>
       </div>`;
@@ -65,9 +65,25 @@ function showCartModal() {
   // أحداث أزرار التحكم بالسلة
   document.querySelectorAll('.remove-from-cart-btn').forEach(btn => {
     btn.addEventListener('click', (e) => {
-      const productKey = e.target.closest('.cart-item').dataset.key;
-      removeFromCart(productKey);
-      showCartModal(); // إعادة رسم المودال
+      const cartItem = e.target.closest('.cart-item');
+      const productKey = cartItem.dataset.key;
+      const productName = cartItem.querySelector('.cart-item-details strong').textContent;
+
+      Swal.fire({
+        title: 'هل أنت متأكد؟',
+        text: `هل تريد بالتأكيد إزالة "${productName}" من السلة؟`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'نعم، قم بالإزالة!',
+        cancelButtonText: 'إلغاء'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          removeFromCart(productKey);
+          showCartModal(); // إعادة رسم المودال
+        }
+      });
     });
   });
 

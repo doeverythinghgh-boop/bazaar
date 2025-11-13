@@ -49,8 +49,12 @@ async function showPurchasesModal(userKey) {
         ? `https://pub-e828389e2f1e484c89d8fb652c540c12.r2.dev/${firstImage}`
         : 'data:image/svg+xml,...'; // صورة افتراضية
       
-      const purchaseDate = new Date(item.created_at).toLocaleDateString('ar-EG', {
-        year: 'numeric', month: 'long', day: 'numeric'
+      // ✅ إصلاح نهائي: تحويل التاريخ إلى صيغة ISO 8601 القياسية (YYYY-MM-DDTHH:MM:SSZ)
+      // هذا يضمن أن جميع المتصفحات ستفسره كتوقيت UTC بشكل صحيح قبل تحويله للمنطقة المحلية.
+      const isoDateTime = item.created_at.replace(' ', 'T') + 'Z';
+      const purchaseDate = new Date(isoDateTime).toLocaleString('ar-EG', {
+        year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true,
+        timeZone: 'Africa/Cairo' // ✅ جديد: تحديد المنطقة الزمنية بشكل صريح
       });
 
       // تحديد تنسيق حالة الطلب

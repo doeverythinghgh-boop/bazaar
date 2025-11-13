@@ -119,12 +119,13 @@ function initializeAdminPanel(user) {
               </div>
             </div>
             <div class="user-card-body">
-              <div class="user-card-field seller-field">
-                <label for="seller-cb-${u.user_key}">بائع؟</label>
-                <label class="switch">
-                  <input type="checkbox" id="seller-cb-${u.user_key}" class="seller-checkbox" data-phone="${u.phone}" data-original-state="${u.is_seller}" ${u.is_seller === 1 ? 'checked' : ''}>
-                  <span class="slider round"></span>
-                </label>
+              <div class="user-card-field">
+                <label for="role-select-${u.user_key}">دور المستخدم</label>
+                <select id="role-select-${u.user_key}" class="user-role-select" data-phone="${u.phone}" data-original-state="${u.is_seller}">
+                  <option value="0" ${u.is_seller === 0 ? 'selected' : ''}>عميل</option>
+                  <option value="1" ${u.is_seller === 1 ? 'selected' : ''}>بائع</option>
+                  <option value="2" ${u.is_seller === 2 ? 'selected' : ''}>خدمة توصيل</option>
+                </select>
               </div>
               <div class="user-card-field">
                 <label>إرسال إشعار</label>
@@ -153,7 +154,7 @@ function initializeAdminPanel(user) {
   });
 
   document.getElementById("users-table-container").addEventListener('change', (event) => {
-    if (event.target.classList.contains('seller-checkbox')) {
+    if (event.target.classList.contains('user-role-select')) {
       tableActions.style.display = 'flex';
     }
   });
@@ -195,15 +196,15 @@ function initializeAdminPanel(user) {
   });
 
   updateBtn.addEventListener('click', async () => {
-    const checkboxes = document.querySelectorAll('.seller-checkbox');
+    const selects = document.querySelectorAll('.user-role-select');
     const updates = [];
     const changedUsersNames = [];
-    checkboxes.forEach(cb => {
-      const isSellerNow = cb.checked ? 1 : 0;
-      const originalState = parseInt(cb.dataset.originalState, 10);
-      updates.push({ phone: cb.dataset.phone, is_seller: isSellerNow });
-      if (isSellerNow !== originalState) {
-        const userName = cb.closest('.user-card').querySelector('.user-name').textContent;
+    selects.forEach(select => {
+      const newRole = parseInt(select.value, 10);
+      const originalState = parseInt(select.dataset.originalState, 10);
+      updates.push({ phone: select.dataset.phone, is_seller: newRole });
+      if (newRole !== originalState) {
+        const userName = select.closest('.user-card').querySelector('.user-name').textContent;
         changedUsersNames.push(userName);
       }
     });

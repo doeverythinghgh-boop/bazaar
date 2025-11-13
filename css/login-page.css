@@ -192,26 +192,34 @@
 
 .user-card-field {
   display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding-bottom: 15px;
+  flex-direction: row; /* ✅ تعديل: جعل التخطيط أفقيًا */
+  justify-content: space-between; /* ✅ تعديل: توزيع المساحة بين العنوان والأداة */
+  align-items: center; /* ✅ تعديل: محاذاة العناصر عموديًا */
+  gap: 15px; /* ✅ تعديل: زيادة المسافة بين العناصر */
+  padding: 15px 0; /* ✅ تعديل: إضافة حشو علوي وسفلي متساوٍ */
   border-bottom: 1px solid #f0f2f5;
-}
-.user-card-field:last-child {
-  border-bottom: none;
-  padding-bottom: 0;
-}
-
-.user-card-field.seller-field {
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
 }
 
 .user-card-field > label {
   font-weight: 600;
   color: #4a5568;
   font-size: 0.9rem;
+}
+
+/* ✅ جديد: تنسيق القائمة المنسدلة لدور المستخدم */
+.user-role-select {
+  padding: 8px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background-color: #f9fafb;
+  font-family: "Tajawal", sans-serif;
+  font-size: 0.9rem;
+  color: #374151;
+  cursor: pointer;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.user-role-select:hover {
+  border-color: #a5b4fc;
 }
 
 /* --- جديد: تصميم مفتاح التبديل (Toggle Switch) --- */

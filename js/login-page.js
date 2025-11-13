@@ -72,6 +72,14 @@ function updateViewForLoggedInUser(user) {
       document.getElementById("view-my-products-btn").addEventListener("click", () => showMyProducts(user.user_key));
     }
 
+    // ✅ جديد: التحقق مما إذا كان المستخدم "خدمة توصيل"
+    if (user.is_seller === 2) {
+      const deliveryActions = document.getElementById("delivery-actions");
+      deliveryActions.style.display = "block";
+      // يمكنك ربط الأحداث هنا لأزرار خدمة التوصيل في المستقبل
+      // document.getElementById("view-delivery-requests-btn").addEventListener("click", showDeliveryRequests);
+    }
+
     // التحقق مما إذا كان المستخدم هو أحد المسؤولين المحددين
     const adminPhoneNumbers = ["01024182175", "01026546550"];
     if (adminPhoneNumbers.includes(user.phone)) {
@@ -469,9 +477,12 @@ async function showPurchasesModal(userKey) {
         ? `https://pub-e828389e2f1e484c89d8fb652c540c12.r2.dev/${firstImage}`
         : 'data:image/svg+xml,...'; // صورة افتراضية
       
-      // ✅ تعديل: إظهار التاريخ والوقت معًا
-      const purchaseDate = new Date(item.created_at).toLocaleString('ar-EG', {
-        year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true
+      // ✅ إصلاح نهائي: تحويل التاريخ إلى صيغة ISO 8601 القياسية (YYYY-MM-DDTHH:MM:SSZ)
+      // هذا يضمن أن جميع المتصفحات ستفسره كتوقيت UTC بشكل صحيح قبل تحويله إلى توقيت القاهرة.
+      const isoDateTime = item.created_at.replace(' ', 'T') + 'Z';
+      const purchaseDate = new Date(isoDateTime).toLocaleString('ar-EG', {
+        year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true,
+        timeZone: 'Africa/Cairo'
       });
 
       // تحديد تنسيق حالة الطلب
