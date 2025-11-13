@@ -1,64 +1,6 @@
 /**
  * @file js/ui/purchases-modal.js
  * @description يحتوي على المنطق الخاص بعرض سجل مشتريات المستخدم.
- */
-
-/**
- * ✅ جديد: ينشئ شريط تقدم زمني (Timeline) لحالة الطلب.
- * @param {object} statusDetails - كائن تفاصيل الحالة (id, state, description).
- * @returns {string} - كود HTML لشريط التقدم.
- */
-function createStatusTimelineHTML(statusDetails) {
-  const currentStatusId = statusDetails.id;
-
-  // تعريف الحالات التي تمثل مسار التقدم الطبيعي للطلب
-  const progressStates = [
-    ORDER_STATUS_MAP.REVIEW,
-    ORDER_STATUS_MAP.CONFIRMED,
-    ORDER_STATUS_MAP.SHIPPED,
-    ORDER_STATUS_MAP.DELIVERED
-  ];
-
-  // إذا كانت الحالة الحالية هي حالة استثنائية (ملغي, مرفوض, مرتجع)
-  if (!progressStates.some(p => p.id === currentStatusId)) {
-    const statusClass = `status-${currentStatusId}`;
-    let icon = 'fa-info-circle';
-    if (currentStatusId === ORDER_STATUS_MAP.CANCELLED.id || currentStatusId === ORDER_STATUS_MAP.REJECTED.id) {
-      icon = 'fa-times-circle';
-    } else if (currentStatusId === ORDER_STATUS_MAP.RETURNED.id) {
-      icon = 'fa-undo-alt';
-    }
-
-    return `
-      <div class="status-timeline-exception ${statusClass}">
-        <i class="fas ${icon}"></i>
-        <span>${statusDetails.state}</span>
-      </div>
-    `;
-  }
-
-  // بناء شريط التقدم للحالات الطبيعية
-  let timelineHTML = '<div class="status-timeline">';
-  progressStates.forEach((state, index) => {
-    const isActive = currentStatusId >= state.id;
-    const isCurrent = currentStatusId === state.id;
-    const stepClass = isActive ? 'active' : '';
-    const currentClass = isCurrent ? 'current' : '';
-
-    timelineHTML += `
-      <div class="timeline-step ${stepClass} ${currentClass}" title="${state.description}">
-        <div class="timeline-dot"></div>
-        <div class="timeline-label">${state.state}</div>
-      </div>
-    `;
-    // إضافة خط واصل بين الكرات (ما عدا الأخيرة)
-    if (index < progressStates.length - 1) {
-      timelineHTML += `<div class="timeline-line ${stepClass}"></div>`;
-    }
-  });
-  timelineHTML += '</div>';
-
-  return timelineHTML;
 }
 
 /**
