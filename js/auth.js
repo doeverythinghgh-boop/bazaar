@@ -13,6 +13,14 @@
  * الحصول على توكن FCM، وإرساله إلى السيرفر.
  */
 async function setupFCM() {
+  // ✅ خطوة حاسمة: التحقق إذا كان الكود يعمل داخل تطبيق الأندرويد
+  // إذا كان كائن "Android" موجودًا، فهذا يعني أننا داخل WebView
+  // ويجب ألا نقوم بإعداد إشعارات الويب لتجنب التكرار.
+  if (window.Android) {
+    console.log('%c[FCM Setup] تم اكتشاف بيئة الأندرويد. سيتم الاعتماد على الإشعارات الأصلية (Native).', 'color: green; font-weight: bold;');
+    return; // إيقاف إعداد إشعارات الويب
+  }
+
   console.log('%c[FCM Setup] بدأت عملية إعداد الإشعارات...', 'color: purple; font-weight: bold;');
   // التأكد من أن المتصفح يدعم Service Workers
   if (!('serviceWorker' in navigator)) {
@@ -166,6 +174,14 @@ function checkLoginStatus() {
     // ✅ تعديل: يتم استدعاء إعداد FCM فقط إذا كان المستخدم مسجلاً وليس ضيفًا.
     if (user && !user.is_guest) {
       console.log('[Auth] مستخدم مسجل، جاري إعداد FCM...');
+
+      // ✅ خطوة حاسمة: إعلام كود الأندرويد الأصلي بنجاح تسجيل الدخول
+      // نمرر كائن المستخدم بالكامل كـ JSON string
+      if (window.Android && typeof window.Android.onUserLoggedIn === 'function') {
+        console.log('[Auth] إعلام الواجهة الأصلية بتسجيل دخول المستخدم...');
+        window.Android.onUserLoggedIn(JSON.stringify(user));
+      }
+
       setupFCM();
     }
   }
@@ -193,6 +209,12 @@ function logout() {
     preConfirm: async () => {
       // إذا كان هناك توكن ومستخدم، أرسل طلب حذفه من الخادم
       if (fcmToken && loggedInUser?.user_key) {
+        // ✅ خطوة حاسمة: إعلام كود الأندرويد الأصلي بتسجيل الخروج
+        if (window.Android && typeof window.Android.onUserLoggedOut === 'function') {
+            console.log('[Auth] إعلام الواجهة الأصلية بتسجيل خروج المستخدم...');
+            window.Android.onUserLoggedOut(loggedInUser.user_key);
+        }
+
         try {
           await fetch(`${baseURL}/api/tokens`, {
             method: "DELETE",
