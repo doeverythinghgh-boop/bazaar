@@ -32,12 +32,12 @@ export default async function handler(request) {
   try {
     if (request.method === "POST") {
       console.log("[API: /api/tokens] Received POST request to save token.");
-      const { user_key, token } = await request.json();
+      const { user_key, token, platform } = await request.json();
 
-      if (!user_key || !token) {
-        console.error("[API: /api/tokens] Bad Request: user_key or token is missing.");
+      if (!user_key || !token || !platform) {
+        console.error("[API: /api/tokens] Bad Request: user_key, token, or platform is missing.");
         return new Response(
-          JSON.stringify({ error: "user_key and token are required." }),
+          JSON.stringify({ error: "user_key, token, and platform are required." }),
           { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
@@ -54,8 +54,8 @@ export default async function handler(request) {
         await tx.execute({ sql: "DELETE FROM user_tokens WHERE user_key = ?", args: [user_key] });
         await tx.execute({ sql: "DELETE FROM user_tokens WHERE fcm_token = ?", args: [token] });
         await tx.execute({
-          sql: "INSERT INTO user_tokens (user_key, fcm_token) VALUES (?, ?)",
-          args: [user_key, token],
+          sql: "INSERT INTO user_tokens (user_key, fcm_token, platform) VALUES (?, ?, ?)",
+          args: [user_key, token, platform],
         });
         await tx.commit();
       } catch (err) {

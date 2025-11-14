@@ -14,16 +14,17 @@
  */
 async function setupFCM() {
   // دالة مساعدة لإرسال التوكن إلى الخادم لتجنب التكرار
-  async function sendTokenToServer(userKey, token) {
+  async function sendTokenToServer(userKey, token, platform) {
     console.log(`%c[FCM] Sending token to server...`, "color: #fd7e14");
     console.log(`[FCM] User Key: ${userKey}`);
     console.log(`[FCM] FCM Token: ${token}`);
+    console.log(`[FCM] Platform: ${platform}`);
 
     try {
       const response = await fetch(`${baseURL}/api/tokens`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ user_key: userKey, token: token }),
+        body: JSON.stringify({ user_key: userKey, token: token, platform: platform }),
       });
 
       const responseData = await response.json();
@@ -59,7 +60,7 @@ async function setupFCM() {
       await waitForFcmKey(async (fcmToken) => {
         console.log("تم العثور على مفتاح للاندرويد محفوظ محليا :", fcmToken);
         // استدعاء الدالة المساعدة الجديدة
-        await sendTokenToServer(loggedInUser.user_key, fcmToken);
+        await sendTokenToServer(loggedInUser.user_key, fcmToken, 'android');
       });
     } else {
       console.log(
@@ -183,7 +184,7 @@ async function setupFCM() {
 
       if (fcmToken) {
         // استدعاء الدالة المساعدة الجديدة
-        await sendTokenToServer(loggedInUser.user_key, fcmToken);
+        await sendTokenToServer(loggedInUser.user_key, fcmToken, 'web');
       } else {
         console.error("[FCM] لم يتمكن من الحصول على توكن لإرساله إلى الخادم.");
       }
