@@ -306,8 +306,8 @@ function checkLoginStatus() {
  * يقوم بتسجيل خروج المستخدم عن طريق إزالة بياناته من التخزين المحلي وإعادة التوجيه.
  */
 function logout() {
-  const fcmToken = localStorage.getItem("fcm_token");
-  const android_fcm_key = localStorage.getItem("android_fcm_key");
+  const existingWebToken = localStorage.getItem("fcm_token");
+  const existingAndroidToken = localStorage.getItem("android_fcm_key");
 
   const loggedInUser = JSON.parse(localStorage.getItem("loggedInUser"));
 
@@ -322,7 +322,7 @@ function logout() {
     cancelButtonText: "إلغاء",
     showLoaderOnConfirm: true,
     preConfirm: async () => {
-      if (fcmToken || (android_fcm_key && loggedInUser?.user_key)) {
+      if (existingWebToken || (existingAndroidToken && loggedInUser?.user_key)) {
         // إعلام كود الأندرويد الأصلي بتسجيل الخروج
         if (
           window.Android &&
@@ -345,7 +345,7 @@ function logout() {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               user_key: loggedInUser.user_key,
-              token: fcmToken,
+              token: existingWebToken,
             }),
           });
           console.log("[FCM] تم إرسال طلب حذف التوكن من الخادم بنجاح.");
