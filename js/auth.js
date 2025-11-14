@@ -17,25 +17,24 @@ async function setupFCM() {
   const loggedInUser = JSON.parse(localStorage.getItem("loggedInUser"));
   // ✅ خطوة حاسمة: التحقق إذا كان الكود يعمل داخل تطبيق الأندرويد
 
-     // الخطوة الحاسمة: إعلام كود الأندرويد الأصلي (فقط إذا كان مطلوبًا)
-      if (
-        window.Android &&
-        typeof window.Android.onUserLoggedIn === "function"
-      ) {
-        // احصل على التوكن المحلي من الأندرويد إذا كان موجودًا
-        const existingAndroidToken = localStorage.getItem("android_fcm_key");
+  // الخطوة الحاسمة: إعلام كود الأندرويد الأصلي (فقط إذا كان مطلوبًا)
+  if (window.Android && typeof window.Android.onUserLoggedIn === "function") {
+    // احصل على التوكن المحلي من الأندرويد إذا كان موجودًا
+    const existingAndroidToken = localStorage.getItem("android_fcm_key");
 
-        // تحقق مما إذا كان التوكن فارغًا أو غير موجود
-        if (!existingAndroidToken) {
-          console.log(
-            "[Auth] بيئة أندرويد مكتشفة والتوكن المحلي فارغ. جاري طلب توكن جديد..."
-          );
-          // استدعِ دالة الأندرويد فقط إذا لم يكن هناك توكن بالفعل
-// الحل المقترح (يرسل كائن JSON)
-window.Android.onUserLoggedIn(JSON.stringify({ user_key: loggedInUser.user_key }));
-await waitForFcmKey  (async(fcmToken)  => {
-    console.log("تم العثور على مفتاح للاندرويد محفوظ محليا :", fcmToken);
+    // تحقق مما إذا كان التوكن فارغًا أو غير موجود
+    if (!existingAndroidToken) {
       console.log(
+        "[Auth] بيئة أندرويد مكتشفة والتوكن المحلي فارغ. جاري طلب توكن جديد..."
+      );
+      // استدعِ دالة الأندرويد فقط إذا لم يكن هناك توكن بالفعل
+      // الحل المقترح (يرسل كائن JSON)
+      window.Android.onUserLoggedIn(
+        JSON.stringify({ user_key: loggedInUser.user_key })
+      );
+      await waitForFcmKey(async (fcmToken) => {
+        console.log("تم العثور على مفتاح للاندرويد محفوظ محليا :", fcmToken);
+        console.log(
           `%c[FCM Setup] جاري إرسال التوكن إلى الخادم...`,
           "color: #fd7e14"
         );
@@ -74,15 +73,15 @@ await waitForFcmKey  (async(fcmToken)  => {
             networkError
           );
         }
-});
-        } else {
-          console.log(
-            "[Auth] بيئة أندرويد مكتشفة، والتوكن المحلي موجود بالفعل. لا حاجة لطلب جديد."
-          );
-          // يمكنك هنا إضافة أي منطق آخر إذا أردت، مثل التحقق من صحة التوكن
-        }
-        return;
-      }
+      });
+    } else {
+      console.log(
+        "[Auth] بيئة أندرويد مكتشفة، والتوكن المحلي موجود بالفعل. لا حاجة لطلب جديد."
+      );
+      // يمكنك هنا إضافة أي منطق آخر إذا أردت، مثل التحقق من صحة التوكن
+    }
+    return;
+  }
 
   console.log(
     "%c[FCM Setup] بدأت عملية إعداد الإشعارات...",
@@ -95,7 +94,7 @@ await waitForFcmKey  (async(fcmToken)  => {
   }
 
   console.log("[FCM Setup] جاري التحقق من وجود مستخدم مسجل...");
-  
+
   if (!loggedInUser || !loggedInUser.user_key) {
     console.warn(
       "[FCM Setup] لا يوجد مستخدم مسجل أو لا يحتوي على user_key. تتوقف العملية."
@@ -250,16 +249,17 @@ await waitForFcmKey  (async(fcmToken)  => {
     );
   }
 }
-async function waitForFcmKey(callback) {
-    const checkInterval = setInterval(() => {
-        const key = localStorage.getItem("android_fcm_key");
 
-        // تأكد أن القيمة موجودة وليست فارغة وليست null
-        if (key && key.trim() !== "") {
-            clearInterval(checkInterval);
-            callback(key);
-        }
-    }, 300); // يتم الفحص كل 300 مللي ثانية
+async function waitForFcmKey(callback) {
+  const checkInterval = setInterval(() => {
+    const key = localStorage.getItem("android_fcm_key");
+
+    // تأكد أن القيمة موجودة وليست فارغة وليست null
+    if (key && key.trim() !== "") {
+      clearInterval(checkInterval);
+      callback(key);
+    }
+  }, 300); // يتم الفحص كل 300 مللي ثانية
 }
 /**
  * يعالج سيناريو قيام المستخدم بإلغاء أذونات الإشعارات من إعدادات المتصفح.
@@ -348,8 +348,6 @@ function checkLoginStatus() {
     if (user && !user.is_guest) {
       console.log("[Auth] مستخدم مسجل، جاري إعداد FCM...");
 
-  
-
       setupFCM();
     }
   }
@@ -375,14 +373,16 @@ function logout() {
     cancelButtonText: "إلغاء",
     showLoaderOnConfirm: true,
     preConfirm: async () => {
-      if (fcmToken || android_fcm_key  && loggedInUser?.user_key) {
+      if (fcmToken || (android_fcm_key && loggedInUser?.user_key)) {
         // إعلام كود الأندرويد الأصلي بتسجيل الخروج
         if (
           window.Android &&
           typeof window.Android.onUserLoggedOut === "function"
         ) {
           console.log("[Auth] إعلام الواجهة الأصلية بتسجيل خروج المستخدم...");
-          window.Android.onUserLoggedOut(JSON.stringify({ user_key: loggedInUser.user_key }));
+          window.Android.onUserLoggedOut(
+            JSON.stringify({ user_key: loggedInUser.user_key })
+          );
           // ✅ إضافة: حذف توكن الأندرويد من localStorage
           localStorage.removeItem("android_fcm_key");
           console.log(
