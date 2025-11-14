@@ -39,9 +39,6 @@ async function setupFCM() {
 //
   try {
     console.log('[FCM Setup] جاري تسجيل عامل الخدمة (Service Worker)...');
-    // ✅ إصلاح: استخدام مسار نسبي بدلاً من المسار المطلق ('/').
-    // هذا يضمن العثور على الملف سواء كان المشروع في مجلد فرعي أو في الجذر.
-    // يفترض هذا أن `firebase-messaging-sw.js` موجود في نفس مستوى `index.html`.
     await navigator.serviceWorker.register('firebase-messaging-sw.js');
     console.log('%c[FCM] تم تسجيل عامل الخدمة (Service Worker) بنجاح.', 'color: #28a745');
 
@@ -50,7 +47,6 @@ async function setupFCM() {
     const { getMessaging, getToken, onMessage } = await import("https://www.gstatic.com/firebasejs/12.5.0/firebase-messaging.js");
 
     console.log('[FCM Setup] جاري تهيئة تطبيق Firebase...');
-    // إعداد Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyClapclT8_4UlPvM026gmZbYCiXaiBDUYk",
       authDomain: "suze-bazaar-notifications.firebaseapp.com",
@@ -65,11 +61,9 @@ async function setupFCM() {
     const messaging = getMessaging(app);
     console.log('[FCM Setup] تم تهيئة Firebase بنجاح.');
 
-    // استقبال الإشعارات أثناء فتح الموقع (Foreground)
     onMessage(messaging, (payload) => {
       console.log('%c[FCM] تم استقبال إشعار أثناء فتح الموقع (Foreground):', 'color: #17a2b8', payload);
       const { title, body } = payload.data;
-      // ✅ تحديث: عرض الإشعار باستخدام SweetAlert2 بدلاً من إشعار المتصفح.
       Swal.fire({
         title: title, // عنوان الرسالة
         text: body,   // نص الرسالة
@@ -79,39 +73,33 @@ async function setupFCM() {
     });
 
     console.log('[FCM Setup] جاري طلب إذن عرض الإشعارات من المستخدم...');
-    // طلب إذن المستخدم لإرسال الإشعارات
     const permission = await Notification.requestPermission();
     if (permission === "granted") {
       console.log('%c[FCM] تم الحصول على إذن إرسال الإشعارات.', 'color: #28a745');
 
-      // 1. التحقق من وجود توكن مخزن محليًا.
       let fcmToken = localStorage.getItem('fcm_token');
       if (fcmToken) {
         console.log('[FCM Setup] تم العثور على توكن مخزن في localStorage:', fcmToken);
       }
 
-      // 2. إذا لم يوجد توكن، اطلب واحدًا جديدًا.
       if (!fcmToken) {
         console.log('[FCM Setup] لا يوجد توكن مخزن، جاري طلب توكن جديد من Firebase...');
         try {
           const newFcmToken = await getToken(messaging, { vapidKey: "BK1_lxS32198GdKm0Gf89yk1eEGcKvKLu9bn1sg9DhO8_eUUhRCAW5tjynKGRq4igNhvdSaR0-eL74V3ACl3AIY" });
           if (newFcmToken) {
             console.log('%c[FCM Setup] تم الحصول على توكن جديد:', 'color: #007bff', newFcmToken);
-            // 3. خزّن التوكن الجديد محليًا.
             console.log('%c[FCM Setup] جاري حفظ التوكن الجديد في localStorage...', 'color: orange;');
-            localStorage.setItem('fcm_token', newFcmToken); // <--- نقطة الحفظ المحلي
-            fcmToken = newFcmToken; // استخدم التوكن الجديد في الخطوة التالية.
+            localStorage.setItem('fcm_token', newFcmToken);
+            fcmToken = newFcmToken;
           } else {
             console.error('[FCM] فشل في الحصول على توكن جديد من Firebase.');
           }
         } catch (err) {
           console.error('[FCM] خطأ عند طلب التوكن من Firebase:', err);
-          return; // إيقاف التنفيذ إذا فشل الحصول على التوكن
+          return;
         }
       }
 
-      // 4. ✅ إصلاح: إرسال التوكن (سواء كان جديدًا أو مخزنًا) إلى الخادم دائمًا عند كل تحميل للصفحة.
-      // هذا يضمن أن الخادم لديه دائمًا أحدث توكن للمستخدم.
       if (fcmToken) {
         console.log(`%c[FCM Setup] جاري إرسال التوكن إلى الخادم...`, 'color: #fd7e14');
         console.log(`[FCM] User Key: ${loggedInUser.user_key}`);
@@ -145,6 +133,48 @@ async function setupFCM() {
 }
 
 /**
+ * يعالج سيناريو قيام المستخدم بإلغاء أذونات الإشعارات من إعدادات المتصفح.
+ * إذا تم العثور على توكن مخزن محليًا بينما الإذن مرفوض، فإنه يحاول حذفه من الخادم.
+ */
+async function handleRevokedPermissions() {
+  // هذا المنطق خاص بالويب فقط، لا ينطبق داخل تطبيق الأندرويد.
+  if (window.Android || !('Notification' in window)) {
+    return;
+  }
+
+  const currentPermission = Notification.permission;
+  const fcmToken = localStorage.getItem('fcm_token');
+
+  // إذا كان الإذن 'denied' أو 'default' وما زال لدينا توكن،
+  // فهذا يعني أن المستخدم قد ألغى الإذن بعد منحه سابقًا.
+  if ((currentPermission === 'denied' || currentPermission === 'default') && fcmToken) {
+    console.warn('[FCM] تم اكتشاف أن إذن الإشعارات لم يعد ممنوحًا. سيتم حذف التوكن...');
+    const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
+
+    if (loggedInUser?.user_key) {
+      try {
+        await fetch(`${baseURL}/api/tokens`, {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ user_key: loggedInUser.user_key, token: fcmToken }),
+        });
+        console.log('[FCM] تم إرسال طلب حذف التوكن من الخادم بسبب تغيير حالة الإذن.');
+      } catch (error) {
+        console.error('[FCM] فشل إرسال طلب حذف التوكن بعد تغيير حالة الإذن:', error);
+        // ملاحظة: من الجيد هنا تسجيل هذا الخطأ في خدمة مراقبة خارجية.
+      } finally {
+        // سواء نجح الحذف من الخادم أم لا، يجب إزالة التوكن المحلي.
+        localStorage.removeItem('fcm_token');
+        console.log('[FCM] تم حذف التوكن من التخزين المحلي.');
+      }
+    } else {
+      // إذا لم نجد مستخدمًا مسجلاً، فقط احذف التوكن المحلي.
+      localStorage.removeItem('fcm_token');
+    }
+  }
+}
+
+/**
  * يتحقق من حالة تسجيل دخول المستخدم ويقوم بتحديث واجهة المستخدم بناءً عليها.
  */
 function checkLoginStatus() {
@@ -162,21 +192,21 @@ function checkLoginStatus() {
 
     // تغيير الأيقونة إلى كلمة "مرحباً"
     if (userIcon) {
-      // ✅ تعديل: استخدام class مخصص بدلاً من إزالة كل شيء
-      userIcon.className = "welcome-text"; // إضافة class جديد للتنسيق
+      userIcon.className = "welcome-text";
       userIcon.textContent = "مرحباً";
     }
 
     // تحديث النص لعرض اسم المستخدم
     userText.textContent = user.username;
 
+    // ✅ تحسين: التعامل مع حالة إلغاء المستخدم لأذونات الإشعارات
+    handleRevokedPermissions();
+
     // بعد التأكد من تسجيل الدخول، قم بإعداد إشعارات FCM.
-    // ✅ تعديل: يتم استدعاء إعداد FCM فقط إذا كان المستخدم مسجلاً وليس ضيفًا.
     if (user && !user.is_guest) {
       console.log('[Auth] مستخدم مسجل، جاري إعداد FCM...');
 
       // ✅ خطوة حاسمة: إعلام كود الأندرويد الأصلي بنجاح تسجيل الدخول
-      // نمرر كائن المستخدم بالكامل كـ JSON string
       if (window.Android && typeof window.Android.onUserLoggedIn === 'function') {
         console.log('[Auth] إعلام الواجهة الأصلية بتسجيل دخول المستخدم...');
         window.Android.onUserLoggedIn(JSON.stringify(user));
@@ -185,14 +215,12 @@ function checkLoginStatus() {
       setupFCM();
     }
   }
-  // إذا لم يكن المستخدم مسجلاً دخوله، سيبقى كل شيء على حاله الافتراضي
 }
 
 /**
  * يقوم بتسجيل خروج المستخدم عن طريق إزالة بياناته من التخزين المحلي وإعادة التوجيه.
  */
 function logout() {
-  // جلب التوكن والمستخدم قبل الحذف للتأكد من وجودهما
   const fcmToken = localStorage.getItem("fcm_token");
   const loggedInUser = JSON.parse(localStorage.getItem("loggedInUser"));
 
@@ -207,9 +235,8 @@ function logout() {
     cancelButtonText: "إلغاء",
     showLoaderOnConfirm: true,
     preConfirm: async () => {
-      // إذا كان هناك توكن ومستخدم، أرسل طلب حذفه من الخادم
       if (fcmToken && loggedInUser?.user_key) {
-        // ✅ خطوة حاسمة: إعلام كود الأندرويد الأصلي بتسجيل الخروج
+        // إعلام كود الأندرويد الأصلي بتسجيل الخروج
         if (window.Android && typeof window.Android.onUserLoggedOut === 'function') {
             console.log('[Auth] إعلام الواجهة الأصلية بتسجيل خروج المستخدم...');
             window.Android.onUserLoggedOut(loggedInUser.user_key);
@@ -223,8 +250,10 @@ function logout() {
           });
           console.log('[FCM] تم إرسال طلب حذف التوكن من الخادم بنجاح.');
         } catch (error) {
-          console.error('[FCM] فشل إرسال طلب حذف التوكن من الخادم:', error);
-          // لا توقف عملية تسجيل الخروج حتى لو فشل الحذف
+          // ✅ تحسين: التعامل مع فشل الحذف
+          console.error('[FCM] فشل إرسال طلب حذف التوكن من الخادم. هذا قد يؤدي إلى بقاء توكن غير مستخدم في قاعدة البيانات. الخطأ:', error);
+          // اقتراح: في بيئة الإنتاج، يُنصح بإرسال هذا الخطأ إلى خدمة مراقبة (Logging Service)
+          // لمتابعة الحالات التي تفشل فيها عملية الحذف ومعالجتها لاحقًا.
         }
       }
     },
@@ -234,13 +263,8 @@ function logout() {
       localStorage.removeItem("fcm_token");
       console.log('[FCM] تم حذف توكن FCM من التخزين المحلي عند تسجيل الخروج.');
 
-      // إزالة بيانات المستخدم من التخزين المحلي
       localStorage.removeItem("loggedInUser");
-
-      // ✅ تعديل: لم نعد نحذف السلة عند تسجيل الخروج،
-      // لأنها الآن مرتبطة بالمستخدم وستبقى محفوظة لزيارته القادمة.
       
-      // إعادة توجيه المستخدم إلى الصفحة الرئيسية لتحديث حالته
       window.location.href = "index.html";
     }
   });
