@@ -33,6 +33,48 @@ async function setupFCM() {
           // استدعِ دالة الأندرويد فقط إذا لم يكن هناك توكن بالفعل
 // الحل المقترح (يرسل كائن JSON)
 window.Android.onUserLoggedIn(JSON.stringify({ user_key: loggedInUser.user_key }));
+await waitForFcmKey  (async(fcmToken)  => {
+    console.log("تم العثور على مفتاح للاندرويد محفوظ محليا :", fcmToken);
+      console.log(
+          `%c[FCM Setup] جاري إرسال التوكن إلى الخادم...`,
+          "color: #fd7e14"
+        );
+        console.log(`[FCM] User Key: ${loggedInUser.user_key}`);
+        console.log(`[FCM] FCM Token: ${fcmToken}`);
+
+        try {
+          const response = await fetch(`${baseURL}/api/tokens`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              user_key: loggedInUser.user_key,
+              token: fcmToken,
+            }),
+          });
+
+          const responseData = await response.json();
+          if (response.ok) {
+            console.log(
+              "%c[FCM Setup] نجح الخادم في حفظ/تحديث التوكن.",
+              "color: #28a745",
+              responseData
+            );
+          } else {
+            console.error(
+              "[FCM] فشل الخادم في حفظ التوكن. الحالة:",
+              response.status,
+              "الاستجابة:",
+              responseData
+            );
+          }
+        } catch (networkError) {
+          console.error(
+            "%c[FCM] حدث خطأ في الشبكة أثناء إرسال التوكن:",
+            "color: #dc3545",
+            networkError
+          );
+        }
+});
         } else {
           console.log(
             "[Auth] بيئة أندرويد مكتشفة، والتوكن المحلي موجود بالفعل. لا حاجة لطلب جديد."
@@ -208,7 +250,17 @@ window.Android.onUserLoggedIn(JSON.stringify({ user_key: loggedInUser.user_key }
     );
   }
 }
+async function waitForFcmKey(callback) {
+    const checkInterval = setInterval(() => {
+        const key = localStorage.getItem("android_fcm_key");
 
+        // تأكد أن القيمة موجودة وليست فارغة وليست null
+        if (key && key.trim() !== "") {
+            clearInterval(checkInterval);
+            callback(key);
+        }
+    }, 300); // يتم الفحص كل 300 مللي ثانية
+}
 /**
  * يعالج سيناريو قيام المستخدم بإلغاء أذونات الإشعارات من إعدادات المتصفح.
  * إذا تم العثور على توكن مخزن محليًا بينما الإذن مرفوض، فإنه يحاول حذفه من الخادم.
