@@ -328,7 +328,7 @@ function logout() {
           typeof window.Android.onUserLoggedOut === "function"
         ) {
           console.log("[Auth] إعلام الواجهة الأصلية بتسجيل خروج المستخدم...");
-          window.Android.onUserLoggedOut(loggedInUser.user_key);
+          window.Android.onUserLoggedOut(JSON.stringify({ user_key: loggedInUser.user_key }));
           // ✅ إضافة: حذف توكن الأندرويد من localStorage
           localStorage.removeItem("android_fcm_key");
           console.log(
