@@ -155,7 +155,12 @@ async function initializeUsersAdminLogic(modalContainer) {
     const message = messageInput.value.trim();
 
     if (!message) {
-      Swal.fire('خطأ', 'الرجاء كتابة رسالة قبل الإرسال.', 'error');
+      Swal.fire({
+        title: 'خطأ',
+        text: 'الرجاء كتابة رسالة قبل الإرسال.',
+        icon: 'error',
+        target: modalContainer, // ✅ إصلاح: ربط الرسالة بالنافذة المنبثقة لضمان ظهورها في المقدمة
+      });
       return;
     }
 
@@ -169,7 +174,12 @@ async function initializeUsersAdminLogic(modalContainer) {
     const recipientUser = allUsers.find(u => u.user_key === userKey);
 
     if (result && result.success) {
-      Swal.fire('تم الإرسال', 'تم إرسال الإشعار بنجاح.', 'success');
+      Swal.fire({
+        title: 'تم الإرسال',
+        text: 'تم إرسال الإشعار بنجاح.',
+        icon: 'success',
+        target: modalContainer, // ✅ إصلاح: ربط الرسالة بالنافذة المنبثقة لضمان ظهورها في المقدمة
+      });
       messageInput.value = '';
       if (typeof addNotificationLog === 'function' && recipientUser) {
         addNotificationLog({
@@ -182,7 +192,12 @@ async function initializeUsersAdminLogic(modalContainer) {
         });
       }
     } else {
-      Swal.fire('فشل الإرسال', `حدث خطأ: ${result.error}`, 'error');
+      Swal.fire({
+        title: 'فشل الإرسال',
+        text: `حدث خطأ: ${result.error}`,
+        icon: 'error',
+        target: modalContainer, // ✅ إصلاح: ربط الرسالة بالنافذة المنبثقة لضمان ظهورها في المقدمة
+      });
       if (typeof addNotificationLog === 'function' && recipientUser) {
         addNotificationLog({
           type: 'sent',
