@@ -48,15 +48,16 @@ async function showNotificationsLogModal() {
     <style>
       .modal-header-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
       .modal-header-controls h2 { margin: 0; }
+      /* ✅ جديد: تنسيق حاوية الزر في أسفل النافذة */
+      .modal-footer-controls { text-align: center; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid #eee; }
     </style>
     <span class="close-button" id="notifications-log-modal-close-btn">&times;</span>
     <div class="modal-header-controls">
       <h2><i class="fas fa-history"></i> سجل الإشعارات</h2>
-      <button id="clear-notifications-btn" class="button delete-btn-small" style="display: none;"><i class="fas fa-trash-alt"></i> مسح الكل</button>
     </div>`;
 
   if (logs && logs.length > 0) {
-    contentHTML += '<div id="notifications-log-list" style="max-height: 65vh; overflow-y: auto; padding-right: 10px;">';
+    contentHTML += '<div id="notifications-log-list" style="max-height: 60vh; overflow-y: auto; padding-right: 10px;">';
     logs.forEach(log => {
       const logDate = new Date(log.timestamp).toLocaleString('ar-EG', {
         year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
@@ -91,6 +92,11 @@ async function showNotificationsLogModal() {
         </div>`;
     });
     contentHTML += '</div>';
+    // ✅ نقل: إضافة زر "مسح الكل" في الأسفل بعد قائمة الإشعارات
+    contentHTML += `
+      <div class="modal-footer-controls">
+        <button id="clear-notifications-btn" class="button delete-btn-small" style="display: none;"><i class="fas fa-trash-alt"></i> مسح الكل</button>
+      </div>`;
   } else if (logs) {
     contentHTML += '<p style="text-align: center; padding: 2rem 0;">لا توجد إشعارات مسجلة بعد.</p>';
   } else {
