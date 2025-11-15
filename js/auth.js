@@ -13,6 +13,10 @@
  * الحصول على توكن FCM، وإرساله إلى السيرفر.
  */
 async function setupFCM() {
+    const isOnline = await checkInternetConnection();
+  if (!isOnline) {
+    return { error: "لا يوجد اتصال بالإنترنت." };
+  }
   // دالة مساعدة لإرسال التوكن إلى الخادم لتجنب التكرار
   async function sendTokenToServer(userKey, token, platform) {
     console.log(`%c[FCM] Sending token to server...`, "color: #fd7e14");
@@ -24,17 +28,34 @@ async function setupFCM() {
       const response = await fetch(`${baseURL}/api/tokens`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ user_key: userKey, token: token, platform: platform }),
+        body: JSON.stringify({
+          user_key: userKey,
+          token: token,
+          platform: platform,
+        }),
       });
 
       const responseData = await response.json();
       if (response.ok) {
-        console.log("%c[FCM] Server successfully saved/updated the token.", "color: #28a745", responseData);
+        console.log(
+          "%c[FCM] Server successfully saved/updated the token.",
+          "color: #28a745",
+          responseData
+        );
       } else {
-        console.error("[FCM] Server failed to save token. Status:", response.status, "Response:", responseData);
+        console.error(
+          "[FCM] Server failed to save token. Status:",
+          response.status,
+          "Response:",
+          responseData
+        );
       }
     } catch (networkError) {
-      console.error("%c[FCM] Network error while sending token:", "color: #dc3545", networkError);
+      console.error(
+        "%c[FCM] Network error while sending token:",
+        "color: #dc3545",
+        networkError
+      );
     }
   }
 
@@ -60,7 +81,7 @@ async function setupFCM() {
       await waitForFcmKey(async (fcmToken) => {
         console.log("تم العثور على مفتاح للاندرويد محفوظ محليا :", fcmToken);
         // استدعاء الدالة المساعدة الجديدة
-        await sendTokenToServer(loggedInUser.user_key, fcmToken, 'android');
+        await sendTokenToServer(loggedInUser.user_key, fcmToken, "android");
       });
     } else {
       console.log(
@@ -159,7 +180,8 @@ async function setupFCM() {
         );
         try {
           const newFcmToken = await getToken(messaging, {
-            vapidKey: "BK1_lxS32198GdKm0Gf89yk1eEGcKvKLu9bn1sg9DhO8_eUUhRCAW5tjynKGRq4igNhvdSaR0-eL74V3ACl3AIY", // يُفضل نقل هذا إلى ملف config.js
+            vapidKey:
+              "BK1_lxS32198GdKm0Gf89yk1eEGcKvKLu9bn1sg9DhO8_eUUhRCAW5tjynKGRq4igNhvdSaR0-eL74V3ACl3AIY", // يُفضل نقل هذا إلى ملف config.js
           });
           if (newFcmToken) {
             console.log(
@@ -184,7 +206,7 @@ async function setupFCM() {
 
       if (fcmToken) {
         // استدعاء الدالة المساعدة الجديدة
-        await sendTokenToServer(loggedInUser.user_key, fcmToken, 'web');
+        await sendTokenToServer(loggedInUser.user_key, fcmToken, "web");
       } else {
         console.error("[FCM] لم يتمكن من الحصول على توكن لإرساله إلى الخادم.");
       }
@@ -316,7 +338,9 @@ function checkLoginStatus() {
       console.log("[Auth] مستخدم مؤهل، جاري إعداد FCM...");
       setupFCM();
     } else {
-      console.log("[Auth] المستخدم (عميل عادي) غير مؤهل لاستقبال الإشعارات. تم تخطي إعداد FCM.");
+      console.log(
+        "[Auth] المستخدم (عميل عادي) غير مؤهل لاستقبال الإشعارات. تم تخطي إعداد FCM."
+      );
     }
   }
 }
@@ -324,7 +348,11 @@ function checkLoginStatus() {
 /**
  * يقوم بتسجيل خروج المستخدم عن طريق إزالة بياناته من التخزين المحلي وإعادة التوجيه.
  */
-function logout() {
+async function logout() {
+    const isOnline = await checkInternetConnection();
+  if (!isOnline) {
+    return { error: "لا يوجد اتصال بالإنترنت." };
+  }
   const existingWebToken = localStorage.getItem("fcm_token");
   const existingAndroidToken = localStorage.getItem("android_fcm_key");
 
@@ -341,7 +369,10 @@ function logout() {
     cancelButtonText: "إلغاء",
     showLoaderOnConfirm: true,
     preConfirm: async () => {
-      if (existingWebToken || (existingAndroidToken && loggedInUser?.user_key)) {
+      if (
+        existingWebToken ||
+        (existingAndroidToken && loggedInUser?.user_key)
+      ) {
         // إعلام كود الأندرويد الأصلي بتسجيل الخروج
         if (
           window.Android &&

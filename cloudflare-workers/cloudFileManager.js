@@ -32,6 +32,10 @@ async function ensureToken2cf() {
 }
 
  async function uploadFile2cf(blob, fileName, onLog = console.log) {
+  // ✅ جديد: التحقق من الاتصال بالإنترنت أولاً
+  const isOnline = await checkInternetConnection();
+  if (!isOnline) return null;
+
   if (!(blob instanceof Blob) || !fileName) {
     throw new Error("❌ يجب توفير ملف Blob واسم الملف.");
   }
@@ -63,6 +67,10 @@ async function ensureToken2cf() {
 }
 
  async function downloadFile2cf(fileName, onLog = console.log) {
+  // ✅ جديد: التحقق من الاتصال بالإنترنت أولاً
+  const isOnline = await checkInternetConnection();
+  if (!isOnline) return null;
+
   if (!fileName) {
     throw new Error("❌ يجب توفير اسم الملف.");
   }
@@ -94,6 +102,10 @@ async function ensureToken2cf() {
 }
 
  async function deleteFile2cf(fileName, onLog = console.log) {
+  // ✅ جديد: التحقق من الاتصال بالإنترنت أولاً
+  const isOnline = await checkInternetConnection();
+  if (!isOnline) return null;
+
   if (!fileName) {
     throw new Error("❌ يجب توفير اسم الملف.");
   }

@@ -14,6 +14,11 @@
  * @returns {Promise<Object|null>} كائن يحتوي على بيانات المستخدمين أو null في حالة حدوث خطأ
  */
 async function fetchUsers() {
+  // ✅ جديد: التحقق من الاتصال بالإنترنت أولاً
+  const isOnline = await checkInternetConnection();
+  if (!isOnline) {
+    return null;
+  }
   console.log('%c[API] Starting fetchUsers...', 'color: blue;');
   try {
     // إرسال طلب لجلب البيانات من الرابط المحدد
@@ -47,6 +52,11 @@ async function fetchUsers() {
  * @returns {Promise<Object|null>} الكائن الذي تم إنشاؤه أو null في حالة الفشل.
  */
 async function addUser(userData) {
+  // ✅ جديد: التحقق من الاتصال بالإنترنت أولاً
+  const isOnline = await checkInternetConnection();
+  if (!isOnline) {
+    return { error: "لا يوجد اتصال بالإنترنت." };
+  }
   console.log('%c[API] Starting addUser with data:', 'color: blue;', userData);
   try {
     const response = await fetch(`${baseURL}/api/users`, {
@@ -79,6 +89,11 @@ async function addUser(userData) {
  * @returns {Promise<Object|null>} الكائن الذي تم إنشاؤه أو null في حالة الفشل.
  */
 async function addProduct(productData) {
+  // ✅ جديد: التحقق من الاتصال بالإنترنت أولاً
+  const isOnline = await checkInternetConnection();
+  if (!isOnline) {
+    return { error: "لا يوجد اتصال بالإنترنت." };
+  }
   console.log('%c[API] Starting addProduct with data:', 'color: blue;', productData);
   try {
     const response = await fetch(`${baseURL}/api/products`, {
@@ -107,6 +122,11 @@ async function addProduct(productData) {
  * @returns {Promise<Object|null>} الكائن الذي تم تحديثه أو null في حالة الفشل.
  */
 async function updateProduct(productData) {
+  // ✅ جديد: التحقق من الاتصال بالإنترنت أولاً
+  const isOnline = await checkInternetConnection();
+  if (!isOnline) {
+    return { error: "لا يوجد اتصال بالإنترنت." };
+  }
   console.log('%c[API] Starting updateProduct with data:', 'color: blue;', productData);
   try {
     const response = await fetch(`${baseURL}/api/products`, {
@@ -135,6 +155,11 @@ async function updateProduct(productData) {
  * @returns {Promise<Object>} كائن الاستجابة من الخادم.
  */
 async function deleteProduct(productKey) {
+  // ✅ جديد: التحقق من الاتصال بالإنترنت أولاً
+  const isOnline = await checkInternetConnection();
+  if (!isOnline) {
+    return { error: "لا يوجد اتصال بالإنترنت." };
+  }
   console.log(`%c[API] Starting deleteProduct for product_key: ${productKey}`, 'color: blue;');
   try {
     const response = await fetch(`${baseURL}/api/products?product_key=${productKey}`, {
@@ -163,6 +188,11 @@ async function deleteProduct(productKey) {
  * @returns {Promise<Array|null>} مصفوفة من المنتجات أو null في حالة الفشل.
  */
 async function getProductsByCategory(mainCatId, subCatId) {
+  // ✅ جديد: التحقق من الاتصال بالإنترنت أولاً
+  const isOnline = await checkInternetConnection();
+  if (!isOnline) {
+    return null;
+  }
   console.log(`%c[API] Starting getProductsByCategory (Main: ${mainCatId}, Sub: ${subCatId})`, 'color: blue;');
   try {
     // --- جديد: إضافة تسجيلات تشخيصية لتحديد المشكلة بدقة ---
@@ -203,6 +233,11 @@ async function getProductsByCategory(mainCatId, subCatId) {
  * @returns {Promise<Array|null>} مصفوفة من المنتجات أو null في حالة الفشل.
  */
 async function getProductsByUser(userKey) {
+  // ✅ جديد: التحقق من الاتصال بالإنترنت أولاً
+  const isOnline = await checkInternetConnection();
+  if (!isOnline) {
+    return null;
+  }
   console.log(`%c[API] Starting getProductsByUser for user_key: ${userKey}`, 'color: blue;');
   try {
     const response = await fetch(`${baseURL}/api/products?user_key=${userKey}`);
@@ -227,6 +262,11 @@ async function getProductsByUser(userKey) {
  * @returns {Promise<Object|null>} كائن المنتج أو null في حالة الفشل.
  */
 async function getProductByKey(productKey) {
+  // ✅ جديد: التحقق من الاتصال بالإنترنت أولاً
+  const isOnline = await checkInternetConnection();
+  if (!isOnline) {
+    return null;
+  }
   console.log(`%c[API] Starting getProductByKey for product_key: ${productKey}`, 'color: blue;');
   try {
     const response = await fetch(`${baseURL}/api/products?product_key=${productKey}&single=true`);
@@ -255,6 +295,11 @@ async function getProductByKey(productKey) {
  * @returns {Promise<Object|null>}
  */
 async function updateUsers(updates) {
+  // ✅ جديد: التحقق من الاتصال بالإنترنت أولاً
+  const isOnline = await checkInternetConnection();
+  if (!isOnline) {
+    return { error: "لا يوجد اتصال بالإنترنت." };
+  }
   console.log('%c[API] Starting updateUsers with data:', 'color: blue;', updates);
   try {
     const response = await fetch(`${baseURL}/api/users`, {
@@ -283,6 +328,11 @@ async function updateUsers(updates) {
  * @returns {Promise<Object>}
  */
 async function updateUser(userData) {
+  // ✅ جديد: التحقق من الاتصال بالإنترنت أولاً
+  const isOnline = await checkInternetConnection();
+  if (!isOnline) {
+    return { error: "لا يوجد اتصال بالإنترنت." };
+  }
   console.log('%c[API] Starting updateUser with data:', 'color: blue;', userData);
   try {
     const response = await fetch(`${baseURL}/api/users`, {
@@ -310,6 +360,11 @@ async function updateUser(userData) {
  * @returns {Promise<Object|null>} كائن يحتوي على بيانات المستخدم (الاسم، الهاتف، user_key، حالة البائع) أو null إذا لم يتم العثور عليه أو في حالة حدوث خطأ.
  */
 async function getUserByPhone(phone) {
+  // ✅ جديد: التحقق من الاتصال بالإنترنت أولاً
+  const isOnline = await checkInternetConnection();
+  if (!isOnline) {
+    return null;
+  }
   console.log(`%c[API] Starting getUserByPhone for phone: ${phone}`, 'color: blue;');
   try {
     // بناء الرابط مع رقم الهاتف كمعامل استعلام
@@ -343,6 +398,11 @@ async function getUserByPhone(phone) {
  * @returns {Promise<Object|null>} كائن بيانات المستخدم عند النجاح، أو كائن خطأ عند الفشل.
  */
 async function verifyUserPassword(phone, password) {
+  // ✅ جديد: التحقق من الاتصال بالإنترنت أولاً
+  const isOnline = await checkInternetConnection();
+  if (!isOnline) {
+    return { error: "لا يوجد اتصال بالإنترنت." };
+  }
   console.log(`%c[API] Starting verifyUserPassword for phone: ${phone}`, 'color: blue;');
   try {
     const response = await fetch(`${baseURL}/api/users`, {
@@ -372,6 +432,11 @@ async function verifyUserPassword(phone, password) {
  * @returns {Promise<Object>} كائن الاستجابة من الخادم.
  */
 async function deleteUser(userKey) {
+  // ✅ جديد: التحقق من الاتصال بالإنترنت أولاً
+  const isOnline = await checkInternetConnection();
+  if (!isOnline) {
+    return { error: "لا يوجد اتصال بالإنترنت." };
+  }
   console.log(`%c[API] Starting deleteUser for user_key: ${userKey}`, 'color: #e74c3c; font-weight: bold;');
   try {
     const response = await fetch(`${baseURL}/api/users`, {
@@ -404,6 +469,11 @@ async function deleteUser(userKey) {
  * @returns {Promise<Object>} كائن الاستجابة من الخادم.
  */
 async function createOrder(orderData) {
+  // ✅ جديد: التحقق من الاتصال بالإنترنت أولاً
+  const isOnline = await checkInternetConnection();
+  if (!isOnline) {
+    return { error: "لا يوجد اتصال بالإنترنت." };
+  }
   console.log('%c[API] Starting createOrder with data:', 'color: blue;', orderData);
   try {
     const response = await fetch(`${baseURL}/api/orders`, {
@@ -432,6 +502,11 @@ async function createOrder(orderData) {
  * @returns {Promise<Array|null>} مصفوفة من عناصر المشتريات أو null في حالة الفشل.
  */
 async function getUserPurchases(userKey) {
+  // ✅ جديد: التحقق من الاتصال بالإنترنت أولاً
+  const isOnline = await checkInternetConnection();
+  if (!isOnline) {
+    return null;
+  }
   console.log(`%c[API] Starting getUserPurchases for user_key: ${userKey}`, 'color: blue;');
   try {
     const response = await fetch(`${baseURL}/api/purchases?user_key=${userKey}`);
@@ -468,6 +543,11 @@ async function getUserPurchases(userKey) {
  * @returns {Promise<Array|null>} مصفوفة من الطلبات المجمعة أو null في حالة الفشل.
  */
 async function getSalesMovement() {
+  // ✅ جديد: التحقق من الاتصال بالإنترنت أولاً
+  const isOnline = await checkInternetConnection();
+  if (!isOnline) {
+    return null;
+  }
   console.log(`%c[API] Starting getSalesMovement...`, 'color: blue;');
   try {
     const response = await fetch(`${baseURL}/api/sales-movement`);
@@ -495,6 +575,11 @@ async function getSalesMovement() {
  * @returns {Promise<Object>} كائن الاستجابة من الخادم.
  */
 async function sendNotification(token, title, body) {
+  // ✅ جديد: التحقق من الاتصال بالإنترنت أولاً
+  const isOnline = await checkInternetConnection();
+  if (!isOnline) {
+    return { error: "لا يوجد اتصال بالإنترنت." };
+  }
   console.log(`%c[API] Starting sendNotification to token: ${token.substring(0, 10)}...`, 'color: blue;');
   try {
     const response = await fetch(`${baseURL}/api/send-notification`, {
@@ -534,10 +619,10 @@ window.showProductDetails = async function(productData, onCloseCallback) {
   const isOnline = await checkInternetConnection();
   if (!isOnline) {
     // إذا لم يكن هناك اتصال، أبلغ المستخدم وتوقف
-    Swal.fire('لا يوجد اتصال بالإنترنت', 'يرجى التحقق من اتصالك بالشبكة لعرض تفاصيل المنتج.', 'error').then(() => {
+   
       // ✅ إصلاح: إعادة إظهار نافذة البحث إذا فشل الفتح بسبب انقطاع الاتصال
       if (typeof onCloseCallback === 'function') onCloseCallback();
-    });
+   
     return; // إيقاف التنفيذ
   }
 
@@ -712,6 +797,11 @@ window.showProductDetails = async function(productData, onCloseCallback) {
  * @returns {Promise<Object>} كائن الاستجابة من الخادم.
  */
 async function addUpdate(text) {
+  // ✅ جديد: التحقق من الاتصال بالإنترنت أولاً
+  const isOnline = await checkInternetConnection();
+  if (!isOnline) {
+    return { error: "لا يوجد اتصال بالإنترنت." };
+  }
   console.log(`%c[API] Starting addUpdate with text: "${text}"`, 'color: blue;');
   try {
     const response = await fetch(`${baseURL}/api/updates`, {
@@ -739,6 +829,11 @@ async function addUpdate(text) {
  * @returns {Promise<Object|null>} كائن يحتوي على تاريخ التحديث أو null في حالة الفشل.
  */
 async function getLatestUpdate() {
+  // ✅ جديد: التحقق من الاتصال بالإنترنت أولاً
+  const isOnline = await checkInternetConnection();
+  if (!isOnline) {
+    return null;
+  }
   console.log(`%c[API] Starting getLatestUpdate...`, 'color: blue;');
   try {
     const response = await fetch(`${baseURL}/api/updates`);

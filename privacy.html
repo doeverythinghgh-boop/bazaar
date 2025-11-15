@@ -46,16 +46,6 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
 </head>
 <body>
-  <!-- ✅ جديد: حاوية رسالة انقطاع الاتصال -->
-  <div id="offline-container" class="offline-container" style="display: none;">
-    <div class="offline-content">
-      <i class="fas fa-exclamation-triangle"></i>
-      <h2>لا يوجد اتصال بالإنترنت</h2>
-      <p>يرجى التحقق من اتصالك بالشبكة والمحاولة مرة أخرى.</p>
-      <button id="retry-connection-btn" class="button login-btn">إعادة المحاولة</button>
-    </div>
-  </div>
-
   <div class="container" id="main-content">
     <h1>سياسة الخصوصية - SuezBazaar</h1>
     <p>في <strong>SuezBazaar</strong> نحترم خصوصية المستخدمين ونسعى لحماية بياناتهم الشخصية وفقًا لأفضل الممارسات.</p>
@@ -77,18 +67,6 @@
     </p>
   </div>
 
-  <!-- ✅ جديد: إضافة السكريبتات اللازمة -->
   <script src="js/config.js"></script>
-  <script src="js/utils.js"></script>
-  <script>
-    document.addEventListener("DOMContentLoaded", async () => {
-      const isOnline = await checkInternetConnection();
-      if (!isOnline) {
-        document.getElementById('offline-container').style.display = 'flex';
-        document.getElementById('main-content').style.display = 'none';
-        document.getElementById('retry-connection-btn').addEventListener('click', () => window.location.reload());
-      }
-    });
-  </script>
 </body>
 </html>

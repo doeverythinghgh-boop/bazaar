@@ -49,16 +49,6 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
 </head>
 <body>
-  <!-- ✅ جديد: حاوية رسالة انقطاع الاتصال -->
-  <div id="offline-container" class="offline-container" style="display: none;">
-    <div class="offline-content">
-      <i class="fas fa-exclamation-triangle"></i>
-      <h2>لا يوجد اتصال بالإنترنت</h2>
-      <p>يرجى التحقق من اتصالك بالشبكة والمحاولة مرة أخرى.</p>
-      <button id="retry-connection-btn" class="button login-btn">إعادة المحاولة</button>
-    </div>
-  </div>
-
   <div class="container" id="main-content">
     <h1>حذف الحساب على SuezBazaar</h1>
     <p>يمكنك حذف حسابك وجميع البيانات المرتبطة به بسهولة. للقيام بذلك، اتبع الخطوات التالية:</p>
@@ -79,18 +69,6 @@
     <p>إذا كنت ترغب في حذف حسابك الآن أو واجهت أي مشكلة، يمكنك التواصل مع فريق الدعم عبر البريد الإلكتروني: <a href="mailto:suezbazaar@gmail.com">suezbazaar@gmail.com</a></p>
   </div>
 
-  <!-- ✅ جديد: إضافة السكريبتات اللازمة -->
   <script src="js/config.js"></script>
-  <script src="js/utils.js"></script>
-  <script>
-    document.addEventListener("DOMContentLoaded", async () => {
-      const isOnline = await checkInternetConnection();
-      if (!isOnline) {
-        document.getElementById('offline-container').style.display = 'flex';
-        document.getElementById('main-content').style.display = 'none';
-        document.getElementById('retry-connection-btn').addEventListener('click', () => window.location.reload());
-      }
-    });
-  </script>
 </body>
 </html>

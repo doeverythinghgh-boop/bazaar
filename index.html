@@ -49,15 +49,6 @@
       الهدف من هذا الموقع هو إنشاء سوق تجاري إلكتروني ("بازار") في السويس.
       يعمل الموقع كمنصة لعرض منتجات من موردين مختلفين، مما يسمح للمستهلكين بتصفحها وشرائها مباشرة.
     -->
-    <!-- ✅ جديد: حاوية رسالة انقطاع الاتصال (مخفية افتراضيًا) -->
-    <div id="offline-container" class="offline-container" style="display: none;">
-      <div class="offline-content">
-        <i class="fas fa-exclamation-triangle"></i>
-        <h2>لا يوجد اتصال بالإنترنت</h2>
-        <p>يرجى التحقق من اتصالك بالشبكة والمحاولة مرة أخرى.</p>
-        <button id="retry-connection-btn" class="button login-btn">إعادة المحاولة</button>
-      </div>
-    </div>
 
     <!-- المحتوى الرئيسي للصفحة -->
     <div class="container" id="header-container">
@@ -463,29 +454,6 @@
         // ✅ جديد: تشغيل الأنيميشن بشكل مستقل فورًا
         // هذا يمنع الأنيميشن من حظر تحميل باقي مكونات الصفحة.
         if (typeof startAnimationCycle === 'function') startAnimationCycle();
-
-        // ✅ جديد: التحقق من الاتصال بالإنترنت أولاً
-        console.log('[DOM] جاري التحقق من الاتصال بالإنترنت...');
-        const isOnline = await checkInternetConnection();
-        if (!isOnline) {
-          console.error('[DOM] لا يوجد اتصال بالإنترنت. سيتم إيقاف تحميل باقي الصفحة.');
-          // إظهار حاوية انقطاع الاتصال
-          const offlineContainer = document.getElementById('offline-container');
-          offlineContainer.style.display = 'flex';
-
-          // إخفاء المحتوى الرئيسي
-          document.getElementById('header-container').style.display = 'none';
-          document.getElementById('advertisement-section').style.display = 'none';
-          document.getElementById('categories-section').style.display = 'none';
-
-          // إضافة وظيفة لزر إعادة المحاولة
-          document.getElementById('retry-connection-btn').addEventListener('click', () => {
-            console.log('[NetworkCheck] إعادة محاولة الاتصال...');
-            window.location.reload();
-          });
-          return; // إيقاف تنفيذ باقي الكود
-        }
-        console.log('%c[DOM] يوجد اتصال بالإنترنت. جاري استكمال تحميل الصفحة...', 'color: green;');
 
         // استدعاء الدالة للتحقق من حالة تسجيل الدخول
         console.log('[DOM] جاري التحقق من حالة تسجيل الدخول...');

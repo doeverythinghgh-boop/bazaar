@@ -130,17 +130,6 @@
     100% { transform: rotate(360deg); }
   }
 </style>
-<!-- ✅ جديد: حاوية رسالة انقطاع الاتصال -->
-<div id="offline-container-modal" class="offline-container" style="display: none; position: absolute; border-radius: 12px;">
-  <div id="my-products-offline-content" class="offline-content">
-    <i id="my-products-offline-icon" class="fas fa-exclamation-triangle"></i>
-    <h2 id="my-products-offline-title">لا يوجد اتصال بالإنترنت</h2>
-    <p id="my-products-offline-text">يرجى التحقق من اتصالك بالشبكة والمحاولة مرة أخرى.</p>
-    <button id="retry-connection-btn-modal" class="button login-btn">إعادة المحاولة</button>
-  </div>
-</div>
-
-<div id="my-products-modal-main-content">
 <div id="my-products-modal-content" class="modal-content">
   <!-- ✅ تعديل: تحويل زر الإغلاق إلى أيقونة داخل زر لتوحيد التصميم -->
   <button class="close-button" id="my-products-modal-close-btn" aria-label="إغلاق"><i id="my-products-modal-close-icon" class="fas fa-times"></i></button>
@@ -168,25 +157,3 @@
     <!-- سيتم عرض مؤشر التحميل أو جدول المنتجات هنا -->
   </div>
 </div>
-</div>
-
-<script id="my-products-modal-script">
-  // ✅ جديد: التحقق من الاتصال بالإنترنت عند تحميل هذا الجزء
-  (async function() {
-    if (typeof checkInternetConnection === 'undefined') {
-      console.error("utils.js is not loaded. Cannot check internet connection.");
-      return;
-    }
-    const isOnline = await checkInternetConnection();
-    if (!isOnline) {
-      document.getElementById('offline-container-modal').style.display = 'flex';
-      document.getElementById('modal-main-content').style.display = 'none';
-      document.getElementById('retry-connection-btn-modal').addEventListener('click', () => {
-        const user = JSON.parse(localStorage.getItem("loggedInUser"));
-        if (user && typeof showMyProducts === 'function') {
-          showMyProducts(user.user_key);
-        }
-      });
-    }
-  })();
-</script>

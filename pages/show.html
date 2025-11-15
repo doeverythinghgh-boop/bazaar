@@ -81,16 +81,6 @@
     </style>
   </head>
   <body>
-    <!-- ✅ جديد: حاوية رسالة انقطاع الاتصال -->
-    <div id="offline-container" class="offline-container" style="display: none;">
-      <div class="offline-content">
-        <i class="fas fa-exclamation-triangle"></i>
-        <h2>لا يوجد اتصال بالإنترنت</h2>
-        <p>يرجى التحقق من اتصالك بالشبكة والمحاولة مرة أخرى.</p>
-        <button id="retry-connection-btn" class="button login-btn">إعادة المحاولة</button>
-      </div>
-    </div>
-
     <!-- المحتوى الرئيسي للصفحة -->
     <!-- Header بسيط للاتساق -->
     <div class="container" id="header-container">
@@ -134,23 +124,6 @@
     <script src="../js/utils.js"></script>
     <script>
       document.addEventListener("DOMContentLoaded", async () => {
-        // ✅ جديد: التحقق من الاتصال بالإنترنت أولاً
-        const isOnline = await checkInternetConnection();
-        if (!isOnline) {
-          // إظهار رسالة انقطاع الاتصال
-          document.getElementById('offline-container').style.display = 'flex';
-
-          // إخفاء المحتوى الرئيسي للصفحة
-          document.getElementById('header-container').style.display = 'none';
-          document.getElementById('main-content').style.display = 'none';
-
-          // إضافة وظيفة لزر إعادة المحاولة
-          document.getElementById('retry-connection-btn').addEventListener('click', () => {
-            window.location.reload();
-          });
-          return; // إيقاف تحميل باقي السكريبتات
-        }
-
         // الكود الأصلي للصفحة
         const mainCategorySelect = document.getElementById("main-category");
         const subCategorySelect = document.getElementById("sub-category");
