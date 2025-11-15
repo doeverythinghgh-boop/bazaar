@@ -32,9 +32,41 @@ async function showNotificationsLogModal() {
     const newLog = event.detail;
     console.log('[NotificationsModal] تم استقبال إشعار جديد عبر الحدث، سيتم تحديث الواجهة:', newLog);
 
-    // ببساطة، نقوم بإعادة رسم النافذة بالكامل لضمان عرض أحدث البيانات
-    // هذا النهج أبسط وأكثر موثوقية من محاولة تعديل DOM يدويًا.
-    showNotificationsLogModal();
+    // ✅ تحسين: إضافة الإشعار الجديد مباشرة إلى أعلى القائمة بدلاً من إعادة تحميل النافذة.
+    // هذا يضمن الحفاظ على الترتيب التنازلي ويمنع وميض إعادة التحميل.
+    const listContainer = document.getElementById('notifications-log-list');
+    if (listContainer) {
+      const logDate = new Date(newLog.timestamp).toLocaleString('ar-EG', {
+        year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
+      });
+
+      let iconClass = newLog.type === 'sent' ? 'fa-paper-plane' : 'fa-inbox';
+      let statusClass = newLog.type;
+      let titlePrefix = newLog.type === 'sent' ? `إلى: ${newLog.relatedUser.name}` : `من: ${newLog.relatedUser.name}`;
+
+      if (newLog.status === 'failed') {
+        statusClass += ' failed';
+        iconClass = 'fa-exclamation-triangle';
+      }
+
+      const newItemHTML = `
+        <div class="notification-log-item ${statusClass}">
+          <i class="fas ${iconClass} notification-log-icon"></i>
+          <div class="notification-log-content">
+            <h4>${newLog.title}</h4>
+            <p>${newLog.body}</p>
+            <p><em>${titlePrefix}</em></p>
+            ${newLog.status === 'failed' ? `<p style="color: #e74c3c;"><strong>سبب الفشل:</strong> ${newLog.errorMessage || 'غير معروف'}</p>` : ''}
+            <div class="notification-log-timestamp">${logDate}</div>
+          </div>
+        </div>`;
+      
+      // إضافة العنصر الجديد في بداية القائمة
+      listContainer.insertAdjacentHTML('afterbegin', newItemHTML);
+    } else {
+      // كحل بديل إذا لم تكن القائمة موجودة (مثلاً كانت فارغة)، أعد تحميل النافذة
+      showNotificationsLogModal();
+    }
   };
 
   // ✅ جديد: إضافة مستمع للحدث عند فتح النافذة
