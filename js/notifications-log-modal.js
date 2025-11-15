@@ -20,17 +20,40 @@ async function showNotificationsLogModal() {
   document.body.classList.add("modal-open");
   modalContainer.style.display = "block";
 
+  // ✅ جديد: تعريف دالة معالج الحدث لتحديث الواجهة
+  const handleNewNotification = (event) => {
+    const newLog = event.detail;
+    console.log('[NotificationsModal] تم استقبال إشعار جديد عبر الحدث، سيتم تحديث الواجهة:', newLog);
+    // ببساطة، نقوم بإعادة رسم النافذة بالكامل لضمان عرض أحدث البيانات
+    // هذا النهج أبسط وأكثر موثوقية من محاولة تعديل DOM يدويًا.
+    showNotificationsLogModal();
+  };
+
+  // ✅ جديد: إضافة مستمع للحدث عند فتح النافذة
+  window.addEventListener('notificationLogAdded', handleNewNotification);
+
   // 2. إعداد وظيفة الإغلاق
   const closeModal = () => {
     modalContainer.style.display = "none";
     modalContainer.innerHTML = ""; // تنظيف المحتوى عند الإغلاق
     document.body.classList.remove("modal-open");
+    // ✅ جديد: إزالة مستمع الحدث عند إغلاق النافذة لمنع تسرب الذاكرة
+    window.removeEventListener('notificationLogAdded', handleNewNotification);
   };
 
   modalContainer.querySelector("#notifications-log-modal-close-btn").onclick = closeModal;
-  window.addEventListener('click', (event) => {
-    if (event.target == modalContainer) closeModal();
-  }, { once: true });
+  // ✅ إصلاح: استخدام دالة وسيطة لإزالة المستمع بشكل صحيح
+  const handleOutsideClick = (event) => {
+    if (event.target === modalContainer) {
+      closeModal();
+      // إزالة هذا المستمع المحدد بعد استخدامه
+      window.removeEventListener('click', handleOutsideClick);
+    }
+  };
+  // إضافة المستمع الجديد
+  // ملاحظة: لا يمكن استخدام { once: true } هنا لأننا نحتاج إلى إزالة مستمع الإشعارات داخل closeModal
+  window.addEventListener('click', handleOutsideClick);
+
 
   // 3. جلب البيانات من IndexedDB
   // التأكد من وجود الدالة قبل استدعائها

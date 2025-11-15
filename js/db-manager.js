@@ -65,7 +65,14 @@ async function addNotificationLog(notificationData) {
 
     request.onsuccess = () => {
       console.log('[DB] تم إضافة سجل إشعار بنجاح:', notificationData.type);
-      resolve(request.result);
+      // ✅ جديد: إرسال حدث مخصص لإعلام التطبيق بوجود سجل جديد.
+      // هذا يسمح بتحديث الواجهات المفتوحة (مثل نافذة سجل الإشعارات) بشكل فوري.
+      const newLogEvent = new CustomEvent('notificationLogAdded', {
+        // نمرر بيانات الإشعار مع المعرف الجديد الذي تم إنشاؤه بواسطة IndexedDB.
+        detail: { ...notificationData, id: request.result }
+      });
+      window.dispatchEvent(newLogEvent);
+      resolve(request.result); // إرجاع المفتاح الجديد كما كان
     };
 
     request.onerror = (event) => {
