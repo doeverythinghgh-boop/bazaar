@@ -477,3 +477,50 @@ function saveNotificationFromAndroid(notificationJson) {
     console.error("[Auth] خطأ في معالجة الإشعار القادم من الأندرويد:", error);
   }
 }
+
+/**
+ * ✅ جديد: دالة مخصصة ليتم استدعاؤها من كود الأندرويد الأصلي.
+ * تقوم هذه الدالة باستلام دفعة من الإشعارات كـ JSON array string وحفظها في IndexedDB.
+ * @param {string} notificationsJsonArray - سلسلة JSON تحتوي على مصفوفة من الإشعارات.
+ */
+function saveBulkNotificationsFromAndroid(notificationsJsonArray) {
+  console.log("[Auth] تم استدعاء saveBulkNotificationsFromAndroid من الأندرويد:", notificationsJsonArray);
+  try {
+    const notifications = JSON.parse(notificationsJsonArray);
+    if (!Array.isArray(notifications)) {
+      console.error("[Auth] البيانات المستلمة ليست مصفوفة.");
+      return;
+    }
+
+    if (typeof addNotificationLog !== 'function') {
+      console.error("[Auth] الدالة addNotificationLog غير موجودة. تأكد من تحميل ملف db-manager.js.");
+      return;
+    }
+
+    // Process each notification in the array
+    notifications.forEach(notificationData => {
+      const { title, body } = notificationData;
+      if (title && body) {
+        addNotificationLog({
+          type: 'received',
+          title: title,
+          body: body,
+          timestamp: new Date(),
+          status: 'unread',
+          relatedUser: { key: 'admin', name: 'الإدارة' }, 
+          payload: notificationData,
+        });
+      }
+    });
+
+    console.log(`[Auth] تم حفظ ${notifications.length} إشعارًا من الأندرويد بنجاح في IndexedDB.`);
+    
+    // ✅ Optional: Inform native code that processing is complete so it can clear the cache
+    if (window.Android && typeof window.Android.onPendingNotificationsProcessed === 'function') {
+      window.Android.onPendingNotificationsProcessed();
+    }
+
+  } catch (error) {
+    console.error("[Auth] خطأ في معالجة دفعة الإشعارات القادمة من الأندرويد:", error);
+  }
+}
