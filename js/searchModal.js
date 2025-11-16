@@ -60,11 +60,12 @@ async function initSearchModal(containerId, openTriggerId) {
       // ✅ جديد: إيقاف حركة الزر بمجرد بدء البحث
       performSearchBtn.classList.remove('is-pulsing');
 
-      const searchTerm = searchModalInput.value.trim();
+      // ✅ تحسين: تنقيح النص العربي من التشكيل والهمزات قبل إرساله للبحث
+      const searchTerm = normalizeArabicText(searchModalInput.value.trim());
       const mainCategory = mainCategoryFilter.value;
       const subCategory = subCategoryFilter.value;
 
-      // ✅ جديد: تسجيل معايير البحث من الواجهة الأمامية لتسهيل التصحيح
+      // ✅ تحسين: تسجيل معايير البحث (بعد التنقيح) لتسهيل التصحيح
       console.log(`[SearchModal] Starting search with: searchTerm='${searchTerm}', mainCategory='${mainCategory}', subCategory='${subCategory}'`);
 
       // لا تقم بالبحث إذا كان حقل البحث فارغًا ولم يتم تحديد أي فئة

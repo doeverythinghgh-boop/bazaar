@@ -311,7 +311,7 @@ window.productModule = (function() {
     const errorDiv = element.parentElement.querySelector('.error-message');
     if (errorDiv) errorDiv.remove();
   }
-  // حالة داخلية: مصفوفة من الكائنات {id, file, compressedBlob, status}
+
   /**
    * يحول البايت إلى صيغة قابلة للقراءة (KB, MB, ...).
    * @param {number} bytes - الحجم بالبايت.
@@ -605,14 +605,16 @@ window.productModule = (function() {
 
   // إخفاء رسائل الخطأ عند التفاعل مع حقول الكمية والسعر
   quantityInput.addEventListener('input', () => {
-    // جديد: إزالة أي شيء ليس رقمًا صحيحًا
-    quantityInput.value = quantityInput.value.replace(/[^0-9]/g, '');
+    // ✅ تحسين: تحويل الأرقام الهندية والسماح بالأرقام الإنجليزية فقط
+    let value = normalizeDigits(quantityInput.value);
+    quantityInput.value = value.replace(/[^0-9]/g, '');
     if (quantityInput.value) clearError(quantityInput);
   });
 
   priceInput.addEventListener('input', () => {
-    // جديد: إزالة أي شيء ليس رقمًا أو نقطة عشرية
-    let value = priceInput.value.replace(/[^0-9.]/g, '');
+    // ✅ تحسين: تحويل الأرقام الهندية والسماح بالأرقام والنقاط فقط
+    let value = normalizeDigits(priceInput.value);
+    value = value.replace(/[^0-9.]/g, '');
     // التأكد من وجود نقطة عشرية واحدة فقط
     const parts = value.split('.');
     if (parts.length > 2) {
@@ -624,7 +626,9 @@ window.productModule = (function() {
   
   // جديد: التحقق من حقل السعر قبل الخصم
   originalPriceInput.addEventListener('input', () => {
-    let value = originalPriceInput.value.replace(/[^0-9.]/g, '');
+    // ✅ تحسين: تحويل الأرقام الهندية
+    let value = normalizeDigits(originalPriceInput.value);
+    value = value.replace(/[^0-9.]/g, '');
     const parts = value.split('.');
     if (parts.length > 2) {
       value = parts[0] + '.' + parts.slice(1).join('');
@@ -855,15 +859,15 @@ window.productModule = (function() {
       }
 
       const productData = {
-        productName: document.getElementById('product-name').value, // جديد
+        productName: normalizeArabicText(document.getElementById('product-name').value.trim()), // ✅ تحسين: تنقيح النص قبل الحفظ
         user_key: user.user_key,
         product_key: productSerial,
-        product_description: document.getElementById('product-description').value,
+        product_description: normalizeArabicText(document.getElementById('product-description').value.trim()), // ✅ تحسين: تنقيح النص قبل الحفظ
         product_price: document.getElementById('product-price').value,
         product_quantity: document.getElementById('product-quantity').value,
         original_price: document.getElementById('original-price').value || null, // جديد
-        user_message: document.getElementById('seller-message').value,
-        user_note: document.getElementById('product-notes').value,
+        user_message: normalizeArabicText(document.getElementById('seller-message').value.trim()), // ✅ تحسين: تنقيح النص قبل الحفظ
+        user_note: normalizeArabicText(document.getElementById('product-notes').value.trim()), // ✅ تحسين: تنقيح النص قبل الحفظ
         ImageName: finalImageNames.join(','), // استخدام القائمة النهائية للصور
         MainCategory: document.getElementById('main-category').value, // جديد
         SubCategory: document.getElementById('sub-category').value,   // جديد

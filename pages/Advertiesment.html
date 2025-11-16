@@ -448,10 +448,83 @@ window.adverModule = (function() {
     fileInput.removeAttribute('capture');
     fileInput.click();
   });
+
+  // ✅ جديد: منطق مشروط ومحسّن لزر الكاميرا
   takePhotoBtn.addEventListener('click', () => {
-    fileInput.setAttribute('capture', 'environment');
-    fileInput.click();
+    // 1. التحقق إذا كان الجهاز محمولاً
+    const isMobile = /Mobi|Android|iPhone/i.test(navigator.userAgent);
+
+    if (isMobile) {
+      // السلوك الحالي للهواتف: استخدام capture لفتح تطبيق الكاميرا الأصلي
+      console.log('[AdverForm Camera] Mobile device detected. Using capture attribute.');
+      fileInput.setAttribute('capture', 'environment');
+      fileInput.click();
+    } else {
+      // السلوك الجديد لأجهزة سطح المكتب: استخدام getUserMedia
+      console.log('[AdverForm Camera] Desktop device detected. Using getUserMedia API.');
+      openDesktopCamera();
+    }
   });
+
+  /**
+   * ✅ جديد: دالة لفتح كاميرا الويب على أجهزة سطح المكتب.
+   *    (هذه الدالة مضافة داخل نطاق <script> الخاص بموديول الإعلانات)
+   */
+  async function openDesktopCamera() {
+    // ملاحظة: الحاوية camera-modal-container موجودة بالفعل في admin.html
+    const cameraModalContainer = document.getElementById('camera-modal-container');
+    if (!cameraModalContainer) {
+      console.error('Camera modal container not found in admin.html!');
+      return;
+    }
+
+    // 1. إنشاء واجهة المستخدم لنافذة الكاميرا
+    cameraModalContainer.innerHTML = `
+      <div class="modal-content camera-modal-content">
+        <button class="close-button" id="camera-modal-close-btn" aria-label="إغلاق"><i class="fas fa-times"></i></button>
+        <video id="camera-preview" autoplay playsinline></video>
+        <canvas id="camera-canvas" style="display:none;"></canvas>
+        <div class="camera-controls">
+          <button id="capture-photo-btn" class="btn btn-primary"><i class="fas fa-camera"></i> التقاط الصورة</button>
+        </div>
+      </div>
+    `;
+    cameraModalContainer.style.display = 'flex';
+
+    const video = document.getElementById('camera-preview');
+    const captureBtn = document.getElementById('capture-photo-btn');
+    const closeBtn = document.getElementById('camera-modal-close-btn');
+
+    // 2. طلب الوصول إلى الكاميرا
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+      video.srcObject = stream;
+
+      const closeStream = () => {
+        stream.getTracks().forEach(track => track.stop());
+        cameraModalContainer.style.display = 'none';
+        cameraModalContainer.innerHTML = '';
+      };
+
+      closeBtn.onclick = closeStream;
+
+      captureBtn.onclick = () => {
+        const canvas = document.getElementById('camera-canvas');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        canvas.getContext('2d').drawImage(video, 0, 0);
+        canvas.toBlob(blob => {
+          handleNewFiles([blob]); // استخدام نفس الدالة لمعالجة الصورة الملتقطة
+          closeStream(); // إغلاق النافذة بعد الالتقاط
+        }, 'image/jpeg', 0.9);
+      };
+    } catch (err) {
+      console.error("Error accessing camera: ", err);
+      Swal.fire({ title: 'خطأ!', text: 'لم نتمكن من الوصول إلى الكاميرا. يرجى التأكد من منح الإذن اللازم.', icon: 'error', target: document.getElementById('modal-main-content') });
+      cameraModalContainer.style.display = 'none';
+    }
+  }
+
   clearAllBtn.addEventListener('click', clearAll);
   fileInput.addEventListener('change', (e) => handleNewFiles(e.target.files));
 
