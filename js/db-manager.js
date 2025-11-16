@@ -13,7 +13,7 @@ let db;
  * يفتح أو ينشئ قاعدة البيانات ويهيئ مخازن الكائنات.
  * @returns {Promise<IDBDatabase>} كائن قاعدة البيانات.
  */
-function initDB() {
+async function initDB() {
   return new Promise((resolve, reject) => {
     if (db) {
       return resolve(db);
@@ -144,4 +144,4 @@ async function clearNotificationLogs() {
   });
 }
 // قم بتهيئة قاعدة البيانات عند تحميل السكريبت
- initDB();
+initDB();
