@@ -77,12 +77,12 @@ export default async function handler(request) {
     let args = [];
     let logMessage = '';
 
-    if (isSeller === 1) {
+    if (userRole === 1) {
       // حالة البائع: فلترة المنتجات بناءً على seller_key
       whereClause = 'WHERE oi.seller_key = ?';
       args.push(userKey); // userKey is guaranteed to exist here
       logMessage = `Filtering by seller_key: ${userKey} (is_seller = 1).`;
-    } else if (isSeller === 3) {
+    } else if (userRole === 3) {
       // حالة المشرف: جلب جميع الطلبات
       whereClause = ''; // لا يتم إضافة شرط WHERE
       logMessage = `Fetching all sales movement (is_seller = 3, Admin view).`;
