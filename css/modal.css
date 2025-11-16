@@ -204,3 +204,43 @@
   font-size: 1.2rem;
   color: #f59e0b; /* لون برتقالي تحذيري */
 }
+
+/* ✅ جديد: أنماط محسّنة لنافذة الكاميرا على سطح المكتب */
+.camera-modal-content {
+  /* جعل النافذة أكبر */
+  max-width: 800px; /* زيادة العرض الأقصى */
+  width: 90%; /* عرض مرن للشاشات الأصغر */
+  
+  /* تحسينات التخطيط */
+  margin: 5vh auto; /* هامش علوي مرن يعتمد على ارتفاع الشاشة */
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem; /* مسافة بين الفيديو وأزرار التحكم */
+}
+
+/* فيديو الكاميرا */
+#camera-preview {
+  width: 100%;
+  height: auto;
+  max-height: 70vh; /* تحديد أقصى ارتفاع للفيديو ليتناسب مع الشاشة */
+  object-fit: contain; /* ضمان ظهور الفيديو بالكامل دون قص */
+  border-radius: 12px; /* حواف أكثر نعومة */
+  background-color: #111; /* خلفية داكنة للفيديو */
+  border: 1px solid #333;
+}
+
+/* أزرار التحكم */
+.camera-controls {
+  display: flex;
+  justify-content: center;
+}
+
+/* زر التقاط الصورة */
+#capture-photo-btn {
+  font-size: 1.2rem; /* تكبير الخط */
+  padding: 0.8rem 2rem; /* زيادة الحشو الداخلي */
+  display: flex;
+  align-items: center;
+  gap: 10px; /* مسافة بين الأيقونة والنص */
+}
