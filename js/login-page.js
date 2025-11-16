@@ -115,7 +115,7 @@ function updateViewForLoggedInUser(user) {
       const reportsActions = document.getElementById("reports-actions");
       reportsActions.style.display = "block";
       // ✅ تفعيل: ربط حدث النقر بالزر 
-      document.getElementById("view-sales-movement-btn").addEventListener("click", showSalesMovementModal);
+      document.getElementById("view-sales-movement-btn").addEventListener("click", () => showSalesMovementModal(user.user_key));
     }
   }
 }

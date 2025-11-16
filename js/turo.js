@@ -540,17 +540,18 @@ async function getUserPurchases(userKey) {
 
 /**
  * ✅ جديد: يجلب بيانات حركة المشتريات الكاملة (للمسؤولين والبائعين).
+ * @param {string} userKey - مفتاح المستخدم الذي يطلب التقرير.
  * @returns {Promise<Array|null>} مصفوفة من الطلبات المجمعة أو null في حالة الفشل.
  */
-async function getSalesMovement() {
+async function getSalesMovement(userKey) {
   // ✅ جديد: التحقق من الاتصال بالإنترنت أولاً
   const isOnline = await checkInternetConnection();
   if (!isOnline) {
     return null;
   }
-  console.log(`%c[API] Starting getSalesMovement...`, 'color: blue;');
+  console.log(`%c[API] Starting getSalesMovement for user_key: ${userKey}`, 'color: blue;');
   try {
-    const response = await fetch(`${baseURL}/api/sales-movement`);
+    const response = await fetch(`${baseURL}/api/sales-movement?user_key=${userKey}`);
 
     if (!response.ok) {
       const errorData = await response.json();

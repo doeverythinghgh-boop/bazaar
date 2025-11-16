@@ -64,8 +64,9 @@ function createStatusTimelineHTML(statusDetails) {
 
 /**
  * يعرض نافذة منبثقة بحركة المشتريات لجميع الطلبات.
+ * @param {string} userKey - مفتاح المستخدم الذي يطلب التقرير.
  */
-async function showSalesMovementModal() {
+async function showSalesMovementModal(userKey) {
   const modalContainer = document.getElementById("sales-movement-modal-container");
 
   modalContainer.innerHTML = `
@@ -88,7 +89,7 @@ async function showSalesMovementModal() {
     if (event.target == modalContainer) closeModal();
   }, { once: true });
 
-  const orders = await getSalesMovement();
+  const orders = await getSalesMovement(userKey);
   // ✅ تتبع: تسجيل البيانات فور استلامها من الخادم
   console.log('%c[DEV-LOG] showSalesMovementModal: البيانات المستلمة من getSalesMovement():', 'color: blue; font-weight: bold;', orders);
 
