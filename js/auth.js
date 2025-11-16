@@ -323,6 +323,28 @@ function isUserEligibleForNotifications(user) {
     adminPhoneNumbers.includes(user.phone); // مسؤول
   return isAdvancedUser;
 }
+
+/**
+ * ✅ جديد: يتحقق مما إذا كان المستخدم الحالي مسؤولاً.
+ * @returns {object|null} كائن المستخدم إذا كان مسؤولاً، وإلا `null`.
+ */
+function checkAdminStatus() {
+  console.log('[Auth] Checking admin status...');
+  const loggedInUser = localStorage.getItem("loggedInUser");
+  if (!loggedInUser) {
+    console.log('[Auth] No user is logged in.');
+    return null;
+  }
+
+  const user = JSON.parse(loggedInUser);
+
+  // adminPhoneNumbers معرفة بشكل عام في config.js
+  if (adminPhoneNumbers && adminPhoneNumbers.includes(user.phone)) {
+    console.log(`[Auth] Admin access confirmed for user: ${user.username}`);
+    return user;
+  }
+  return null;
+}
 /**
  * يتحقق من حالة تسجيل دخول المستخدم ويقوم بتحديث واجهة المستخدم بناءً عليها.
  */
