@@ -144,4 +144,4 @@ async function clearNotificationLogs() {
   });
 }
 // قم بتهيئة قاعدة البيانات عند تحميل السكريبت
-initDB();
+await initDB();

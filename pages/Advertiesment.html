@@ -338,6 +338,7 @@ window.adverModule = (function() {
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#d33',
+      target: document.getElementById('modal-main-content'), // ✅ إصلاح: جعل الرسالة تظهر فوق النافذة الحالية
       cancelButtonColor: '#3085d6',
       confirmButtonText: 'موافق',
       cancelButtonText: 'إلغاء'
@@ -581,6 +582,7 @@ window.adverModule = (function() {
       title: 'جاري نشر الإعلان...',
       text: 'الرجاء الانتظار بينما يتم تحديث الصور.',
       allowOutsideClick: false,
+      target: document.getElementById('modal-main-content'), // ✅ إصلاح: جعل الرسالة تظهر فوق النافذة الحالية
       didOpen: () => { Swal.showLoading(); },
     });
 
@@ -691,7 +693,13 @@ window.adverModule = (function() {
         await addUpdate("تم تحديث صور الإعلانات");
       }
 
-      Swal.fire('تم بنجاح!', 'تم نشر الإعلان بنجاح.', 'success').then(() => {
+      // ✅ إصلاح: إضافة خاصية 'target' لضمان ظهور الرسالة فوق النافذة
+      Swal.fire({
+        title: 'تم بنجاح!',
+        text: 'تم نشر الإعلان بنجاح.',
+        icon: 'success',
+        target: document.getElementById('modal-main-content')
+      }).then(() => {
         // إعادة تحميل المعاينة لتحديث الحالة
         initializeAdvertiesmentForm();
       });
@@ -699,7 +707,8 @@ window.adverModule = (function() {
     } catch (error) {
       // ✅ تحسين: تسجيل الخطأ بشكل أوضح للمطور
       console.error('%c[DevLog] Submission failed with critical error. The operation was stopped.', 'color: red; font-weight: bold;', { errorObject: error, fullState: { images, originalImageNames } });
-      Swal.fire('خطأ!', `فشل في نشر الإعلان: ${error.message}`, 'error');
+      // ✅ إصلاح: إضافة خاصية 'target' لضمان ظهور الرسالة فوق النافذة
+      Swal.fire({ title: 'خطأ!', text: `فشل في نشر الإعلان: ${error.message}`, icon: 'error', target: document.getElementById('modal-main-content') });
     }
   });
 
