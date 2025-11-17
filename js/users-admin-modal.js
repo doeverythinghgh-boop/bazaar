@@ -170,7 +170,7 @@ async function initializeUsersAdminLogic(modalContainer) {
         title: 'خطأ',
         text: 'الرجاء كتابة رسالة قبل الإرسال.',
         icon: 'error',
-        target: modalContainer, // ✅ إصلاح: ربط الرسالة بالنافذة المنبثقة لضمان ظهورها في المقدمة
+        target: modalContainer,
       });
       return;
     }
@@ -189,7 +189,7 @@ async function initializeUsersAdminLogic(modalContainer) {
         title: 'تم الإرسال',
         text: 'تم إرسال الإشعار بنجاح.',
         icon: 'success',
-        target: modalContainer, // ✅ إصلاح: ربط الرسالة بالنافذة المنبثقة لضمان ظهورها في المقدمة
+        target: modalContainer,
       });
       messageInput.value = '';
       if (typeof addNotificationLog === 'function' && recipientUser) {
@@ -207,7 +207,7 @@ async function initializeUsersAdminLogic(modalContainer) {
         title: 'فشل الإرسال',
         text: `حدث خطأ: ${result.error}`,
         icon: 'error',
-        target: modalContainer, // ✅ إصلاح: ربط الرسالة بالنافذة المنبثقة لضمان ظهورها في المقدمة
+        target: modalContainer,
       });
       if (typeof addNotificationLog === 'function' && recipientUser) {
         addNotificationLog({
@@ -246,7 +246,12 @@ async function initializeUsersAdminLogic(modalContainer) {
 
     const updateResult = await updateUsers(updates);
     if (updateResult && !updateResult.error) {
-      Swal.fire('تم التحديث!', 'تم حفظ التغييرات بنجاح.', 'success');
+      Swal.fire({
+        title: 'تم التحديث!',
+        text: 'تم حفظ التغييرات بنجاح.',
+        icon: 'success',
+        target: modalContainer
+      });
       // تحديث الحالة الأصلية في الواجهة لتجنب الحفظ المتكرر
       updates.forEach(upd => {
         const selectEl = modalContent.querySelector(`.user-role-select[data-phone="${upd.phone}"]`);
@@ -254,7 +259,9 @@ async function initializeUsersAdminLogic(modalContainer) {
       });
       actionsContainer.style.display = 'none';
     } else {
-      Swal.fire('خطأ!', 'فشل تحديث البيانات.', 'error');
+      Swal.fire({
+        title: 'خطأ!', text: 'فشل تحديث البيانات.', icon: 'error', target: modalContainer
+      });
     }
   });
 }

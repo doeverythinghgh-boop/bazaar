@@ -41,6 +41,9 @@ if (window.Android && typeof window.Android.checkInternetWithToast === 'function
  * @returns {Promise<boolean>} الحالة الجديدة للاتصال.
  */
 async function performActualConnectionCheck() {
+  if (window.Android && typeof window.Android.checkInternetWithToast === 'function') {return;}
+
+
   const now = Date.now();
   lastConnectionCheck = now;
 
@@ -85,6 +88,8 @@ async function performActualConnectionCheck() {
  * ✅ جديد: تبدأ عملية فحص الاتصال الدورية في الخلفية.
  */
 function startPeriodicConnectionCheck() {
+    if (window.Android && typeof window.Android.checkInternetWithToast === 'function') {return;}
+
   console.log('[فحص الشبكة] بدء الفحص الدوري للاتصال بالإنترنت...');
 
   // 1. قم بإجراء فحص فوري عند بدء التشغيل لتحديد الحالة الأولية

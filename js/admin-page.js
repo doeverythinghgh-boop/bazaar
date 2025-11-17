@@ -175,6 +175,7 @@ async function showAdvertiesmentModal() {
     // استدعاء دالة التهيئة مباشرة بعد إضافة السكريبت
     if (typeof initializeAdvertiesmentForm === "function") {
         initializeAdvertiesmentForm();
+        initializeAdvertiesmentForm(adverModal); // ✅ تمرير حاوية المودال
     }
     document.body.removeChild(newScript); // تنظيف
   }
