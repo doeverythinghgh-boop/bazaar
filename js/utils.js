@@ -123,3 +123,13 @@ function normalizeArabicText(text) {
   return text;
 }
 
+/**
+ * ✅ جديد: ينتقل إلى صفحة تسجيل الدخول ويفتح نافذة سجل الإشعارات عند التحميل.
+ * يستخدم sessionStorage لتمرير طلب فتح النافذة إلى الصفحة التالية.
+ */
+function redirectToLoginAndShowNotifications() {
+  // استخدام sessionStorage لتمرير الحالة إلى الصفحة التالية
+  sessionStorage.setItem('openNotificationsOnLoad', 'true');
+  // الانتقال إلى صفحة تسجيل الدخول
+  window.location.href = 'login.html';
+}
