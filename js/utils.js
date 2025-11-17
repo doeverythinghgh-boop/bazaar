@@ -161,7 +161,6 @@ function normalizeArabicText(text) {
 
 /**
  * ✅ تعديل: تفتح نافذة سجل الإشعارات مباشرة في الصفحة الحالية.
- * لم تعد تقوم بإعادة التوجيه إلى صفحة تسجيل الدخول.
  */
 async function showNotificationsModal() {
   const loggedInUserJSON = localStorage.getItem("loggedInUser");
