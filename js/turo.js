@@ -668,11 +668,27 @@ window.showProductDetails = async function(productData, onCloseCallback) {
  * @description يملأ تفاصيل المنتج ويربط الأحداث بعد تحميل محتوى النافذة المنبثقة.
  */
 function populateProductDetails(productData, onCloseCallback) {
-  document.getElementById("product-modal-quantity").textContent = productData.availableQuantity;
-  // ✅ تعديل: التعامل مع السعر قبل الخصم
-  document.getElementById("product-modal-price").textContent = `${productData.pricePerItem} جنيه`;
   document.getElementById("product-modal-description").textContent = productData.description || "لا يوجد وصف متاح.";
   document.getElementById("product-modal-seller-message").textContent = productData.sellerMessage || "لا توجد رسالة من البائع.";
+
+  // ✅ جديد: إخفاء حقول السعر والكمية إذا كانت الفئة هي "الخدمات العامة" (id=6)
+  const isServiceCategory = productData.MainCategory == '6';
+  const quantityContainer = document.getElementById("product-modal-quantity-container");
+  const priceContainer = document.getElementById("product-modal-price-container");
+  const cartActionsContainer = document.getElementById("product-modal-cart-actions");
+
+  if (isServiceCategory) {
+    quantityContainer.style.display = 'none';
+    priceContainer.style.display = 'none';
+    cartActionsContainer.style.display = 'none';
+  } else {
+    quantityContainer.style.display = 'block';
+    priceContainer.style.display = 'block';
+    cartActionsContainer.style.display = 'block';
+    document.getElementById("product-modal-quantity").textContent = productData.availableQuantity;
+    document.getElementById("product-modal-price").textContent = `${productData.pricePerItem} جنيه`;
+  }
+
 
   // تعبئة معرض الصور
   const mainImage = document.getElementById("product-modal-image");
@@ -704,17 +720,18 @@ function populateProductDetails(productData, onCloseCallback) {
   const originalPriceEl = document.getElementById("product-modal-original-price");
   // ✅ تحسين: التحقق من وجود القيم قبل المقارنة لتجنب الأخطاء
   const originalPrice = productData.original_price ? parseFloat(productData.original_price) : 0;
-  const currentPrice = productData.pricePerItem ? parseFloat(productData.pricePerItem) : 0;
-
-  if (originalPrice > 0 && originalPrice !== currentPrice) {
-    console.log('[Modal] Displaying original price.');
-    originalPriceEl.textContent = `${originalPrice.toFixed(2)} جنيه`;
-    originalPriceContainer.style.display = 'block'; // إظهار الحاوية بأكملها
-  } else {
-    console.log('[Modal] Hiding original price.');
-    // ✅ إصلاح: إفراغ المحتوى بالإضافة إلى الإخفاء لمنع ظهور "undefined"
-    originalPriceContainer.style.display = 'none'; // إخفاء الحاوية بأكملها
-    originalPriceEl.textContent = '';
+  // ✅ تعديل: إظهار السعر الأصلي فقط إذا لم تكن خدمة
+  if (!isServiceCategory) {
+    const currentPrice = productData.pricePerItem ? parseFloat(productData.pricePerItem) : 0;
+    if (originalPrice > 0 && originalPrice !== currentPrice) {
+      console.log('[Modal] Displaying original price.');
+      originalPriceEl.textContent = `${originalPrice.toFixed(2)} جنيه`;
+      originalPriceContainer.style.display = 'block'; // إظهار الحاوية بأكملها
+    } else {
+      console.log('[Modal] Hiding original price.');
+      originalPriceContainer.style.display = 'none'; // إخفاء الحاوية بأكملها
+      originalPriceEl.textContent = '';
+    }
   }
 
 
@@ -739,6 +756,12 @@ function populateProductDetails(productData, onCloseCallback) {
   const increaseBtn = document.getElementById('product-modal-increase-quantity');
   const selectedQuantityInput = document.getElementById('product-modal-selected-quantity');
   const totalPriceEl = document.getElementById('product-modal-total-price');
+
+  // ✅ جديد: لا تقم بتهيئة عناصر التحكم بالكمية إذا كانت من فئة الخدمات
+  if (isServiceCategory) {
+    // لا تفعل شيئًا، فقد تم إخفاء الحاوية بالفعل
+    return;
+  }
 
   console.log('[Modal] Initializing quantity controls.');
   // تعيين الحد الأقصى للكمية
