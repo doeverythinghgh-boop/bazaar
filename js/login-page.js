@@ -171,21 +171,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // إضافة مستمع لحدث الإدخال لتنقية رقم الهاتف في الوقت الفعلي
   phoneInput.addEventListener("input", function (e) {
-    let value = e.target.value;
-    // تعريف قاموس لتحويل الأرقام الهندية إلى الإنجليزية
-    const hindiToArabic = {
-      "٠": "0", "١": "1", "٢": "2", "٣": "3", "٤": "4",
-      "٥": "5", "٦": "6", "٧": "7", "٨": "8", "٩": "9",
-    };
-
-    // استبدال الأرقام الهندية بالإنجليزية
-    value = value.replace(/[٠-٩]/g, (d) => hindiToArabic[d]);
-
-    // إزالة أي حرف ليس رقمًا (0-9)
-    value = value.replace(/[^0-9]/g, "");
-
-    // تحديث قيمة الحقل
-    e.target.value = value;
+    // ✅ تحسين: استخدام دالة normalizeDigits الموحدة من utils.js
+    const normalized = normalizeDigits(e.target.value);
+    // إزالة أي حرف ليس رقمًا (0-9) بعد التحويل
+    e.target.value = normalized.replace(/[^0-9]/g, "");
   });
 
   // إضافة مستمع لحدث الإرسال للنموذج
@@ -252,12 +241,14 @@ document.addEventListener("DOMContentLoaded", () => {
           },
           preConfirm: async (password) => {
             const passwordInput = document.getElementById('swal-password-input');
-            const passwordValue = passwordInput.value;
+            let passwordValue = passwordInput.value;
 
             if (!passwordValue) {
               Swal.showValidationMessage(`كلمة المرور لا يمكن أن تكون فارغة`);
               return;
             }
+            // ✅ جديد: استخدام normalizeDigits لتحويل أي أرقام هندية في كلمة المرور
+            passwordValue = normalizeDigits(passwordValue);
             const verificationResult = await verifyUserPassword(phoneValue, passwordValue);
             if (verificationResult.error) {
               Swal.showValidationMessage(`خطأ: ${verificationResult.error}`);
