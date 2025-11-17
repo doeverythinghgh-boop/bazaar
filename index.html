@@ -104,6 +104,28 @@
     <!-- ✅ جديد: حاوية لنافذة البحث المنبثقة (سيتم ملؤها بواسطة JS) -->
     <div id="search-modal-container"></div>
 
+    <!-- ✅ إصلاح شامل: إضافة جميع حاويات النوافذ المنبثقة لضمان توفرها في كل الصفحات -->
+    <!-- حاوية فارغة لنافذة "إضافة منتج". سيتم ملؤها بالمحتوى عند الحاجة. -->
+    <div id="add-product-modal" class="modal"></div>
+    <!-- حاوية فارغة لنافذة "سلة المشتريات". -->
+    <div id="cart-modal-container" class="modal"></div>
+    <!-- حاوية فارغة لنافذة "سجل المشتريات". -->
+    <div id="purchases-modal-container" class="modal"></div>
+    <!-- حاوية فارغة لنافذة "منتجاتي" الخاصة بالبائع. -->
+    <div id="my-products-modal-container" class="modal"></div>
+    <!-- حاوية فارغة لنافذة تقرير "حركة المشتريات". -->
+    <div id="sales-movement-modal-container" class="modal"></div>
+    <!-- حاوية فارغة لنافذة "إدارة المستخدمين" الخاصة بالمسؤول. -->
+    <div id="users-modal-container" class="modal"></div>
+    <!-- حاوية فارغة لنافذة "سجل الإشعارات". -->
+    <div id="notifications-log-modal-container" class="modal"></div>
+    <!-- حاوية فارغة لنافذة "الكاميرا" التي تستخدم لالتقاط الصور من أجهزة سطح المكتب. -->
+    <div id="camera-modal-container" class="modal"></div>
+    <!-- 
+      ملاحظة: حاوية product-details-modal موجودة بالفعل، لذلك لا حاجة لإضافتها مرة أخرى.
+    -->
+
+
     <script id="config-script" src="js/config.js"></script> <!-- ✅ إضافة: تحميل ملف الإعدادات أولاً -->
     <script id="utils-script" src="js/utils.js"></script> <!-- ✅ جديد: تحميل ملف الدوال المساعدة -->
     <script id="turo-script" src="js/turo.js"></script> <!-- ✅ إصلاح: تحميل turo.js مبكرًا لضمان توفر دوال الـ API -->
