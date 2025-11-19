@@ -99,15 +99,13 @@
       "title": "الخدمات العامة",
       "icon": "fas fa-briefcase",
       "subcategories": [
-     { "id": 10, "title": "خدمات طبية", "icon": "fas fa-user-md" },
-   
+    
    
     { "id": 9, "title": "خدمات تعليمية", "icon": "fas fa-chalkboard-teacher" },
    
     { "id": 7, "title": "خدمات تجميلية شخصية", "icon": "fas fa-cut" },
     { "id": 4, "title": "تصميم جرافيك وتصوير", "icon": "fas fa-drafting-compass" },
 
-    { "id": 8, "title": "خدمات تنظيم المناسبات", "icon": "fas fa-birthday-cake" },
   
       { "id": 3, "title": "خدمات الشحن والتوصيل", "icon": "fas fa-shipping-fast" },
     { "id": 5, "title": "خدمات صيانه المركبات", "icon": "fas fa-wrench" },
@@ -194,6 +192,7 @@
       "title": "المناسبات والهدايا",
       "icon": "fas fa-gift",
       "subcategories": [
+            { "id": 8, "title": "خدمات تنظيم المناسبات", "icon": "fas fa-birthday-cake" },
         { "id": 1, "title": "هدايا وترتيبات باقات الورد", "icon": "fas fa-gifts" },
         { "id": 2, "title": "ديكورات وحلي المناسبات", "icon": "fas fa-birthday-cake" },
         { "id": 3, "title": "بطاقات المعايدة والتهنئة", "icon": "fas fa-envelope-open-text" },
@@ -201,6 +200,49 @@
         { "id": 5, "title": "خدمات التصوير والفيديو", "icon": "fas fa-video" },
         { "id": 6, "title": "خدمات تنظيم الحفلات", "icon": "fas fa-calendar-check" }
       ]
+    },{
+  "id": 20,
+  "title": "الخدمات الطبية والرعاية الصحية",
+  "icon": "fas fa-user-md",
+  "subcategories": [
+
+    {
+      "id": 201,
+      "title": "كشف طبيب منزلي",
+      "icon": "fas fa-stethoscope"
+    },
+    {
+      "id": 202,
+      "title": "خدمات الأشعة",
+      "icon": "fas fa-x-ray"
+    },
+    {
+      "id": 203,
+      "title": "تحاليل وفحوصات مخبرية",
+      "icon": "fas fa-vials"
+    },
+    {
+      "id": 204,
+      "title": "الصيدليات وخدمة توصيل الأدوية",
+      "icon": "fas fa-prescription-bottle-medical"
+    },
+    {
+      "id": 205,
+      "title": "تمريض منزلي ورعاية طبية",
+      "icon": "fas fa-user-nurse"
+    },
+    {
+      "id": 206,
+      "title": "العلاج الطبيعي",
+      "icon": "fas fa-dumbbell"
+    },
+    {
+      "id": 208,
+      "title": "رعاية المسنين وذوي الاحتياجات الخاصة",
+      "icon": "fas fa-hands-helping"
     }
+  ]
+}
+
   ]
 }
