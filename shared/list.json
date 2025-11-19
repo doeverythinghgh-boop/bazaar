@@ -111,7 +111,7 @@
   
       { "id": 3, "title": "خدمات الشحن والتوصيل", "icon": "fas fa-shipping-fast" },
     { "id": 5, "title": "خدمات صيانه المركبات", "icon": "fas fa-wrench" },
-    { "id": 6, "title": "خدمات تأجير المركبات", "icon": "fas fa-key" },
+    { "id": 6, "title": "خدمات تأجير المركبات", "icon": "fas fa-key" }
 
 ]
       
