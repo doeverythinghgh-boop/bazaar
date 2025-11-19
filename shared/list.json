@@ -30,10 +30,10 @@
         { "id": 4, "title": "مشروبات وعصائر طبيعية", "icon": "fas fa-blender" },
         { "id": 5, "title": "مواد غذائية معلبة ومجففة", "icon": "fas fa-box-open" },
         { "id": 6, "title": "منتجات الألبان والبيض", "icon": "fas fa-egg" },
-        { "id": 7, "title": "التوابل والأعشاب والمحاصيل الزراعية", "icon": "fas fa-leaf" },
+        { "id": 7, "title": "التوابل والأعشاب", "icon": "fas fa-leaf" },
         { "id": 8, "title": "مكسرات وبذور وفواكه مجففة", "icon": "fas fa-seedling" },
         { "id": 9, "title": "زيوت وسمن ودهون", "icon": "fas fa-oil-can" },
-        { "id": 10, "title": "لحوم ودواجن وأسماك طازجة", "icon": "fas fa-drumstick-bite" },
+        { "id": 10, "title": "لحوم ودواجن وأسماك", "icon": "fas fa-drumstick-bite" },
         { "id": 11, "title": "منتجات غذائية وعضوية", "icon": "fas fa-carrot" },
         { "id": 12, "title": "أطعمة مجمدة ومثلجة", "icon": "fas fa-snowflake" }
       ]
@@ -109,11 +109,9 @@
 
     { "id": 8, "title": "خدمات تنظيم المناسبات", "icon": "fas fa-birthday-cake" },
   
-     { "id": 1, "title": "خدمات الصيانة المنزلية", "icon": "fas fa-tools" },
       { "id": 3, "title": "خدمات الشحن والتوصيل", "icon": "fas fa-shipping-fast" },
     { "id": 5, "title": "خدمات صيانه المركبات", "icon": "fas fa-wrench" },
     { "id": 6, "title": "خدمات تأجير المركبات", "icon": "fas fa-key" },
-        { "id": 2, "title": "خدمات التنظيف والمغاسل", "icon": "fas fa-soap" }
 
 ]
       
@@ -123,14 +121,13 @@
       "title": "سوق المركبات",
       "icon": "fas fa-car",
       "subcategories": [
-        { "id": 1, "title": "سيارات مستعملة وجديدة", "icon": "fas fa-car-side" },
-        { "id": 2, "title": "الدراجات النارية والهوائية", "icon": "fas fa-motorcycle" },
+        { "id": 1, "title": "السيارات", "icon": "fas fa-car-side" },
+        { "id": 2, "title": "الدراجات", "icon": "fas fa-motorcycle" },
         { "id": 3, "title": "قطع الغيار والمحركات والزيوت", "icon": "fas fa-cogs" },
         { "id": 4, "title": "إكسسوارات وكماليات المركبات", "icon": "fas fa-car-battery" },
          { "id": 7, "title": "إطارات وعجلات المركبات", "icon": "fas fa-dot-circle" },
         { "id": 8, "title": "أنظمة الصوت والمرئيات للمركبات", "icon": "fas fa-volume-up" },
-        { "id": 9, "title": "مركبات تجارية وشاحنات", "icon": "fas fa-truck-moving" },
-        { "id": 10, "title": "قوارب ومركبات مائية", "icon": "fas fa-ship" }
+        { "id": 10, "title": "مركبات مائية", "icon": "fas fa-ship" }
       ]
     },
     {
