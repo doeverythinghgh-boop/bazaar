@@ -90,6 +90,11 @@ async function showSalesMovementModal(userKey) {
   }, { once: true });
 
   const orders = await getSalesMovement(userKey);
+  // ✅ جديد: جلب بيانات المستخدم الحالي للتحقق من دوره (بائع أم لا)
+  const loggedInUser = JSON.parse(localStorage.getItem("loggedInUser"));
+  // نفترض أن البائع له is_seller = 1. المسؤولون سيظلون يرون كل شيء.
+  const isSeller = loggedInUser && loggedInUser.is_seller === 1;
+
   // ✅ تتبع: تسجيل البيانات فور استلامها من الخادم
   console.log('%c[DEV-LOG] showSalesMovementModal: البيانات المستلمة من getSalesMovement():', 'color: blue; font-weight: bold;', orders);
 
@@ -135,8 +140,12 @@ async function showSalesMovementModal(userKey) {
         <div class="purchase-item">
           <div class="purchase-item-details">
             <p><strong>رقم الطلب:</strong> ${order.order_key}</p>
-            <p><strong>العميل:</strong> ${order.customer_name} (${order.customer_phone})</p>
-            <p><strong>العنوان:</strong> ${order.customer_address || 'غير محدد'}</p>
+            ${!isSeller ? `
+              <p><strong>العميل:</strong> ${order.customer_name} (${order.customer_phone})</p>
+              <p><strong>العنوان:</strong> ${order.customer_address || 'غير محدد'}</p>
+            ` : `
+              <p><strong>هاتف العميل:</strong> ${order.customer_phone}</p>
+            `}
             <p><strong>تاريخ الطلب:</strong> ${orderDate}</p>
             <p><strong>إجمالي الطلب:</strong> ${order.total_amount.toFixed(2)} جنيه</p>
             <div class="purchase-status-container">
