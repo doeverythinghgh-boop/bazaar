@@ -90,10 +90,11 @@ async function showSalesMovementModal(userKey) {
   }, { once: true });
 
   const orders = await getSalesMovement(userKey);
-  // ✅ جديد: جلب بيانات المستخدم الحالي للتحقق من دوره (بائع أم لا)
+  // ✅ إصلاح: جلب بيانات المستخدم الحالي للتحقق مما إذا كان مسؤولاً أم لا
   const loggedInUser = JSON.parse(localStorage.getItem("loggedInUser"));
-  // نفترض أن البائع له is_seller = 1. المسؤولون سيظلون يرون كل شيء.
-  const isSeller = loggedInUser && loggedInUser.is_seller === 1;
+  // سيتم إخفاء البيانات فقط إذا لم يكن المستخدم مسؤولاً.
+  // adminPhoneNumbers معرفة في js/config.js
+  const isAdmin = loggedInUser && adminPhoneNumbers.includes(loggedInUser.phone);
 
   // ✅ تتبع: تسجيل البيانات فور استلامها من الخادم
   console.log('%c[DEV-LOG] showSalesMovementModal: البيانات المستلمة من getSalesMovement():', 'color: blue; font-weight: bold;', orders);
@@ -139,8 +140,7 @@ async function showSalesMovementModal(userKey) {
       contentHTML += `
         <div class="purchase-item">
           <div class="purchase-item-details">
-            <p><strong>رقم الطلب:</strong> ${order.order_key}</p>
-            ${!isSeller ? `
+            <p><strong>رقم الطلب:</strong> ${order.order_key}</p>            ${isAdmin ? `
               <p><strong>العميل:</strong> ${order.customer_name} (${order.customer_phone})</p>
               <p><strong>العنوان:</strong> ${order.customer_address || 'غير محدد'}</p>
             ` : `
