@@ -180,7 +180,7 @@ async function initializeAddProductForm(editProductData = null) {
       const priceQuantityRow = document.getElementById('price-quantity-row');
       const quantityInput = document.getElementById('product-quantity');
       const priceInput = document.getElementById('product-price');
-      if (selectedCategoryId === '6') { // id=6 هي "الخدمات العامة"
+      if (selectedCategoryId === SERVICE_CATEGORY_NoPrice_ID) { // id=6 هي "الخدمات العامة"
         priceQuantityRow.style.display = 'none';
         quantityInput.required = false; // إلغاء شرط الإدخال الإجباري
         priceInput.required = false;    // إلغاء شرط الإدخال الإجباري
@@ -227,7 +227,7 @@ async function initializeAddProductForm(editProductData = null) {
     document.getElementById('product-notes').value = editProductData.user_note || '';
 
     // ✅ إصلاح شامل: التحقق من الفئة قبل تعبئة السعر والكمية
-    const isServiceCategory = editProductData.MainCategory == '6';
+    const isServiceCategory = editProductData.MainCategory == SERVICE_CATEGORY_NoPrice_ID;
     const quantityInput = document.getElementById('product-quantity');
     const priceInput = document.getElementById('product-price');
     quantityInput.value = isServiceCategory ? 0 : (editProductData.product_quantity || '');
@@ -800,7 +800,7 @@ window.productModule = (function() {
     // 6. التحقق من الكمية
     clearError(quantityInput);
     // ✅ إصلاح: التحقق من الكمية فقط إذا لم تكن من فئة الخدمات
-    if (mainCategoryIdForValidation !== '6' && (!quantityInput.value || parseFloat(quantityInput.value) < 1)) {
+    if (mainCategoryIdForValidation !== SERVICE_CATEGORY_NoPrice_ID && (!quantityInput.value || parseFloat(quantityInput.value) < 1)) {
       showError(quantityInput, 'يجب إدخال كمية متاحة صالحة (1 على الأقل).');
       isValid = false;
     }
@@ -808,7 +808,7 @@ window.productModule = (function() {
     // 7. التحقق من السعر
     clearError(priceInput);
     // ✅ إصلاح: التحقق من السعر فقط إذا لم تكن من فئة الخدمات
-    if (mainCategoryIdForValidation !== '6' && (priceInput.value === '' || parseFloat(priceInput.value) < 0)) {
+    if (mainCategoryIdForValidation !== SERVICE_CATEGORY_NoPrice_ID && (priceInput.value === '' || parseFloat(priceInput.value) < 0)) {
       showError(priceInput, 'يجب إدخال سعر صالح للمنتج.');
       isValid = false;
     }
@@ -821,7 +821,7 @@ window.productModule = (function() {
 
     // ✅ إصلاح شامل: قبل الإرسال، تأكد من أن قيم السعر والكمية هي 0 إذا كانت الفئة هي الخدمات
     const mainCatForSubmit = document.getElementById('main-category').value;
-    if (mainCatForSubmit === '6') {
+    if (mainCatForSubmit === SERVICE_CATEGORY_NoPrice_ID) {
       console.log('[ProductForm] Service category detected. Forcing price and quantity to 0 before submission.');
       document.getElementById('product-price').value = 0;
       document.getElementById('product-quantity').value = 0;

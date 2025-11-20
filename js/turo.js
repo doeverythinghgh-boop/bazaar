@@ -607,7 +607,7 @@ function populateProductDetails(productData, onCloseCallback) {
   document.getElementById("product-modal-seller-message").textContent = productData.sellerMessage || "لا توجد رسالة من البائع.";
 
   // ✅ جديد: إخفاء حقول السعر والكمية إذا كانت الفئة هي "الخدمات العامة" (id=6)
-  const isServiceCategory = productData.MainCategory == '6';
+  const isServiceCategory = productData.MainCategory == SERVICE_CATEGORY_NoPrice_ID;
   const quantityContainer = document.getElementById("product-modal-quantity-container");
   const priceContainer = document.getElementById("product-modal-price-container");
   const cartActionsContainer = document.getElementById("product-modal-cart-actions");

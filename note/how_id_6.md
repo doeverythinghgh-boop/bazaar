@@ -1,118 +1,122 @@
-# آلية التعامل مع الفئة الخاصة (id=6)
+آلية التعامل مع الفئة الخاصة (SERVICE_CATEGORY_NoPrice_ID)
 
-يشرح هذا المستند بالتفصيل كيف يتعامل النظام مع الفئة التي تحمل المعرف `id = 6`، والتي تمثل فئة **"الخدمات العامة"**. يتم التعامل مع هذه الفئة بشكل خاص لضمان أن المنتجات التي تندرج تحتها (وهي خدمات) لا تتطلب سعرًا أو كمية، مما يوفر تجربة مستخدم منطقية وسلسة.
+يشرح هذا المستند بالتفصيل كيف يتعامل النظام مع الفئة التي تحمل المعرف المخزن في:
 
-يتم تطبيق هذا المنطق الخاص في مكانين رئيسيين: عند إضافة المنتج وعند عرضه.
+const SERVICE_CATEGORY_NoPrice_ID = "6";
 
----
+والموجود داخل:
 
-## 1. عند إضافة أو تعديل منتج (`addProduct.html`)
+js/utils.js
 
-عندما يقوم البائع بإنشاء منتج جديد أو تعديل منتج موجود، يتم تطبيق منطق خاص فور اختيار فئة "الخدمات العامة".
+وهي فئة "الخدمات العامة"، والتي يتم التعامل معها بشكل خاص لضمان أن المنتجات التي تندرج تحتها (كونها خدمات) لا تتطلب سعرًا أو كمية. هذا يحقق تجربة مستخدم منطقية ومتسقة.
 
-### أ. التفاعل الفوري في واجهة المستخدم
+يتم تطبيق هذا المنطق في 3 مواقع داخل المشروع:
 
-بمجرد أن يختار البائع الفئة، يتم إخفاء حقول السعر والكمية وإلغاء كونها حقولاً إجبارية.
+عند إضافة المنتج
 
-**الملف:** `pages/addProduct.html`
-**الدالة:** `initializeAddProductForm`
+عند عرض المنتج
 
-```javascript
-// إضافة مستمع للتغيير على الفئة الرئيسية
+عند البحث داخل المنتجات
+
+1. معالجة الفئة داخل صفحة إضافة/تعديل منتج (addProduct.html)
+أ. التفاعل الفوري داخل النموذج
+
+عند اختيار فئة "الخدمات العامة"، يتم إخفاء حقول السعر والكمية، وإلغاء كونها حقولاً إجبارية.
+
+الملف: pages/addProduct.html
+الدالة: initializeAddProductForm
+
 mainCategorySelect.addEventListener("change", (event) => {
   const selectedCategoryId = event.target.value;
 
-  // إظهار أو إخفاء حقول السعر والكمية بناءً على الفئة الرئيسية
   const priceQuantityRow = document.getElementById('price-quantity-row');
   const quantityInput = document.getElementById('product-quantity');
   const priceInput = document.getElementById('product-price');
-  
-  // ---> هنا يكمن المنطق الأساسي <---
-  if (selectedCategoryId === '6') { // id=6 هي "الخدمات العامة"
-    priceQuantityRow.style.display = 'none'; // 1. إخفاء الصف الذي يحتوي على الحقول
-    quantityInput.required = false; // 2. إلغاء شرط الإدخال الإجباري للكمية
-    priceInput.required = false;    // 3. إلغاء شرط الإدخال الإجباري للسعر
+
+  // استخدام المتغير العام بدل الرقم
+  if (selectedCategoryId === SERVICE_CATEGORY_NoPrice_ID) {
+    priceQuantityRow.style.display = 'none';
+    quantityInput.required = false;
+    priceInput.required = false;
   } else {
-    priceQuantityRow.style.display = 'flex'; // 4. إظهار الحقول للفئات الأخرى
+    priceQuantityRow.style.display = 'flex';
     quantityInput.required = true;
     priceInput.required = true;
   }
 });
-```
 
-### ب. التحقق من صحة البيانات عند الإرسال
+ب. التحقق من صحة البيانات عند الإرسال
 
-عند إرسال النموذج، يتجاوز النظام التحقق من وجود قيمة للسعر والكمية إذا كانت الفئة المختارة هي `6`.
+يتم تخطي التحقق من السعر والكمية إذا كانت الفئة هي فئة الخدمات.
 
-**الملف:** `pages/addProduct.html`
-**الحدث:** `form.addEventListener('submit', ...)`
-
-```javascript
 const mainCategoryIdForValidation = document.getElementById('main-category').value;
 
-// 6. التحقق من الكمية
+// التحقق من الكمية
 clearError(quantityInput);
-// ---> هنا يتم تخطي التحقق <---
-if (mainCategoryIdForValidation !== '6' && (!quantityInput.value || parseFloat(quantityInput.value) < 1)) {
+if (mainCategoryIdForValidation !== SERVICE_CATEGORY_NoPrice_ID &&
+    (!quantityInput.value || parseFloat(quantityInput.value) < 1)) {
   showError(quantityInput, 'يجب إدخال كمية متاحة صالحة (1 على الأقل).');
   isValid = false;
 }
 
-// 7. التحقق من السعر
+// التحقق من السعر
 clearError(priceInput);
-// ---> وهنا أيضًا يتم تخطي التحقق <---
-if (mainCategoryIdForValidation !== '6' && (priceInput.value === '' || parseFloat(priceInput.value) < 0)) {
+if (mainCategoryIdForValidation !== SERVICE_CATEGORY_NoPrice_ID &&
+    (priceInput.value === '' || parseFloat(priceInput.value) < 0)) {
   showError(priceInput, 'يجب إدخال سعر صالح للمنتج.');
   isValid = false;
 }
-```
 
-### ج. ضمان سلامة البيانات عند الحفظ
-
-كخطوة وقائية أخيرة قبل إرسال البيانات إلى قاعدة البيانات، يتم تعيين قيمة السعر والكمية إلى `0` بشكل إجباري لضمان اتساق البيانات.
-
-**الملف:** `pages/addProduct.html`
-**الحدث:** `form.addEventListener('submit', ...)`
-
-```javascript
-// قبل الإرسال، تأكد من أن قيم السعر والكمية هي 0 إذا كانت الفئة هي الخدمات
+ج. ضبط القيم قبل حفظ البيانات
 const mainCatForSubmit = document.getElementById('main-category').value;
-if (mainCatForSubmit === '6') {
+
+if (mainCatForSubmit === SERVICE_CATEGORY_NoPrice_ID) {
   console.log('[ProductForm] Service category detected. Forcing price and quantity to 0 before submission.');
   document.getElementById('product-price').value = 0;
   document.getElementById('product-quantity').value = 0;
 }
-```
 
----
+2. عرض تفاصيل المنتج (showProduct.html)
 
-## 2. عند عرض تفاصيل المنتج (`showProduct.html`)
+الملف: js/turo.js
+الدالة: populateProductDetails
 
-عندما يقوم مستخدم بعرض تفاصيل منتج ينتمي لفئة "الخدمات العامة"، يتم تعديل الواجهة لإخفاء المعلومات غير ذات الصلة وأدوات الشراء.
+const isServiceCategory = productData.MainCategory == SERVICE_CATEGORY_NoPrice_ID;
 
-**الملف:** `js/turo.js`
-**الدالة:** `populateProductDetails`
-
-```javascript
-// إخفاء حقول السعر والكمية إذا كانت الفئة هي "الخدمات العامة" (id=6)
-const isServiceCategory = productData.MainCategory == '6';
 const quantityContainer = document.getElementById("product-modal-quantity-container");
 const priceContainer = document.getElementById("product-modal-price-container");
 const cartActionsContainer = document.getElementById("product-modal-cart-actions");
 
-// ---> هنا يتم تكييف واجهة العرض <---
 if (isServiceCategory) {
-  quantityContainer.style.display = 'none'; // 1. إخفاء حاوية الكمية
-  priceContainer.style.display = 'none';     // 2. إخفاء حاوية السعر
-  cartActionsContainer.style.display = 'none'; // 3. إخفاء قسم "إضافة للسلة" بالكامل
+  quantityContainer.style.display = 'none';
+  priceContainer.style.display = 'none';
+  cartActionsContainer.style.display = 'none';
 } else {
-  // إظهار الحقول وتعبئتها للمنتجات العادية
   quantityContainer.style.display = 'block';
   priceContainer.style.display = 'block';
   cartActionsContainer.style.display = 'block';
+
   document.getElementById("product-modal-quantity").textContent = productData.availableQuantity;
   document.getElementById("product-modal-price").textContent = `${productData.pricePerItem} جنيه`;
 }
-```
 
-بهذه الطريقة، يضمن النظام تجربة متسقة ومنطقية عبر التطبيق بأكمله عند التعامل مع هذه الفئة الخاصة.
+3. عرض السعر بشروط داخل نتائج البحث
+
+الملف: js/searchModal.js
+الدالة: displaySearchResults
+
+const isService = product.MainCategory == SERVICE_CATEGORY_NoPrice_ID;
+
+const priceHTML = isService
+  ? ''
+  : `<p class="search-result-price">${product.product_price} جنيه</p>`;
+
+resultsHTML += `
+  <div class="search-result-item" data-product-key="${product.product_key}">
+    <img src="${imageUrl}" alt="${product.productName}" class="search-result-image">
+    <div class="search-result-details">
+      <h4 class="search-result-title">${product.productName}</h4>
+      ${priceHTML}
+    </div>
+  </div>
+`;

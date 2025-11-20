@@ -126,12 +126,16 @@ async function initSearchModal(containerId, openTriggerId) {
         const firstImage = product.ImageName ? product.ImageName.split(',')[0] : 'images/placeholder.png';
         const imageUrl = firstImage.startsWith('http') ? firstImage : `https://pub-e828389e2f1e484c89d8fb652c540c12.r2.dev/${firstImage}`;
         
+        // ✅ جديد: التحقق إذا كان المنتج من فئة الخدمات (id=6) لإخفاء السعر
+        const isService = product.MainCategory == SERVICE_CATEGORY_NoPrice_ID;
+        const priceHTML = isService ? '' : `<p class="search-result-price">${product.product_price} جنيه</p>`;
+        
         resultsHTML += `
           <div class="search-result-item" data-product-key="${product.product_key}">
             <img src="${imageUrl}" alt="${product.productName}" class="search-result-image">
             <div class="search-result-details">
               <h4 class="search-result-title">${product.productName}</h4>
-              <p class="search-result-price">${product.product_price} جنيه</p>
+              ${priceHTML}
             </div>
           </div>
         `;
