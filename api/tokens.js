@@ -30,6 +30,49 @@ export default async function handler(request) {
   }
 
   try {
+// -----------------------------------------------------
+    // ✅ الجزء الجديد: معالجة طلب GET لجلب التوكنات
+    // -----------------------------------------------------
+    if (request.method === "GET") {
+      console.log("[API: /api/tokens] Received GET request to fetch tokens.");
+      
+      // تحليل الـ URL لاستخراج query parameters
+      const url = new URL(request.url);
+      const userKeysQuery = url.searchParams.get("userKeys"); // جلب المفاتيح المرسلة في الرابط
+
+      if (!userKeysQuery) {
+        return new Response(
+          JSON.stringify({ error: "userKeys parameter is required." }),
+          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+      
+      // تحويل سلسلة المفاتيح (مفصولة بفواصل) إلى مصفوفة
+      const userKeys = userKeysQuery.split(',');
+      
+      // بناء استعلام SQL لجلب التوكنات للمفاتيح المحددة
+      // نستخدم علامات الاستفهام (?) كـ placeholders ونمرر userKeys كمصفوفة للـ args
+      const placeholders = userKeys.map(() => '?').join(',');
+      const sqlQuery = `SELECT fcm_token FROM user_tokens WHERE user_key IN (${placeholders})`;
+
+      console.log(`[API: /api/tokens] Fetching tokens for ${userKeys.length} users.`);
+      
+      const result = await db.execute({
+        sql: sqlQuery,
+        args: userKeys, // تمرير المصفوفة هنا
+      });
+
+      // استخلاص التوكنات من نتائج قاعدة البيانات
+      const tokens = result.rows.map(row => row.fcm_token);
+      
+      // إعادة التوكنات كمصفوفة في استجابة JSON
+      return new Response(
+        JSON.stringify({ success: true, tokens: tokens }),
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+
     if (request.method === "POST") {
       console.log("[API: /api/tokens] Received POST request to save token.");
       const { user_key, token, platform } = await request.json();

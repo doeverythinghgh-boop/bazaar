@@ -188,6 +188,20 @@ async function handleCheckout() {
   });
 
   if (result.isConfirmed && result.value && !result.value.error) {
+
+// جلب التوكنات وإرسال الإشعار
+    const sellerKeys = getUniqueSellerKeys(orderData); // دالة جديدة لجمع مفاتيح البائعين من بيانات الطلب
+    const tokens = await getNotificationTokensForOrder(sellerKeys);
+
+    if (tokens.length > 0) {
+        // يتم استدعاء دالة إرسال الإشعار، يُرجح أنها موجودة في 'api/send-notification.js'
+        await sendNotification({
+            tokens: tokens,
+            title: 'طلب شراء جديد',
+            body: `تم استلام طلب شراء جديد رقم #${response.orderId}. يرجى المراجعة.`
+        });
+    }
+
     console.log('[Checkout] نجاح! تم تأكيد الطلب من قبل المستخدم وإنشاءه بنجاح.');
     clearCart(); // هذه الدالة تحذف السلة وتطلق حدث 'cartUpdated'
 
@@ -199,4 +213,96 @@ async function handleCheckout() {
     console.error('[Checkout] فشل! الخادم أعاد خطأ:', result.value.error);
     Swal.fire('حدث خطأ', `فشل إرسال الطلب: ${result.value.error}`, 'error');
   }
+}
+/**
+ * تجلب توكنات إشعارات Firebase (FCM Tokens) لكل من المسؤولين (2) والبائعين المعنيين بالطلب.
+ * * ✅ ملاحظة: هذه الدالة تعتمد على نقطة النهاية (API Endpoint) /api/tokens التي قمنا بتعديلها
+ * لتقبل قائمة المفاتيح عبر متغير الاستعلام (Query Parameter) userKeys.
+ * * @param {Array<string>} sellerKeys - قائمة بمفاتيح البائعين (user_key) الذين يملكون المنتجات في الطلب.
+ * @returns {Promise<Array<string>>} - مصفوفة تحتوي على جميع توكنات الإشعارات الصالحة.
+ */
+async function getNotificationTokensForOrder(sellerKeys) {
+    console.log("[FCM] Preparing to fetch notification tokens.");
+    
+    // 1. تحديد مفاتيح المسؤولين (Admin Keys)
+    const ADMIN_KEYS = [
+        'dl14v1k7', // المفتاح الأول
+        '682dri6b'  // المفتاح الثاني
+    ]; 
+    
+    // 2. دمج مفاتيح البائعين مع مفاتيح المسؤولين وإزالة أي تكرارات
+    // يتم استخدام معامل النشر (...) داخل كائن Set لضمان تفرد كل مفتاح
+    const uniqueUsersKeys = [...new Set([...sellerKeys, ...ADMIN_KEYS])];
+
+    if (uniqueUsersKeys.length === 0) {
+        console.warn("[FCM] No users keys found to fetch tokens for.");
+        return [];
+    }
+
+    // 3. بناء استعلام URL آمن
+    // يتم تحويل المصفوفة إلى سلسلة نصية مفصولة بفواصل
+    const userKeysQuery = uniqueUsersKeys.join(',');
+    
+    // نقطة النهاية المعدلة تستقبل userKeys كـ Query Parameter
+    const apiUrl = `/api/tokens?userKeys=${encodeURIComponent(userKeysQuery)}`;
+
+    try {
+        const response = await fetch(apiUrl, {
+            method: 'GET', // ✅ الآن تدعم GET لجلب التوكنات
+            headers: {
+                'Content-Type': 'application/json',
+                // إذا كانت نقطة النهاية محمية، يجب إضافة توكن المصادقة هنا
+                // 'Authorization': `Bearer ${getUserAuthToken()}`, 
+            },
+        });
+
+        if (!response.ok) {
+            console.error(`[FCM] API Error: Status ${response.status} for ${apiUrl}`);
+            // محاولة قراءة رسالة الخطأ من الاستجابة
+            const errorBody = await response.json();
+            throw new Error(errorBody.error || 'Failed to fetch notification tokens from the server.'); 
+        }
+
+        const result = await response.json();
+
+        // 4. التحقق من هيكل الاستجابة المتوقع وإعادة التوكنات
+        // الاستجابة المتوقعة: { success: true, tokens: ['fcm_token_1', 'fcm_token_2', ...] }
+        if (result && Array.isArray(result.tokens)) {
+            console.log(`[FCM] Successfully fetched ${result.tokens.length} notification tokens.`);
+            return result.tokens;
+        } else {
+            console.warn('[FCM] API returned an invalid or empty token list:', result);
+            return [];
+        }
+
+    } catch (error) {
+        console.error('[FCM] Critical error during token fetch:', error);
+        // في حالة الفشل، نُعيد مصفوفة فارغة لمنع تعطل إرسال الإشعار
+        return []; 
+    }
+}
+/**
+ * تستخلص المفاتيح الفريدة للبائعين (seller_key) من بنية بيانات الطلب (orderData).
+ * @param {object} orderData - هيكل بيانات الطلب الذي يتم إعداده للإرسال إلى API.
+ * @returns {Array<string>} - قائمة بمفاتيح البائعين الفريدة.
+ */
+function getUniqueSellerKeys(orderData) {
+    if (!orderData || !Array.isArray(orderData.items)) {
+        console.error("Invalid order data structure provided.");
+        return [];
+    }
+    
+    // استخدام كائن Set لضمان أن كل مفتاح بائع يظهر مرة واحدة فقط (فريد)
+    const sellerKeys = new Set(); 
+    
+    // المرور على كل عنصر في الطلب
+    orderData.items.forEach(item => {
+        // يتم افتراض أن كل عنصر (item) يحتوي على حقل باسم 'seller_key'
+        if (item.seller_key) {
+            sellerKeys.add(item.seller_key);
+        }
+    });
+    
+    // تحويل الـ Set إلى مصفوفة وإعادتها
+    return Array.from(sellerKeys);
 }
