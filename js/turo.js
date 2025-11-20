@@ -544,6 +544,66 @@ async function sendNotification(token, title, body) {
 }
 
 /**
+ * ✅ جديد: يحدث حالة طلب معين عبر واجهة برمجة التطبيقات.
+ * @param {string} orderKey - المفتاح الفريد للطلب.
+ * @param {number} newStatusId - المعرف الرقمي للحالة الجديدة.
+ * @returns {Promise<Object>} كائن الاستجابة من الخادم.
+ */
+async function updateOrderStatus(orderKey, newStatusId) {
+  console.log(`%c[API] Starting updateOrderStatus for order_key: ${orderKey} to status: ${newStatusId}`, 'color: blue;');
+  try {
+    const response = await fetch(`${baseURL}/api/orders`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        order_key: orderKey,
+        order_status: newStatusId
+      }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      return { error: data.error || `HTTP error! status: ${response.status}` };
+    }
+
+    console.log('%c[API] updateOrderStatus successful.', 'color: green;', data);
+    return data;
+  } catch (error) {
+    console.error('%c[API] updateOrderStatus failed:', 'color: red;', error);
+    return { error: "فشل الاتصال بالخادم عند تحديث حالة الطلب." };
+  }
+}
+/**
+ * @file js/turo.js
+ * @description ... (بقية الوصف كما هو)
+ * ... (بقية الدوال كما هي)
+ */
+
+// ... (الكود السابق للدوال الأخرى)
+
+/**
+ * يعرض نافذة منبثقة تحتوي على تفاصيل المنتج.
+ * @param {object} productData - بيانات المنتج الكاملة.
+ */
+window.showProductDetails = async function(productData, onCloseCallback, options = {}) {
+  // ✅ جديد: التحقق من وجود بيانات الفئة قبل فتح النافذة
+  if (!productData.MainCategory || !productData.SubCategory) {
+    console.error('[Modal] Missing category data. Cannot open product details.', productData);
+    Swal.fire(
+      'خطأ في البيانات',
+      'لا يمكن عرض تفاصيل المنتج لعدم توفر معلومات الفئة.',
+      'error'
+    );
+    // استدعاء دالة رد الاتصال إذا فشل الفتح
+    if (typeof onCloseCallback === 'function') onCloseCallback();
+    return; // إيقاف التنفيذ
+  }
+  
+
+  console.log('%c[Modal] Opening product details modal for:', 'color: darkcyan', productData.productName);
+  const modal = document.getElementById("product-details-modal");
+/**
  * @file js/turo.js
  * @description ... (بقية الوصف كما هو)
  * ... (بقية الدوال كما هي)

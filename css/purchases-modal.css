@@ -186,3 +186,15 @@
 .timeline-step.editable-step {
   cursor: pointer;
 }
+
+/* ✅ تحسين: إضافة تأثير بسيط عند مرور الفأرة لتمييز الخطوات القابلة للنقر */
+.timeline-step.editable-step:hover .timeline-dot {
+  transform: scale(1.5);
+  box-shadow: 0 0 0 4px rgba(46, 204, 113, 0.3);
+}
+
+/* ✅ تحسين: إضافة تأثير بسيط عند مرور الفأرة لتمييز الخطوات القابلة للنقر */
+.timeline-step.editable-step:hover .timeline-dot {
+  transform: scale(1.5);
+  box-shadow: 0 0 0 4px rgba(46, 204, 113, 0.3);
+}
