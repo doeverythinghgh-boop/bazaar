@@ -109,6 +109,10 @@ async function showSalesMovementModal(userKey) {
   // adminPhoneNumbers معرفة في js/config.js
   const isAdmin = loggedInUser && adminPhoneNumbers.includes(loggedInUser.phone);
 
+  // ✅ تتبع للمطور: عرض بيانات المستخدم المسجل دخوله لتأكيد دوره
+  console.log('%c[DEV-LOG] showSalesMovementModal: بيانات المستخدم المسجل دخوله:', 'color: purple;', loggedInUser);
+  console.log(`%c[DEV-LOG] showSalesMovementModal: هل المستخدم مسؤول (isAdmin)؟ -> ${isAdmin}`, 'color: purple;');
+
   // ✅ تتبع: تسجيل البيانات فور استلامها من الخادم
   console.log('%c[DEV-LOG] showSalesMovementModal: البيانات المستلمة من getSalesMovement():', 'color: blue; font-weight: bold;', orders);
 
@@ -123,6 +127,24 @@ async function showSalesMovementModal(userKey) {
     orders.forEach(order => {
       // ✅ تتبع: تسجيل بيانات كل طلب على حدة
       console.log(`%c[DEV-LOG] ... جاري معالجة الطلب: ${order.order_key}`, 'color: darkcyan;', order);
+      
+      // ✅ تتبع للمطور: التحقق من صلاحية التعديل خطوة بخطوة
+      const isSeller = loggedInUser && loggedInUser.is_seller === 1;
+      console.log(`[DEV-LOG] ......... 1. هل المستخدم الحالي بائع (is_seller === 1)؟ -> ${isSeller}`);
+
+      // ✅ تتبع للمطور: فحص مفتاح البائع لكل منتج في الطلب
+      const sellerKeysInOrder = order.items.map(item => item.seller_key);
+      console.log(`[DEV-LOG] ......... 2. مفاتيح البائعين في هذا الطلب:`, sellerKeysInOrder);
+      console.log(`[DEV-LOG] ......... 3. مفتاح المستخدم الحالي (loggedInUser.user_key): "${loggedInUser.user_key}"`);
+
+      // ✅ تتبع للمطور: التحقق من تطابق المفاتيح
+      const isSellerOfThisOrder = isSeller && order.items.some(item => item.seller_key === loggedInUser.user_key);
+      console.log(`[DEV-LOG] ......... 4. هل المستخدم الحالي هو بائع أحد المنتجات في هذا الطلب؟ -> ${isSellerOfThisOrder}`);
+
+      const canEdit = isAdmin || isSellerOfThisOrder;
+      // ✅ تتبع للمطور: النتيجة النهائية لصلاحية التعديل
+      console.log(`%c[DEV-LOG] .........>> النتيجة النهائية: صلاحية التعديل (canEdit) لهذا الطلب هي: ${canEdit}`, 'font-weight: bold; color: green;');
+
       const isoDateTime = order.created_at.replace(' ', 'T') + 'Z';
       const orderDate = new Date(isoDateTime).toLocaleString('ar-EG', {
         year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', timeZone: 'Africa/Cairo'
@@ -166,7 +188,7 @@ async function showSalesMovementModal(userKey) {
               ${createStatusTimelineHTML(
                 order.order_key, 
                 ORDER_STATUSES.find(s => s.id === order.order_status),
-                isAdmin // يمكن للبائع أو المسؤول التعديل
+                canEdit // ✅ إصلاح: تمرير صلاحية التعديل المحسوبة لكل طلب
               )}
             </div>
             <h4>المنتجات:</h4>

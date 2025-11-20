@@ -108,7 +108,8 @@ export default async function handler(request) {
           p.productName,
           p.product_price,
           oi.product_key AS item_product_key,
-          oi.quantity
+          oi.quantity,
+          oi.seller_key -- ✅ إصلاح: إضافة حقل مفتاح البائع من جدول عناصر الطلب
         FROM orders AS o
         JOIN users AS u ON o.user_key = u.user_key
         JOIN order_items AS oi ON o.order_key = oi.order_key
@@ -143,7 +144,8 @@ export default async function handler(request) {
         productName: row.productName,
         product_price: row.product_price,
         quantity: row.quantity,
-        product_key: row.item_product_key
+        product_key: row.item_product_key,
+        seller_key: row.seller_key // ✅ إصلاح: إضافة مفتاح البائع إلى كائن المنتج
       });
     }
 
