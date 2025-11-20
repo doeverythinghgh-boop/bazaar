@@ -550,6 +550,7 @@ async function sendNotification(token, title, body) {
  * @returns {Promise<Object>} كائن الاستجابة من الخادم.
  */
 async function updateOrderStatus(orderKey, newStatusId) {
+window.updateOrderStatus = async function(orderKey, newStatusId) {
   console.log(`%c[API] Starting updateOrderStatus for order_key: ${orderKey} to status: ${newStatusId}`, 'color: blue;');
   try {
     const response = await fetch(`${baseURL}/api/orders`, {

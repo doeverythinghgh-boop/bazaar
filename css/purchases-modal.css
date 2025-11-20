@@ -80,6 +80,9 @@
   text-align: center;
   width: 80px; /* عرض ثابت لكل خطوة */
   opacity: 0.5;
+  /* ✅ إصلاح: جعل الخطوة نفسها في الطبقة العليا لتلقي النقرات */
+  position: relative;
+  z-index: 3;
   transition: opacity 0.4s ease;
 }
 
@@ -91,8 +94,9 @@
   border-radius: 50%;
   border: 3px solid #fff;
   box-shadow: 0 0 0 2px #ccc;
-  transition: all 0.4s ease;
-  z-index: 2;
+  transition: all 0.4s ease;  
+  /* ✅ إصلاح: السماح للنقرات بالمرور من خلال النقطة إلى الحاوية الأب */
+  pointer-events: none;
 }
 
 /* نص المرحلة (قيد المراجعة، تم الشحن، ...) */
@@ -102,6 +106,8 @@
   font-weight: 500;
   color: #888;
   transition: color 0.4s ease;
+  /* ✅ إصلاح: السماح للنقرات بالمرور من خلال النص إلى الحاوية الأب */
+  pointer-events: none;
 }
 
 /* الخط الواصل بين الكرات */
@@ -111,7 +117,6 @@
   background-color: #ccc;
   margin-top: 10px; /* ليكون على نفس مستوى منتصف الكرة */
   transition: background-color 0.4s ease;
-  z-index: 1;
 }
 
 /* --- الأنماط عند تفعيل المرحلة --- */
