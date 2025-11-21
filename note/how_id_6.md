@@ -78,7 +78,7 @@ if (mainCatForSubmit === SERVICE_CATEGORY_NoPrice_ID) {
 
 2. عرض تفاصيل المنتج (showProduct.html)
 
-الملف: js/turo.js
+الملف: js/connectProduct.js
 الدالة: populateProductDetails
 
 const isServiceCategory = productData.MainCategory == SERVICE_CATEGORY_NoPrice_ID;

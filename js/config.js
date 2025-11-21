@@ -21,7 +21,7 @@ const ORDER_STATUS_MAP = {
   REVIEW: {
     id: 0,
     state: "قيد المراجعة",
-    description: "الطلب تم إرساله وينتظر تأكيد البائع و الادارة.",
+    description: "الطلب تم إرساله وينتظر تأكيد البائع.",
   },
   CONFIRMED: {
     id: 1,
@@ -36,7 +36,7 @@ const ORDER_STATUS_MAP = {
   DELIVERED: {
     id: 3,
     state: "تم التسليم",
-    description: "المشتري استلم المنتج بنجاح.",
+    description: "المشتري استلم المنتج.",
   },
   CANCELLED: {
     id: 31,

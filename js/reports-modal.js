@@ -288,7 +288,7 @@ async function showSalesMovementModal(userKey) {
 
       // ✅ إصلاح: جلب بيانات المنتج الكاملة من الواجهة الخلفية باستخدام مفتاح المنتج
       Swal.fire({ title: 'جاري تحميل تفاصيل المنتج...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-      const productData = await getProductByKey(productKey); // افتراض وجود هذه الدالة في turo.js
+      const productData = await getProductByKey(productKey); // افتراض وجود هذه الدالة في connect1.js
       Swal.close();
 
       if (productData) {
