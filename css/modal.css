@@ -13,7 +13,7 @@
   width: 100%;
   height: 100%;
   overflow: auto; /* Enable scroll if needed */
-  background-color: rgba(0, 0, 0, 0.6); /* Black w/ opacity */
+  background-color: rgba(0, 0, 0, 0.5);
   -webkit-backdrop-filter: blur(5px); /* Frosted glass effect */
   backdrop-filter: blur(5px);
   animation: fadeIn 0.3s ease-out;
@@ -21,14 +21,14 @@
 
 /* محتوى النافذة المنبثقة */
 .modal-content {
-  background-color: #fefefe;
+  background-color: var(--bg-color-white);
   margin: 15% auto; /* 15% from the top and centered */
   padding: 30px;
   border: 1px solid #888;
   width: 80%;
   max-width: 600px; /* Max width */
   border-radius: 10px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
   text-align: center;
   position: relative;
   animation: slideIn 0.4s ease-out;
@@ -39,7 +39,7 @@
   font-size: 24px;
   margin-top: 0;
   margin-bottom: 25px;
-  color: #333;
+  color: var(--text-color-dark);
 }
 
 /* تصميم زر الإغلاق في النوافذ المنبثقة */
@@ -49,8 +49,8 @@
   left: 15px; /* For RTL */
   width: 36px;
   height: 36px;
-  background-color: #fee2e2; /* ✅ تعديل: خلفية حمراء فاتحة وناعمة */
-  color: #ef4444; /* ✅ تعديل: لون أيقونة أحمر داكن للتباين */
+  background-color: var(--danger-color-light);
+  color: var(--danger-color-dark);
   border-radius: 50%;
   display: flex;
   border: none; /* ✅ إضافة: إزالة الحدود الافتراضية للزر */
@@ -66,8 +66,8 @@
 }
 
 .close-button:active {
-  background-color: #fecaca; /* ✅ تعديل: لون أغمق قليلاً عند الضغط */
-  transform: scale(0.95); /* تأثير ضغط طفيف */
+  background-color: var(--danger-color-lighter);
+  transform: scale(0.95);
 }
 
 /* Animation for modal background */
@@ -90,157 +90,4 @@
     transform: translateY(0);
     opacity: 1;
   }
-}
-
-/* أنماط خاصة بنافذة البحث المنبثقة */
-.search-modal-content {
-  background-color: #fdfdfd;
-  margin: 10% auto; /* تعديل الهامش العلوي ليكون أقرب للأعلى */
-  padding: 2rem;
-  border: none;
-  width: 90%;
-  max-width: 700px; /* عرض أكبر قليلاً ليناسب البحث */
-  border-radius: 16px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-  text-align: center;
-  position: relative;
-  animation: slideIn 0.4s ease-out;
-}
-
-.search-modal-content h2 {
-  font-family: "Tajawal", sans-serif;
-  font-size: 1.75rem;
-  color: #2c3e50;
-  margin-top: 0;
-  margin-bottom: 2rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-}
-
-/* أنماط خاصة بنافذة عرض تفاصيل المنتج */
-.product-modal-content {
-  margin: 5% auto; /* Adjust margin for better vertical positioning */
-  max-width: 900px; /* Wider modal for product details */
-}
-
-.product-modal-content .close-button {
-  transform: none; /* إلغاء أي تحويل سابق قد يؤثر على الموضع */
-}
-
-/* ✅ جديد: أنماط للعنصر النائب عند فشل تحميل الصورة */
-.image-load-error-placeholder {
-  width: 90px;
-  height: 90px;
-  flex-shrink: 0;
-  background-color: #f1f5f9;
-  border: 1px dashed #cbd5e1;
-  border-radius: 10px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  color: #64748b;
-  font-size: 0.75rem;
-  gap: 5px;
-}
-
-.image-load-error-placeholder i {
-  font-size: 1.2rem;
-  color: #f59e0b; /* لون برتقالي تحذيري */
-}
-
-/* --- أنماط SweetAlert2 المخصصة --- */
-.swal2-password-container {
-  position: relative;
-  width: 100%;
-}
-.swal2-password-container .swal2-input {
-  padding-left: 2.5rem;
-  width: calc(100% - 20px);
-  box-sizing: border-box;
-  display: block;
-  margin: 0 auto;
-}
-.swal2-password-toggle-icon {
-  position: absolute;
-  left: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  cursor: pointer;
-  color: #7066e0;
-}
-.swal2-popup { width: auto !important; max-width: 480px; font-size: 0.9rem; }
-.swal2-title { font-size: 1.25rem !important; }
-.swal2-html-container { font-size: 1rem !important; overflow-x: hidden; word-break: break-word; }
-.swal2-styled { padding: 8px 16px !important; font-size: 0.9rem !important; margin: 5px; }
-@media (max-width: 500px) { .swal2-popup { width: 90% !important; } }
-
-.swal-password-prompt { display: flex; flex-direction: column; align-items: center; gap: 1rem; padding: 10px 0; }
-.swal-password-prompt-icon { font-size: 3rem; color: #3498db; margin-bottom: 0.5rem; }
-.swal-password-prompt-text { font-size: 1rem; color: #5a6a7b; margin: 0; text-align: center; line-height: 1.5; }
-
-/* ✅ جديد: أنماط للعنصر النائب عند فشل تحميل الصورة */
-.image-load-error-placeholder {
-  width: 90px;
-  height: 90px;
-  flex-shrink: 0;
-  background-color: #f1f5f9;
-  border: 1px dashed #cbd5e1;
-  border-radius: 10px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  color: #64748b;
-  font-size: 0.75rem;
-  gap: 5px;
-}
-
-.image-load-error-placeholder i {
-  font-size: 1.2rem;
-  color: #f59e0b; /* لون برتقالي تحذيري */
-}
-
-/* ✅ جديد: أنماط محسّنة لنافذة الكاميرا على سطح المكتب */
-.camera-modal-content {
-  /* جعل النافذة أكبر */
-  max-width: 800px; /* زيادة العرض الأقصى */
-  width: 90%; /* عرض مرن للشاشات الأصغر */
-  
-  /* تحسينات التخطيط */
-  margin: 5vh auto; /* هامش علوي مرن يعتمد على ارتفاع الشاشة */
-  padding: 1.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem; /* مسافة بين الفيديو وأزرار التحكم */
-}
-
-/* فيديو الكاميرا */
-#camera-preview {
-  width: 100%;
-  height: auto;
-  max-height: 70vh; /* تحديد أقصى ارتفاع للفيديو ليتناسب مع الشاشة */
-  object-fit: contain; /* ضمان ظهور الفيديو بالكامل دون قص */
-  border-radius: 12px; /* حواف أكثر نعومة */
-  background-color: #111; /* خلفية داكنة للفيديو */
-  border: 1px solid #333;
-}
-
-/* أزرار التحكم */
-.camera-controls {
-  display: flex;
-  justify-content: center;
-}
-
-/* زر التقاط الصورة */
-#capture-photo-btn {
-  font-size: 1.2rem; /* تكبير الخط */
-  padding: 0.8rem 2rem; /* زيادة الحشو الداخلي */
-  display: flex;
-  align-items: center;
-  gap: 10px; /* مسافة بين الأيقونة والنص */
 }

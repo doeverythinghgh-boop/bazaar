@@ -14,23 +14,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Suez Bazaar</title>
     <!-- Favicon -->
-    <link rel="icon" href="/favicon.ico" type="image/x-icon" />
-    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
-    <!-- ✅ تعديل: تقسيم ملف style.css إلى ملفات أصغر وأكثر تنظيمًا -->
+    <link rel="icon" href="favicon.ico" type="image/x-icon" />
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
+    <!-- CSS Core & Layout -->
     <link rel="stylesheet" href="css/base.css" />
-    <link rel="stylesheet" href="css/header.css" />
-    <link rel="stylesheet" href="css/categories.css" />
-    <link rel="stylesheet" href="css/products-gallery.css" />
+    <link rel="stylesheet" href="css/utilities.css" />
+    <link rel="stylesheet" href="css/layout.css" />
+    <!-- Page-Specific Styles -->
+    <link rel="stylesheet" href="css/index-page.css" />
+    <!-- Non-blocking Modals & Dialogs Styles -->
+    <link rel="preload" href="css/modals-and-dialogs.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="css/modals-and-dialogs.css"></noscript>
     <link rel="stylesheet" href="css/modal.css" />
-    <link rel="stylesheet" href="css/searchModal.css" /> <!-- ✅ جديد: إضافة ملف أنماط نافذة البحث -->
-    <link rel="stylesheet" href="css/adverModule.css" /> <!-- ✅ جديد: إضافة ملف أنماط الإعلانات -->
-    <!-- ✅ إصلاح شامل: إضافة جميع ملفات CSS الخاصة بالنوافذ المنبثقة لضمان عرضها بشكل صحيح -->
-    <link rel="stylesheet" href="css/add-product-modal.css" />
-    <link rel="stylesheet" href="css/cart-modal.css" />
-    <link rel="stylesheet" href="css/purchases-modal.css" />
-    <link rel="stylesheet" href="css/my-products-modal.css" />
-    <link rel="stylesheet" href="css/reports-modal.css" />
-    <link rel="stylesheet" href="css/notifications-log-modal.css" />
+     <link rel="stylesheet" href="css\searchModal.css" />
     <!-- Link to Google Fonts for a more stylish look (Optional) -->
     <link
       id="font-tajawal"
@@ -109,7 +105,7 @@
     </div>
     
     <!-- ✅ جديد: حاوية لنافذة البحث المنبثقة (سيتم ملؤها بواسطة JS) -->
-    <div id="search-modal-container"></div>
+    <div id="search-modal-container" class="modal"></div>
 
     <!-- ✅ إصلاح شامل: إضافة جميع حاويات النوافذ المنبثقة لضمان توفرها في كل الصفحات -->
     <!-- حاوية فارغة لنافذة "إضافة منتج". سيتم ملؤها بالمحتوى عند الحاجة. -->
