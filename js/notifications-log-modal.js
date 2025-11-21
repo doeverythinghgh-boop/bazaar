@@ -35,7 +35,7 @@ async function showNotificationsLogModal() {
 
   await loadAndShowModal(
     "notifications-log-modal-container",
-    "js/notificationsLogModal.html",
+    "pages/notificationsLogModal.html",
     async (modal) => {
       window.addEventListener('notificationLogAdded', handleNewNotification);
 

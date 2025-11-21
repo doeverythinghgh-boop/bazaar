@@ -7,7 +7,7 @@
  * يعرض نافذة منبثقة بمحتويات سلة المشتريات.
  */
 async function showCartModal() {
-  await loadAndShowModal("cart-modal-container", "../js/cartModal.html", (modal) => {
+  await loadAndShowModal("cart-modal-container", "pages/cartModal.html", (modal) => {
     const cart = getCart();
     const modalContent = modal.querySelector(".modal-content");
     const itemsListContainer = modalContent.querySelector("#cart-items-list");

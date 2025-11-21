@@ -10,7 +10,7 @@
 async function showPurchasesModal(userKey) {
   await loadAndShowModal(
     "purchases-modal-container",
-    "js/purchasesModal.html",
+    "pages/purchasesModal.html",
     async (modal) => {
       const contentWrapper = modal.querySelector("#purchases-content-wrapper");
       contentWrapper.innerHTML = '<div class="loader" style="margin: 2rem auto;"></div>';

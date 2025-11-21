@@ -95,7 +95,7 @@ function createStatusTimelineHTML(orderKey, statusDetails, canEdit, userRole) {
  * @param {string} userKey - مفتاح المستخدم الذي يطلب التقرير.
  */
 async function showSalesMovementModal(userKey) {
-  await loadAndShowModal("sales-movement-modal-container", "../js/salesMovementModal.html", async (modal) => {
+  await loadAndShowModal("sales-movement-modal-container", "pages/salesMovementModal.html", async (modal) => {
     const contentWrapper = modal.querySelector("#sales-movement-content-wrapper");
     contentWrapper.innerHTML = '<div class="loader" style="margin: 2rem auto;"></div>';
 

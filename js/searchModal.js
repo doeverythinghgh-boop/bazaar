@@ -18,6 +18,7 @@ async function initSearchModal(containerId, openTriggerId) {
   }
 
   const openModal = async () => {
+    console.log(`%c[SearchModal] بدء عملية فتح نافذة البحث...`, 'color: #0d6efd; font-weight: bold;');
     await loadAndShowModal("search-modal-container", "pages/searchModal.html", async (modal) => {
     const searchModalInput = document.getElementById('search-modal-input');
     const mainCategoryFilter = document.getElementById('main-category-filter');
@@ -232,24 +233,32 @@ async function initSearchModal(containerId, openTriggerId) {
 
     // ✅ جديد: ربط أحداث البحث
     // ✅ تعديل: تغيير الحدث من 'input' إلى 'change' لتنفيذ البحث عند الانتهاء من الكتابة فقط
-    searchModalInput.addEventListener('change', performSearch);
-    mainCategoryFilter.addEventListener('change', performSearch);
-    subCategoryFilter.addEventListener('change', performSearch);
-    // ✅ جديد: ربط حدث النقر على زر البحث لتنفيذ البحث فورًا
-    performSearchBtn.addEventListener('click', performSearch);
+    // ✅ إصلاح: التحقق من وجود العناصر قبل ربط الأحداث لتجنب الأخطاء
+    if (searchModalInput) searchModalInput.addEventListener('change', performSearch);
+    if (mainCategoryFilter) mainCategoryFilter.addEventListener('change', performSearch);
+    if (subCategoryFilter) subCategoryFilter.addEventListener('change', performSearch);
+    if (performSearchBtn) {
+      performSearchBtn.addEventListener('click', performSearch);
+    } else {
+      // رسالة للمطور في حال عدم العثور على الزر
+      console.error('[SearchModal] لم يتم العثور على زر البحث (perform-search-btn) لربط حدث النقر.');
+    }
     
+    // ✅ جديد: إضافة حدث للتحكم في حركة زر البحث أثناء الكتابة
+    searchModalInput.addEventListener('input', () => {
+      if (searchModalInput.value.trim() !== '') {
+        performSearchBtn.classList.add('is-pulsing');
+      } else {
+        performSearchBtn.classList.remove('is-pulsing');
+      }
+    });
+
     setTimeout(() => searchModalInput.focus(), 50);
     });
   };
-  openSearchBtn.addEventListener('click', openModal);
-  // ✅ جديد: إضافة حدث للتحكم في حركة زر البحث أثناء الكتابة
-  const searchInputForAnimation = document.getElementById('search-modal-input');
-  const searchBtnForAnimation = document.getElementById('perform-search-btn');
-  searchInputForAnimation.addEventListener('input', () => {
-    if (searchInputForAnimation.value.trim() !== '') {
-      searchBtnForAnimation.classList.add('is-pulsing');
-    } else {
-      searchBtnForAnimation.classList.remove('is-pulsing');
-    }
+  openSearchBtn.addEventListener('click', () => {
+    // ✅ جديد: إضافة رسالة تتبع للمطور عند النقر على زر البحث
+    console.log(`[SearchModal] تم النقر على زر البحث (ID: ${openTriggerId}).`);
+    openModal();
   });
 }

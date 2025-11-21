@@ -196,12 +196,14 @@ function setupModalLogic(modalId, closeBtnId, options = {}) {
     modalElement.style.display = "block";
     document.body.classList.add("modal-open");
 
+    // ✅ إصلاح: ربط حدث الإغلاق بالزر والخلفية بشكل صحيح
     const closeBtn = document.getElementById(closeBtnId);
     if (closeBtn) closeBtn.onclick = close;
 
-    window.addEventListener('click', (event) => {
+    // ربط حدث النقر على النافذة نفسها (الخلفية)
+    modalElement.onclick = (event) => {
       if (event.target === modalElement) close();
-    }, { once: true });
+    };
   };
 
   return { open, close, modalElement };

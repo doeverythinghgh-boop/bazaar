@@ -140,7 +140,7 @@
   <script src="js/connectUsers.js"></script>
     <script id="cart-script" src="js/cart.js"></script> <!-- ✅ إضافة: تحميل ملف السلة -->
     <script id="adver-module-script" src="js/adverModule.js"></script> <!-- ✅ جديد: إضافة ملف موديول الإعلانات -->
-    <script id="search-modal-script" src="js/searchModal.js"></script> <!-- ✅ جديد: إضافة ملف نافذة البحث -->
+    <script id="search-modal-script" src="js/searchModal.js"></script> <!-- ✅ إصلاح: إزالة defer لضمان تحميل السكريبت قبل استدعاء الدالة -->
     <script src="js/db-manager.js"></script> <!-- مدير قاعدة البيانات المحلي لتسجيل الإشعارات -->
     <script src="js/notifications-log-modal.js"></script> <!-- سكريبت نافذة سجل الإشعارات -->
     <script id="main-script" src="js/main.js"></script>
@@ -487,39 +487,6 @@
         }
       }
 
-      // انتظر حتى يتم تحميل محتوى الصفحة بالكامل
-      document.addEventListener("DOMContentLoaded", async function () {
-        console.log('%c[DOM] اكتمل تحميل محتوى الصفحة (DOMContentLoaded).', 'color: green; font-weight: bold;');
-
-        // ✅ جديد: تشغيل الأنيميشن بشكل مستقل فورًا
-        // هذا يمنع الأنيميشن من حظر تحميل باقي مكونات الصفحة.
-        if (typeof startAnimationCycle === 'function') startAnimationCycle();
-
-        // استدعاء الدالة للتحقق من حالة تسجيل الدخول
-        console.log('[DOM] جاري التحقق من حالة تسجيل الدخول...');
-        checkLoginStatus(); // تبقى لتحديث الواجهة
-        initializeNotifications(); // ✅ حل بديل: إضافة استدعاء دالة الإشعارات الجديدة
-        // استدعاء الدالة الجديدة لتحميل الفئات كجدول
-        console.log('[DOM] جاري تحميل الفئات...');
-        loadCategoriesAsTable();
-        // جديد: تحديث شارة السلة عند تحميل الصفحة
-        console.log('[DOM] جاري تحديث شارة السلة...');
-        updateCartBadge();
-        // جديد: الاستماع لتحديثات السلة لتحديث الشارة
-        window.addEventListener('cartUpdated', updateCartBadge);
-
-        // ✅ جديد: تهيئة نافذة البحث المنبثقة بعد تحميل محتوى الصفحة
-        if (typeof initSearchModal === 'function') {
-          console.log('[DOM] جاري تهيئة نافذة البحث...');
-          // استدعاء الدالة و تمرير معرف الحاوية و معرف زر الفتح
-          initSearchModal('search-modal-container', 'search-icon-btn');
-        }
-
-        // ✅ جديد: تهيئة موديول الإعلانات بعد تحميل محتوى الصفحة
-        if (typeof initAdverModule === 'function') {
-          initAdverModule('advertisement-section');
-        }
-      });
     </script>
     
   </body>

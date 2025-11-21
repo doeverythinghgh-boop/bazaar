@@ -238,16 +238,24 @@ document.addEventListener("DOMContentLoaded", () => {
   // --- Page Visibility Handling ---
   // Restart animation when the tab becomes visible again to prevent it from getting stuck.
   document.addEventListener("visibilitychange", () => {
-    // Check if the page is visible and not hidden
     if (document.visibilityState === "visible") {
-      // Restart the whole animation cycle to ensure it's in a clean state.
       startAnimationCycle();
     }
   });
 
-  // Start the first cycle
-  startAnimationCycle();
-
-  loadCategories(); // Load categories
-
+  // ✅ جديد: تهيئة المكونات الرئيسية بعد تحميل الصفحة
+  console.log('%c[DOM] اكتمل تحميل محتوى الصفحة (DOMContentLoaded).', 'color: green; font-weight: bold;');
+  startAnimationCycle(); // تشغيل الأنيميشن
+  checkLoginStatus();
+  initializeNotifications();
+  loadCategoriesAsTable(); // ✅ جديد: استدعاء دالة تحميل الفئات من index.html
+  updateCartBadge(); // تحديث شارة السلة
+  window.addEventListener('cartUpdated', updateCartBadge); // الاستماع لتحديثات السلة
+  if (typeof initSearchModal === 'function') {
+    console.log('[DOM] جاري تهيئة نافذة البحث...');
+    initSearchModal('search-modal-container', 'search-icon-btn');
+  }
+  if (typeof initAdverModule === 'function') {
+    initAdverModule('advertisement-section');
+  }
 });
