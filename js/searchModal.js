@@ -19,7 +19,7 @@ async function initSearchModal(containerId, openTriggerId) {
 
   const openModal = async () => {
     console.log(`%c[SearchModal] بدء عملية فتح نافذة البحث...`, 'color: #0d6efd; font-weight: bold;');
-    await loadAndShowModal("search-modal-container", "pages/searchModal.html", async (modal) => {
+    await loadAndShowModal(containerId, "pages/searchModal.html", async (modal) => {
     const searchModalInput = document.getElementById('search-modal-input');
     const mainCategoryFilter = document.getElementById('main-category-filter');
     const subCategoryFilter = document.getElementById('sub-category-filter');

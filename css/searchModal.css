@@ -3,6 +3,21 @@
  * @description أنماط نافذة البحث المنبثقة.
  */
 
+/* ✅ جديد: أنماط أساسية للنافذة المنبثقة (Modal) */
+
+.modal-search {
+ position: fixed; /* تثبيت الموضع لتغطية الشاشة بالكامل */
+  z-index: 1000; /* ضمان ظهور النافذة فوق كل العناصر الأخرى */
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto; /* إضافة شريط تمرير إذا كان المحتوى أطول من الشاشة */
+  background-color: rgba(0, 0, 0, 0.6); /* خلفية سوداء شبه شفافة */
+  -webkit-backdrop-filter: blur(5px); /* تأثير ضبابي للخلفية (للمتصفحات الداعمة) */
+  backdrop-filter: blur(5px);
+  animation: fade-in 0.4s ease-out forwards; /* تأثير ظهور تدريجي */
+}
 /* أنماط نافذة البحث المنبثقة */
 .search-modal-content {
   background-color: #ffffff;
@@ -26,6 +41,16 @@
   }
   to {
     transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* ✅ جديد: تأثير الظهور التدريجي للنافذة */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
     opacity: 1;
   }
 }
