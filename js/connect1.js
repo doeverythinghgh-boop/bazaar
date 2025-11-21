@@ -19,35 +19,10 @@
  * @returns {Promise<Object>} كائن يحتوي على بيانات الطلب الذي تم إنشاؤه، أو كائن خطأ في حالة الفشل.
  */
 async function createOrder(orderData) {
-  console.log(
-    "%c[API] Starting createOrder with data:",
-    "color: blue;",
-    orderData
-  );
-  try {
-    // إرسال طلب POST إلى نقطة النهاية الخاصة بالطلبات لإنشاء طلب جديد.
-    const response = await fetch(`${baseURL}/api/orders`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(orderData),
-    });
-
-    // قراءة الاستجابة من الخادم كـ JSON.
-    const data = await response.json();
-
-    // التحقق مما إذا كان الطلب ناجحًا. إذا لم يكن كذلك، قم بإرجاع كائن خطأ.
-    if (!response.ok) {
-      return { error: data.error || `HTTP error! status: ${response.status}` };
-    }
-
-    // تسجيل النجاح وإرجاع البيانات المستلمة.
-    console.log("%c[API] createOrder successful.", "color: green;", data);
-    return data;
-  } catch (error) {
-    // تسجيل أي خطأ يحدث أثناء الاتصال بالشبكة وإرجاع كائن خطأ عام.
-    console.error("%c[API] createOrder failed:", "color: red;", error);
-    return { error: "فشل الاتصال بالخادم عند إنشاء الطلب." };
-  }
+  return await apiFetch('/api/orders', {
+    method: 'POST',
+    body: orderData,
+  });
 }
 
 /**
@@ -57,26 +32,12 @@ async function createOrder(orderData) {
  * @returns {Promise<Array|null>} مصفوفة تحتوي على تفاصيل مشتريات المستخدم، أو `null` في حالة حدوث خطأ.
  */
 async function getUserPurchases(userKey) {
-  console.log(
-    `%c[API] Starting getUserPurchases for user_key: ${userKey}`,
-    "color: blue;"
-  );
   try {
-    // إرسال طلب GET لجلب المشتريات المرتبطة بمفتاح المستخدم المحدد.
-    const response = await fetch(
-      `${baseURL}/api/purchases?user_key=${userKey}`
-    );
-
-    // إذا لم يكن الطلب ناجحًا، اقرأ رسالة الخطأ من الخادم وألقِ خطأ.
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(
-        errorData.error || `HTTP error! status: ${response.status}`
-      );
+    const purchases = await apiFetch(`/api/purchases?user_key=${userKey}`);
+    if (purchases.error) {
+      throw new Error(purchases.error);
     }
 
-    // تحويل الاستجابة إلى JSON.
-    const purchases = await response.json();
     console.log(
       "%c[API] getUserPurchases successful. Raw data:",
       "color: green;",
@@ -105,7 +66,7 @@ async function getUserPurchases(userKey) {
     return purchasesWithStatus;
   } catch (error) {
     // تسجيل أي خطأ وإرجاع `null`.
-    console.error("%c[API] getUserPurchases failed:", "color: red;", error);
+    console.error("%c[getUserPurchases] failed:", "color: red;", error);
     return null;
   }
 }
@@ -117,31 +78,14 @@ async function getUserPurchases(userKey) {
  * @returns {Promise<Array|null>} مصفوفة من الطلبات المجمعة مع تفاصيلها، أو `null` في حالة الفشل.
  */
 async function getSalesMovement(userKey) {
-  console.log(
-    `%c[API] Starting getSalesMovement for user_key: ${userKey}`,
-    "color: blue;"
-  );
   try {
-    // إرسال طلب GET لجلب جميع الطلبات التي يمتلك المستخدم صلاحية رؤيتها.
-    const response = await fetch(
-      `${baseURL}/api/sales-movement?user_key=${userKey}`
-    );
-
-    // معالجة الأخطاء.
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(
-        errorData.error || `HTTP error! status: ${response.status}`
-      );
+    const data = await apiFetch(`/api/sales-movement?user_key=${userKey}`);
+    if (data.error) {
+      throw new Error(data.error);
     }
-
-    // تحويل الاستجابة إلى JSON وإرجاعها.
-    const data = await response.json();
-    console.log("%c[API] getSalesMovement successful.", "color: green;", data);
     return data;
   } catch (error) {
-    // تسجيل أي خطأ وإرجاع `null`.
-    console.error("%c[API] getSalesMovement failed:", "color: red;", error);
+    console.error("%c[getSalesMovement] failed:", "color: red;", error);
     return null;
   }
 }
@@ -155,34 +99,10 @@ async function getSalesMovement(userKey) {
  * @returns {Promise<Object>} كائن يحتوي على نتيجة الإرسال من الخادم، أو كائن خطأ.
  */
 async function sendNotification(token, title, body) {
-  console.log(
-    `%c[API] Starting sendNotification to token: ${token.substring(0, 10)}...`,
-    "color: blue;"
-  );
-  try {
-    // إرسال طلب POST إلى نقطة النهاية المسؤولة عن إرسال الإشعارات.
-    const response = await fetch(`${baseURL}/api/send-notification`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ token, title, body }),
-    });
-
-    // قراءة استجابة الخادم.
-    const data = await response.json();
-
-    // التحقق من نجاح الطلب.
-    if (!response.ok) {
-      return { error: data.error || `HTTP error! status: ${response.status}` };
-    }
-
-    // تسجيل النجاح وإرجاع البيانات.
-    console.log("%c[API] sendNotification successful.", "color: green;", data);
-    return data;
-  } catch (error) {
-    // تسجيل أخطاء الشبكة.
-    console.error("%c[API] sendNotification failed:", "color: red;", error);
-    return { error: "فشل الاتصال بخادم الإشعارات." };
-  }
+  return await apiFetch('/api/send-notification', {
+    method: 'POST',
+    body: { token, title, body },
+  });
 }
 
 /**
@@ -192,35 +112,13 @@ async function sendNotification(token, title, body) {
  * @returns {Promise<Object>} كائن الاستجابة من الخادم.
  */
 async function updateOrderStatus(orderKey, newStatusId) {
-  console.log(
-    `%c[API] Starting updateOrderStatus for order_key: ${orderKey} to status: ${newStatusId}`,
-    "color: blue;"
-  );
-  try {
-    const response = await fetch(`${baseURL}/api/orders`, {
-      // استخدام طريقة PUT لتحديث بيانات موجودة.
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        order_key: orderKey,
-        order_status: newStatusId,
-      }),
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      return {
-        error: data.error || `HTTP error! status: ${response.status}`,
-      };
-    }
-
-    console.log("%c[API] updateOrderStatus successful.", "color: green;", data);
-    return data;
-  } catch (error) {
-    console.error("%c[API] updateOrderStatus failed:", "color: red;", error);
-    return { error: "فشل الاتصال بالخادم عند تحديث حالة الطلب." };
-  }
+  return await apiFetch('/api/orders', {
+    method: 'PUT',
+    body: {
+      order_key: orderKey,
+      order_status: newStatusId,
+    },
+  });
 }
 
 /**
@@ -230,31 +128,10 @@ async function updateOrderStatus(orderKey, newStatusId) {
  * @returns {Promise<Object>} كائن الاستجابة من الخادم، أو كائن خطأ.
  */
 async function addUpdate(text) {
-  console.log(
-    `%c[API] Starting addUpdate with text: "${text}"`,
-    "color: blue;"
-  );
-  try {
-    const response = await fetch(`${baseURL}/api/updates`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ txt: text }),
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      return {
-        error: data.error || `HTTP error! status: ${response.status}`,
-      };
-    }
-
-    console.log("%c[API] addUpdate successful.", "color: green;", data);
-    return data;
-  } catch (error) {
-    console.error("%c[API] addUpdate failed:", "color: red;", error);
-    return { error: "فشل الاتصال بالخادم عند تسجيل التحديث." };
-  }
+  return await apiFetch('/api/updates', {
+    method: 'POST',
+    body: { txt: text },
+  });
 }
 
 /**
@@ -263,24 +140,15 @@ async function addUpdate(text) {
  * @returns {Promise<Object|null>} كائن يحتوي على تاريخ التحديث (`{ datetime: '...' }`)، أو `null` في حالة الفشل.
  */
 async function getLatestUpdate() {
-  console.log(`%c[API] Starting getLatestUpdate...`, "color: blue;");
   try {
-    const response = await fetch(`${baseURL}/api/updates`);
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      // لا نعتبر خطأ 404 (Not Found) خطأً فادحًا، بل يعني أنه لا توجد تحديثات مسجلة بعد.
-      if (response.status === 404) return { datetime: null };
-      throw new Error(
-        errorData.error || `HTTP error! status: ${response.status}`
-      );
-    }
-
-    const data = await response.json();
-    console.log("%c[API] getLatestUpdate successful.", "color: green;", data);
+    const data = await apiFetch('/api/updates', {
+      specialHandlers: {
+        404: () => ({ datetime: null }) // Not a fatal error
+      }
+    });
     return data;
   } catch (error) {
-    console.error("%c[API] getLatestUpdate failed:", "color: red;", error);
+    console.error("%c[getLatestUpdate] failed:", "color: red;", error);
     return null;
   }
 }

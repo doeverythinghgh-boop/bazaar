@@ -165,6 +165,92 @@ function normalizeArabicText(text) {
 }
 
 /**
+ * ✅ جديد: إعداد منطق النافذة المنبثقة (Modal) بشكل معياري.
+ *
+ * هذه الدالة المساعدة تنشئ وتدير دورة حياة نافذة منبثقة.
+ * تتولى إظهار وإخفاء النافذة، إضافة وإزالة فئة `modal-open` من الجسم،
+ * وربط أحداث الإغلاق (زر الإغلاق والنقر على الخلفية).
+ *
+ * @param {string} modalId - معرف (ID) حاوية النافذة المنبثقة.
+ * @param {string} closeBtnId - معرف (ID) زر الإغلاق داخل النافذة.
+ * @param {object} [options] - خيارات إضافية.
+ * @param {function} [options.onClose] - دالة رد اتصال اختيارية يتم استدعاؤها عند إغلاق النافذة.
+ * @returns {{open: function, close: function, modalElement: HTMLElement}|null} - كائن يحتوي على دوال الفتح والإغلاق وعنصر النافذة، أو `null` إذا لم يتم العثور على عنصر النافذة.
+ */
+function setupModalLogic(modalId, closeBtnId, options = {}) {
+  const modalElement = document.getElementById(modalId);
+  if (!modalElement) {
+    console.error(`[Modal Logic] لم يتم العثور على عنصر النافذة بالمعرف: ${modalId}`);
+    return null;
+  }
+
+  const close = () => {
+    modalElement.style.display = "none";
+    document.body.classList.remove("modal-open");
+    if (typeof options.onClose === "function") {
+      options.onClose();
+    }
+  };
+
+  const open = () => {
+    modalElement.style.display = "block";
+    document.body.classList.add("modal-open");
+
+    const closeBtn = document.getElementById(closeBtnId);
+    if (closeBtn) closeBtn.onclick = close;
+
+    window.addEventListener('click', (event) => {
+      if (event.target === modalElement) close();
+    }, { once: true });
+  };
+
+  return { open, close, modalElement };
+}
+
+/**
+ * ✅ جديد: دالة مركزية لإجراء طلبات API.
+ * تغلف منطق fetch، معالجة الأخطاء، وتحويل JSON.
+ * @param {string} endpoint - نقطة النهاية (e.g., '/api/users').
+ * @param {object} [options={}] - خيارات fetch، بما في ذلك method, body, headers.
+ * @returns {Promise<Object>} - بيانات الاستجابة أو كائن خطأ.
+ */
+async function apiFetch(endpoint, options = {}) {
+  const { method = 'GET', body = null, specialHandlers = {}, ...restOptions } = options;
+  const url = `${baseURL}${endpoint}`;
+
+  const fetchOptions = {
+    method,
+    headers: {
+      'Content-Type': 'application/json',
+      ...restOptions.headers,
+    },
+    ...restOptions,
+  };
+
+  if (body) {
+    fetchOptions.body = JSON.stringify(body);
+  }
+
+  console.log(`%c[API Fetch] ${method} ${endpoint}`, 'color: #17a2b8;', body ? { payload: body } : '');
+
+  try {
+    const response = await fetch(url, fetchOptions);
+
+    if (specialHandlers[response.status]) {
+      return specialHandlersresponse.status;
+    }
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      return { error: data.error || `HTTP error! status: ${response.status}` };
+    }
+    return data;
+  } catch (error) {
+    return { error: `فشل الاتصال بالخادم: ${error.message}` };
+  }
+}
+/**
  * ✅ تعديل: تفتح نافذة سجل الإشعارات مباشرة في الصفحة الحالية.
  */
 async function showNotificationsModal() {

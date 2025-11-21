@@ -46,21 +46,12 @@ function showCartModal() {
   modalContent += '</div>';
   cartModal.innerHTML = modalContent;
 
-  // إظهار النافذة
-  document.body.classList.add("modal-open");
-  cartModal.style.display = "block";
-
-  // وظيفة الإغلاق
-  const closeCartModal = () => {
-    cartModal.style.display = "none";
-    document.body.classList.remove("modal-open");
-  };
-
-  // إضافة أحداث الأزرار
-  document.getElementById("cart-modal-close-btn").onclick = closeCartModal;
-  window.addEventListener('click', (event) => {
-    if (event.target == cartModal) closeCartModal();
-  }, { once: true });
+  // ✅ تعديل: استخدام الدالة المساعدة لإدارة النافذة
+  const modalLogic = setupModalLogic(
+    "cart-modal-container",
+    "cart-modal-close-btn"
+  );
+  if (modalLogic) modalLogic.open();
 
   // أحداث أزرار التحكم بالسلة
   document.querySelectorAll('.remove-from-cart-btn').forEach(btn => {

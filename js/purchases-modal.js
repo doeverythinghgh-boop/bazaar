@@ -18,23 +18,19 @@ async function showPurchasesModal(userKey) {
       <div class="loader" style="margin: 2rem auto;"></div>
     </div>`;
   
-  document.body.classList.add("modal-open");
-  purchasesModal.style.display = "block";
-
-  // وظيفة الإغلاق
-  const closePurchasesModal = () => {
-    purchasesModal.style.display = "none";
-    document.body.classList.remove("modal-open");
-  };
-
-  document.getElementById("purchases-modal-close-btn").onclick = closePurchasesModal;
-  window.addEventListener('click', (event) => {
-    if (event.target == purchasesModal) closePurchasesModal();
-  }, { once: true });
+  // ✅ تعديل: استخدام الدالة المساعدة لإدارة النافذة
+  const modalLogic = setupModalLogic(
+    "purchases-modal-container",
+    "purchases-modal-close-btn"
+  );
+  if (!modalLogic) return;
+  modalLogic.open();
 
   // جلب البيانات
   const purchases = await getUserPurchases(userKey);
-  const modalContentEl = purchasesModal.querySelector('.modal-content');
+  // استخدام العنصر من الدالة المساعدة لضمان أنه موجود
+  const modalContentEl = modalLogic.modalElement.querySelector('.modal-content');
+  if (!modalContentEl) return;
 
   // بناء المحتوى بعد جلب البيانات
   let contentHTML = `
@@ -87,5 +83,8 @@ async function showPurchasesModal(userKey) {
 
   modalContentEl.innerHTML = contentHTML;
   // إعادة ربط حدث الإغلاق بعد تحديث المحتوى
-  modalContentEl.querySelector('#purchases-modal-close-btn').onclick = closePurchasesModal;
+  const newCloseBtn = modalContentEl.querySelector('#purchases-modal-close-btn');
+  if (newCloseBtn) {
+    newCloseBtn.onclick = modalLogic.close;
+  }
 }

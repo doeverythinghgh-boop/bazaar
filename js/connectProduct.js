@@ -14,43 +14,10 @@
  * @returns {Promise<Object>} كائن يحتوي على بيانات المنتج الذي تم إنشاؤه، أو كائن خطأ في حالة الفشل.
  */
 async function addProduct(productData) {
-  // تسجيل البيانات المرسلة لتسهيل عملية التصحيح والمتابعة.
-  console.log("%c[API] Starting addProduct with data:", "color: blue;", productData);
-  try {
-    // إرسال طلب POST إلى نقطة النهاية الخاصة بالمنتجات.
-    const response = await fetch(`${baseURL}/api/products`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(productData),
-    });
-
-    // قراءة الاستجابة من الخادم كـ JSON.
-    const data = await response.json();
-
-    // التحقق مما إذا كان الطلب ناجحًا. إذا لم يكن كذلك، يتم تسجيل تفاصيل الخطأ.
-    if (!response.ok) {
-      // تسجيل معلومات مفصلة للمطور عند حدوث خطأ (مثل خطأ 400 بسبب بيانات غير صالحة).
-      console.error(
-        "%c[API Error] addProduct failed with status:",
-        "color: red; font-weight: bold;",
-        response.status
-      );
-      console.error("%c[API Error] Server Response:", "color: red;", data);
-      console.error("%c[API Error] Sent Payload:", "color: red;", productData);
-      // إرجاع كائن خطأ يحتوي على رسالة الخطأ من الخادم أو رسالة عامة.
-      return {
-        error: data.error || `فشل الاتصال بالخادم (Status: ${response.status})`,
-      };
-    }
-
-    // تسجيل النجاح وإرجاع البيانات المستلمة.
-    console.log("%c[API] addProduct successful.", "color: green;", data);
-    return data;
-  } catch (error) {
-    // تسجيل أي خطأ يحدث أثناء الاتصال بالشبكة (مثل انقطاع الإنترنت).
-    console.error("%c[API] addProduct failed:", "color: red;", error);
-    return { error: "فشل الاتصال بالخادم عند إضافة المنتج." };
-  }
+  return await apiFetch('/api/products', {
+    method: 'POST',
+    body: productData,
+  });
 }
 
 /**
@@ -59,41 +26,10 @@ async function addProduct(productData) {
  * @returns {Promise<Object>} الكائن الذي تم تحديثه، أو كائن خطأ في حالة الفشل.
  */
 async function updateProduct(productData) {
-  console.log(
-    "%c[API] Starting updateProduct with data:",
-    "color: blue;",
-    productData
-  );
-  try {
-    // إرسال طلب PUT لتحديث بيانات موجودة.
-    const response = await fetch(`${baseURL}/api/products`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(productData),
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      // تسجيل معلومات مفصلة للمطور عند حدوث خطأ.
-      console.error( 
-        "%c[API Error] updateProduct failed with status:",
-        "color: red; font-weight: bold;",
-        response.status
-      );
-      console.error("%c[API Error] Server Response:", "color: red;", data);
-      console.error("%c[API Error] Sent Payload:", "color: red;", productData);
-      return {
-        error: data.error || `فشل الاتصال بالخادم (Status: ${response.status})`,
-      };
-    }
-
-    console.log("%c[API] updateProduct successful.", "color: green;", data);
-    return data;
-  } catch (error) {
-    console.error("%c[API] updateProduct failed:", "color: red;", error);
-    return { error: "فشل الاتصال بالخادم عند تحديث المنتج." };
-  }
+  return await apiFetch('/api/products', {
+    method: 'PUT',
+    body: productData,
+  });
 }
 
 /**
@@ -102,33 +38,9 @@ async function updateProduct(productData) {
  * @returns {Promise<Object>} كائن الاستجابة من الخادم.
  */
 async function deleteProduct(productKey) {
-  console.log(
-    `%c[API] Starting deleteProduct for product_key: ${productKey}`,
-    "color: blue;"
-  );
-  try {
-    // إرسال طلب DELETE مع تمرير مفتاح المنتج كمعامل استعلام (Query Parameter).
-    const response = await fetch(
-      `${baseURL}/api/products?product_key=${productKey}`,
-      {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-      }
-    );
-
-    const data = await response.json();
-
-    // التحقق من نجاح الطلب.
-    if (!response.ok) {
-      return { error: data.error || `HTTP error! status: ${response.status}` };
-    }
-
-    console.log("%c[API] deleteProduct successful.", "color: green;", data);
-    return data;
-  } catch (error) {
-    console.error("%c[API] deleteProduct failed:", "color: red;", error);
-    return { error: "فشل الاتصال بالخادم عند حذف المنتج." };
-  }
+  return await apiFetch(`/api/products?product_key=${productKey}`, {
+    method: 'DELETE',
+  });
 }
 
 /**
@@ -138,15 +50,11 @@ async function deleteProduct(productKey) {
  * @returns {Promise<Array|null>} مصفوفة من المنتجات أو null في حالة الفشل.
  */
 async function getProductsByCategory(mainCatId, subCatId) {
-  console.log(
-    `%c[API] Starting getProductsByCategory (Main: ${mainCatId}, Sub: ${subCatId})`,
-    "color: blue;"
-  );
   try {
     // التحقق من وجود متغير baseURL لضمان أن الإعدادات تم تحميلها بشكل صحيح.
     if (typeof baseURL === "undefined" || !baseURL) {
       console.error(
-        "%c[API-Debug] متغير baseURL غير معرف أو فارغ! هذا هو سبب فشل fetch.",
+        "%c[API-Debug] متغير baseURL غير معرف أو فارغ!",
         "color: red; font-weight: bold;"
       );
       throw new Error("baseURL is not defined"); // إيقاف التنفيذ إذا كان المتغير غير موجود.
@@ -160,34 +68,13 @@ async function getProductsByCategory(mainCatId, subCatId) {
     if (subCatId) {
       params.append("SubCategory", subCatId);
     }
-    const requestURL = `${baseURL}/api/products?${params.toString()}`;
-    console.log(
-      `%c[API-Debug] Preparing to fetch from URL: ${requestURL}`,
-      "color: magenta;"
-    );
-    // إرسال طلب GET لجلب البيانات.
-    const response = await fetch(requestURL);
-
-    // إذا لم يكن الطلب ناجحًا، اقرأ رسالة الخطأ من الخادم وألقِ خطأ.
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(
-        errorData.error || `HTTP error! status: ${response.status}`
-      );
-    }
-
-    // تحويل الاستجابة إلى JSON وإرجاعها.
-    const data = await response.json();
-    console.log(
-      "%c[API] getProductsByCategory successful.",
-      "color: green;",
-      data
-    );
+    const data = await apiFetch(`/api/products?${params.toString()}`);
+    if (data.error) throw new Error(data.error);
     return data;
   } catch (error) {
     // تسجيل أي خطأ وإرجاع `null`.
     console.error(
-      "%c[API] getProductsByCategory failed:",
+      "%c[getProductsByCategory] failed:",
       "color: red;",
       error
     );
@@ -201,26 +88,11 @@ async function getProductsByCategory(mainCatId, subCatId) {
  * @returns {Promise<Array|null>} مصفوفة من المنتجات أو null في حالة الفشل.
  */
 async function getProductsByUser(userKey) {
-  console.log(
-    `%c[API] Starting getProductsByUser for user_key: ${userKey}`,
-    "color: blue;"
-  );
   try {
-    // إرسال طلب GET مع تمرير مفتاح المستخدم كمعامل استعلام.
-    const response = await fetch(`${baseURL}/api/products?user_key=${userKey}`);
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(
-        errorData.error || `HTTP error! status: ${response.status}`
-      );
-    }
-
-    const data = await response.json();
-    console.log("%c[API] getProductsByUser successful.", "color: green;", data);
-    return data;
+    const data = await apiFetch(`/api/products?user_key=${userKey}`);
+    return data.error ? null : data;
   } catch (error) {
-    console.error("%c[API] getProductsByUser failed:", "color: red;", error);
+    console.error("%c[getProductsByUser] failed:", "color: red;", error);
     return null;
   }
 }
@@ -231,34 +103,18 @@ async function getProductsByUser(userKey) {
  * @returns {Promise<Object|null>} كائن المنتج أو null في حالة الفشل.
  */
 async function getProductByKey(productKey) {
-  console.log(
-    `%c[API] Starting getProductByKey for product_key: ${productKey}`,
-    "color: blue;"
-  );
   try {
-    // إرسال طلب GET مع تمرير مفتاح المنتج ومعامل `single=true` لتمييز الطلب.
-    const response = await fetch(
-      `${baseURL}/api/products?product_key=${productKey}&single=true`
-    );
-
-    // إذا كان المنتج غير موجود (404)، لا يعتبر خطأ فادحًا، بل يتم إرجاع null.
-    if (response.status === 404) {
-      console.warn("[API] getProductByKey: Product not found (404).");
-      return null;
-    }
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(
-        errorData.error || `HTTP error! status: ${response.status}`
-      );
-    }
-
-    const data = await response.json();
-    console.log("%c[API] getProductByKey successful.", "color: green;", data);
+    const data = await apiFetch(`/api/products?product_key=${productKey}&single=true`, {
+      specialHandlers: {
+        404: () => {
+          console.warn("[API] getProductByKey: Product not found (404).");
+          return null;
+        }
+      }
+    });
     return data;
   } catch (error) {
-    console.error("%c[API] getProductByKey failed:", "color: red;", error);
+    console.error("%c[getProductByKey] failed:", "color: red;", error);
     return null;
   }
 }
