@@ -1,16 +1,14 @@
-
+node_modules
+.git
+.vscode
+.DS_Store
+Thumbs.db
 .git
 .gitignore
 delete-account.html
 favicon.ico
-package.json
-package-lock.json
 privacy.html
-.hintrc
 test.html
-info.txt
-file-manager.js
-wrangler.toml
 get
 extensions.txt
 accounts.txt
@@ -20,3 +18,13 @@ notification discuse.txt
 formatted_drizzle_files (1).md
 formatted_drizzle_files.md
 list.json
+
+
+
+أريدك أن تقوم بقراءة جميع الملفات التي سأرسلها لك وأن تقوم بتحليل الكود بداخلها بالكامل. افهم العلاقات بين الملفات، كيف تتصل ببعضها، وما هي الوظائف والدوال التي يعتمد كل ملف عليها.
+بعد تحليل الكود، أريدك أن تجهّز نموذجًا داخليًا واضحًا عن طريقة عمل المشروع بالكامل بحيث تستطيع بعد ذلك:
+شرح أي جزء من الكود عند الطلب.
+تعديل أي جزء بدقة دون كسر المشروع.
+اقتراح تحسينات.
+اكتشاف الأخطاء المحتملة.
+فهم تدفق البيانات والعمليات بين الملفات.
