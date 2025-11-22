@@ -30,20 +30,37 @@ export const config = {
  * @see createClient
  */
 export default async function handler(request) {
-  // ✅ جديد: إضافة ترويسات CORS للسماح بالطلبات من أي مصدر
+/**
+ * @const {object} corsHeaders - ترويسات CORS للسماح بالطلبات من أي مصدر.
+ * @property {string} Access-Control-Allow-Origin - يسمح بالوصول من أي مصدر.
+ * @property {string} Access-Control-Allow-Methods - طرق HTTP المسموح بها.
+ * @property {string} Access-Control-Allow-Headers - ترويسات الطلب المسموح بها.
+ */
   const corsHeaders = {
     'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'POST, PUT, OPTIONS', // ✅ تعديل: السماح بطلبات PUT
+    'Access-Control-Allow-Methods': 'POST, PUT, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type',
   };
 
   // ✅ جديد: معالجة طلبات OPTIONS (preflight) التي يرسلها المتصفح
+  /**
+   * @description يعالج طلبات OPTIONS (preflight) لتمكين CORS.
+   *   يرد برمز الحالة 204 (No Content) وتضمين ترويسات CORS.
+   * @param {Request} request - كائن طلب HTTP الوارد.
+   * @returns {Response} استجابة HTTP 204 مع ترويسات CORS.
+   */
   if (request.method === 'OPTIONS') {
-    console.log('[CORS] تمت معالجة طلب OPTIONS لـ /api/orders'); // ✅ تعديل: السماح بطلبات PUT
+    console.log('[CORS] تمت معالجة طلب OPTIONS لـ /api/orders');
     return new Response(null, { status: 204, headers: corsHeaders });
   }
 
-  // ✅ جديد: معالجة طلبات PUT لتحديث حالة الطلب
+  /**
+   * @description يعالج طلبات PUT لتحديث حالة طلب موجود في قاعدة البيانات.
+   *   يتطلب 'order_key' و 'order_status' في جسم الطلب.
+   * @param {Request} request - كائن طلب HTTP الوارد.
+   * @returns {Promise<Response>} استجابة HTTP تشير إلى نجاح أو فشل التحديث.
+   * @throws {Error} إذا كان 'order_key' أو 'order_status' مفقودًا، أو حدث خطأ في قاعدة البيانات.
+   */
   if (request.method === 'PUT') {
     try {
       console.log('[API: /api/orders] بدء معالجة طلب تحديث حالة الطلب...');
@@ -75,7 +92,15 @@ export default async function handler(request) {
     }
   }
 
-  // ✅ تعديل: معالجة طلبات POST لإنشاء طلب جديد
+  /**
+   * @description يعالج طلبات POST لإنشاء طلب جديد وعناصره في قاعدة البيانات.
+   *   يتطلب 'order_key', 'user_key', 'total_amount', و 'items' (مصفوفة من عناصر الطلب)
+   *   في جسم الطلب.
+   *   يقوم بتنفيذ عملية إدخال مجمعة (batch) لضمان اتساق البيانات.
+   * @param {Request} request - كائن طلب HTTP الوارد.
+   * @returns {Promise<Response>} استجابة HTTP تشير إلى نجاح أو فشل الإنشاء.
+   * @throws {Error} إذا كانت بيانات الطلب غير مكتملة أو حدث خطأ في قاعدة البيانات.
+   */
   if (request.method === 'POST') {
     try {
       console.log('[API: /api/orders] بدء معالجة طلب إنشاء طلب جديد...');
@@ -96,12 +121,13 @@ export default async function handler(request) {
         authToken: process.env.TURSO_AUTH_TOKEN,
       });
 
-      // بناء مجموعة من الاستعلامات لتنفيذها في معاملة واحدة
+      /**
+       * @type {Array<Object>} statements - مصفوفة من الاستعلامات لتنفيذها في معاملة واحدة.
+       */
       const statements = [];
 
       // 1. إضافة الطلب الرئيسي إلى جدول `orders`
       statements.push({
-        // ✅ تعديل: الاعتماد على القيمة الافتراضية '0' في قاعدة البيانات لـ order_status
         sql: "INSERT INTO orders (order_key, user_key, total_amount) VALUES (?, ?, ?)",
         args: [order_key, user_key, total_amount],
       });
@@ -110,7 +136,7 @@ export default async function handler(request) {
       for (const item of items) {
         statements.push({
           sql: "INSERT INTO order_items (order_key, product_key, quantity, seller_key) VALUES (?, ?, ?, ?)",
-          args: [order_key, item.product_key, item.quantity, item.seller_key], // ✅ إصلاح: يجب أن يكون seller_key موجودًا دائمًا
+          args: [order_key, item.product_key, item.quantity, item.seller_key],
         });
       }
 

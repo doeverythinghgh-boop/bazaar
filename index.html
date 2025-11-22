@@ -157,9 +157,41 @@
  
     <script>
       /**
-       * يقوم بتحميل الفئات من ملف JSON ويبني جدولاً ديناميكياً.
-       * - يعرض الفئات الرئيسية في صفوف، كل صف يحتوي على 3 فئات.
-       * - عند النقر على فئة رئيسية، يظهر صف جديد أسفلها يحتوي على فئاتها الفرعية.
+       * @file index.html - Inline Script
+       * @description This script handles the dynamic loading and display of product categories and their subcategories
+       *              as a navigable table, and subsequently displays product galleries based on user selections.
+       *              It ensures a structured and interactive user experience for browsing products.
+       * @see js/config.js
+       * @see js/helpers/network.js
+       * @see js/helpers/format.js
+       * @see js/helpers/dom.js
+       * @see js/connect1.js
+       * @see js/connectProduct.js
+       * @see js/connectUsers.js
+       * @see js/cart.js
+       * @see js/adverModule.js
+       * @see js/searchModal.js
+       * @see js/db-manager.js
+       * @see js/notifications-log-modal.js
+       * @see js/main.js
+       * @see js/auth.js
+       * @see js/cart-modal.js
+       * @see js/purchases-modal.js
+       * @see js/profile-modal.js
+       * @see js/users-admin-modal.js
+       */
+
+      /**
+       * Loads categories from a JSON file and dynamically constructs a table.
+       * - Displays main categories in rows, with 4 categories per row.
+       * - Clicking a main category reveals a new row below it containing its subcategories.
+       * @async
+       * @function loadCategoriesAsTable
+       * @returns {Promise<void>} A Promise that resolves when categories are loaded and rendered, or rejects if an error occurs.
+       * @throws {Error} If the 'list.json' file fails to load or parse.
+       * @see shared/list.json
+       * @see toggleSubcategories
+       * @see showProductGallery
        */
       async function loadCategoriesAsTable() {
         const tbody = document.getElementById("categories-tbody");
@@ -176,36 +208,31 @@
 
           tbody.innerHTML = ""; // مسح المحتوى القديم
 
-          // تجميع الفئات في مجموعات من 3
-          // ✅ تعديل: تجميع الفئات في مجموعات من 4 لعرض أربعة أعمدة
+          // تجميع الفئات في مجموعات من 4 لعرض أربعة أعمدة
           console.log('[Categories] جاري بناء صفوف الجدول...');
           for (let i = 0; i < categories.length; i += 4) {
             const chunk = categories.slice(i, i + 4);
             const mainRow = document.createElement("tr");
-            mainRow.className = "categories-section__main-row"; // ✅ BEM
+            mainRow.className = "categories-section__main-row";
 
             chunk.forEach((category) => {
               const cell = document.createElement("td");
-              cell.className = "categories-section__cell"; // ✅ BEM
+              cell.className = "categories-section__cell";
               cell.dataset.categoryId = category.id;
 
-              // ✅ تحسين: قراءة الأيقونة مباشرة من بيانات الفئة
-              const iconClass = category.icon || "fas fa-store"; // استخدام أيقونة افتراضية
-              const iconHtml = `<i class="category-cell-content__icon ${iconClass}"></i>`; // ✅ BEM
+              const iconClass = category.icon || "fas fa-store";
+              const iconHtml = `<i class="category-cell-content__icon ${iconClass}"></i>`;
 
               cell.innerHTML = `
                 <div class="category-cell-content">
                   ${iconHtml}
                   <span class="category-cell-content__text">${category.title}</span>
-                </div>`; // ✅ BEM
+                </div>`;
 
-              // جديد: إضافة تأخير للحركة لكل خلية للحصول على تأثير متدرج
-              // يتم حساب التأخير بناءً على فهرس الفئة الكلي
               cell.style.animationDelay = `${(i + mainRow.cells.length) * 0.07}s`;
 
-              // إضافة حدث النقر فقط إذا كانت هناك فئات فرعية
               if (category.subcategories && category.subcategories.length > 0) {
-                cell.classList.add("categories-section__cell--has-subcategories"); // ✅ BEM
+                cell.classList.add("categories-section__cell--has-subcategories");
                 cell.addEventListener("click", () => {
                   toggleSubcategories(mainRow, category.subcategories, cell);
                 });
@@ -213,7 +240,6 @@
               mainRow.appendChild(cell);
             });
 
-            // إضافة خلايا فارغة إذا كان الصف الأخير غير مكتمل
             while (mainRow.cells.length < 4) {
               mainRow.appendChild(document.createElement("td"));
             }
@@ -228,32 +254,30 @@
       }
 
       /**
-       * يعرض أو يخفي صف الفئات الفرعية.
-       * @param {HTMLTableRowElement} mainRow - صف الفئة الرئيسية الذي تم النقر عليه.
-       * @param {Array} subcategories - مصفوفة الفئات الفرعية.
-       * @param {HTMLTableCellElement} clickedCell - الخلية التي تم النقر عليها.
+       * Toggles the display of subcategory rows and product galleries when a main category cell is clicked.
+       * This function manages the active state of category cells, showing or hiding subcategories and
+       * subsequently product galleries based on user interaction.
+       * @function toggleSubcategories
+       * @param {HTMLTableRowElement} mainRow - The main category table row that was clicked.
+       * @param {Array<Object>} subcategories - An array of subcategory objects associated with the clicked main category.
+       * @param {HTMLTableCellElement} clickedCell - The specific table cell (main category) that was clicked.
+       * @returns {void}
+       * @see loadCategoriesAsTable
+       * @see showProductGallery
        */
       function toggleSubcategories(mainRow, subcategories, clickedCell) {
         console.log(`%c[Subcategories] تم النقر على الفئة الرئيسية (ID: ${clickedCell.dataset.categoryId})`, 'color: purple;');
         const tbody = document.getElementById("categories-tbody");
-        const currentlyActiveCell = tbody.querySelector("td.categories-section__cell--active"); // ✅ BEM
-        const existingProductsRow = document.querySelector(
-          ".products-gallery-row"
-        );
-        const existingSubRow = document.querySelector(".categories-section__sub-row"); // ✅ BEM
+        const currentlyActiveCell = tbody.querySelector("td.categories-section__cell--active");
+        const existingProductsRow = document.querySelector(".products-gallery-row");
+        const existingSubRow = document.querySelector(".categories-section__sub-row");
         const isClickingSameCell = currentlyActiveCell === clickedCell;
 
-        // --- ✅ إصلاح جذري: إعادة ترتيب منطق الإغلاق لضمان إزالة الصفوف القديمة دائمًا ---
-        // هذه الخطوة حاسمة: يجب إزالة الصفوف القديمة دائمًا عند أي نقرة، سواء للفتح أو الإغلاق.
-        // المشكلة السابقة كانت تكمن في عدم إزالة الصفوف بشكل صحيح في سيناريو الإغلاق.
-
-        // --- ✅ جديد: رسائل تتبع للمطور ---
         console.group(`%c[DevLog] دورة حياة النقر على الفئة الرئيسية`, 'color: #0d6efd; font-weight: bold;');
         console.log(`- الخلية المنقور عليها:`, clickedCell);
         console.log(`- هل هي نفس الخلية النشطة؟: ${isClickingSameCell}`);
-        // --- ✅ إصلاح شامل: إعادة هيكلة المنطق بالكامل لضمان الترتيب الصحيح ---
 
-        // الخطوة 1: إزالة أي صفوف مفتوحة حاليًا (فئات فرعية أو منتجات) دائمًا عند أي نقرة.
+        // Step 1: Remove any currently open rows (subcategories or products) always on any click.
         if (existingSubRow) {
           console.log('[Subcategories] إزالة صف الفئات الفرعية المفتوح حاليًا.');
           existingSubRow.remove();
@@ -263,31 +287,29 @@
           existingProductsRow.remove();
         }
 
-        // الخطوة 2: التحقق مما إذا كانت النقرة على خلية جديدة (وليست لإغلاق الخلية الحالية).
+        // Step 2: Check if the click is on a new cell (not to close the current cell).
         if (!isClickingSameCell) {
           console.log('%c[DevLog] الحالة: فتح قسم جديد.', 'color: green;');
           
-          // أولاً: إزالة التمييز القديم إن وجد.
+          // First: Remove old highlighting if it exists.
           if (currentlyActiveCell) {
             console.log('[DevLog] 1. إزالة التمييز من الخلية القديمة:', currentlyActiveCell);
-            // ✅ إصلاح جذري: إزالة حالة الاختيار من الجدول هنا لضمان إعادة التعيين الكاملة
-            tbody.classList.remove("categories-section__tbody--selection-active"); // ✅ BEM
-            currentlyActiveCell.classList.remove("categories-section__cell--active"); // ✅ BEM
+            tbody.classList.remove("categories-section__tbody--selection-active");
+            currentlyActiveCell.classList.remove("categories-section__cell--active");
           }
-          // ثانيًا: تطبيق التمييز على الخلية الجديدة والجدول.
+          // Second: Apply highlighting to the new cell and the table.
           console.log('[DevLog] 2. إضافة حالة الاختيار للجدول (tbody).');
-          tbody.classList.add("categories-section__tbody--selection-active"); // ✅ BEM
+          tbody.classList.add("categories-section__tbody--selection-active");
           console.log('[DevLog] 3. إضافة التمييز للخلية الجديدة (المنقور عليها).');
-          clickedCell.classList.add("categories-section__cell--active"); // ✅ BEM
+          clickedCell.classList.add("categories-section__cell--active");
 
           console.log('[DevLog] 4. بناء وإدراج صف الفئات الفرعية.');
           const subRow = document.createElement("tr");
-          subRow.className = "categories-section__sub-row"; // ✅ BEM
-          // إضافة تأثير انزلاق للأسفل
-          subRow.style.animation = "slide-fade-in 1.5s ease-out forwards"; /* ✅ تعديل: جعل الحركة تظهر من الأعلى للأسفل خلال 1.5 ثانية */
+          subRow.className = "categories-section__sub-row";
+          subRow.style.animation = "slide-fade-in 1.5s ease-out forwards";
 
           const subCell = document.createElement("td");
-          subCell.colSpan = 4; // ✅ تعديل: مطابقة عدد الأعمدة الجديد
+          subCell.colSpan = 4;
 
           const subcategoriesContainer = document.createElement("div");
           subcategoriesContainer.className = "subcategories-container";
@@ -296,18 +318,16 @@
             const subItem = document.createElement("a");
             subItem.href = `#`;
             subItem.className = "subcategory-item";
-            // ✅ تحسين: قراءة الأيقونة مباشرة من بيانات الفئة الفرعية
-            const iconHtml = sub.icon ? `<i class="subcategory-item__icon ${sub.icon}"></i>` : '<i class="subcategory-item__icon fas fa-tag"></i>'; // ✅ BEM
+            const iconHtml = sub.icon ? `<i class="subcategory-item__icon ${sub.icon}"></i>` : '<i class="subcategory-item__icon fas fa-tag"></i>';
             subItem.innerHTML = `${iconHtml} ${sub.title}`.trim();
-            // إضافة حدث النقر لعرض المنتجات
+            
             subItem.addEventListener("click", (e) => {
               e.preventDefault();
-              // إزالة التمييز من أي فئة فرعية أخرى
               document
-                .querySelectorAll(".subcategory-item--active") // ✅ BEM
-                .forEach((item) => item.classList.remove("subcategory-item--active")); // ✅ BEM
+                .querySelectorAll(".subcategory-item--active")
+                .forEach((item) => item.classList.remove("subcategory-item--active"));
               console.log(`[Subcategories] تم النقر على الفئة الفرعية (ID: ${sub.id})`);
-              subItem.classList.add("subcategory-item--active"); // ✅ BEM
+              subItem.classList.add("subcategory-item--active");
               showProductGallery(
                 subRow,
                 clickedCell.dataset.categoryId,
@@ -320,30 +340,35 @@
           subCell.appendChild(subcategoriesContainer);
           subRow.appendChild(subCell);
 
-          // إدراج الصف الفرعي بعد الصف الرئيسي مباشرة
           mainRow.parentNode.insertBefore(subRow, mainRow.nextSibling);
         } else {
           console.log('%c[DevLog] الحالة: إغلاق القسم الحالي.', 'color: red;');
-          // إذا كانت النقرة على نفس الخلية (للإغلاق)، نزيل التمييز.
           if (currentlyActiveCell) {
             console.log('[DevLog] 1. إزالة التمييز من الخلية الحالية:', currentlyActiveCell);
-            currentlyActiveCell.classList.remove("categories-section__cell--active"); // ✅ BEM
+            currentlyActiveCell.classList.remove("categories-section__cell--active");
           }
           console.log('[DevLog] 2. إزالة حالة الاختيار من الجدول (tbody).');
-          tbody.classList.remove("categories-section__tbody--selection-active"); // ✅ BEM
+          tbody.classList.remove("categories-section__tbody--selection-active");
         }
         console.groupEnd();
       }
 
       /**
-       * يعرض معرض صور للمنتجات أسفل صف الفئات الفرعية.
-       * @param {HTMLTableRowElement} subRow - صف الفئات الفرعية.
-       * @param {string} mainCatId - معرف الفئة الرئيسية.
-       * @param {string} subCatId - معرف الفئة الفرعية.
+       * Displays a product gallery below the subcategory row.
+       * It fetches products based on the provided main and subcategory IDs and
+       * renders them with lazy loading for images and interactive click events.
+       * @async
+       * @function showProductGallery
+       * @param {HTMLTableRowElement} subRow - The subcategory table row under which the product gallery will be inserted.
+       * @param {string} mainCatId - The ID of the main category.
+       * @param {string} subCatId - The ID of the subcategory.
+       * @returns {Promise<void>} A Promise that resolves when the product gallery is displayed, or rejects if product fetching fails.
+       * @throws {Error} If `getProductsByCategory` fails to fetch products.
+       * @see getProductsByCategory
+       * @see window.showProductDetails
        */
       async function showProductGallery(subRow, mainCatId, subCatId) {
         console.log(`%c[Products] بدء عرض معرض المنتجات للفئة (${mainCatId} / ${subCatId})`, 'color: #fd7e14;');
-        // إزالة أي معرض منتجات قديم
         const existingGallery = document.querySelector(".products-gallery-row");
         if (existingGallery) {
           existingGallery.remove();
@@ -352,45 +377,47 @@
         const galleryRow = document.createElement("tr");
         galleryRow.className = "products-gallery__row";
         const galleryCell = document.createElement("td");
-        galleryCell.colSpan = 4; // ✅ تعديل: مطابقة عدد الأعمدة الجديد
+        galleryCell.colSpan = 4;
         galleryRow.appendChild(galleryCell);
-        // إدراج صف المنتجات بعد صف الفئات الفرعية
         subRow.parentNode.insertBefore(galleryRow, subRow.nextSibling);
 
-        // إظهار مؤشر تحميل مبدئي
         galleryCell.innerHTML = `<div class="loader" style="margin: 20px auto;"></div>`;
 
         console.log('[Products] جاري جلب المنتجات من الواجهة الخلفية...');
-        const products = await getProductsByCategory(mainCatId, subCatId);
-        console.log('[Products] تم استلام المنتجات:', products);
+        let products;
+        try {
+          products = await getProductsByCategory(mainCatId, subCatId);
+          console.log('[Products] تم استلام المنتجات:', products);
+        } catch (error) {
+          console.error(`%c[Products] فشل جلب المنتجات للفئة (${mainCatId} / ${subCatId}):`, 'color: red; font-weight: bold;', error);
+          galleryCell.innerHTML = `<p class="error-message">حدث خطأ أثناء تحميل المنتجات. الرجاء المحاولة لاحقاً.</p>`;
+          return;
+        }
 
-        // التحقق مرة أخرى من وجود الصف في حال أغلقه المستخدم بسرعة
+
         const currentRow = subRow.nextElementSibling;
         if (
           !currentRow ||
           !currentRow.classList.contains("products-gallery__row")
         ) {
           console.warn('[Products] تم إغلاق القسم قبل اكتمال تحميل المنتجات. تتوقف العملية.');
-          return; // توقف إذا تم إغلاق القسم
+          return;
         }
 
         const currentGalleryCell = currentRow.querySelector("td");
 
-        // إذا كانت هناك منتجات، ابدأ في عرضها
         if (products && products.length > 0) {
           console.log(`[Products] تم العثور على ${products.length} منتج. جاري بناء المعرض...`);
           const galleryContainer = document.createElement("div");
           galleryContainer.className = "products-gallery__container";
-          currentGalleryCell.innerHTML = ""; // إزالة مؤشر التحميل
+          currentGalleryCell.innerHTML = "";
           currentGalleryCell.appendChild(galleryContainer);
 
-          // دالة لتحميل صورة واحدة وإضافتها للمعرض
           const loadProductItem = (product) => {
             return new Promise((resolve) => {
-              // ✅ تحسين: إذا لم تكن هناك صورة، لا يزال بإمكاننا عرض اسم المنتج
               if (!product.ImageName) {
                 const productItem = document.createElement("div");
-                productItem.className = "product-item no-image"; // كلاس إضافي للتحكم بالتنسيق
+                productItem.className = "product-item no-image";
 
                 const productName = document.createElement("p");
                 productName.className = "product-item__name";
@@ -399,7 +426,6 @@
                 productItem.appendChild(productName);
                 galleryContainer.appendChild(productItem);
 
-                // تطبيق التأثيرات مباشرة
                 productItem.style.opacity = "0";
                 productItem.style.transform = "translateY(20px)";
                 productItem.style.transition = "opacity 0.5s ease, transform 0.5s ease";
@@ -414,7 +440,6 @@
               const firstImage = product.ImageName.split(",")[0];
               if (!firstImage) return resolve();
 
-              // ✅ إضافة: إنشاء حاوية المنتج الرئيسية
               const productItem = document.createElement("div");
               productItem.className = "product-item";
 
@@ -424,43 +449,37 @@
               img.alt = product.product_description;
               img.title = product.product_description;
               
-              // ✅ تعديل: إضافة التأثيرات للحاوية بدلاً من الصورة فقط
               productItem.style.opacity = "0";
               productItem.style.transform = "translateY(20px)";
               productItem.style.transition = "opacity 0.5s ease, transform 0.5s ease";
 
-              // ✅ تعديل: حدث النقر يكون على حاوية المنتج بأكملها
               productItem.addEventListener("click", () => {
                 console.log(`%c[Products] تم النقر على المنتج: ${product.productName}`, 'color: darkcyan');
-                // التأكد من أن الدالة العالمية متاحة
                 if (window.showProductDetails) {
                   const productDataForModal = {
-                    // جديد: تمرير البيانات اللازمة للسلة
                     product_key: product.product_key,
                     productName: product.productName,
-                    user_key: product.user_key, // ✅ إضافة: تمرير مفتاح البائع
-                    pricePerItem: product.product_price, // ✅ إصلاح: توحيد اسم الخاصية إلى pricePerItem
+                    user_key: product.user_key,
+                    pricePerItem: product.product_price,
                     image: `https://pub-e828389e2f1e484c89d8fb652c540c12.r2.dev/${firstImage}`,
-                    original_price: product.original_price, // ✅ إصلاح: تمرير السعر قبل الخصم
-                    // جديد: تمرير جميع الصور وليس فقط الأولى
+                    original_price: product.original_price,
                     imageSrc: product.ImageName.split(',').map(name => `https://pub-e828389e2f1e484c89d8fb652c540c12.r2.dev/${name}`),
                     availableQuantity: product.product_quantity,
                     sellerMessage: product.user_message,
                     description: product.product_description,
                     sellerName: product.seller_username,
                     sellerPhone: product.seller_phone,
-                    MainCategory: product.MainCategory, // ✅ إضافة: تمرير ID الفئة الرئيسية
-                    SubCategory: product.SubCategory   // ✅ إضافة: تمرير ID الفئة الفرعية
+                    MainCategory: product.MainCategory,
+                    SubCategory: product.SubCategory
                   };
                   window.showProductDetails(productDataForModal);
                 }
               });
 
               img.onload = () => {
-                // ✅ إضافة: إنشاء عنصر اسم المنتج هنا لضمان الترتيب الصحيح
                 const productName = document.createElement("p");
                 productName.className = "product-item__name";
-                productName.id = `product-name-${product.product_key}`; // ✅ إضافة: ID فريد
+                productName.id = `product-name-${product.product_key}`;
                 productName.textContent = product.productName || 'منتج غير مسمى';
 
                 productItem.appendChild(img);
@@ -468,21 +487,19 @@
                 galleryContainer.appendChild(productItem);
 
                 setTimeout(() => {
-                  // تأخير بسيط قبل إظهار الصورة
                   productItem.style.opacity = "1";
                   productItem.style.transform = "translateY(0)";
                   resolve();
-                }, 50); // 50ms delay
+                }, 50);
               };
               img.onerror = () => {
                 console.warn(`[Products] فشل تحميل الصورة: ${imageUrl}`);
-                resolve(); // انتقل للتالي حتى لو فشلت الصورة
+                resolve();
               };
               img.src = imageUrl;
             });
           };
 
-          // تحميل الصور واحدة تلو الأخرى
           for (const product of products) {
             await loadProductItem(product);
           }
