@@ -28,10 +28,20 @@ async function showEditProfileModal(currentUser) {
     const deleteBtn = document.getElementById('profile-delete-account-btn');
     const closeBtn = document.getElementById('profile-modal-close-btn');
 
+    // ✅ جديد: متغير لتتبع ما إذا تم التحقق من كلمة المرور بالفعل
+    let isPasswordVerified = false;
+
     // --- Populate Initial Data ---
     usernameInput.value = currentUser.username || '';
     phoneInput.value = currentUser.phone || '';
     addressInput.value = currentUser.Address || '';
+
+    // ✅ جديد: إعادة تعيين حالة حقول كلمة المرور عند فتح النافذة
+    changePasswordCheckbox.checked = false;
+    passwordFields.style.display = 'none';
+    passwordInput.value = '';
+    confirmPasswordInput.value = '';
+    document.getElementById('profile-password-error').textContent = '';
 
     // --- Close Button Logic ---
     if (closeBtn) {
@@ -86,6 +96,8 @@ async function showEditProfileModal(currentUser) {
       if (isConfirmed && oldPassword) {
         changePasswordCheckbox.checked = true;
         passwordFields.style.display = 'block';
+        // ✅ جديد: تمكين العلم للإشارة إلى أن المستخدم قد تحقق من كلمة المرور
+        isPasswordVerified = true;
       }
     });
 
@@ -161,8 +173,9 @@ async function showEditProfileModal(currentUser) {
       }
 
       // --- Password Verification before saving ---
-      // If the user has a password, we must verify it before saving any changes.
-      if (currentUser.Password) {
+      // إذا كان لدى المستخدم كلمة مرور، فيجب علينا التحقق منها قبل حفظ أي تغييرات،
+      // إلا إذا كان قد تم التحقق منها بالفعل عند محاولة تغيير كلمة المرور.
+      if (currentUser.Password && !isPasswordVerified) {
         const { value: password, isConfirmed } = await Swal.fire({
           title: 'تأكيد الهوية',
           text: 'لحفظ التغييرات، يرجى إدخال كلمة المرور الحالية.',
@@ -197,13 +210,15 @@ async function showEditProfileModal(currentUser) {
       Swal.close();
 
       if (result && !result.error) {
-        const updatedUser = { ...currentUser };
-        if (updatedData.username) updatedUser.username = updatedData.username;
-        if (updatedData.phone) updatedUser.phone = updatedData.phone;
-        if (updatedData.address !== undefined) updatedUser.Address = updatedData.address;
+        // تحديث الكائن currentUser مباشرةً لضمان أن البيانات الجديدة ستُستخدم عند إعادة فتح النافذة
+        if (updatedData.username) currentUser.username = updatedData.username;
+        if (updatedData.phone) currentUser.phone = updatedData.phone;
+        if (updatedData.address !== undefined) currentUser.Address = updatedData.address;
+        // إذا تم تغيير كلمة المرور، قم بتحديث حالتها في الكائن الحالي
+        if (updatedData.password) currentUser.Password = true; // أو أي قيمة تشير إلى وجودها
 
-        localStorage.setItem('loggedInUser', JSON.stringify(updatedUser));
-        document.getElementById("welcome-message").textContent = `أهلاً بك، ${updatedUser.username}`;
+        localStorage.setItem('loggedInUser', JSON.stringify(currentUser));
+        document.getElementById("welcome-message").textContent = `أهلاً بك، ${currentUser.username}`;
 
         Swal.fire({
           icon: 'success',
