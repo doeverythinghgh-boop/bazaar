@@ -143,6 +143,18 @@ export default async function handler(request) {
 
   if (request.method === "POST") {
     try {
+      const {
+        productName,
+        user_key,
+        product_key,
+        product_description,
+        product_price,
+        original_price,
+        product_quantity,
+        user_message,
+        user_note,
+        ImageName,
+        MainCategory,
         SubCategory,
         ImageIndex,
         serviceType // جديد: استقبال نوع الخدمة
@@ -158,7 +170,7 @@ export default async function handler(request) {
 
       await db.execute({
         sql: "INSERT INTO marketplace_products (productName, user_key, product_key, product_description, product_price, original_price, product_quantity, user_message, user_note, ImageName, MainCategory, SubCategory, ImageIndex, serviceType) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-        args: [productName, user_key, product_key, product_description, parseFloat(product_price), original_price ? parseFloat(original_price) : null, parseInt(product_quantity), user_message, user_note, ImageName, parseInt(MainCategory), parseInt(SubCategory) || null, parseInt(ImageIndex), serviceType || 0]
+        args: [productName, user_key, product_key, product_description, parseFloat(product_price), original_price ? parseFloat(original_price) : null, parseInt(product_quantity), user_message, user_note, ImageName, parseInt(MainCategory), SubCategory ? parseInt(SubCategory) : null, parseInt(ImageIndex), serviceType || 0]
       });
 
       return new Response(JSON.stringify({ message: "تم إضافة المنتج إلى قاعدة البيانات بنجاح." }), {
