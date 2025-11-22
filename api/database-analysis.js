@@ -1,6 +1,4 @@
 import { createClient } from "@libsql/client";
-import fs from "fs";
-import path from "path";
 
 export const config = {
   runtime: 'edge',
@@ -24,8 +22,8 @@ const db = createClient({
  * @description تحليل قاعدة البيانات بالكامل وتخزينها في ملف JSON.
  * @async
  * @function analyzeAndSaveDatabase
- * @returns {Promise<{message: string, filePath: string, data: object}>} 
- *   رسالة النجاح، مسار الملف، وبيانات التحليل.
+ * @returns {Promise<string>} 
+ *   سلسلة نصية تحتوي على بيانات التحليل بصيغة JSON.
  * @throws {Error} إذا حدث خطأ أثناء الاتصال بقاعدة البيانات أو تنفيذ الاستعلامات.
  */
 export async function analyzeAndSaveDatabase() {
@@ -73,18 +71,9 @@ export async function analyzeAndSaveDatabase() {
     }
     result.foreignKeys = foreignKeys;
 
-    // 5️⃣ حفظ النتائج في ملف JSON
-    // Use path.resolve to ensure the file is created in the project root
-    const filePath = path.resolve(process.cwd(), "database-analysis.json");
-    console.log(`[DatabaseAnalysis] حفظ النتائج في الملف ${filePath}...`);
-    fs.writeFileSync(filePath, JSON.stringify(result, null, 2), "utf8");
-
     console.log("[DatabaseAnalysis] تم الانتهاء من التحليل بنجاح!");
-    return {
-      message: "تم تحليل قاعدة البيانات بنجاح وحفظ الملف",
-      filePath,
-      data: result,
-    };
+    // 5️⃣ إرجاع النتائج كنص JSON
+    return JSON.stringify(result, null, 2);
 
   } catch (error) {
     console.error("[DatabaseAnalysis] خطأ أثناء التحليل:", error);
