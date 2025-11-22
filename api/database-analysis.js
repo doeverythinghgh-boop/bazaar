@@ -1,6 +1,8 @@
 import { createClient } from "@libsql/client";
-import fs from "fs";
 
+export const config = {
+  runtime: 'edge',
+};
 /**
  * @file api/database-analysis.js
  * @description تحليل قاعدة بيانات Turso بالكامل وحفظ جميع معلومات الجداول،
@@ -13,10 +15,9 @@ import fs from "fs";
  * @const
  */
 const db = createClient({
-  url: "libsql://bazaar-bazaar.aws-eu-west-1.turso.io",
-  authToken: process.env.TURSO_AUTH_TOKEN,
+  url: process.env.DATABASE_URL,
+  authToken: process.env.TURSO_AUTH_TOKEN
 });
-
 /**
  * @description تحليل قاعدة البيانات بالكامل وتخزينها في ملف JSON.
  * @async
