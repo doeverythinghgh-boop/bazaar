@@ -294,16 +294,14 @@
           // First: Remove old highlighting if it exists.
           if (currentlyActiveCell) {
             console.log('[DevLog] 1. إزالة التمييز من الخلية القديمة:', currentlyActiveCell);
-            tbody.classList.remove("categories-section__tbody--selection-active");
             currentlyActiveCell.classList.remove("categories-section__cell--active");
           }
-          // Second: Apply highlighting to the new cell and the table.
-          console.log('[DevLog] 2. إضافة حالة الاختيار للجدول (tbody).');
-          tbody.classList.add("categories-section__tbody--selection-active");
-          console.log('[DevLog] 3. إضافة التمييز للخلية الجديدة (المنقور عليها).');
+          // Second: Apply highlighting to the new cell.
+          // The dimming effect on other cells has been removed as per the request.
+          console.log('[DevLog] 2. إضافة التمييز للخلية الجديدة (المنقور عليها).');
           clickedCell.classList.add("categories-section__cell--active");
 
-          console.log('[DevLog] 4. بناء وإدراج صف الفئات الفرعية.');
+          console.log('[DevLog] 3. بناء وإدراج صف الفئات الفرعية.');
           const subRow = document.createElement("tr");
           subRow.className = "categories-section__sub-row";
           subRow.style.animation = "slide-fade-in 1.5s ease-out forwards";
@@ -347,8 +345,6 @@
             console.log('[DevLog] 1. إزالة التمييز من الخلية الحالية:', currentlyActiveCell);
             currentlyActiveCell.classList.remove("categories-section__cell--active");
           }
-          console.log('[DevLog] 2. إزالة حالة الاختيار من الجدول (tbody).');
-          tbody.classList.remove("categories-section__tbody--selection-active");
         }
         console.groupEnd();
       }
@@ -375,7 +371,7 @@
         }
 
         const galleryRow = document.createElement("tr");
-        galleryRow.className = "products-gallery__row";
+        galleryRow.className = "products-gallery-row"; // ✅ إصلاح: توحيد اسم الفئة ليتطابق مع المحدد
         const galleryCell = document.createElement("td");
         galleryCell.colSpan = 4;
         galleryRow.appendChild(galleryCell);
@@ -398,7 +394,7 @@
         const currentRow = subRow.nextElementSibling;
         if (
           !currentRow ||
-          !currentRow.classList.contains("products-gallery__row")
+          !currentRow.classList.contains("products-gallery-row") // ✅ إصلاح: توحيد اسم الفئة ليتطابق مع المحدد
         ) {
           console.warn('[Products] تم إغلاق القسم قبل اكتمال تحميل المنتجات. تتوقف العملية.');
           return;
