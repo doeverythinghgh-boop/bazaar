@@ -16,8 +16,12 @@ async function showAddProductModal() {
     "add-product-modal",
     "pages/addProduct.html",
     () => {
-      if (typeof initializeAddProductForm === "function") {
-        initializeAddProductForm();
+      // Reset the form in case it was initialized before.
+      if (typeof window.productResetAddProductForm === "function") {
+        window.productResetAddProductForm();
+      }
+      if (typeof productInitializeAddProductForm === "function") {
+        window.productInitializeAddProductForm();
       }
     }
   );
@@ -39,9 +43,15 @@ async function showEditProductModal(productData, onCloseCallback) {
     "add-product-modal",
     "pages/addProduct.html",
     () => {
-      if (typeof initializeAddProductForm === "function") {
-        // ننتظر قليلاً لضمان تحميل كل شيء قبل التعبئة.
-        setTimeout(() => initializeAddProductForm(productData), 100);
+      // Reset the form in case it was initialized before.
+      if (typeof window.productResetAddProductForm === "function") {
+        window.productResetAddProductForm();
+      }
+      if (typeof productInitializeAddProductForm === "function") {
+        // Use setTimeout with 0ms delay to ensure the DOM is ready.
+        // This pushes the initialization to the next tick of the event loop,
+        // allowing the browser to render the modal's content first.
+        setTimeout(() => window.productInitializeAddProductForm(productData), 0);
       }
     },
     onCloseCallback
