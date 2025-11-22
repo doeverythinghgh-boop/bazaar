@@ -284,9 +284,7 @@
     font-size: 0.9rem;
   }
 
-  .close-button {
-    font-size: 1.5rem; /* تصغير حجم أيقونة الإغلاق */
-  }
+ 
 
   /* ✅ جديد: تعديل حجم الأعمدة في الشاشات الصغيرة جدًا */
   .search-results-grid {
