@@ -5,6 +5,57 @@
  */
 
 /**
+ * @description تحديث الوضع الموسع للنموذج بناءً على الوضع الأساسي والفئة المحددة
+ * @function productUpdateExtendedMode
+ * @returns {string} - الوضع الموسع الحالي
+ */
+function productUpdateExtendedMode() {
+  const form = document.getElementById('add-product-form');
+  if (!form) return '';
+  
+  const baseMode = form.dataset.mode; // 'add' أو 'edit'
+  const mainCategorySelect = document.getElementById('main-category');
+  const mainCategory = mainCategorySelect ? mainCategorySelect.value : '';
+  
+  let extendedMode = baseMode;
+  
+  // تحديد إذا كانت فئة الخدمات
+  if (mainCategory === SERVICE_CATEGORY_NoPrice_ID) {
+    extendedMode = baseMode + 'InServiceCategory';
+  }
+  
+  // تحديث الخاصية
+  form.dataset.extendedMode = extendedMode;
+  
+  // تسجيل التغيير للمطور
+  console.log(`%c[ProductForm] 🎯 Extended Mode: ${extendedMode}`, 
+    'color: purple; font-weight: bold; font-size: 14px;');
+  
+  return extendedMode;
+}
+
+/**
+ * @description تسجيل الحالة الحالية للنموذج للمطور
+ * @function productLogCurrentState
+ * @param {string} action - وصف الإجراء الحالي
+ * @returns {void}
+ */
+function productLogCurrentState(action = 'State Update') {
+  const form = document.getElementById('add-product-form');
+  const mainCategory = document.getElementById('main-category');
+  
+  if (!form || !mainCategory) return;
+  
+  console.group(`%c📊 Product Form State - ${action}`, 'color: navy; font-weight: bold;');
+  console.log(`📍 Base Mode: ${form.dataset.mode || 'undefined'}`);
+  console.log(`🎯 Extended Mode: ${form.dataset.extendedMode || 'undefined'}`);
+  console.log(`🏷️ Main Category: ${mainCategory.value || 'undefined'}`);
+  console.log(`🔧 Service Category ID: ${SERVICE_CATEGORY_NoPrice_ID}`);
+  console.log(`🖼️ Images Count: ${window.productModule?.images.length || 0}`);
+  console.groupEnd();
+}
+
+/**
  * @description الدالة الرئيسية لتهيئة نموذج إضافة/تعديل المنتج. تقوم بتنظيف الحالات السابقة،
  *   وتهيئة الوحدات المطلوبة (مثل وحدة رفع الصور)، وتحميل الفئات، وإعداد مستمعي الأحداث،
  *   وتعبئة النموذج بالبيانات الموجودة مسبقًا في حالة التعديل.
@@ -83,6 +134,12 @@ async function productInitializeAddProductForm(editProductData = null) {
     productPopulateEditForm(editProductData);
   }
 
+  // تحديث الحالة الموسعة بعد التهيئة
+  setTimeout(() => {
+    productUpdateExtendedMode();
+    productLogCurrentState('Form Initialized');
+  }, 100);
+
   productSetupCharacterCounters();
   productSetupFormSubmit();
   
@@ -113,6 +170,7 @@ function productInitializeModules() {
   
   return true;
 }
+
 /**
  * @description دالة مصنعية (Factory Function) تُرجع معالج حدث لتغيير الفئة الرئيسية.
  *   يقوم المعالج بتحديث قائمة الفئات الفرعية وإظهار/إخفاء حقول السعر والكمية ونوع الخدمة
@@ -163,6 +221,8 @@ function productHandleMainCategoryChange(categories) {
 
     if (!selectedCategoryId) {
       subCategoryGroup.style.display = "none";
+      // تحديث الحالة الموسعة
+      productUpdateExtendedMode();
       return;
     }
 
@@ -178,6 +238,10 @@ function productHandleMainCategoryChange(categories) {
     } else {
       subCategoryGroup.style.display = "none";
     }
+
+    // تحديث الحالة الموسعة بعد معالجة التغيير
+    productUpdateExtendedMode();
+    productLogCurrentState('Category Changed');
   };
 }
 
@@ -273,8 +337,13 @@ function productPopulateEditForm(editProductData) {
       subCategorySelect.value = subCatId; 
     }, 100);
   }
-}
 
+  // تحديث الحالة الموسعة بعد تعبئة البيانات
+  setTimeout(() => {
+    productUpdateExtendedMode();
+    productLogCurrentState('Edit Form Populated');
+  }, 200);
+}
 
 /**
  * @description تقوم بإعداد عدادات الأحرف للحقول النصية (مثل اسم المنتج والوصف)
@@ -418,7 +487,7 @@ function productSetupNumberFields() {
   }
 }
 
-
-
 // جعل الدالة متاحة عالميًا
 window.productInitializeAddProductForm = productInitializeAddProductForm;
+window.productUpdateExtendedMode = productUpdateExtendedMode;
+window.productLogCurrentState = productLogCurrentState;

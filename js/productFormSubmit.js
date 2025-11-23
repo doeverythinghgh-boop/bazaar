@@ -26,7 +26,11 @@ function productSetupFormSubmit() {
  */
 async function productHandleFormSubmit(e) {
   e.preventDefault();
-  console.log('%c[ProductForm] Submit event triggered.', 'color: blue;');
+  const form = document.getElementById('add-product-form');
+  const extendedMode = form ? form.dataset.extendedMode : 'unknown';
+  
+  console.log(`%c[Submit] 🚀 Form submission in mode: ${extendedMode}`, 
+    'color: blue; font-weight: bold;');
   
   // التحقق من الصحة
   if (!productValidateForm()) {
@@ -50,8 +54,9 @@ async function productHandleFormSubmit(e) {
  */
 async function productProcessFormSubmission() {
   const form = document.getElementById('add-product-form');
+  const extendedMode = form ? form.dataset.extendedMode : 'unknown';
   
-  console.log('%c[ProductForm] Validation passed. Starting submission process.', 'color: green;');
+  console.log(`%c[ProductForm] Validation passed. Starting submission process in mode: ${extendedMode}.`, 'color: green;');
   
   // استخدام SweetAlert2 إذا متاح، وإلا استخدام confirm عادي
   if (typeof Swal !== 'undefined') {

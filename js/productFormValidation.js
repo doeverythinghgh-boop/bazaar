@@ -60,7 +60,11 @@ function productClearError(element) {
  * @see productClearError
  */
 function productValidateForm() {
-  console.log('[ProductForm] Starting validation...');
+  const form = document.getElementById('add-product-form');
+  const extendedMode = form ? form.dataset.extendedMode : 'unknown';
+  
+  console.log(`%c[Validation] 🔍 Starting validation in mode: ${extendedMode}`, 
+    'color: teal; font-weight: bold;');
   
   let isValid = true;
   const images = window.productModule ? window.productModule.images : [];
