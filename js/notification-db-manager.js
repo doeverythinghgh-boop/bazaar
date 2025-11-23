@@ -1,5 +1,5 @@
 /**
- * @file js/db-manager.js
+ * @file js/notification-db-manager.js
  * @description وحدة لإدارة قاعدة بيانات IndexedDB الخاصة بالتطبيق.
  */
 

@@ -572,7 +572,7 @@ function saveNotificationFromAndroid(notificationJson) {
       });
       console.log("[Auth] تم حفظ الإشعار من الأندرويد بنجاح في IndexedDB.");
     } else {
-      console.error("[Auth] الدالة addNotificationLog غير موجودة. تأكد من تحميل ملف db-manager.js.");
+      console.error("[Auth] الدالة addNotificationLog غير موجودة. تأكد من تحميل ملف notification-db-manager.js.");
     }
   } catch (error) {
     console.error("[Auth] خطأ في معالجة الإشعار القادم من الأندرويد:", error);

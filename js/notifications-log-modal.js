@@ -59,7 +59,7 @@ async function showNotificationsLogModal() {
       contentWrapper.innerHTML = '<div class="loader" style="margin: 2rem auto;"></div>';
 
       if (typeof getNotificationLogs !== 'function') {
-        console.error("الدالة getNotificationLogs غير معرفة. تأكد من تحميل db-manager.js.");
+        console.error("الدالة getNotificationLogs غير معرفة. تأكد من تحميل notification-db-manager.js.");
         contentWrapper.innerHTML = "<p style='color: red;'>خطأ: لا يمكن تحميل سجل الإشعارات.</p>";
         return;
       }
