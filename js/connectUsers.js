@@ -82,6 +82,24 @@ async function getUserByPhone(phone) {
 }
 
 /**
+ * @description يجلب قائمة المستخدمين الذين لديهم دور "خدمة توصيل" (is_seller = 2).
+ * @async
+ * @function getDeliveryUsers
+ * @returns {Promise<Array<Object>|null>} - وعد (Promise) يحتوي على مصفوفة من كائنات مستخدمي التوصيل، أو `null` في حالة حدوث خطأ.
+ * @see apiFetch
+ */
+async function getDeliveryUsers() {
+  try {
+    // استدعاء نقطة النهاية مع فلتر الدور
+    const data = await apiFetch('/api/users?role=2');
+    return data.error ? null : data;
+  } catch (error) {
+    console.error("%c[getDeliveryUsers] failed:", "color: red;", error);
+    return null;
+  }
+}
+
+/**
  * @description يحدث بيانات عدة مستخدمين دفعة واحدة عبر واجهة برمجة التطبيقات (API).
  *   تُستخدم هذه الدالة في لوحة تحكم المسؤول لتغيير أدوار عدة مستخدمين (مثلاً، ترقيتهم إلى بائعين).
  * @function updateUsers

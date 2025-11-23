@@ -121,30 +121,31 @@ async function showSalesMovementModal(userKey) {
   await loadAndShowModal("sales-movement-modal-container", "pages/salesMovementModal.html", async (modal) => {
     const contentWrapper = modal.querySelector("#sales-movement-content-wrapper");
     contentWrapper.innerHTML = '<div class="loader" style="margin: 2rem auto;"></div>';
+    
+    // ✅ تحسين: جلب الطلبات ومستخدمي التوصيل بشكل متزامن لتحسين الأداء
+    const [orders, deliveryUsers] = await Promise.all([
+      getSalesMovement(userKey),
+      getDeliveryUsers()
+    ]);
 
-  const orders = await getSalesMovement(userKey);
-  // ✅ إصلاح: جلب بيانات المستخدم الحالي للتحقق مما إذا كان مسؤولاً أم لا
-  const loggedInUser = JSON.parse(localStorage.getItem("loggedInUser"));
-  // سيتم إخفاء البيانات فقط إذا لم يكن المستخدم مسؤولاً.
-  // adminPhoneNumbers معرفة في js/config.js
-  const isAdmin = loggedInUser && adminPhoneNumbers.includes(loggedInUser.phone);
+    // جلب بيانات المستخدم الحالي للتحقق من الصلاحيات
+    const loggedInUser = JSON.parse(localStorage.getItem("loggedInUser"));
+    const isAdmin = loggedInUser && adminPhoneNumbers.includes(loggedInUser.phone);
 
-  // ✅ تتبع للمطور: عرض بيانات المستخدم المسجل دخوله لتأكيد دوره
-  console.log('%c[DEV-LOG] showSalesMovementModal: بيانات المستخدم المسجل دخوله:', 'color: purple;', loggedInUser);
-  console.log(`%c[DEV-LOG] showSalesMovementModal: هل المستخدم مسؤول (isAdmin)؟ -> ${isAdmin}`, 'color: purple;');
+    // ✅ تتبع للمطور: عرض البيانات التي تم جلبها
+    console.log('%c[DEV-LOG] showSalesMovementModal: بيانات المستخدم المسجل دخوله:', 'color: purple;', loggedInUser);
+    console.log(`%c[DEV-LOG] showSalesMovementModal: هل المستخدم مسؤول (isAdmin)؟ -> ${isAdmin}`, 'color: purple;');
+    console.log('%c[DEV-LOG] showSalesMovementModal: الطلبات المستلمة:', 'color: blue; font-weight: bold;', orders);
+    console.log('%c[DEV-LOG] showSalesMovementModal: مستخدمو التوصيل:', 'color: darkcyan; font-weight: bold;', deliveryUsers);
 
-  // ✅ تتبع: تسجيل البيانات فور استلامها من الخادم
-  console.log('%c[DEV-LOG] showSalesMovementModal: البيانات المستلمة من getSalesMovement():', 'color: blue; font-weight: bold;', orders);
-
-  if (orders && orders.length > 0) {
-    // ✅ تبسيط: لم تعد هناك حاجة لمعالجة البيانات هنا،
-    // لأنها تأتي جاهزة من دالة `getSalesMovement` في `connect1.js`.
-    contentWrapper.innerHTML = `<div id="sales-movement-list">
-        ${orders.map(order => generateSalesMovementItemHTML(order, loggedInUser, isAdmin)).join('')}
-      </div>`;
-  } else {
-    contentWrapper.innerHTML = '<p style="text-align: center; padding: 2rem 0;">لا توجد طلبات لعرضها.</p>';
-  }
+    if (orders && orders.length > 0) {
+      // تمرير قائمة مستخدمي التوصيل إلى دالة بناء الواجهة
+      contentWrapper.innerHTML = `<div id="sales-movement-list">
+          ${orders.map(order => generateSalesMovementItemHTML(order, loggedInUser, isAdmin, deliveryUsers)).join('')}
+        </div>`;
+    } else {
+      contentWrapper.innerHTML = '<p style="text-align: center; padding: 2rem 0;">لا توجد طلبات لعرضها.</p>';
+    }
 
   // ✅ جديد: إضافة مستمع حدث للنقر على خطوات الحالة القابلة للتعديل
   contentWrapper.addEventListener('click', async (event) => {

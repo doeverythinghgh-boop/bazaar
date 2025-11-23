@@ -120,6 +120,7 @@ export default async function handler(request) {
     } else if (request.method === "GET") {
       const { searchParams } = new URL(request.url);
       const phone = searchParams.get('phone');
+      const role = searchParams.get('role'); // ✅ جديد: استقبال معامل "role"
 
       // إذا تم توفير رقم هاتف، ابحث عن مستخدم معين
       if (phone) {
@@ -142,6 +143,20 @@ export default async function handler(request) {
         return new Response(JSON.stringify(result.rows[0]), {
           status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
         });
+      }
+
+      // ✅ جديد: إذا تم توفير دور، قم بالفلترة بناءً عليه
+      if (role) {
+        const result = await db.execute({
+          sql: `
+            SELECT id, username, phone, is_seller, user_key, Address,
+                   (SELECT fcm_token FROM user_tokens ut WHERE ut.user_key = u.user_key LIMIT 1) as fcm_token
+            FROM users u 
+            WHERE is_seller = ?
+          `,
+          args: [parseInt(role, 10)]
+        });
+        return new Response(JSON.stringify(result.rows), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
       }
 
       // إذا لم يتم توفير رقم هاتف، أرجع جميع المستخدمين

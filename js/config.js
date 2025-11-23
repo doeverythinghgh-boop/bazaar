@@ -2,20 +2,21 @@
  * @description يحدد عنوان URL الأساسي لنقاط نهاية API بناءً على بيئة التشغيل (محلي، Cloudflare Pages، أو تطبيق Android).
  * @type {string}
  */
-let baseURL = "";
+const VERCEL_URL = "https://bazaar-neon-three.vercel.app";
 
-// لو محلي → استخدم Vercel
-if (location.hostname === "127.0.0.1" || location.hostname === "localhost") {
-  baseURL = "https://bazaar-neon-three.vercel.app";
-}
-// لو Cloudflare Pages → استخدم Vercel
-else if (location.hostname.endsWith("pages.dev") || location.hostname.endsWith("bazaar-bk1.pages.dev")) {
-  baseURL = "https://bazaar-neon-three.vercel.app";
-}
-// ✅ جديد: لو داخل تطبيق أندرويد → استخدم Vercel
-else if (location.hostname === "appassets.androidplatform.net") {
-  baseURL = "https://bazaar-neon-three.vercel.app";
-}
+/**
+ * @description قائمة بأسماء النطاقات المسموح لها باستخدام Vercel URL.
+ * @type {string[]}
+ */
+const allowedHosts = [
+  "127.0.0.1",
+  "localhost",
+  "bazaar-bk1.pages.dev",
+  "appassets.androidplatform.net"
+];
+
+// ✅ تحسين: تبسيط منطق تحديد baseURL باستخدام مصفوفة.
+const baseURL = allowedHosts.includes(location.hostname) ? VERCEL_URL : "";
 
 /**
  * @description قائمة بأرقام هواتف المسؤولين المسموح لهم بالوصول الإداري.
