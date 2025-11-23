@@ -509,6 +509,10 @@ window.productModule = (function() {
    */
   function productCleanupModule() {
     console.log('[ProductModule] Cleaning up module...');
+     // إعادة تعيين لون الخلفية إلى الأصلي
+  if (typeof productResetModalBackground === 'function') {
+    productResetModalBackground();
+  }
     productResetModule();
   }
 

@@ -1,118 +1,151 @@
+
+<style>
+/* تأكيد تغيير خلفية العنصر الصحيح */
+.add-product-modal.service-category-active {
+  background: #f5f5f5 !important;
+  background-color: #f5f5f5 !important;
+  transition: background-color 0.3s ease !important;
+}
+
+/* إزالة أي خلفية من العناصر الأخرى */
+#modal-main-content {
+  background: transparent !important;
+  background-color: transparent !important;
+}
+</style>
+
+
+
 <!-- addProduct.html -->
 <button class="close-button" id="add-product-modal-close-btn" aria-label="إغلاق"><i class="fas fa-times"></i></button>
 
 <div id="modal-main-content">
-<div class="add-product-modal" role="dialog" aria-modal="true" aria-labelledby="addProductTitle">
-  <h2 class="add-product-modal__title" id="addProductTitle"><i class="fas fa-cart-plus"></i> إضافة منتج جديد</h2>
+  <div class="add-product-modal" role="dialog" aria-modal="true" aria-labelledby="addProductTitle">
+    <h2 class="add-product-modal__title" id="addProductTitle"><i class="fas fa-cart-plus"></i> إضافة منتج جديد</h2>
 
-  <form class="add-product-modal__form" id="add-product-form" novalidate>
+    <form class="add-product-modal__form" id="add-product-form" novalidate>
       <!-- موديول رفع الصور -->
-    <section class="add-product-modal__form-group" aria-labelledby="imagesHeading">
-      <label id="imagesHeading" class="add-product-modal__label"><i class="fas fa-images"></i> صور المنتج</label>
+      <section class="add-product-modal__form-group" aria-labelledby="imagesHeading">
+        <label id="imagesHeading" class="add-product-modal__label"><i class="fas fa-images"></i> صور المنتج</label>
 
-      <div class="add-product-modal__image-uploader" id="image-uploader" tabindex="0" role="group" aria-label="منطقة رفع الصور">
+        <div class="add-product-modal__image-uploader" id="image-uploader" tabindex="0" role="group"
+          aria-label="منطقة رفع الصور">
 
-        <div class="add-product-modal__uploader-actions">
-          <!-- input مع capture لتفعيل الكاميرا على الأجهزة المحمولة -->
-          <input class="add-product-modal__hidden-file" id="file-input" type="file" accept="image/*" multiple aria-hidden="true">
+          <div class="add-product-modal__uploader-actions">
+            <!-- input مع capture لتفعيل الكاميرا على الأجهزة المحمولة -->
+            <input class="add-product-modal__hidden-file" id="file-input" type="file" accept="image/*" multiple
+              aria-hidden="true">
 
-          <!-- تم تغيير btn-primary إلى btn-ghost لتوحيد التصميم -->
-          <button type="button" class="btn btn-ghost btn-icon" id="pick-files-btn" title="اختر صورًا"><i class="fas fa-folder-open"></i></button>
-          <button type="button" class="btn btn-ghost btn-icon" id="take-photo-btn" title="التقاط من الكاميرا"><i class="fas fa-camera"></i></button>
-          <button type="button" class="btn btn-ghost btn-icon" id="clear-all-btn" title="مسح الكل"><i class="fas fa-trash-alt"></i></button>
+            <!-- تم تغيير btn-primary إلى btn-ghost لتوحيد التصميم -->
+            <button type="button" class="btn btn-ghost btn-icon" id="pick-files-btn" title="اختر صورًا"><i
+                class="fas fa-folder-open"></i></button>
+            <button type="button" class="btn btn-ghost btn-icon" id="take-photo-btn" title="التقاط من الكاميرا"><i
+                class="fas fa-camera"></i></button>
+            <button type="button" class="btn btn-ghost btn-icon" id="clear-all-btn" title="مسح الكل"><i
+                class="fas fa-trash-alt"></i></button>
+          </div>
+
+          <div class="add-product-modal__hint">المطلوب: صورة واحدة على الأقل. الدعم: jpg, png, webp. </div>
+
+          <div class="add-product-modal__previews" id="previews" aria-live="polite" aria-atomic="false"></div>
+
         </div>
 
-        <div class="add-product-modal__hint">المطلوب: صورة واحدة على الأقل. الدعم: jpg, png, webp. </div>
-
-        <div class="add-product-modal__previews" id="previews" aria-live="polite" aria-atomic="false"></div>
-
+      </section>
+      <!-- حاوية الفئات (في سطر واحد) -->
+      <div class="add-product-modal__form-row" id="table-product-category">
+        <div class="add-product-modal__form-group" id="main-category-group">
+          <label for="main-category" class="add-product-modal__label"><i class="fas fa-tags"></i> الفئة الرئيسية</label>
+          <select id="main-category" name="main-category" class="add-product-modal__select" required>
+            <option value="" selected disabled>-- اختر الفئة الرئيسية --</option>
+          </select>
+        </div>
+        <div class="add-product-modal__form-group" id="sub-category-group" style="display: none;">
+          <label for="sub-category" class="add-product-modal__label"><i class="fas fa-tag"></i> الفئة الفرعية</label>
+          <select id="sub-category" name="sub-category" class="add-product-modal__select" disabled>
+            <option value="">-- اختر الفئة الفرعية --</option>
+          </select>
+        </div>
       </div>
 
-    </section>
-    <!-- حاوية الفئات (في سطر واحد) -->
-    <div class="add-product-modal__form-row" id="table-product-category">
-      <div class="add-product-modal__form-group" id="main-category-group">
-        <label for="main-category" class="add-product-modal__label"><i class="fas fa-tags"></i> الفئة الرئيسية</label>
-        <select id="main-category" name="main-category" class="add-product-modal__select" required>
-          <option value="" selected disabled>-- اختر الفئة الرئيسية --</option>
-        </select>
-      </div>
-      <div class="add-product-modal__form-group" id="sub-category-group" style="display: none;">
-        <label for="sub-category" class="add-product-modal__label"><i class="fas fa-tag"></i> الفئة الفرعية</label>
-        <select id="sub-category" name="sub-category" class="add-product-modal__select" disabled>
-          <option value="">-- اختر الفئة الفرعية --</option>
-        </select>
-      </div>
-    </div>
-
-    <!-- جديد: حقل اسم المنتج -->
-    <div class="add-product-modal__form-group">
-      <label for="product-name" class="add-product-modal__label"><i class="fas fa-signature"></i> اسم المنتج</label>
-      <input type="text" id="product-name" name="product-name" class="add-product-modal__input" maxlength="100" placeholder="اكتب اسمًا واضحًا للمنتج..." required>
-      <div id="product-name-char-counter" class="add-product-modal__char-counter">0 / 100</div>
-    </div>
-
-    <!-- حقل وصف المنتج -->
-    <div class="add-product-modal__form-group">
-      <label for="product-description" class="add-product-modal__label"><i class="fas fa-file-alt"></i> الوصف</label>
-      <textarea id="product-description" name="product-description" class="add-product-modal__textarea" rows="4" maxlength="400" placeholder="اكتب وصفًا جذابًا ..."></textarea>
-      <div id="description-char-counter" class="add-product-modal__char-counter">0 / 400</div>
-    </div>
-
-    <!-- حقل رسالة من البائع -->
-    <div class="add-product-modal__form-group">
-      <label for="seller-message" class="add-product-modal__label"><i class="fas fa-comment-dots"></i> رسالة من البائع</label>
-      <input type="text" id="seller-message" name="seller-message" class="add-product-modal__input" maxlength="100" placeholder="اكتب رسالة قصيرة ومميزة تظهر للمشتري...">
-      <div id="seller-message-char-counter" class="add-product-modal__char-counter">0 / 100</div>
-    </div>
-
-    <!-- حقل ملاحظات -->
-    <div class="add-product-modal__form-group">
-      <label for="product-notes" class="add-product-modal__label"><i class="fas fa-sticky-note"></i> ملاحظات</label>
-      <input type="text" id="product-notes" name="product-notes" class="add-product-modal__input" maxlength="100" placeholder="النص هنا لا يظهر للمشتري هو خاص بك انت">
-      <div id="notes-char-counter" class="add-product-modal__char-counter">0 / 100</div>
-    </div>
-
-    <!-- صف جديد للسعر والكمية -->
-    <div class="add-product-modal__form-row" id="price-quantity-row">
-      <!-- حقل الكمية -->
+      <!-- جديد: حقل اسم المنتج -->
       <div class="add-product-modal__form-group">
-        <label for="product-quantity" class="add-product-modal__label"><i class="fas fa-boxes-stacked"></i> الكمية المتاحة</label>
-        <input type="number" id="product-quantity" name="product-quantity" class="add-product-modal__input" placeholder="مثال: 50" required min="1">
+        <label for="product-name" class="add-product-modal__label"><i class="fas fa-signature"></i> اسم المنتج</label>
+        <input type="text" id="product-name" name="product-name" class="add-product-modal__input" maxlength="100"
+          placeholder="اكتب اسمًا واضحًا للمنتج..." required>
+        <div id="product-name-char-counter" class="add-product-modal__char-counter">0 / 100</div>
       </div>
-      <!-- حقل السعر -->
-      <div class="add-product-modal__form-group">
-        <label for="product-price" class="add-product-modal__label"><i class="fas fa-dollar-sign"></i>سعر القطعة</label>
-        <input type="text" inputmode="decimal" id="product-price" name="product-price" class="add-product-modal__input" placeholder="بالجنيه" required>
-      </div>
-      <!-- جديد: حقل السعر قبل الخصم -->
-      <div class="add-product-modal__form-group">
-        <label for="original-price" class="add-product-modal__label"><i class="fas fa-tag"></i>السعر قبل الخصم</label>
-        <input type="text" inputmode="decimal" id="original-price" name="original-price" class="add-product-modal__input" placeholder="اختياري">
-      </div>
-    </div>
 
-    <!-- جديد: حقول نوع الخدمة (تظهر فقط للفئة 6) -->
-    <div class="add-product-modal__form-group" id="service-type-options" style="display: none;">
-      <label class="add-product-modal__label"><i class="fas fa-concierge-bell"></i> نوع الخدمة</label>
-      <div class="add-product-modal__radio-group">
-        <label class="add-product-modal__radio-label">
-          <input type="radio" name="serviceType" value="1" class="add-product-modal__radio-input">
-          تحديد موعد
-        </label>
-        <label class="add-product-modal__radio-label">
-          <input type="radio" name="serviceType" value="2" class="add-product-modal__radio-input">
-          إرسال بيانات
-        </label>
+      <!-- حقل وصف المنتج -->
+      <div class="add-product-modal__form-group">
+        <label for="product-description" class="add-product-modal__label"><i class="fas fa-file-alt"></i> الوصف</label>
+        <textarea id="product-description" name="product-description" class="add-product-modal__textarea" rows="4"
+          maxlength="400" placeholder="اكتب وصفًا جذابًا ..."></textarea>
+        <div id="description-char-counter" class="add-product-modal__char-counter">0 / 400</div>
       </div>
-    </div>
 
-    <!-- زر إرسال النموذج -->
-    <div class="add-product-modal__submit-container">
-      <button type="submit" class="btn btn-primary">اضف المنتج الآن</button>
-    </div>
-  </form>
-</div>
+      <!-- حقل رسالة من البائع -->
+      <div class="add-product-modal__form-group">
+        <label for="seller-message" class="add-product-modal__label"><i class="fas fa-comment-dots"></i> رسالة من
+          البائع</label>
+        <input type="text" id="seller-message" name="seller-message" class="add-product-modal__input" maxlength="100"
+          placeholder="اكتب رسالة قصيرة ومميزة تظهر للمشتري...">
+        <div id="seller-message-char-counter" class="add-product-modal__char-counter">0 / 100</div>
+      </div>
+
+      <!-- حقل ملاحظات -->
+      <div class="add-product-modal__form-group">
+        <label for="product-notes" class="add-product-modal__label"><i class="fas fa-sticky-note"></i> ملاحظات</label>
+        <input type="text" id="product-notes" name="product-notes" class="add-product-modal__input" maxlength="100"
+          placeholder="النص هنا لا يظهر للمشتري هو خاص بك انت">
+        <div id="notes-char-counter" class="add-product-modal__char-counter">0 / 100</div>
+      </div>
+
+      <!-- صف جديد للسعر والكمية -->
+      <div class="add-product-modal__form-row" id="price-quantity-row">
+        <!-- حقل الكمية -->
+        <div class="add-product-modal__form-group">
+          <label for="product-quantity" class="add-product-modal__label"><i class="fas fa-boxes-stacked"></i> الكمية
+            المتاحة</label>
+          <input type="number" id="product-quantity" name="product-quantity" class="add-product-modal__input"
+            placeholder="مثال: 50" required min="1">
+        </div>
+        <!-- حقل السعر -->
+        <div class="add-product-modal__form-group">
+          <label for="product-price" class="add-product-modal__label"><i class="fas fa-dollar-sign"></i>سعر
+            القطعة</label>
+          <input type="text" inputmode="decimal" id="product-price" name="product-price"
+            class="add-product-modal__input" placeholder="بالجنيه" required>
+        </div>
+        <!-- جديد: حقل السعر قبل الخصم -->
+        <div class="add-product-modal__form-group">
+          <label for="original-price" class="add-product-modal__label"><i class="fas fa-tag"></i>السعر قبل الخصم</label>
+          <input type="text" inputmode="decimal" id="original-price" name="original-price"
+            class="add-product-modal__input" placeholder="اختياري">
+        </div>
+      </div>
+
+      <!-- جديد: حقول نوع الخدمة (تظهر فقط للفئة 6) -->
+      <div class="add-product-modal__form-group" id="service-type-options" style="display: none;">
+        <label class="add-product-modal__label"><i class="fas fa-concierge-bell"></i> نوع الخدمة</label>
+        <div class="add-product-modal__radio-group">
+          <label class="add-product-modal__radio-label">
+            <input type="radio" name="serviceType" value="1" class="add-product-modal__radio-input">
+            تحديد موعد
+          </label>
+          <label class="add-product-modal__radio-label">
+            <input type="radio" name="serviceType" value="2" class="add-product-modal__radio-input">
+            إرسال بيانات
+          </label>
+        </div>
+      </div>
+
+      <!-- زر إرسال النموذج -->
+      <div class="add-product-modal__submit-container">
+        <button type="submit" class="btn btn-primary">اضف المنتج الآن</button>
+      </div>
+    </form>
+  </div>
 </div>
 
 <!-- رسالة تحميل -->
@@ -124,6 +157,59 @@
 <script>
 // عرض رسالة التحميل
 document.getElementById('product-loading-message').style.display = 'block';
+
+// إخفاء رسالة التحميل بعد تحميل جميع الملفات
+window.addEventListener('load', function() {
+  document.getElementById('product-loading-message').style.display = 'none';
+  console.log('%c[Product] All modules loaded successfully', 'color: green; font-weight: bold;');
+});
+
+// معالجة أخطاء تحميل الملفات
+window.addEventListener('error', function(e) {
+  console.error('%c[Product] Error loading module:', 'color: red;', e.error);
+  document.getElementById('product-loading-message').innerHTML = 
+    '<i class="fas fa-exclamation-triangle"></i> خطأ في تحميل بعض المكونات. يرجى تحديث الصفحة.';
+});
+
+// مستمع عالمي لأي زر إغلاق في الصفحة
+document.addEventListener('click', function(e) {
+  if (e.target.closest('#add-product-modal-close-btn') || 
+      e.target.closest('.close-button') && e.target.closest('.add-product-modal')) {
+    console.log('%c[ProductForm] 🔒 Global close detection - resetting background', 'color: gray; font-weight: bold;');
+    
+    // تأخير بسيط للتأكد من إغلاق النموذج
+    setTimeout(() => {
+      if (typeof productResetModalBackground === 'function') {
+        productResetModalBackground();
+      }
+    }, 100);
+  }
+});
+
+// أيضًا نستمع لحدث إخفاء النموذج
+document.addEventListener('DOMContentLoaded', function() {
+  const modal = document.querySelector('.add-product-modal');
+  if (modal) {
+    const observer = new MutationObserver(function(mutations) {
+      mutations.forEach(function(mutation) {
+        if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
+          const displayStyle = modal.style.display;
+          if (displayStyle === 'none' || displayStyle === '') {
+            console.log('%c[ProductForm] 🔒 Modal hidden - resetting background', 'color: gray;');
+            if (typeof productResetModalBackground === 'function') {
+              productResetModalBackground();
+            }
+          }
+        }
+      });
+    });
+    
+    observer.observe(modal, {
+      attributes: true,
+      attributeFilter: ['style']
+    });
+  }
+});
 </script>
 
 
@@ -141,4 +227,20 @@ window.addEventListener('error', function(e) {
   document.getElementById('product-loading-message').innerHTML = 
     '<i class="fas fa-exclamation-triangle"></i> خطأ في تحميل بعض المكونات. يرجى تحديث الصفحة.';
 });
+
+// مستمع عالمي لأي زر إغلاق في الصفحة
+document.addEventListener('click', function(e) {
+  if (e.target.closest('#add-product-modal-close-btn') || 
+      e.target.closest('.close-button') && e.target.closest('.add-product-modal')) {
+    console.log('%c[ProductForm] 🔒 Global close detection - resetting background', 'color: gray; font-weight: bold;');
+    
+    setTimeout(() => {
+      if (typeof productResetModalBackground === 'function') {
+        productResetModalBackground();
+      }
+    }, 100);
+  }
+});
+
+// لا حاجة لتعيين متغيرات CSS - سنعمل مباشرة عبر JavaScript
 </script>

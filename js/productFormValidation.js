@@ -291,6 +291,28 @@ function productQuickValidateField(field) {
   return isValid;
 }
 
+/**
+ * @description تنظيف النموذج وإعادة الخلفية عند الإغلاق
+ * @function productCleanupForm
+ * @returns {void}
+ */
+function productCleanupForm() {
+  console.log('%c[ProductForm] 🧹 Cleaning up form and resetting background', 'color: gray;');
+  
+  // إعادة تعيين لون الخلفية
+  if (typeof productResetModalBackground === 'function') {
+    productResetModalBackground();
+  }
+  
+  // تنظيف أي حالات أخرى إذا لزم الأمر
+  const form = document.getElementById('add-product-form');
+  if (form) {
+    delete form.dataset.extendedMode;
+    delete form.dataset.mode;
+    delete form.dataset.productKey;
+  }
+}
 // جعل الدوال متاحة عالميًا
 window.productValidateForm = productValidateForm;
 window.productQuickValidateField = productQuickValidateField;
+window.productCleanupForm = productCleanupForm;
