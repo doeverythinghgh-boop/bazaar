@@ -27,7 +27,7 @@ let offlineToast = null;
  * @type {number}
  * @const
  */
-const CONNECTION_CHECK_INTERVAL = 3000; // 3 ثوانٍ
+const CONNECTION_CHECK_INTERVAL = 10000; // 10 ثوانٍ
 
 /* ----------------------------------------
     🟦 دالة مستخدمة من أي مكان
