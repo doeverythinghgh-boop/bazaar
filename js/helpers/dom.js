@@ -263,7 +263,8 @@ function generatePurchaseItemHTML(item) {
         <p><strong>الإجمالي:</strong> ${itemTotal} جنيه</p>
         <p><strong>تاريخ الطلب:</strong> ${purchaseDate}</p>
         <div class="purchase-status-timeline">
-          ${createStatusTimelineHTML(null, item.status_details, false, 0)}
+          <!-- ✅ تحسين: تمرير تاريخ الحالة لعرضه بجانب الوصف -->
+          ${createStatusTimelineHTML(null, item.status_details, item.status_timestamp, false, 0)}
         </div>
       </div>
     </div>`;
@@ -317,7 +318,8 @@ function generateSalesMovementItemHTML(order, loggedInUser, isAdmin) {
         <p><strong>تاريخ الطلب:</strong> ${orderDate}</p>
         <p><strong>إجمالي الطلب:</strong> ${order.total_amount.toFixed(2)} جنيه</p>
         <div class="purchase-status-timeline">
-          ${createStatusTimelineHTML(order.order_key, ORDER_STATUSES.find(s => s.id === order.order_status), canEdit, userRole)}
+          <!-- ✅ تحسين: تمرير تاريخ الحالة لعرضه بجانب الوصف -->
+          ${createStatusTimelineHTML(order.order_key, order.status_details, order.status_timestamp, canEdit, userRole)}
         </div>
         <h4>المنتجات:</h4>
         ${itemsTable}

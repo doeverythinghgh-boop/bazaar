@@ -80,3 +80,23 @@ function parseOrderStatus(statusValue) {
   // للتعامل مع البيانات القديمة التي قد تكون مجرد رقم أو نص
   return { statusId: -1, timestamp: null }; // افترض أنها حالة غير معروفة إذا لم تكن بالتنسيق الجديد
 }
+
+/**
+ * @description يعالج كائن طلب فردي لإضافة تفاصيل الحالة المنسقة إليه.
+ *   هذه دالة مساعدة مركزية تُستخدم في طبقة الاتصال (connect1.js) لضمان
+ *   أن جميع الطلبات القادمة من API تحتوي على `status_details` و `status_timestamp`.
+ * @function processOrderStatus
+ * @param {object} order - كائن الطلب الأصلي الذي يحتوي على `order_status`.
+ * @returns {object} - كائن الطلب بعد إضافة الحقول المنسقة.
+ * @see parseOrderStatus
+ * @see ORDER_STATUSES
+ */
+function processOrderStatus(order) {
+  const { statusId, timestamp } = parseOrderStatus(order.order_status);
+  const statusInfo = ORDER_STATUSES.find((s) => s.id === statusId) || { state: "غير معروف", description: "حالة الطلب غير معروفة." };
+  return {
+    ...order,
+    status_details: statusInfo,
+    status_timestamp: timestamp,
+  };
+}

@@ -51,20 +51,8 @@ async function getUserPurchases(userKey) {
 
     // ✅ تحسين: يتم هنا دمج بيانات حالة الطلب (مثل النص والوصف) مع كل عنصر في المشتريات.
     // هذا يسهل على الواجهة الأمامية عرض حالة الطلب دون الحاجة إلى منطق إضافي.
-    const purchasesWithStatus = purchases.map((purchase) => {
-      // ✅ جديد: تفكيك قيمة `order_status` للحصول على ID والتاريخ
-      const { statusId, timestamp } = parseOrderStatus(purchase.order_status);
-
-      // البحث عن كائن الحالة المطابق لـ `order_status` في مصفوفة `ORDER_STATUSES` المعرفة في `config.js`.
-      const statusInfo = ORDER_STATUSES.find(
-        (s) => s.id === statusId
-      ) || { state: "غير معروف", description: "حالة الطلب غير معروفة." };
-      return {
-        ...purchase,
-        status_details: statusInfo, // إضافة كائن `status_details` الذي يحتوي على (id, state, description).
-        status_timestamp: timestamp, // ✅ جديد: إضافة تاريخ تحديث الحالة
-      };
-    });
+    // ✅ تحسين: استخدام دالة مساعدة مركزية لمعالجة حالة الطلب لتقليل التكرار.
+    const purchasesWithStatus = purchases.map(processOrderStatus);
 
     // تسجيل البيانات المعالجة وإرجاعها.
     console.log(
@@ -92,10 +80,22 @@ async function getUserPurchases(userKey) {
 async function getSalesMovement(userKey) {
   try {
     const data = await apiFetch(`/api/sales-movement?user_key=${userKey}`);
-    if (data.error) {
+    if (!data || data.error) {
       throw new Error(data.error);
     }
-    return data;
+
+    // ✅ تحسين: معالجة البيانات لإضافة تفاصيل الحالة قبل إرجاعها.
+    // هذا يضمن أن البيانات تكون منسقة وجاهزة للاستخدام في الواجهة الأمامية.
+    // ✅ تحسين: استخدام دالة مساعدة مركزية لمعالجة حالة الطلب لتقليل التكرار.
+    const processedOrders = data.map(processOrderStatus);
+
+    console.log(
+      "%c[API] getSalesMovement processed data with status info:",
+      "color: darkcyan; font-weight: bold;",
+      processedOrders
+    );
+
+    return processedOrders;
   } catch (error) {
     console.error("%c[getSalesMovement] failed:", "color: red;", error);
     return null;
@@ -127,11 +127,14 @@ async function sendNotification(token, title, body) {
  * @see apiFetch
  */
 async function updateOrderStatus(orderKey, newStatusId) {
+  // ✅ إصلاح: استخدام دالة المساعدة لدمج الحالة مع التاريخ قبل الإرسال
+  const composedStatus = composeOrderStatus(newStatusId);
+
   return await apiFetch('/api/orders', {
     method: 'PUT',
     body: {
       order_key: orderKey,
-      order_status: newStatusId,
+      order_status: composedStatus, // إرسال القيمة المدمجة "ID#TIMESTAMP"
     },
   });
 }

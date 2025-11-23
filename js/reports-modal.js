@@ -7,14 +7,15 @@
  * @description ينشئ شريط تقدم زمني (Timeline) لحالة الطلب، مع تحديد الخطوات النشطة
  *   والخطوات القابلة للتعديل بناءً على دور المستخدم وصلاحياته.
  * @function createStatusTimelineHTML
- * @param {string} orderKey - المفتاح الفريد للطلب الذي يتم إنشاء شريط التقدم له.
+ * @param {string | null} orderKey - المفتاح الفريد للطلب الذي يتم إنشاء شريط التقدم له.
  * @param {object} statusDetails - كائن يحتوي على تفاصيل الحالة الحالية للطلب (id, state, description).
+ * @param {string | null} statusTimestamp - التاريخ بصيغة ISO للحالة الحالية.
  * @param {boolean} canEdit - قيمة منطقية تحدد ما إذا كان المستخدم لديه صلاحية تعديل هذا الطلب بشكل عام.
  * @param {number} userRole - دور المستخدم الحالي (على سبيل المثال: 1=بائع, 2=خدمة توصيل, 3=مسؤول).
  * @returns {string} - كود HTML الذي يمثل شريط التقدم الزمني للحالة.
  * @see ORDER_STATUS_MAP
  */
-function createStatusTimelineHTML(orderKey, statusDetails, canEdit, userRole) {
+function createStatusTimelineHTML(orderKey, statusDetails, statusTimestamp, canEdit, userRole) {
   const currentStatusId = statusDetails ? statusDetails.id : -1; // لا تغيير هنا، سنمرر statusDetails الصحيح
 
   const progressStates = [
@@ -26,7 +27,18 @@ function createStatusTimelineHTML(orderKey, statusDetails, canEdit, userRole) {
 
   // إذا كانت تفاصيل الحالة غير موجودة، اعرض حالة غير معروفة
   if (!statusDetails) {
-    return `<p class="timeline-description">حالة الطلب غير معروفة.</p>`;
+    return `<p class="timeline-description" style="text-align: center;">حالة الطلب غير معروفة.</p>`;
+  }
+
+  // ✅ جديد: تنسيق التاريخ لإضافته إلى الوصف
+  let descriptionText = statusDetails.description;
+  if (statusTimestamp) {
+    const date = new Date(statusTimestamp);
+    // التحقق من أن التاريخ صالح قبل عرضه
+    if (!isNaN(date.getTime())) {
+      const formattedDate = date.toLocaleString('ar-EG', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+      descriptionText += ` <span class="status-date">(بتاريخ: ${formattedDate})</span>`;
+    }
   }
 
   if (!progressStates.some(p => p.id === currentStatusId)) {
@@ -44,7 +56,7 @@ function createStatusTimelineHTML(orderKey, statusDetails, canEdit, userRole) {
           <i class="fas ${icon}"></i>
           <span>${statusDetails.state}</span>
         </div>
-        <p class="timeline-description">${statusDetails.description}</p>
+        <p class="timeline-description">${descriptionText}</p>
       </div>
     `;
   }
@@ -88,7 +100,7 @@ function createStatusTimelineHTML(orderKey, statusDetails, canEdit, userRole) {
   });
   timelineHTML += '</div>';
 
-  const descriptionHTML = `<p class="timeline-description">${statusDetails.description}</p>`;
+  const descriptionHTML = `<p class="timeline-description">${descriptionText}</p>`;
 
   return timelineHTML + descriptionHTML;
 }
@@ -125,21 +137,10 @@ async function showSalesMovementModal(userKey) {
   console.log('%c[DEV-LOG] showSalesMovementModal: البيانات المستلمة من getSalesMovement():', 'color: blue; font-weight: bold;', orders);
 
   if (orders && orders.length > 0) {
-    // ✅ جديد: معالجة الطلبات لإضافة تفاصيل الحالة بناءً على النص
-    const processedOrders = orders.map(order => {
-      const { statusId, timestamp } = parseOrderStatus(order.order_status);
-      const statusInfo = ORDER_STATUSES.find(s => s.id === statusId) || { state: "غير معروف", description: "حالة غير معروفة" };
-      return {
-        ...order,
-        status_details: statusInfo,
-        status_timestamp: timestamp
-      };
-    });
-
-    console.log('%c[DEV-LOG] showSalesMovementModal: البيانات بعد إضافة تفاصيل الحالة:', 'color: green;', processedOrders);
-
+    // ✅ تبسيط: لم تعد هناك حاجة لمعالجة البيانات هنا،
+    // لأنها تأتي جاهزة من دالة `getSalesMovement` في `connect1.js`.
     contentWrapper.innerHTML = `<div id="sales-movement-list">
-        ${processedOrders.map(order => generateSalesMovementItemHTML(order, loggedInUser, isAdmin)).join('')}
+        ${orders.map(order => generateSalesMovementItemHTML(order, loggedInUser, isAdmin)).join('')}
       </div>`;
   } else {
     contentWrapper.innerHTML = '<p style="text-align: center; padding: 2rem 0;">لا توجد طلبات لعرضها.</p>';
