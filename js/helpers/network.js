@@ -183,7 +183,7 @@ async function apiFetch(endpoint, options = {}) {
     fetchOptions.body = JSON.stringify(body);
   }
 
-  console.log(`%c[API Fetch] ${method} ${endpoint}`, 'color: #17a2b8;', body ? { payload: body } : '');
+  console.log(`%c[API Fetch] ${method} ${endpoint}`, 'color: #b81717ff;', body ? { payload: body } : '');
 
   try {
     const response = await fetch(url, fetchOptions);

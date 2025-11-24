@@ -134,7 +134,7 @@ async function showSalesMovementModal(userKey) {
       // جلب الطلبات ومستخدمي التوصيل بشكل متزامن لتحسين الأداء
       [orders, deliveryUsers] = await Promise.all([
         getSalesMovement(userKey),
-        getDeliveryUsers()
+        //getDeliveryUsers()
       ]);
     } else {
       // جلب الطلبات فقط إذا لم يكن المستخدم مسؤولاً
