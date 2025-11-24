@@ -45,7 +45,7 @@ export async function analyzeAndSaveDatabase() {
   // ✅ جديد: إضافة وصف تفصيلي للبيانات التي سيتم إرجاعها
   // ✅ تحسين: تم تحويل الوصف إلى مخطط منظم (schema) ليكون قابلاً للتحليل الآلي بواسطة أدوات الذكاء الاصطناعي.
   result.schemaMetadata = {
-    ai_prompt: "You are a database analysis expert. This JSON contains the complete schema of an SQLite database. Use 'tableNames' to iterate through tables. Use 'tablesInfo' for column details and 'foreignKeys' to understand relationships between tables. Your task is to analyze this schema to answer questions, generate documentation, or create diagrams.",
+    ai_prompt: "You are a database analysis expert. This JSON contains the complete schema of an SQLite database In turso server. Use 'tableNames' to iterate through tables. Use 'tablesInfo' for column details and 'foreignKeys' to understand relationships between tables. Your task is to analyze this schema to answer questions, generate documentation, or create diagrams.",
     type: "object",
     properties: {
       tableNames: {
