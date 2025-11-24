@@ -13,6 +13,7 @@
  * @see initializeUsersAdminLogic
  */
 async function showUsersAdminModal() {
+  console.log("%c[Users Admin] بدء عملية عرض نافذة إدارة المستخدمين...", "color: blue; font-weight: bold;");
   await loadAndShowModal(
     "users-modal-container",
     "pages/usersAdminModal.html",
@@ -34,6 +35,7 @@ async function showUsersAdminModal() {
  * @see updateUsers
  */
 async function initializeUsersAdminLogic(modalContainer) {
+  console.log("[Users Admin] بدء تهيئة منطق النافذة...");
   const contentWrapper = modalContainer.querySelector("#users-admin-modal-content-wrapper");
   const actionsContainer = modalContainer.querySelector("#users-admin-modal-actions");
   const searchInput = modalContainer.querySelector("#users-admin-search-input");
@@ -49,6 +51,7 @@ async function initializeUsersAdminLogic(modalContainer) {
    * @see generateUserCardHTML
    */
   const displayUsers = (users) => {
+    console.log(`[Users Admin] بدء عرض ${users ? users.length : 0} مستخدم في الواجهة.`);
     actionsContainer.style.display = 'none';
     if (users && users.length > 0) {
       let usersHTML = '<div class="user-cards-container">';
@@ -67,18 +70,24 @@ async function initializeUsersAdminLogic(modalContainer) {
 
           if (container) {
             // 3. استدعاء دالة تحميل العلاقات وتمرير مفتاح البائع والحاوية
+            console.log(`[Users Admin] المستخدم ${user.username} هو بائع. بدء تحميل الموزعين المرتبطين به...`);
             loadDeliveryRelations(user.user_key, container);
+          } else {
+            console.warn(`[Users Admin] لم يتم العثور على الحاوية 'deliveries-container-${user.user_key}' للبائع ${user.username}.`);
           }
         }
       });
     } else {
+      console.log("[Users Admin] لا يوجد مستخدمين لعرضهم حسب الفلتر الحالي.");
       contentWrapper.innerHTML = "<p>لم يتم العثور على مستخدمين.</p>";
     }
   };
 
   // تحميل المستخدمين لأول مرة
   contentWrapper.innerHTML = '<div class="loader"></div>';
+  console.log("[Users Admin] بدء جلب قائمة المستخدمين الأولية من الخادم...");
   allUsers = await fetchUsers();
+  console.log(`[Users Admin] تم جلب ${allUsers ? allUsers.length : 0} مستخدم بنجاح.`);
   displayUsers(allUsers);
 
   /**
@@ -369,6 +378,7 @@ async function handleDeliveryStatusToggle(checkbox) {
  * @param {HTMLElement} container - الحاوية التي سيتم عرض الجدول بداخلها.
  */
 async function loadDeliveryRelations(sellerKey, container) {
+  console.log(`[Load Deliveries] بدء جلب علاقات الموزعين للبائع: ${sellerKey}`);
   container.innerHTML = '<div class="loader loader-small"></div>';
 
   try {
@@ -379,6 +389,7 @@ async function loadDeliveryRelations(sellerKey, container) {
 
 
     if (relations.length === 0) {
+      console.log(`[Load Deliveries] لا يوجد موزعين مرتبطين بالبائع ${sellerKey}.`);
       container.innerHTML = '<p>لا يوجد موزعين لعرضهم.</p>';
       return;
     }
@@ -403,8 +414,9 @@ async function loadDeliveryRelations(sellerKey, container) {
         </tbody>
       </table>`;
     container.innerHTML = tableHTML;
+    console.log(`%c[Load Deliveries] تم عرض ${relations.length} موزع بنجاح للبائع ${sellerKey}.`, "color: green;");
   } catch (error) {
-    console.error(`[Load Deliveries] Error loading relations for seller ${sellerKey}:`, error);
+    console.error(`%c[Load Deliveries] خطأ فادح أثناء تحميل علاقات البائع ${sellerKey}:`, "color: red; font-weight: bold;", error);
     container.innerHTML = '<p>حدث خطأ أثناء تحميل بيانات الموزعين.</p>';
   }
 }
