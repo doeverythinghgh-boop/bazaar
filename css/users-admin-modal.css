@@ -209,6 +209,70 @@
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
 }
 
+/* ✅ جديد: أنماط قسم الموزعين داخل بطاقة البائع */
+.user-deliveries-section {
+  padding: 0 20px 20px; /* إضافة حشو للقسم */
+  border-top: 1px solid #f0f2f5;
+  margin-top: 20px;
+}
+
+.user-deliveries-section h4 {
+  font-size: 0.95rem;
+  color: #4a5568;
+  margin: 15px 0 10px;
+}
+
+.deliveries-table-container {
+  height: 200px;
+  overflow-y: auto;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  position: relative; /* ضروري لتثبيت رأس الجدول */
+}
+
+.deliveries-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.deliveries-table th,
+.deliveries-table td {
+  padding: 10px 12px;
+  text-align: right;
+  border-bottom: 1px solid #e2e8f0;
+  white-space: nowrap;
+}
+
+.deliveries-table thead th {
+  position: sticky;
+  top: 0;
+  background-color: #f8fafc;
+  color: #475569;
+  font-weight: 600;
+  z-index: 1;
+}
+
+.deliveries-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.deliveries-table .delivery-phone {
+  direction: ltr;
+  text-align: right;
+}
+
+.deliveries-table .status-toggle-checkbox {
+  cursor: pointer;
+  width: 18px;
+  height: 18px;
+}
+
+.deliveries-table .loader-small {
+  margin: 20px auto;
+  width: 24px;
+  height: 24px;
+}
 /* ✅ جديد: أنماط فلاتر الأدوار (Radio Buttons) */
 .user-role-filter-container {
   display: flex;

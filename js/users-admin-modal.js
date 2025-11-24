@@ -52,7 +52,10 @@ async function initializeUsersAdminLogic(modalContainer) {
     actionsContainer.style.display = 'none';
     if (users && users.length > 0) {
       let usersHTML = '<div class="user-cards-container">';
-      users.forEach(u => { usersHTML += generateUserCardHTML(u); });
+      users.forEach(u => { 
+        // ✅ تعديل: تمرير قائمة جميع المستخدمين لتحديد الموزعين
+        usersHTML += generateUserCardHTML(u, allUsers); 
+      });
       usersHTML += `</div>`;
       contentWrapper.innerHTML = usersHTML;
     } else {
@@ -114,6 +117,8 @@ async function initializeUsersAdminLogic(modalContainer) {
     }
   });
   // ربط الأحداث داخل النافذة المنبثقة
+  // ✅ تعديل: استخدام contentWrapper لربط الأحداث لأنه يحتوي على البطاقات
+  const modalBody = modalContainer.querySelector('.users-admin-modal-body');
   const modalContent = modalContainer.querySelector('.modal-content');
   const updateBtn = modalContainer.querySelector("#update-users-btn");
   const cancelBtn = modalContainer.querySelector("#cancel-update-btn");
@@ -124,7 +129,8 @@ async function initializeUsersAdminLogic(modalContainer) {
     }
   });
 
-  modalContent.addEventListener('click', async (event) => {
+  // ✅ تعديل: استخدام modalBody لربط الأحداث لأنه أب مستقر
+  modalBody.addEventListener('click', async (event) => {
     const sendBtn = event.target.closest('.send-notif-btn');
     if (!sendBtn) return;
 
@@ -191,6 +197,14 @@ async function initializeUsersAdminLogic(modalContainer) {
     }
   });
 
+  // ✅ جديد: ربط حدث النقر لمعالجة تغيير حالة الموزع
+  modalBody.addEventListener('change', async (event) => {
+    if (event.target.classList.contains('status-toggle-checkbox')) {
+      await handleDeliveryStatusToggle(event.target);
+    }
+  });
+
+
   cancelBtn.addEventListener('click', () => {
     displayUsers(allUsers); // إعادة عرض جميع المستخدمين
   });
@@ -232,4 +246,89 @@ async function initializeUsersAdminLogic(modalContainer) {
       });
     }
   });
+}
+
+/**
+ * @description يعالج حدث تغيير حالة ارتباط الموزع بالبائع.
+ * @param {HTMLInputElement} checkbox - مربع الاختيار الذي تم النقر عليه.
+ */
+async function handleDeliveryStatusToggle(checkbox) {
+  const sellerKey = checkbox.dataset.sellerKey;
+  const deliveryKey = checkbox.dataset.deliveryKey;
+  const isActive = checkbox.checked;
+
+  checkbox.disabled = true; // تعطيل مربع الاختيار أثناء التحديث
+
+  try {
+    const response = await fetchWithAuth('/api/suppliers-deliveries', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sellerKey, deliveryKey, isActive }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to update status: ${response.statusText}`);
+    }
+
+    // تم التحديث بنجاح
+    console.log(`[Delivery Toggle] Relation updated for seller ${sellerKey} and delivery ${deliveryKey} to ${isActive}`);
+
+  } catch (error) {
+    console.error('[Delivery Toggle] Error updating delivery status:', error);
+    // في حالة الفشل، أرجع مربع الاختيار إلى حالته السابقة
+    checkbox.checked = !isActive;
+    Swal.fire({
+      title: 'خطأ',
+      text: 'فشل تحديث حالة الموزع. الرجاء المحاولة مرة أخرى.',
+      icon: 'error',
+      target: document.getElementById('users-modal-container'), // عرض التنبيه داخل المودال
+    });
+  } finally {
+    checkbox.disabled = false; // إعادة تفعيل مربع الاختيار
+  }
+}
+
+/**
+ * @description يقوم بجلب علاقات الموزعين وعرضها في جدول داخل بطاقة البائع.
+ * @param {string} sellerKey - مفتاح البائع.
+ * @param {HTMLElement} container - الحاوية التي سيتم عرض الجدول بداخلها.
+ */
+async function loadDeliveryRelations(sellerKey, container) {
+  container.innerHTML = '<div class="loader loader-small"></div>';
+
+  try {
+    const response = await fetchWithAuth(`/api/suppliers-deliveries?sellerKey=${sellerKey}`);
+    if (!response.ok) throw new Error('Failed to fetch delivery relations');
+
+    const relations = await response.json();
+
+    if (relations.length === 0) {
+      container.innerHTML = '<p>لا يوجد موزعين لعرضهم.</p>';
+      return;
+    }
+
+    let tableHTML = `
+      <table class="deliveries-table">
+        <thead>
+          <tr>
+            <th>الاسم</th>
+            <th>الهاتف</th>
+            <th>نشط</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${relations.map(rel => `
+            <tr>
+              <td>${rel.username}</td>
+              <td class="delivery-phone">${rel.phone}</td>
+              <td><input type="checkbox" class="status-toggle-checkbox" data-seller-key="${sellerKey}" data-delivery-key="${rel.deliveryKey}" ${rel.isActive ? 'checked' : ''}></td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>`;
+    container.innerHTML = tableHTML;
+  } catch (error) {
+    console.error(`[Load Deliveries] Error loading relations for seller ${sellerKey}:`, error);
+    container.innerHTML = '<p>حدث خطأ أثناء تحميل بيانات الموزعين.</p>';
+  }
 }
