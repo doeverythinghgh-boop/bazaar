@@ -1,6 +1,7 @@
 /**
  * @file js/login-page.js
  * @description يحتوي هذا الملف على المنطق البرمجي الكامل الخاص بصفحة تسجيل الدخول (`login.html`).
+ * @description يحتوي هذا الملف على المنطق البرمجي الكامل الخاص بصفحة تسجيل الدخول (`login.html`).
  * يتولى الملف مسؤولية التحقق من وجود مستخدم مسجل، وعرض الواجهة المناسبة له،
  * أو معالجة عملية تسجيل دخول جديدة لمستخدم موجود أو تسجيل الدخول كضيف.
  * @requires module:sweetalert2 - لعرض رسائل تفاعلية للمستخدم.
@@ -9,6 +10,21 @@
  * @requires js/utils.js - لاستخدام `normalizeDigits`.
  * @requires js/modal.js - لاستدعاء دوال عرض النوافذ المنبثقة المختلفة.
  */
+
+/**
+ * @description يتحقق مما إذا كان المستخدم مؤهلاً لاستقبال الإشعارات.
+ * المستخدمون المؤهلون هم: البائعون (is_seller: 1)، خدمات التوصيل (is_seller: 2)، والمسؤولون.
+ * @function isUserEligibleForNotifications
+ * @param {object} user - كائن المستخدم للتحقق منه.
+ * @param {number} [user.is_seller] - دور المستخدم.
+ * @param {string} [user.phone] - رقم هاتف المستخدم للتحقق من كونه مسؤولاً.
+ * @returns {boolean} - `true` إذا كان المستخدم مؤهلاً، وإلا `false`.
+ */
+function isUserEligibleForNotifications(user) {
+  if (!user || user.is_guest) return false;
+  // adminPhoneNumbers is defined globally in config.js
+  return user.is_seller === 1 || user.is_seller === 2 || (typeof adminPhoneNumbers !== 'undefined' && adminPhoneNumbers.includes(user.phone));
+}
 
 /**
  * @description تحديث واجهة المستخدم لتعكس حالة تسجيل الدخول،
@@ -144,11 +160,7 @@ function updateViewForLoggedInUser(user) {
 
     // ✅ جديد: إظهار زر "حركة المشتريات" للمسؤول أو البائع أو خدمة التوصيل
     // ✅ تعديل: تحديث الشرط ليشمل المسؤول (adminPhoneNumbers)
-    if (
-      user.is_seller === 1 ||
-      user.is_seller === 2 ||
-      adminPhoneNumbers.includes(user.phone)
-    ) {
+    if (isUserEligibleForNotifications(user)) {
       const reportsActions = document.getElementById("reports-actions");
       reportsActions.style.display = "block";
       // ✅ تفعيل: ربط حدث النقر بالزر
