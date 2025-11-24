@@ -57,13 +57,16 @@ export default async function handler(request) {
         const { rows } = await db.execute({
           sql: `
             SELECT
-              u.user_key,
-              u.username,
-              u.phone
+                u.user_key,
+                u.username,
+                u.phone,
+                ut.fcm_token
             FROM
-              users u
+                users u
             JOIN
-              suppliers_deliveries sd ON u.user_key = sd.delivery_key
+                suppliers_deliveries sd ON u.user_key = sd.delivery_key
+            LEFT JOIN 
+                user_tokens ut ON u.user_key = ut.user_key
             WHERE
               sd.seller_key = ? AND sd.is_active = 1 AND u.is_seller = 2;
           `,
@@ -74,6 +77,7 @@ export default async function handler(request) {
           deliveryKey: row.user_key,
           username: row.username,
           phone: row.phone,
+          fcmToken: row.fcm_token, // ✅ إضافة: تضمين التوكن في النتيجة
           isActive: true, // بما أننا جلبنا النشطين فقط، فستكون القيمة دائماً true
         }));
 
