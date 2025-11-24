@@ -29,11 +29,8 @@ const corsHeaders = {
  * @returns {Promise<Response>} - وعد يحتوي على كائن استجابة HTTP.
  */
 export default async function handler(request) {
-  // ✅ إصلاح حاسم لمشكلة CORS:
-  // يجب معالجة طلبات OPTIONS (preflight) كأول شيء على الإطلاق في الدالة.
-  // هذا يضمن استجابة سريعة وصحيحة للمتصفح قبل تنفيذ أي منطق آخر،
-  // وهو أمر ضروري لنجاح طلبات CORS في بيئات Edge مثل Vercel.
-  if (request.method === 'OPTIONS') {
+  if (request.method === "OPTIONS") {
+    console.log(`[CORS] Handled OPTIONS request for: ${request.url}`);
     return new Response(null, { status: 204, headers: corsHeaders });
   }
 
