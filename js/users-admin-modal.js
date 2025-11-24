@@ -73,26 +73,46 @@ async function initializeUsersAdminLogic(modalContainer) {
    * @see displayUsers
    */
   const applyFilters = () => {
+    console.log("%c[Users Admin] بدء عملية تصفية المستخدمين...", "color: blue;");
     const searchTerm = searchInput.value.toLowerCase().trim();
     const selectedRole = roleFilterContainer.querySelector('input[name="user-role-filter"]:checked').value;
+    console.log(`[Users Admin] معايير التصفية: نص البحث='${searchTerm}', الدور المحدد='${selectedRole}'`);
 
-    if (!allUsers) return;
+    if (!allUsers) {
+      console.warn("[Users Admin] لا يوجد مستخدمين لعرضهم (allUsers is null).");
+      return;
+    }
 
+    // ✅ إصلاح: تعديل منطق تصفية الأدوار ليعمل بشكل صحيح.
+    // يتم تحويل قيمة الفلتر المحددة (selectedRole) إلى رقم للمقارنة.
+    // إذا كانت القيمة فارغة (فلتر "الكل")، يتم تخطي التحقق من الدور.
     const filteredUsers = allUsers.filter(user => {
       const matchesSearch = (user.username && user.username.toLowerCase().includes(searchTerm)) ||
                             (user.phone && user.phone.includes(searchTerm));
       
-      const matchesRole = !selectedRole || user.is_seller == roleToNumber(selectedRole);
+      // إذا لم يتم تحديد دور (فلتر "الكل")، فإن matchesRole تكون true دائمًا.
+      if (!selectedRole) {
+        return matchesSearch;
+      }
 
+      // مقارنة دور المستخدم بالدور المحدد في الفلتر.
+      const matchesRole = parseInt(user.is_seller, 10) === parseInt(selectedRole, 10);
       return matchesSearch && matchesRole;
     });
 
     displayUsers(filteredUsers);
+    console.log("%c[Users Admin] انتهت عملية تصفية وعرض المستخدمين.", "color: green;");
   };
 
   // ربط الأحداث
   searchInput.addEventListener('input', applyFilters);
-  roleFilterContainer.addEventListener('change', applyFilters);
+  roleFilterContainer.addEventListener('change', (event) => {
+    // ✅ تتبع للمطور: تسجيل الحدث عند تغيير فلتر الدور
+    if (event.target.name === 'user-role-filter') {
+        console.log(`%c[Users Admin] تم النقر على فلتر الدور: ${event.target.labels[0].innerText}`, "color: purple; font-weight: bold;");
+        applyFilters();
+    }
+  });
   // ربط الأحداث داخل النافذة المنبثقة
   const modalContent = modalContainer.querySelector('.modal-content');
   const updateBtn = modalContainer.querySelector("#update-users-btn");
