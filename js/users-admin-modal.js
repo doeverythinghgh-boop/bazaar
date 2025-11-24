@@ -332,6 +332,8 @@ function generateUserCardHTML(user) {
   `;
 }
 
+
+
 /**
  * @description يعالج حدث تغيير حالة ارتباط الموزع بالبائع.
  * @param {HTMLInputElement} checkbox - مربع الاختيار الذي تم النقر عليه.
@@ -339,38 +341,66 @@ function generateUserCardHTML(user) {
 async function handleDeliveryStatusToggle(checkbox) {
   const sellerKey = checkbox.dataset.sellerKey;
   const deliveryKey = checkbox.dataset.deliveryKey;
-  const isActive = checkbox.checked;
+  const isActive = checkbox.checked; // الحالة الجديدة التي يتم تفعيلها/إلغاؤها
 
   checkbox.disabled = true; // تعطيل مربع الاختيار أثناء التحديث
+  const initialState = !isActive; // الحالة السابقة لمربع الاختيار (لإعادة التراجع)
 
   try {
-    const response = await apiFetch('/api/suppliers-deliveries', {
+    // 1. استدعاء apiFetch. نحن نفترض أن apiFetch تعالج أخطاء HTTP Status (مثل 500)
+    // وتُعيد كائن JSON (النتيجة) مباشرةً في حالة النجاح (HTTP Status 2xx).
+    const result = await apiFetch('/api/suppliers-deliveries', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: { sellerKey, deliveryKey, isActive },
+      // يجب تمرير الحمولة كجسم (body) إذا كانت apiFetch تتوقع ذلك.
+      body: { sellerKey, deliveryKey, isActive }, 
     });
 
-    if (!response.ok) {
-      throw new Error(`Failed to update status: ${response.statusText}`);
+    // 2. التحقق مباشرةً من حقل النجاح داخل كائن النتيجة
+    if (result && result.success) {
+      // تم التحديث بنجاح
+      console.log(`%c[Delivery Toggle] Relation updated successfully for seller ${sellerKey} and delivery ${deliveryKey} to ${isActive}`, "color: green;");
+      
+      // عرض إشعار النجاح للمستخدم
+      Swal.fire({
+        title: 'نجاح',
+        text: result.message || 'تم تحديث حالة الموزع بنجاح.',
+        icon: 'success',
+        target: document.getElementById('users-modal-container'),
+        timer: 2500,
+        showConfirmButton: false
+      });
+      
+    } else {
+      // حالة فشل منطقي (مثلاً: الخادم أعاد 200 OK لكن success: false)
+      const errorMessage = (result && result.message) || 'استجابة خادم غير متوقعة: لم يتم تأكيد النجاح.';
+      throw new Error(`Failed to update status: ${errorMessage}`);
     }
 
-    // تم التحديث بنجاح
-    console.log(`[Delivery Toggle] Relation updated for seller ${sellerKey} and delivery ${deliveryKey} to ${isActive}`);
-
   } catch (error) {
+    // 3. معالجة الفشل (يشمل أخطاء الشبكة، أخطاء HTTP التي يتم رميها بواسطة apiFetch، أو الخطأ المرمي في النقطة 2)
     console.error('[Delivery Toggle] Error updating delivery status:', error);
-    // في حالة الفشل، أرجع مربع الاختيار إلى حالته السابقة
-    checkbox.checked = !isActive;
+    
+    // إرجاع مربع الاختيار إلى حالته السابقة (Rollback)
+    checkbox.checked = initialState; 
+    
+    // عرض إشعار الخطأ
     Swal.fire({
       title: 'خطأ',
       text: 'فشل تحديث حالة الموزع. الرجاء المحاولة مرة أخرى.',
       icon: 'error',
-      target: document.getElementById('users-modal-container'), // عرض التنبيه داخل المودال
+      target: document.getElementById('users-modal-container'),
     });
+    
+    // رمي الخطأ مجدداً للسماح للدالة المستدعية بالتعامل معه (مهم للحماية)
+    throw error;
+    
   } finally {
-    checkbox.disabled = false; // إعادة تفعيل مربع الاختيار
+    checkbox.disabled = false; // إعادة تفعيل مربع الاختيار دائماً
   }
 }
+
+
 
 /**
  * @description يقوم بجلب علاقات الموزعين وعرضها في جدول داخل بطاقة البائع.
