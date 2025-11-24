@@ -353,15 +353,13 @@ function getCurrentUser() {
  * @see isUserAdmin
  */
 function isUserEligibleForNotifications(user) {
-  if (!user || user.is_guest) {
+  if (!user || user.is_guest || !user.role) {
     return false;
   }
-  // ✅ تعديل: استخدام دالة isUserAdmin للتحقق
-  const isAdmin = isUserAdmin(user);
-
-  return user.is_seller === 1 || // بائع
-         user.is_seller === 2 || // خدمة توصيل
-         isAdmin;              // مسؤول
+  // التحقق باستخدام الأسماء النصية للأدوار
+  return user.role === 'SELLER' ||
+         user.role === 'DELIVERY' ||
+         user.role === 'ADMIN';
 }
 
 /**
@@ -371,9 +369,9 @@ function isUserEligibleForNotifications(user) {
  * @returns {boolean} - `true` إذا كان المستخدم بائعًا أو مسؤولاً، وإلا `false`.
  */
 function isUserSeller(user) {
-  if (!user) return false;
-  // المسؤول (3) يعتبر بائعًا أيضًا
-  return user.is_seller === 1 || user.is_seller === 3;
+  if (!user || !user.role) return false;
+  // المسؤول يعتبر بائعًا أيضًا في سياق الصلاحيات
+  return user.role === 'SELLER' || user.role === 'ADMIN';
 }
 
 /**
@@ -383,9 +381,9 @@ function isUserSeller(user) {
  * @returns {boolean} - `true` إذا كان المستخدم مسؤولاً، وإلا `false`.
  */
 function isUserAdmin(user) {
-  if (!user) return false;
-  // التحقق من الدور (is_seller === 3) أو من رقم الهاتف
-  const isAdminByRole = user.is_seller === 3;
+  if (!user || !user.role) return false;
+  // التحقق من الدور أو من رقم الهاتف
+  const isAdminByRole = user.role === 'ADMIN';
   const isAdminByPhone = adminPhoneNumbers && adminPhoneNumbers.includes(user.phone);
   return isAdminByRole || isAdminByPhone;
 }
@@ -406,7 +404,7 @@ function checkAdminStatus() {
   }
 
   // adminPhoneNumbers معرفة بشكل عام في config.js
-  if (adminPhoneNumbers && adminPhoneNumbers.includes(user.phone)) {
+  if (isUserAdmin(user)) {
     console.log(`[Auth] Admin access confirmed for user: ${user.username}`);
     return user;
   }

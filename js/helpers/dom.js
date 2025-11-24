@@ -384,10 +384,10 @@ function generateUserCardHTML(user) {
   const isAdmin = adminPhoneNumbers.includes(user.phone);
   const roleUI = isAdmin
     ? `<div class="user-role-static"><i class="fas fa-user-shield"></i> <span>مسؤول</span></div>`
-    : `<select id="role-select-${user.user_key}" class="user-role-select" data-phone="${user.phone}" data-original-state="${user.is_seller}">
-         <option value="0" ${user.is_seller === 0 ? 'selected' : ''}>عميل</option>
-         <option value="1" ${user.is_seller === 1 ? 'selected' : ''}>بائع</option>
-         <option value="2" ${user.is_seller === 2 ? 'selected' : ''}>خدمة توصيل</option>
+    : `<select id="role-select-${user.user_key}" class="user-role-select" data-phone="${user.phone}" data-original-state="${user.is_seller ?? 0}">
+         <option value="${USER_ROLES_MAP.CUSTOMER}" ${user.is_seller === USER_ROLES_MAP.CUSTOMER ? 'selected' : ''}>عميل</option>
+         <option value="${USER_ROLES_MAP.SELLER}" ${user.is_seller === USER_ROLES_MAP.SELLER ? 'selected' : ''}>بائع</option>
+         <option value="${USER_ROLES_MAP.DELIVERY}" ${user.is_seller === USER_ROLES_MAP.DELIVERY ? 'selected' : ''}>خدمة توصيل</option>
        </select>`;
 
   return `

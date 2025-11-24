@@ -78,3 +78,36 @@ const ORDER_STATUS_MAP = {
  * @see ORDER_STATUS_MAP
  */
 const ORDER_STATUSES = Object.values(ORDER_STATUS_MAP);
+
+/**
+ * @description كائن يمثل خريطة لأدوار المستخدمين، يربط الاسم النصي بالمعرف الرقمي المستخدم في قاعدة البيانات.
+ *   يعتبر مصدر الحقيقة الوحيد لأدوار المستخدمين.
+ * @type {Object<string, number>}
+ * @const
+ */
+const USER_ROLES_MAP = {
+  CUSTOMER: 0, // عميل
+  SELLER: 1, // بائع
+  DELIVERY: 2, // خدمة توصيل
+  ADMIN: 3, // مسؤول
+};
+
+/**
+ * @description يحول الاسم النصي للدور (مثل 'SELLER') إلى المعرف الرقمي المقابل له.
+ * @function roleToNumber
+ * @param {string} roleString - الاسم النصي للدور.
+ * @returns {number} - المعرف الرقمي للدور. يعود بقيمة العميل (0) كقيمة افتراضية.
+ */
+function roleToNumber(roleString) {
+  return USER_ROLES_MAP[roleString.toUpperCase()] ?? USER_ROLES_MAP.CUSTOMER;
+}
+
+/**
+ * @description يحول المعرف الرقمي للدور إلى الاسم النصي المقابل له (مثل 'SELLER').
+ * @function numberToRole
+ * @param {number} roleNumber - المعرف الرقمي للدور.
+ * @returns {string} - الاسم النصي للدور. يعود بـ 'CUSTOMER' كقيمة افتراضية.
+ */
+function numberToRole(roleNumber) {
+  return Object.keys(USER_ROLES_MAP).find(key => USER_ROLES_MAP[key] === roleNumber) || 'CUSTOMER';
+}

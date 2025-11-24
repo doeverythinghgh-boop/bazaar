@@ -82,7 +82,7 @@ async function initializeUsersAdminLogic(modalContainer) {
       const matchesSearch = (user.username && user.username.toLowerCase().includes(searchTerm)) ||
                             (user.phone && user.phone.includes(searchTerm));
       
-      const matchesRole = !selectedRole || user.is_seller == selectedRole;
+      const matchesRole = !selectedRole || user.is_seller == roleToNumber(selectedRole);
 
       return matchesSearch && matchesRole;
     });
