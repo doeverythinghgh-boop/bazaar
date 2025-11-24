@@ -125,7 +125,6 @@ export default async function handler(request) {
     });
 
   } catch (error) {
-    console.error('[API: /api/suppliers-deliveries] Error:', error);
     console.error('%c[API: /api/suppliers-deliveries] A critical error occurred:', "color: red; font-weight: bold;", error);
     return new Response(JSON.stringify({ error: 'Server error occurred.', details: error.message }), {
       status: 500,
