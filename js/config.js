@@ -103,11 +103,22 @@ function roleToNumber(roleString) {
 }
 
 /**
- * @description يحول المعرف الرقمي للدور إلى الاسم النصي المقابل له (مثل 'SELLER').
+ * @description خريطة معكوسة لتسريع عملية تحويل المعرف الرقمي للدور إلى الاسم النصي.
+ *   تُستخدم داخل دالة `numberToRole` للوصول المباشر (O(1)).
+ * @type {Map<number, string>}
+ * @const
+ */
+const ROLE_NUMBER_TO_STRING_MAP = new Map(
+  Object.entries(USER_ROLES_MAP).map(([key, value]) => [value, key])
+);
+
+/**
+ * @description يحول المعرف الرقمي للدور إلى الاسم النصي المقابل له (مثل 'SELLER') بكفاءة.
  * @function numberToRole
  * @param {number} roleNumber - المعرف الرقمي للدور.
  * @returns {string} - الاسم النصي للدور. يعود بـ 'CUSTOMER' كقيمة افتراضية.
  */
 function numberToRole(roleNumber) {
-  return Object.keys(USER_ROLES_MAP).find(key => USER_ROLES_MAP[key] === roleNumber) || 'CUSTOMER';
+  // ✅ تحسين: استخدام Map للوصول المباشر O(1) بدلاً من البحث الخطي O(n).
+  return ROLE_NUMBER_TO_STRING_MAP.get(roleNumber) || 'CUSTOMER';
 }

@@ -345,21 +345,31 @@ function getCurrentUser() {
 }
 
 /**
+ * @description دالة مساعدة للتحقق مما إذا كان المستخدم يمتلك دورًا محددًا.
+ * @function hasRole
+ * @param {object} user - كائن المستخدم.
+ * @param {string} requiredRoleString - الدور المطلوب (مثل 'SELLER' أو 'ADMIN').
+ * @returns {boolean} - `true` إذا كان المستخدم يمتلك الدور، وإلا `false`.
+ */
+function hasRole(user, requiredRoleString) {
+    if (!user || !user.role) return false;
+    return user.role === requiredRoleString.toUpperCase();
+}
+
+/**
  * @description دالة مساعدة للتحقق مما إذا كان المستخدم مؤهلاً لاستقبال الإشعارات.
  *   الإشعارات مخصصة فقط للمسؤولين، البائعين، وخدمات التوصيل.
  * @function isUserEligibleForNotifications
  * @param {object} user - كائن المستخدم.
  * @returns {boolean} - `true` إذا كان المستخدم مؤهلاً، وإلا `false`.
- * @see isUserAdmin
+ * @see hasRole
  */
 function isUserEligibleForNotifications(user) {
-  if (!user || user.is_guest || !user.role) {
-    return false;
-  }
-  // التحقق باستخدام الأسماء النصية للأدوار
-  return user.role === 'SELLER' ||
-         user.role === 'DELIVERY' ||
-         user.role === 'ADMIN';
+  if (!user || user.is_guest) return false;
+  // ✅ تحسين: استخدام دالة hasRole لزيادة الوضوح
+  return hasRole(user, 'SELLER') || 
+         hasRole(user, 'DELIVERY') || 
+         hasRole(user, 'ADMIN');
 }
 
 /**
@@ -367,33 +377,39 @@ function isUserEligibleForNotifications(user) {
  * @function isUserSeller
  * @param {object} user - كائن المستخدم.
  * @returns {boolean} - `true` إذا كان المستخدم بائعًا أو مسؤولاً، وإلا `false`.
+ * @see hasRole
  */
 function isUserSeller(user) {
-  if (!user || !user.role) return false;
+  if (!user) return false;
   // المسؤول يعتبر بائعًا أيضًا في سياق الصلاحيات
-  return user.role === 'SELLER' || user.role === 'ADMIN';
+  // ✅ تحسين: استخدام دالة hasRole
+  return hasRole(user, 'SELLER') || hasRole(user, 'ADMIN');
 }
 
 /**
  * @description دالة مساعدة للتحقق مما إذا كان المستخدم مسؤولاً.
+ *   يعتبر المستخدم مسؤولاً إذا كان دوره 'ADMIN' أو إذا كان رقم هاتفه مدرجًا في قائمة `adminPhoneNumbers`.
  * @function isUserAdmin
  * @param {object} user - كائن المستخدم.
  * @returns {boolean} - `true` إذا كان المستخدم مسؤولاً، وإلا `false`.
+ * @see hasRole
+ * @see adminPhoneNumbers
  */
 function isUserAdmin(user) {
-  if (!user || !user.role) return false;
+  if (!user) return false;
   // التحقق من الدور أو من رقم الهاتف
-  const isAdminByRole = user.role === 'ADMIN';
+  const isAdminByRole = hasRole(user, 'ADMIN');
   const isAdminByPhone = adminPhoneNumbers && adminPhoneNumbers.includes(user.phone);
   return isAdminByRole || isAdminByPhone;
 }
 
 /**
- * @description يتحقق مما إذا كان المستخدم الحالي مسؤولاً.
+ * @description يتحقق مما إذا كان المستخدم الحالي المسجل دخوله مسؤولاً.
+ *   تعتمد هذه الدالة على `isUserAdmin` للتحقق من الصلاحيات.
  * @function checkAdminStatus
  * @returns {object|null} - كائن المستخدم إذا كان مسؤولاً، وإلا `null`.
  * @see getCurrentUser
- * @see adminPhoneNumbers
+ * @see isUserAdmin
  */
 function checkAdminStatus() {
   console.log('[Auth] Checking admin status...');
