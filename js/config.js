@@ -104,9 +104,9 @@ function roleToNumber(roleString) {
 }
 
 // التحقق من وجود المتغيرات قبل تعريفها لمنع أخطاء إعادة التعريف
-if (typeof window.currentUserIsGuest === "undefined") {
+if (typeof window.window.currentUserIsGuest === "undefined") {
   window.currentUserIsGuest = false;
-  window.currentUserIsCUSTOMER = false;
+window.currentUserIsCUSTOMER = false;
   window.currentUserIsSELLER = false;
   window.currentUserIsDELIVERY = false;
   window.currentUserIsADMIN = false;
@@ -138,43 +138,43 @@ function setUserType(typeUser, key) {
   console.log("1111111111", typeUser);
   switch (typeUser) {
     case -1:
-      currentUserIsGuest = true;
-      currentUserIsCUSTOMER = false;
-      currentUserIsSELLER = false;
-      currentUserIsDELIVERY = false;
-      currentUserIsADMIN = false;
+      window.currentUserIsGuest = true;
+      window.currentUserIsCUSTOMER = false;
+      window.currentUserIsSELLER = false;
+      window.currentUserIsDELIVERY = false;
+      window.currentUserIsADMIN = false;
       console.log("user type is", "GUEST ", key);
       return;
     case 0:
-      currentUserIsCUSTOMER = true;
-      currentUserIsSELLER = false;
-      currentUserIsDELIVERY = false;
-      currentUserIsADMIN = false;
-      currentUserIsGuest = false;
+      window.currentUserIsCUSTOMER = true;
+      window.currentUserIsSELLER = false;
+      window.currentUserIsDELIVERY = false;
+      window.currentUserIsADMIN = false;
+      window.currentUserIsGuest = false;
       console.log("user type is", "CUSTOMER ", key);
       return;
     case 1:
-      currentUserIsSELLER = true;
-      currentUserIsDELIVERY = false;
-      currentUserIsADMIN = false;
-      currentUserIsCUSTOMER = false;
-      currentUserIsGuest = false;
+      window.currentUserIsSELLER = true;
+      window.currentUserIsDELIVERY = false;
+      window.currentUserIsADMIN = false;
+      window.currentUserIsCUSTOMER = false;
+      window.currentUserIsGuest = false;
       console.log("user type is", "SELLER ", key);
       return;
     case 2:
-      currentUserIsDELIVERY = true;
-      currentUserIsADMIN = false;
-      currentUserIsCUSTOMER = false;
-      currentUserIsSELLER = false;
-      currentUserIsGuest = false;
+      window.currentUserIsDELIVERY = true;
+      window.currentUserIsADMIN = false;
+      window.currentUserIsCUSTOMER = false;
+      window.currentUserIsSELLER = false;
+      window.currentUserIsGuest = false;
       console.log("user type is", "DELIVERY ", key);
       return;
     case 3:
-      currentUserIsADMIN = true;
-      currentUserIsDELIVERY = false;
-      currentUserIsCUSTOMER = false;
-      currentUserIsSELLER = false;
-      currentUserIsGuest = false;
+      window.currentUserIsADMIN = true;
+      window.currentUserIsDELIVERY = false;
+      window.currentUserIsCUSTOMER = false;
+      window.currentUserIsSELLER = false;
+      window.currentUserIsGuest = false;
       console.log("user type is", "ADMIN ", key);
       return;
   }
