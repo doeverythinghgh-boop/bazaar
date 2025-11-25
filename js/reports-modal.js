@@ -130,12 +130,18 @@ function createStatusTimelineHTML(
  */
 async function handleStatusUpdateClick(event, userKey) {
   const stepElement = event.target.closest(".editable-step");
+  console.log(stepElement);
+  // console.log(event);
   if (!stepElement) return;
-
   // منع إعادة التفعيل إذا كانت الحالة نشطة بالفعل
   if (stepElement.classList.contains("active")) {
     return;
   }
+  
+const statusIdValue = stepElement.dataset.statusId; 
+
+// 3. مثال على استخدامها:
+console.log(`الحالة الجديدة المراد التعديل إليها هي: ${statusIdValue}`);
 
   const orderKey = stepElement.dataset.orderKey;
   const newStatusId = parseInt(stepElement.dataset.statusId, 10);
@@ -151,8 +157,12 @@ async function handleStatusUpdateClick(event, userKey) {
     html: `هل أنت متأكد من تفعيل حالة الطلب رقم <strong>${orderKey}</strong> إلى <strong>"${statusInfo.state}"</strong>؟<br><small>ملاحظة: لا يمكن التراجع عن هذا الإجراء.</small>`,
     icon: "warning",
     showCancelButton: true,
+    showDenyButton: statusIdValue==1, // 👈 الزر الثالث: الرفض
     confirmButtonText: "نعم، قم بالتفعيل!",
     cancelButtonText: "تجاهل",
+    // إعدادات زر الرفض (Deny)
+    denyButtonText: "رفض الطلب",
+    denyButtonColor: "#dc3545", // لون الخطر (Danger Color)
     showLoaderOnConfirm: true,
     preConfirm: () => updateOrderStatus(orderKey, newStatusId),
     allowOutsideClick: () => !Swal.isLoading(),
@@ -178,37 +188,22 @@ async function handleStatusUpdateClick(event, userKey) {
  */
 async function sendUpdateNotifications(orderKey, userKey, newStatusState) {
   try {
-    // 1. جلب توكنات خدمات التوصيل النشطة والبائع
-    const deliveryUsers = await getActiveDeliveryRelations(userKey);
-    const deliveryTokens = deliveryUsers
-      ?.map((user) => user.fcmToken)
-      .filter(Boolean); // استخراج التوكنات الصالحة فقط
+    // 1. جلب توكنات خدمات التوصيل النشطة للبائع
+    const deliveryTokens = await getTokensForActiveDelivery(userKey); // استخراج التوكنات الصالحة فقط
 
-    // 2. جلب توكنات المسؤولين
-    const ADMIN_KEYS = ["dl14v1k7", "682dri6b"];
-    const adminKeysQuery = ADMIN_KEYS.join(",");
-    const tokensResponse = await apiFetch(
-      `/api/tokens?userKeys=${encodeURIComponent(adminKeysQuery)}`
-    );
-    const adminTokens = tokensResponse?.tokens || [];
+    // 2. جلب توكنات المسؤولين (الدالة معرفة في js/helpers/network.js)
+    const adminTokens = await getAdminTokens();
 
-    // 3. دمج التوكنات وإزالة التكرار
+    // 3. دمج جميع التوكنات (خدمات التوصيل والمسؤولين) وإزالة التكرار
     const allTokens = [...new Set([...(deliveryTokens || []), ...adminTokens])];
-
-    if (allTokens.length > 0) {
-      const title = "تحديث حالة طلب";
-      const body = `تم تحديث حالة الطلب رقم #${orderKey} إلى "${newStatusState}".`;
-
-      const notificationPromises = allTokens.map((token) =>
-        sendNotification(token, title, body)
-      );
-
-      await Promise.all(notificationPromises);
-      console.log("[Notifications] تم إرسال الإشعارات بنجاح.");
-    }
+    const title = "تحديث حالة طلب";
+    const body = `تم تحديث حالة الطلب رقم #${orderKey} إلى "${newStatusState}".`;
+    await sendNotificationsToTokens(allTokens, title, body);
   } catch (error) {
     console.error("[Notifications] فشل في إرسال الإشعارات:", error);
   }
+
+ 
 }
 
 /**

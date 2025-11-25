@@ -117,7 +117,7 @@ function generateOrderKey() {
  * @see generateOrderKey
  * @see createOrder
  * @see getUniqueSellerKeys
- * @see getNotificationTokensForOrder
+ * @see getUsersTokens
  * @see sendNotification
  * @see clearCart
  * @see showCartModal
@@ -185,17 +185,20 @@ async function sendOrder2Excution() {
     const createdOrderKey = result.value.order_key;
     console.log(`[Checkout] Order created with key: ${createdOrderKey}. Now sending notifications.`);
 
-    // جلب التوكنات وإرسال الإشعار
+    // 1. جلب توكنات البائعين
     const sellerKeys = getUniqueSellerKeys(orderData);
-    const tokens = await getNotificationTokensForOrder(sellerKeys);
+    const sellerTokens = await getUsersTokens(sellerKeys);
 
-    if (tokens.length > 0) {
-        const title = 'طلب شراء جديد';
-        const body = `تم استلام طلب شراء جديد رقم #${createdOrderKey}. يرجى المراجعة.`;
-        tokens.forEach(token => {
-            sendNotification(token, title, body); // إرسال إشعار لكل توكن على حدة
-        });
-    }
+    // 2. جلب توكنات المسؤولين (من الدالة المركزية)
+    const adminTokens = await getAdminTokens();
+
+    // 3. دمج جميع التوكنات وإزالة التكرار
+    const allTokens = [...new Set([...sellerTokens, ...adminTokens])];
+
+    // 4. إرسال الإشعارات باستخدام الدالة العامة
+    const title = 'طلب شراء جديد';
+    const body = `تم استلام طلب شراء جديد رقم #${createdOrderKey}. يرجى المراجعة.`;
+    await sendNotificationsToTokens(allTokens, title, body);
 
     console.log('[Checkout] نجاح! تم تأكيد الطلب من قبل المستخدم وإنشاءه بنجاح.');
     clearCart(); // هذه الدالة تحذف السلة وتطلق حدث 'cartUpdated'
@@ -212,54 +215,7 @@ async function sendOrder2Excution() {
 
 
 
-/**
- * @description تجلب توكنات إشعارات Firebase (FCM Tokens) لكل من المسؤولين والبائعين المعنيين بالطلب.
- * تعتمد على نقطة النهاية `/api/tokens` التي تقبل قائمة المفاتيح عبر `userKeys` كـ Query Parameter.
- * @function getNotificationTokensForOrder
- * @param {Array<string>} sellerKeys - قائمة بمفاتيح البائعين (`user_key`) الذين يملكون المنتجات في الطلب.
- * @returns {Promise<Array<string>>} - مصفوفة تحتوي على جميع توكنات الإشعارات الصالحة التي تم جلبها.
- * @throws {Error} - إذا فشل جلب التوكنات من الخادم.
- * @see apiFetch
- */
-async function getNotificationTokensForOrder(sellerKeys) {
-    // 1. تحديد مفاتيح المسؤولين (Admin Keys)
-    const ADMIN_KEYS = ['dl14v1k7', '682dri6b'];
-    
-    // 2. دمج مفاتيح البائعين مع مفاتيح المسؤولين وإزالة أي تكرارات
-    const uniqueUsersKeys = [...new Set([...sellerKeys, ...ADMIN_KEYS])];
 
-    if (uniqueUsersKeys.length === 0) {
-        return [];
-    }
-
-    // 3. بناء استعلام URL آمن (مسار API فقط)
-    const userKeysQuery = uniqueUsersKeys.join(',');
-    const apiUrlPath = `/api/tokens?userKeys=${encodeURIComponent(userKeysQuery)}`;
-
-    try {
-        // استخدام apiFetch (التي يفترض أنها تعالج baseURL وترويسات CORS و Status 4xx/5xx)
-        const result = await apiFetch(apiUrlPath);
-
-        // 4. التحقق من هيكل الاستجابة المتوقع (الاستجابة الناجحة تحتوي على مصفوفة tokens)
-        if (result && Array.isArray(result.tokens)) {
-            // console.log(`[FCM] Successfully fetched ${result.tokens.length} notification tokens.`);
-            return result.tokens;
-        } 
-        
-        // التعامل مع حالة الاستجابة الفارغة أو الخطأ الذي يرجعه الخادم/apiFetch
-        if (result && result.error) {
-             console.error('[FCM] API returned an error:', result.error);
-        } else {
-             // console.warn('[FCM] API returned an invalid or empty token list:', result);
-        }
-        return [];
-
-    } catch (error) {
-        // معالجة أخطاء الشبكة أو الأخطاء التي لم يتم التعامل معها في apiFetch
-        console.error('[FCM] Critical error during token fetch:', error);
-        return []; 
-    }
-}
 
 
 
