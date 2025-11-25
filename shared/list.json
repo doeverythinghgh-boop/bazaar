@@ -393,11 +393,6 @@
           "icon": "fas fa-drafting-compass"
         },
         {
-          "id": 2,
-          "title": "معدات اللياقة البدنية والجيم",
-          "icon": "fas fa-dumbbell"
-        },
-        {
           "id": 3,
           "title": "خدمات الشحن والتوصيل",
           "icon": "fas fa-shipping-fast"
@@ -461,6 +456,11 @@
       "title": "الرياضة والترفيه",
       "icon": "fas fa-basketball-ball",
       "subcategories": [
+          {
+          "id": 2,
+          "title": "جيم",
+          "icon": "fas fa-dumbbell"
+        },
         {
           "id": 4,
           "title": "مستلزمات الصيد والرياضات الخارجية",
@@ -494,6 +494,11 @@
       "icon": "fas fa-paw",
       "subcategories": [
         {
+          "id": 4,
+          "title": "الحيوانات الاليفة",
+          "icon": "fas fa-dog"
+        },
+        {
           "id": 1,
           "title": "طعام ومستلزمات الحيوانات الأليفة",
           "icon": "fas fa-bone"
@@ -508,11 +513,7 @@
           "title": "طيور الزينة",
           "icon": "fas fa-dove"
         },
-        {
-          "id": 4,
-          "title": "الحيوانات النادرة",
-          "icon": "fas fa-hippo"
-        },
+        
         {
           "id": 5,
           "title": "خدمات رعاية وتدريب الحيوانات",
@@ -587,6 +588,12 @@
           "title": "شقق ومنازل للبيع",
           "icon": "fas fa-home"
         },
+        
+         {
+          "id": 7,
+          "title": "شلهات و فلل",
+          "icon": "fas fa-house-chimney-window"
+        },
         {
           "id": 2,
           "title": "شقق ومنازل للإيجار",
@@ -639,22 +646,30 @@
           "title": "بطاقات المعايدة والتهنئة",
           "icon": "fas fa-envelope-open-text"
         },
-        {
-          "id": 4,
-          "title": "ألعاب ونشاطات ترفيهية",
-          "icon": "fas fa-puzzle-piece"
-        },
+        
         {
           "id": 5,
           "title": "خدمات التصوير والفيديو",
           "icon": "fas fa-video"
-        },
-        {
-          "id": 6,
-          "title": "خدمات تنظيم الحفلات",
-          "icon": "fas fa-calendar-check"
         }
+        
       ]
+      
+    }
+    ,
+    {
+      "id": 18,
+      "title": "تجار الجملة",
+      "icon": "fas fa-boxes-stacked",
+      "subcategories": [
+        {
+          "id": 8,
+          "title": "تاجر 1",
+          "icon": "fas fa-warehouse"
+        }
+        
+      ]
+      
     }
   ]
 }
