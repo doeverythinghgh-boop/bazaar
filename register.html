@@ -289,7 +289,7 @@
           };
           localStorage.setItem("loggedInUser", JSON.stringify(loggedInUserData));
 
-         setUserType(ROLE_NUMBER_TO_STRING_MAP.get(loggedInUserData.is_seller),loggedInUserData.user_key);
+         setUserType(loggedInUserData.is_seller,loggedInUserData.user_key);
           
           console.log('[Register] User data saved to localStorage. Redirecting to index.html...');
 

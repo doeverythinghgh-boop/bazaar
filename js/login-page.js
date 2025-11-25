@@ -450,7 +450,7 @@ async function handleLoginSuccess(user) {
     user
   );
   localStorage.setItem("loggedInUser", JSON.stringify(user));
-setUserType(ROLE_NUMBER_TO_STRING_MAP.get(user.is_seller),user.user_key);
+setUserType(user.is_seller,user.user_key);
   // ✅ تعديل: استدعاء setupFCM() فقط إذا كان المستخدم مؤهلاً (مسؤول، بائع، خدمة توصيل).
   // isUserEligibleForNotifications معرفة في auth.js
   if (
@@ -527,7 +527,7 @@ function handleGuestLogin(event) {
 
   // حفظ بيانات الضيف في localStorage
   localStorage.setItem("loggedInUser", JSON.stringify(guestUser));
-             setUserType(ROLE_NUMBER_TO_STRING_MAP.get(guestUser.is_seller),guestUser.user_key);
+             setUserType(guestUser.is_seller,guestUser.user_key);
   // عرض رسالة ترحيب وتوجيه المستخدم
   Swal.fire({
     title: "أهلاً بك كضيف!",

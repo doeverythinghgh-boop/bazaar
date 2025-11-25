@@ -130,24 +130,25 @@ function numberToRole(roleNumber) {
 }
 function setUserType(typeUser,key){
   currentUserKey=key;
+  console.log("1111111111",typeUser);
  switch (typeUser) {
-            case "GUEST":
+            case -1:
               currentUserIsGuest = true;
               console.log("user type is","GUEST ",key);
               return
-            case "CUSTOMER":
+            case 0:
               currentUserIsCUSTOMER = true;
               console.log("user type is","CUSTOMER ",key);
               return
-            case "SELLER":
+            case 1:
               currentUserIsSELLER = true;
               console.log("user type is","SELLER ",key);
               return
-            case "DELIVERY":
+            case 2:
               currentUserIsDELIVERY = true;
                console.log("user type is","DELIVERY ",key);
               return
-            case "ADMIN":
+            case 3:
               currentUserIsADMIN = true;
               console.log("user type is","ADMIN ",key);
               return
