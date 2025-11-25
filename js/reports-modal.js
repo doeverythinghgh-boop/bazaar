@@ -224,15 +224,22 @@ async function handleStatusUpdateClick(event, userKey) {
       cancelButtonText: "إلغاء",
       showLoaderOnConfirm: true,
       preConfirm: async () => {
-        if (currentUserIsADMIN || currentUserIsSELLER) {
-          const response = await updateOrderStatus(orderKey, 32); // 32 يشير إلى الرفض
-          statusInfo = ORDER_STATUSES.find((s) => s.id === 32);
-          Swal.fire("تم التحديث!", "تم تحديث حالة الطلب .", "success");
-        }
-        
-        showSalesMovementModal(userKey); // إعادة تحميل النافذة
+        try {
+          let response; // ✅ إصلاح: تعريف المتغير في النطاق الصحيح
+          console.log("تحيدث الحاله في قاعدة البيانات",currentUserIsSELLER)
+          if (currentUserIsADMIN || currentUserIsSELLER) {
+          console.log("تحيدث الحاله في قاعدة البيانات");
+            response = await updateOrderStatus(orderKey, 32); // 32 يشير إلى الرفض
+              statusInfo = ORDER_STATUSES.find((s) => s.id === 32);
+            Swal.fire("تم التحديث!", "تم تحديث حالة الطلب .", "success");
+          }
 
-        return response;
+          showSalesMovementModal(userKey); // إعادة تحميل النافذة
+  console.log("تحيدث الحاله في قاعدة البيانات",response);
+          return response;
+        } catch (error) {
+          console.log(error);
+        }
       },
       allowOutsideClick: () => !Swal.isLoading(),
     });
