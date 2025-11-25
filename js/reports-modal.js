@@ -226,7 +226,7 @@ async function handleStatusUpdateClick(event, userKey) {
       preConfirm: async () => {
         try {
           let response; // ✅ إصلاح: تعريف المتغير في النطاق الصحيح
-          console.log("تحيدث الحاله في قاعدة البيانات",currentUserIsSELLER)
+          console.log("تحيدث الحاله في قاعدة البيانات",currentUserIsSELLER,currentUserIsADMIN)
           if (currentUserIsADMIN || currentUserIsSELLER) {
           console.log("تحيدث الحاله في قاعدة البيانات");
             response = await updateOrderStatus(orderKey, 32); // 32 يشير إلى الرفض
