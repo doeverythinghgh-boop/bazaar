@@ -25,7 +25,7 @@ const corsHeaders = {
 /**
  * @description تحقق من وجود مجموعة user_keys في جدول suppliers_deliveries
  * @param {string[]} userKeys - مصفوفة مفاتيح المستخدمين للتحقق
- * @returns {Promise<boolean[]>} مصفوفة boolean بنفس ترتيب المدخلات
+ * @returns {Promise<Array<{key: string, isSeller: boolean, isDelivery: boolean}>>} مصفوفة كائنات توضح دور كل مستخدم
  */
 export async function checkUserInSuppliersDeliveries(userKeys) {
   if (!Array.isArray(userKeys) || userKeys.length === 0) return [];
@@ -34,16 +34,23 @@ export async function checkUserInSuppliersDeliveries(userKeys) {
 
   const { rows } = await db.execute({
     sql: `SELECT seller_key, delivery_key FROM suppliers_deliveries WHERE seller_key IN (${placeholders}) OR delivery_key IN (${placeholders})`,
-    args: [...userKeys, ...userKeys]
+    args: [...userKeys, ...userKeys] // نكرر المصفوفة لأننا نستخدم الـ placeholders مرتين
   });
 
-  const foundKeys = new Set();
+  // إنشاء خرائط سريعة للتحقق (Sets)
+  const sellers = new Set();
+  const deliveries = new Set();
+
   rows.forEach(row => {
-    if (row.seller_key) foundKeys.add(row.seller_key);
-    if (row.delivery_key) foundKeys.add(row.delivery_key);
+    if (row.seller_key) sellers.add(row.seller_key);
+    if (row.delivery_key) deliveries.add(row.delivery_key);
   });
 
-  return userKeys.map(key => foundKeys.has(key));
+  return userKeys.map(key => ({
+    key: key,
+    isSeller: sellers.has(key),
+    isDelivery: deliveries.has(key)
+  }));
 }
 
 
@@ -169,6 +176,25 @@ export default async function handler(request) {
 
       console.log(`%c[API] Successfully processed PUT request.`, "color: green;");
       return new Response(JSON.stringify({ success: true, message: 'Relation updated successfully.' }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json', ...corsHeaders },
+      });
+    }
+
+    if (request.method === 'POST') {
+      console.log('[API] Processing POST request to check user status...');
+      const { userKeys } = await request.json();
+
+      if (!Array.isArray(userKeys)) {
+        return new Response(JSON.stringify({ error: 'userKeys must be an array' }), {
+          status: 400,
+          headers: { 'Content-Type': 'application/json', ...corsHeaders },
+        });
+      }
+
+      const results = await checkUserInSuppliersDeliveries(userKeys);
+
+      return new Response(JSON.stringify({ results }), {
         status: 200,
         headers: { 'Content-Type': 'application/json', ...corsHeaders },
       });
