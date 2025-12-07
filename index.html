@@ -1,511 +1,578 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
-  <!--
-    @file index.html
-    @description الصفحة الرئيسية لموقع "بازار السويس".
+<html lang="ar" dir="rtl" id="index-html-root">
 
-    هذه هي الصفحة المقصودة (Landing Page) التي يراها الزائر أولاً.
-    - تعرض العنوان والشعار.
-    - تتحقق من حالة تسجيل دخول المستخدم وتعرض اسمه أو زر "تسجيل الدخول".
-    - تحتوي على حاويات ديناميكية (`categories-grid`) يتم ملؤها بالمحتوى (مثل الإعلانات والفئات) باستخدام JavaScript.
-  -->
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Suez Bazaar</title>
-    <!-- Favicon -->
-    <link rel="icon" href="favicon.ico" type="image/x-icon" />
-    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
-    <!-- CSS Core & Layout -->
-        <link rel="stylesheet" href="css/base/variables.css" />
-    <link rel="stylesheet" href="css/base/base.css" />
-    <link rel="stylesheet" href="css/components/button.css" />
-    <link rel="stylesheet" href="css/components/loader.css" />
-    <link rel="stylesheet" href="css/components/offline-container.css" />
-    <link rel="stylesheet" href="css/utilities.css" />
-    <link rel="stylesheet" href="css/layout.css" />
-    <!-- Page-Specific Styles -->
-        <link rel="stylesheet" href="css/pages/index-categories.css" />
-    <link rel="stylesheet" href="css/pages/index-products-gallery.css" />
-    <link rel="stylesheet" href="css/components/adver-module.css" />
-    <!-- Non-blocking Modals & Dialogs Styles -->
-    <link rel="preload" href="css/modals-and-dialogs.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="css/modals-and-dialogs.css"></noscript>
-    <link rel="stylesheet" href="css/modal.css" />
-     <link rel="stylesheet" href="css\searchModal.css" />
-    <!-- Link to Google Fonts for a more stylish look (Optional) -->
-    <link
-      id="font-tajawal"
-      href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      id="font-orbitron"
-      href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap"
-      rel="stylesheet"
-    />
-    <!-- Font Awesome for icons -->
-    <link
-      id="font-awesome"
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
-    />
-    <!--  SweetAlert2 -->
-    <script id="sweetalert2-script" src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  </head>
-  <body style="position: relative">
-    <!-- 
-      الهدف من هذا الموقع هو إنشاء سوق تجاري إلكتروني ("بازار") في السويس.
-      يعمل الموقع كمنصة لعرض منتجات من موردين مختلفين، مما يسمح للمستهلكين بتصفحها وشرائها مباشرة.
-    -->
+<head id="index-page-head">
+  <meta charset="UTF-8" id="index-meta-charset" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" id="index-meta-viewport" />
+  <title id="index-page-title">Suez Bazaar</title>
+  <!-- Favicon -->
+  <link rel="icon" href="favicon.ico" type="image/x-icon" id="index-favicon-icon" />
+  <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" id="index-favicon-shortcut" />
+  <link id="font-tajawal" href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.2/css/all.css" />
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <!-- المحتوى الرئيسي للصفحة -->
-    <div class="container" id="header-container">
-      <!-- مجموعة العنوان والشعار -->
-      <a
-        id="header-logo-link"
-        href="index.html"
-        class="header-title-group"
-        style="text-decoration: none; color: inherit"
-      >
-      <table id="header-logo-table">
-        <tr id="header-logo-row">
-          <td id="header-logo-cell-title"> <h1 id="animated-text" class="bazaar-title"></h1></td>
-          <td id="header-logo-cell-tagline">  <p id="tagline" class="tagline"></p></td>
-        </tr>
-      </table>
-      </a>
-      <!-- جديد: حاوية جديدة لتجميع عناصر التحكم اليسرى (بحث، مستخدم) -->
-      <div class="header-controls">
-        <!-- جديد: قسم البحث -->
-        <div id="search-container" class="search-container">
-          <button class="search-icon-btn" id="search-icon-btn" title="بحث عن منتج"><i class="fas fa-search"></i></button>
-        </div>
-        <div id="user-profile-container" class="user-profile-container">
-          <div id="user-profile-button" class="user-profile">
-            <a id="user-profile-link" href="login.html" class="user-profile-link">
-              <span class="fas fa-user-circle user-icon" id="user-icon"></span>
-              <span id="user-text" class="user-text">تسجيل الدخول</span>
-            </a>
-            <span id="cart-badge" class="cart-badge" style="display: none;">0</span>
-          </div>
-        </div>
-      </div>
-    </div>
+  <!-- ✅ ربط ملف المتغيرات لاستخدامها في الأنماط الداخلية -->
+  <link rel="stylesheet" href="style/variables.css" />
+  <script src="/js/cloudFileManager.js"></script>
+  <script src="/js/cardPackage.js"></script>
+  <script src="/js/order.js"></script>
+  <script src="/js/forms.js"></script>
+  <!-- ربط ملف الأنماط الخارجي -->
+  <style>
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+      /* Prevent scrollbars on the body */
+      box-sizing: border-box;
+    }
 
-    <!-- ✅ جديد: حاوية شريط الإعلانات -->
-    <div id="advertisement-section"></div>
-    
-    <!-- قسم جديد لعرض الفئات الرئيسية -->
-    <div id="categories-section" class="categories-section">
-      <table id="categories-table" class="categories-section__table">
-        <tbody id="categories-tbody" class="categories-section__tbody">
-          <!-- سيتم ملء صفوف الفئات هنا بواسطة جافاسكريبت -->
-        </tbody>
-      </table>
-    </div>
+    body {
+      display: flex;
+      flex-direction: column;
+      /* لجعل المحتوى الرئيسي والتذييل يترتبان عموديًا */
+    }
 
-    <!-- Modal for Product Details -->
-    <div id="product-details-modal" class="modal">
-      <!-- Product details will be loaded here from showProduct.html -->
-    </div>
-    
-    <!-- ✅ جديد: حاوية لنافذة البحث المنبثقة (سيتم ملؤها بواسطة JS) -->
-    <div id="search-modal-container" class="modal"></div>
+    /* ✅ تعديل: إعادة تسمية الفئة وتطبيق Flexbox */
+    .index-app-header {
+      display: flex;
+      justify-content: flex-start;
+      /* محاذاة العناصر من بداية الحاوية (اليمين في RTL) */
+      align-items: center;
+      flex-wrap: nowrap;
+      /* منع العناصر من الانتقال إلى سطر جديد */
+      overflow-x: auto;
+      /* إضافة شريط تمرير أفقي عند الحاجة */
+      background-color: var(--bg-color-light);
+      padding: 15px 20px;
+      box-shadow: var(--shadow-interactive);
+      /* تغيير الظل ليصبح سفليًا */
+      z-index: 1000;
+      /* لضمان ظهوره فوق المحتوى الآخر */
+    }
 
-    <!-- ✅ إصلاح شامل: إضافة جميع حاويات النوافذ المنبثقة لضمان توفرها في كل الصفحات -->
-    <!-- حاوية فارغة لنافذة "إضافة منتج". سيتم ملؤها بالمحتوى عند الحاجة. -->
-    <div id="add-product-modal" class="modal"></div>
-    <!-- حاوية فارغة لنافذة "سلة المشتريات". -->
-    <div id="cart-modal-container" class="modal"></div>
-    <!-- حاوية فارغة لنافذة "سجل المشتريات". -->
-    <div id="purchases-modal-container" class="modal"></div>
-    <!-- حاوية فارغة لنافذة "منتجاتي" الخاصة بالبائع. -->
-    <div id="my-products-modal-container" class="modal"></div>
-    <!-- حاوية فارغة لنافذة تقرير "حركة المشتريات". -->
-    <div id="sales-movement-modal-container" class="modal"></div>
-    <!-- حاوية فارغة لنافذة "إدارة المستخدمين" الخاصة بالمسؤول. -->
-    <div id="users-modal-container" class="modal"></div>
-    <!-- حاوية فارغة لنافذة "سجل الإشعارات". -->
-    <div id="notifications-log-modal-container" class="modal"></div>
-    <!-- حاوية فارغة لنافذة "الكاميرا" التي تستخدم لالتقاط الصور من أجهزة سطح المكتب. -->
-    <div id="camera-modal-container" class="modal"></div>
-    <!-- 
-      ملاحظة: حاوية product-details-modal موجودة بالفعل، لذلك لا حاجة لإضافتها مرة أخرى.
-    -->
+    .index-header-login-btn {
+      /* ✅ تعديل: استخدام Flexbox لترتيب الأيقونة والنص عمودياً */
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      /* مسافة بين الأيقونة والنص */
 
+      /* ✅ تعديل: إزالة الخلفية والحدود لجعله يبدو كأيقونة ونص فقط */
+      background-color: transparent;
+      border: none;
+      padding: 5px;
+      /* تقليل الحشو */
 
-    <script id="config-script" src="js/config.js"></script> <!-- ✅ إضافة: تحميل ملف الإعدادات أولاً -->
-    <script src="js/helpers/network.js"></script> <!-- دوال الشبكة -->
-    <script src="js/helpers/format.js"></script> <!-- دوال التنسيق -->
-    <script src="js/helpers/dom.js"></script>   <!-- دوال DOM وتوليد HTML -->
-    <script id="connect1-script" src="js/connect1.js"></script> <!-- ✅ إصلاح: تحميل connect1.js مبكرًا لضمان توفر دوال الـ API -->
-     <script src="js/connectProduct.js"></script>
+      font-family: "Tajawal", sans-serif;
+      text-decoration: none;
+      cursor: pointer;
+      transition: transform 0.2s;
+      position: relative;
+      /* ✅ جديد: ضروري لتحديد موضع الشارة بشكل صحيح */
+    }
+
+    /* ✅ جديد: تنسيق الأيقونة */
+    .index-header-login-btn .index-user-icon {
+      font-size: 20px;
+      /* تكبير حجم الأيقونة */
+      color: var(--primary-color);
+      /* لون الأيقونة */
+    }
+
+    /* ✅ جديد: تنسيق النص */
+    .index-header-login-btn span {
+      font-size: 8px;
+      /* تصغير حجم الخط */
+      color: var(--dark-blue);
+      white-space: nowrap;
+      /* ✅ جديد: منع النص من الانقسام إلى سطرين */
+    }
+
+    .index-header-login-btn {
+      /* ... الأنماط الحالية للزر ... */
+
+      /* ✅ جديد: إضافة خصائص الانتقال للتحكم في الانميشن */
+      /* ✅ تحسين: إضافة المزيد من الخصائص للانميشن لضمان اختفاء كامل */
+      opacity: 1;
+      margin-left: 20px;
+      margin-right: 5px;
+      transform: translateY(0);
+      max-width: 100px;
+      /* تحديد عرض أقصى للسماح بالانميشن */
+      transition: opacity 0.3s ease, transform 0.3s ease, max-width 0.5s ease,
+        padding 0.5s ease, margin 0.5s ease;
+    }
+
+    .index-header-login-btn.index-hidden {
+      /* ✅ جديد: تحديد حالة الزر عندما يكون مخفياً */
+      /* ✅ تحسين: جعل الزر يتقلص ويختفي تمامًا من التخطيط */
+      opacity: 0;
+      transform: translateY(-10px
+          /* تحريك الزر للأعلى قليلاً عند الاختفاء */
+        );
+      pointer-events: none;
+      /* منع التفاعل مع الزر أثناء اختفائه */
+      max-width: 0;
+      /* جعل العرض صفرًا لإزالة الزر من التدفق */
+      padding-left: 0;
+      padding-right: 0;
+      /* ✅ حل مشكلة الفجوة: إزالة الهوامش بالكامل عند الإخفاء */
+      margin: 0;
+    }
+
+    /* ✅ جديد: تنسيق الزر النشط */
+    .index-header-login-btn.active {
+      border-bottom: 2px solid var(--primary-color);
+      background-color: var(--primary-color-light);
+      color: var(--primary-color);
+      border-radius: 8px;
+    }
+
+    .index-header-login-btn.active .index-user-icon {
+      color: var(--primary-color);
+    }
+
+    .index-header-login-btn.active span {
+      color: var(--primary-color);
+      font-weight: bold;
+    }
+
+    /* ✅ جديد: أنماط شارة عدد المنتجات في السلة */
+    .cart-badge {
+      position: absolute;
+      top: -5px;
+      /* تعديل الموضع الرأسي */
+      right: -8px;
+      /* تعديل الموضع الأفقي */
+      background-color: var(--accent-color);
+      /* لون الخلفية */
+      border-radius: 50%;
+      /* لجعلها دائرية */
+      width: 18px;
+      /* عرض الشارة */
+      height: 18px;
+      /* ارتفاع الشارة */
+      font-size: 10px;
+      /* حجم الخط */
+      font-weight: bold;
+      display: flex;
+      /* لتوسيط الرقم */
+      align-items: center;
+      justify-content: center;
+      border: 2px solid var(--bg-color-light);
+      /* إضافة حدود لفصلها عن الخلفية */
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+      /* ظل خفيف */
+
+      /* إخفاء الشارة افتراضيًا */
+      display: none;
+    }
+
+    /* ✅ جديد: تنسيق العلامة المائية لوضع المسؤول */
+    .admin-watermark {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: rgba(220, 53, 69, 0.9);
+      /* لون أحمر شفاف */
+      color: white;
+      padding: 8px 15px;
+      border-radius: 25px;
+      font-family: 'Tajawal', sans-serif;
+      font-size: 12px;
+      z-index: 9999;
+      pointer-events: none;
+      /* للسماح بالنقر من خلالها */
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      direction: rtl;
+    }
+
+    .admin-watermark i {
+      font-size: 14px;
+    }
+  </style>
+</head>
+
+<body id="index-app-body">
+  <header class="index-app-header" id="index-app-header">
+    <!-- زر تسجيل الدخول -->
+    <button class="index-header-login-btn" id="index-login-btn">
+      <i class="fas fa-user-circle index-user-icon" id="index-login-icon"></i>
+      <span id="index-login-text">تسجيل الدخول</span>
+    </button>
+
+    <!-- زر الرئيسية -->
+    <button class="index-header-login-btn" id="index-home-btn">
+      <i class="fas fa-home index-user-icon" id="index-home-icon"></i>
+      <span id="index-home-text">الرئيسية</span>
+    </button>
+
+    <!-- زر البحث -->
+    <button class="index-header-login-btn" id="index-search-btn">
+      <i class="fas fa-search index-user-icon" id="index-search-icon"></i>
+      <span id="index-search-text">بحث</span>
+    </button>
+
+    <!-- زر حركة المشتريات -->
+    <button class="index-header-login-btn" id="index-sales-movement-btn">
+      <i class="fas fa-history index-user-icon" id="index-sales-icon"></i>
+      <span id="index-sales-text">مشتريات</span>
+    </button>
+
+    <!-- زر السلة -->
+    <button class="index-header-login-btn" id="index-cart-btn">
+      <i class="fas fa-shopping-cart index-user-icon" id="index-cart-icon"></i>
+      <span id="index-cart-text">السلة</span>
+    </button>
+
+    <!-- جديد: زر الهدايا -->
+    <button class="index-header-login-btn" id="index-gifts-btn">
+      <i class="fas fa-gift index-user-icon" id="index-gifts-icon"></i>
+      <span id="index-gifts-text">هدايا</span>
+    </button>
+    <!-- جديد: زر إضافة منتج -->
+    <button class="index-header-login-btn" id="dash-add-product-btn">
+      <i class="fas fa-plus index-user-icon"></i>
+      <span>إضافة منتج</span>
+    </button>
+
+    <!-- جديد: زر منتجاتي -->
+    <button class="index-header-login-btn" id="dash-view-my-products-btn">
+      <i class="fas fa-archive index-user-icon"></i>
+      <span>منتجاتي</span>
+    </button>
+
+    <!-- زر تواصل معنا -->
+    <button class="index-header-login-btn" id="index-contact-btn">
+      <i class="fas fa-phone index-user-icon" id="index-contact-icon"></i>
+      <span id="index-contact-text">تواصل معنا</span>
+    </button>
+  </header>
+
+  <div id="index-home-container"></div>
+  <div id="index-search-container"></div>
+  <div id="index-user-container"></div>
+  <div id="index-product-container"></div>
+  <div id="index-cardPackage-container"></div>
+  <div id="index-myProducts-container"></div>
+  <div id="index-contact-container"></div>
+  <!---region main javaScript files---->
+  <script src="js/auth.js" id="index-script-auth-js"></script>
+  <!-- ملف الإعدادات العامة للمشروع (مثل baseURL) -->
+  <script src="js/config.js"></script>
   <script src="js/connectUsers.js"></script>
-    <script id="cart-script" src="js/cart.js"></script> <!-- ✅ إضافة: تحميل ملف السلة -->
-    <script id="adver-module-script" src="js/adverModule.js"></script> <!-- ✅ جديد: إضافة ملف موديول الإعلانات -->
-    <script id="search-modal-script" src="js/searchModal.js"></script> <!-- ✅ إصلاح: إزالة defer لضمان تحميل السكريبت قبل استدعاء الدالة -->
-    <script src="js/notification-db-manager.js"></script> <!-- مدير قاعدة البيانات المحلي لتسجيل الإشعارات -->
-    <script src="js/notifications-log-modal.js"></script> <!-- سكريبت نافذة سجل الإشعارات -->
-    <script id="main-script" src="js/main.js"></script>
-    <script id="auth-script" src="js/auth.js"></script> <!-- ملف المصادقة لتوفير الدوال اللازمة -->
-    <!-- ✅ إصلاح شامل: إضافة جميع ملفات النوافذ المنبثقة لضمان توفرها في كل الصفحات -->
-    <script src="js/cart-modal.js"></script>
-    <script src="js/purchases-modal.js"></script>
-    <script src="js/profile-modal.js"></script>
-    <script src="js/users-admin-modal.js"></script> <!-- ✅ إصلاح: إضافة ملف نافذة إدارة المستخدمين لتوفير الدوال المعتمدة عليها -->
- 
-    <script>
-      /**
-       * @file index.html - Inline Script
-       * @description This script handles the dynamic loading and display of product categories and their subcategories
-       *              as a navigable table, and subsequently displays product galleries based on user selections.
-       *              It ensures a structured and interactive user experience for browsing products.
-       * @see js/config.js
-       * @see js/helpers/network.js
-       * @see js/helpers/format.js
-       * @see js/helpers/dom.js
-       * @see js/connect1.js
-       * @see js/connectProduct.js
-       * @see js/connectUsers.js
-       * @see js/cart.js
-       * @see js/adverModule.js
-       * @see js/searchModal.js
-       * @see js/notification-db-manager.js
-       * @see js/notifications-log-modal.js
-       * @see js/main.js
-       * @see js/auth.js
-       * @see js/cart-modal.js
-       * @see js/purchases-modal.js
-       * @see js/profile-modal.js
-       * @see js/users-admin-modal.js
-       */
+  <script src="js/connectProduct.js"></script>
+  <script src="shared/categoryModal.js"></script>
+  <!-- ملف لإدارة حالة الشبكة (متصل/غير متصل) -->
+  <script src="js/network.js" id="index-script-network-js"></script>
 
-      /**
-       * Loads categories from a JSON file and dynamically constructs a table.
-       * - Displays main categories in rows, with 4 categories per row.
-       * - Clicking a main category reveals a new row below it containing its subcategories.
-       * @async
-       * @function loadCategoriesAsTable
-       * @returns {Promise<void>} A Promise that resolves when categories are loaded and rendered, or rejects if an error occurs.
-       * @throws {Error} If the 'list.json' file fails to load or parse.
-       * @see shared/list.json
-       * @see toggleSubcategories
-       * @see showProductGallery
-       */
-      async function loadCategoriesAsTable() {
-        const tbody = document.getElementById("categories-tbody");
-        if (!tbody) return;
+  <script src="js/tools.js" id="index-script-tools-js"></script>
+  <script src="js/globalVariable.js"></script>
 
-        console.log('%c[Categories] بدء تحميل جدول الفئات...', 'color: blue;');
-        try {
-          console.log('[Categories] جاري جلب ملف list.json...');
-          const response = await fetch("shared/list.json");
-          if (!response.ok) throw new Error("فشل تحميل الفئات");
-          const data = await response.json();
-          const categories = data.categories;
-          console.log('%c[Categories] تم جلب الفئات بنجاح:', 'color: green;', categories);
-
-          tbody.innerHTML = ""; // مسح المحتوى القديم
-
-          // تجميع الفئات في مجموعات من 4 لعرض أربعة أعمدة
-          console.log('[Categories] جاري بناء صفوف الجدول...');
-          for (let i = 0; i < categories.length; i += 4) {
-            const chunk = categories.slice(i, i + 4);
-            const mainRow = document.createElement("tr");
-            mainRow.className = "categories-section__main-row";
-
-            chunk.forEach((category) => {
-              const cell = document.createElement("td");
-              cell.className = "categories-section__cell";
-              cell.dataset.categoryId = category.id;
-
-              const iconClass = category.icon || "fas fa-store";
-              const iconHtml = `<i class="category-cell-content__icon ${iconClass}"></i>`;
-
-              cell.innerHTML = `
-                <div class="category-cell-content">
-                  ${iconHtml}
-                  <span class="category-cell-content__text">${category.title}</span>
-                </div>`;
-
-              cell.style.animationDelay = `${(i + mainRow.cells.length) * 0.07}s`;
-
-              if (category.subcategories && category.subcategories.length > 0) {
-                cell.classList.add("categories-section__cell--has-subcategories");
-                cell.addEventListener("click", () => {
-                  toggleSubcategories(mainRow, category.subcategories, cell);
-                });
-              }
-              mainRow.appendChild(cell);
-            });
-
-            while (mainRow.cells.length < 4) {
-              mainRow.appendChild(document.createElement("td"));
-            }
-
-            tbody.appendChild(mainRow);
-          }
-          console.log('%c[Categories] اكتمل بناء جدول الفئات.', 'color: green; font-weight: bold;');
-        } catch (error) {
-          console.error("%c[Categories] خطأ فادح في عرض الفئات:", 'color: red; font-weight: bold;', error);
-          tbody.innerHTML = `<tr><td colspan="3">حدث خطأ أثناء تحميل الفئات.</td></tr>`;
-        }
+  <!---end region main javaScript files---->
+  <script>
+    // دالة لإخفاء أيقونة "الرئيسية" عن طريق إضافة فئة CSS.
+    function hiddenHomeIcon() {
+      const homeButton = document.getElementById("index-home-btn");
+      if (homeButton) {
+        homeButton.classList.add("index-hidden");
       }
+    }
+    // دالة لإظهار أيقونة "الرئيسية" عن طريق إزالة فئة CSS.
+    function showHomeIcon() {
+      const homeButton = document.getElementById("index-home-btn");
+      if (homeButton) {
+        homeButton.classList.remove("index-hidden");
+      }
+    }
 
-      /**
-       * Toggles the display of subcategory rows and product galleries when a main category cell is clicked.
-       * This function manages the active state of category cells, showing or hiding subcategories and
-       * subsequently product galleries based on user interaction.
-       * @function toggleSubcategories
-       * @param {HTMLTableRowElement} mainRow - The main category table row that was clicked.
-       * @param {Array<Object>} subcategories - An array of subcategory objects associated with the clicked main category.
-       * @param {HTMLTableCellElement} clickedCell - The specific table cell (main category) that was clicked.
-       * @returns {void}
-       * @see loadCategoriesAsTable
-       * @see showProductGallery
-       */
-      function toggleSubcategories(mainRow, subcategories, clickedCell) {
-        console.log(`%c[Subcategories] تم النقر على الفئة الرئيسية (ID: ${clickedCell.dataset.categoryId})`, 'color: purple;');
-        const tbody = document.getElementById("categories-tbody");
-        const currentlyActiveCell = tbody.querySelector("td.categories-section__cell--active");
-        const existingProductsRow = document.querySelector(".products-gallery-row");
-        const existingSubRow = document.querySelector(".categories-section__sub-row");
-        const isClickingSameCell = currentlyActiveCell === clickedCell;
+    // [نقطة البداية] يتم تنفيذ هذا الكود بعد تحميل محتوى DOM بالكامل.
+    document.addEventListener("DOMContentLoaded", () => {
+      // [خطوة 1] قراءة بيانات المستخدم المسجل من التخزين المحلي. إذا لم توجد، تكون القيمة null.
+      userSession = JSON.parse(localStorage.getItem("loggedInUser")) || null;
+      // [خطوة 2] تحديث اسم المستخدم في شريط التنقل العلوي.
+      setUserNameInIndexBar();
+      // [خطوة 3] تحديث شارة عدد المنتجات في السلة.
+      updateCartBadge();
+      // [خطوة 4] تحميل الصفحة الرئيسية بشكل افتراضي عند فتح التطبيق.
+      mainLoader(
+        "./pages/home.html",
+        "index-home-container",
+        0,
+        undefined,
+        // استدعاء دالة لإخفاء زر "الرئيسية" لأنه بالفعل في الصفحة الرئيسية.
+        "hiddenHomeIcon"
+      );
 
-        console.group(`%c[DevLog] دورة حياة النقر على الفئة الرئيسية`, 'color: #0d6efd; font-weight: bold;');
-        console.log(`- الخلية المنقور عليها:`, clickedCell);
-        console.log(`- هل هي نفس الخلية النشطة؟: ${isClickingSameCell}`);
+      //#region main navigation handlers
+      document
+        .getElementById("index-login-btn")
+        .addEventListener("click", handleLoginButtonClick);
 
-        // Step 1: Remove any currently open rows (subcategories or products) always on any click.
-        if (existingSubRow) {
-          console.log('[Subcategories] إزالة صف الفئات الفرعية المفتوح حاليًا.');
-          existingSubRow.remove();
-        }
-        if (existingProductsRow) {
-          console.log('[Subcategories] إزالة معرض المنتجات المفتوح حاليًا.');
-          existingProductsRow.remove();
-        }
+      // [خطوة 5.2] ربط زر "الرئيسية" بالدالة الخاصة به.
+      document
+        .getElementById("index-home-btn")
+        .addEventListener("click", handleHomeButtonClick);
 
-        // Step 2: Check if the click is on a new cell (not to close the current cell).
-        if (!isClickingSameCell) {
-          console.log('%c[DevLog] الحالة: فتح قسم جديد.', 'color: green;');
-          
-          // First: Remove old highlighting if it exists.
-          if (currentlyActiveCell) {
-            console.log('[DevLog] 1. إزالة التمييز من الخلية القديمة:', currentlyActiveCell);
-            currentlyActiveCell.classList.remove("categories-section__cell--active");
-          }
-          // Second: Apply highlighting to the new cell.
-          // The dimming effect on other cells has been removed as per the request.
-          console.log('[DevLog] 2. إضافة التمييز للخلية الجديدة (المنقور عليها).');
-          clickedCell.classList.add("categories-section__cell--active");
+      // [خطوة 5.3] ربط زر "البحث" بالدالة الخاصة به.
+      document
+        .getElementById("index-search-btn")
+        .addEventListener("click", handleSearchButtonClick);
 
-          console.log('[DevLog] 3. بناء وإدراج صف الفئات الفرعية.');
-          const subRow = document.createElement("tr");
-          subRow.className = "categories-section__sub-row";
-          subRow.style.animation = "slide-fade-in 1.5s ease-out forwards";
-
-          const subCell = document.createElement("td");
-          subCell.colSpan = 4;
-
-          const subcategoriesContainer = document.createElement("div");
-          subcategoriesContainer.className = "subcategories-container";
-
-          subcategories.forEach((sub) => {
-            const subItem = document.createElement("a");
-            subItem.href = `#`;
-            subItem.className = "subcategory-item";
-            const iconHtml = sub.icon ? `<i class="subcategory-item__icon ${sub.icon}"></i>` : '<i class="subcategory-item__icon fas fa-tag"></i>';
-            subItem.innerHTML = `${iconHtml} ${sub.title}`.trim();
-            
-            subItem.addEventListener("click", (e) => {
-              e.preventDefault();
-              document
-                .querySelectorAll(".subcategory-item--active")
-                .forEach((item) => item.classList.remove("subcategory-item--active"));
-              console.log(`[Subcategories] تم النقر على الفئة الفرعية (ID: ${sub.id})`);
-              subItem.classList.add("subcategory-item--active");
-              showProductGallery(
-                subRow,
-                clickedCell.dataset.categoryId,
-                sub.id
+      // [خطوة 5.4] ربط زر "حركة المشتريات".
+      document
+        .getElementById("index-sales-movement-btn")
+        .addEventListener("click", async () => {
+          // التحقق أولاً من وجود مستخدم مسجل.
+          if (userSession) {
+            const container = document.getElementById(
+              "index-myProducts-container"
+            );
+            if (container.innerHTML == "") {
+              await mainLoader(
+                "./pages/sales-movement.html",
+                "index-myProducts-container",
+                300,
+                undefined,
+                "showHomeIcon",
+                true
               );
-            });
-            subcategoriesContainer.appendChild(subItem);
-          });
-
-          subCell.appendChild(subcategoriesContainer);
-          subRow.appendChild(subCell);
-
-          mainRow.parentNode.insertBefore(subRow, mainRow.nextSibling);
-        } else {
-          console.log('%c[DevLog] الحالة: إغلاق القسم الحالي.', 'color: red;');
-          if (currentlyActiveCell) {
-            console.log('[DevLog] 1. إزالة التمييز من الخلية الحالية:', currentlyActiveCell);
-            currentlyActiveCell.classList.remove("categories-section__cell--active");
-          }
-        }
-        console.groupEnd();
-      }
-
-      /**
-       * Displays a product gallery below the subcategory row.
-       * It fetches products based on the provided main and subcategory IDs and
-       * renders them with lazy loading for images and interactive click events.
-       * @async
-       * @function showProductGallery
-       * @param {HTMLTableRowElement} subRow - The subcategory table row under which the product gallery will be inserted.
-       * @param {string} mainCatId - The ID of the main category.
-       * @param {string} subCatId - The ID of the subcategory.
-       * @returns {Promise<void>} A Promise that resolves when the product gallery is displayed, or rejects if product fetching fails.
-       * @throws {Error} If `getProductsByCategory` fails to fetch products.
-       * @see getProductsByCategory
-       * @see window.showProductDetails
-       */
-      async function showProductGallery(subRow, mainCatId, subCatId) {
-        console.log(`%c[Products] بدء عرض معرض المنتجات للفئة (${mainCatId} / ${subCatId})`, 'color: #fd7e14;');
-        const existingGallery = document.querySelector(".products-gallery-row");
-        if (existingGallery) {
-          existingGallery.remove();
-        }
-
-        const galleryRow = document.createElement("tr");
-        galleryRow.className = "products-gallery-row"; // ✅ إصلاح: توحيد اسم الفئة ليتطابق مع المحدد
-        const galleryCell = document.createElement("td");
-        galleryCell.colSpan = 4;
-        galleryRow.appendChild(galleryCell);
-        subRow.parentNode.insertBefore(galleryRow, subRow.nextSibling);
-
-        galleryCell.innerHTML = `<div class="loader" style="margin: 20px auto;"></div>`;
-
-        console.log('[Products] جاري جلب المنتجات من الواجهة الخلفية...');
-        let products;
-        try {
-          products = await getProductsByCategory(mainCatId, subCatId);
-          console.log('[Products] تم استلام المنتجات:', products);
-        } catch (error) {
-          console.error(`%c[Products] فشل جلب المنتجات للفئة (${mainCatId} / ${subCatId}):`, 'color: red; font-weight: bold;', error);
-          galleryCell.innerHTML = `<p class="error-message">حدث خطأ أثناء تحميل المنتجات. الرجاء المحاولة لاحقاً.</p>`;
-          return;
-        }
-
-
-        const currentRow = subRow.nextElementSibling;
-        if (
-          !currentRow ||
-          !currentRow.classList.contains("products-gallery-row") // ✅ إصلاح: توحيد اسم الفئة ليتطابق مع المحدد
-        ) {
-          console.warn('[Products] تم إغلاق القسم قبل اكتمال تحميل المنتجات. تتوقف العملية.');
-          return;
-        }
-
-        const currentGalleryCell = currentRow.querySelector("td");
-
-        if (products && products.length > 0) {
-          console.log(`[Products] تم العثور على ${products.length} منتج. جاري بناء المعرض...`);
-          const galleryContainer = document.createElement("div");
-          galleryContainer.className = "products-gallery__container";
-          currentGalleryCell.innerHTML = "";
-          currentGalleryCell.appendChild(galleryContainer);
-
-          const loadProductItem = (product) => {
-            return new Promise((resolve) => {
-              if (!product.ImageName) {
-                const productItem = document.createElement("div");
-                productItem.className = "product-item no-image";
-
-                const productName = document.createElement("p");
-                productName.className = "product-item__name";
-                productName.textContent = product.productName || 'منتج غير مسمى';
-
-                productItem.appendChild(productName);
-                galleryContainer.appendChild(productItem);
-
-                productItem.style.opacity = "0";
-                productItem.style.transform = "translateY(20px)";
-                productItem.style.transition = "opacity 0.5s ease, transform 0.5s ease";
-                setTimeout(() => {
-                  productItem.style.opacity = "1";
-                  productItem.style.transform = "translateY(0)";
-                  resolve();
-                }, 50);
-                return;
+            } else {
+              await mainLoader(
+                "./pages/sales-movement.html",
+                "index-myProducts-container",
+                300,
+                undefined,
+                "showHomeIcon",
+                false
+              );
+            }
+          } else {
+            // إذا لم يكن المستخدم مسجلاً، يتم عرض نافذة منبثقة تطلب منه تسجيل الدخول.
+            Swal.fire({
+              icon: "info",
+              title: "يجب تسجيل الدخول",
+              text: "لمتابعه مشترياتك ومنتجاتك، يرجى تسجيل الدخول أولاً.",
+              showCancelButton: true,
+              confirmButtonText: "تسجيل الدخول",
+              cancelButtonText: "إلغاء",
+            }).then((result) => {
+              if (result.isConfirmed) {
+                // إذا وافق المستخدم، يتم توجيهه إلى صفحة تسجيل الدخول.
+                console.log("[Modal] User chose to log in. Redirecting...");
+                mainLoader(
+                  "./pages/login.html",
+                  "index-user-container",
+                  0,
+                  undefined,
+                  "hiddenLoginIcon",
+                  true
+                );
               }
-
-              const firstImage = product.ImageName.split(",")[0];
-              if (!firstImage) return resolve();
-
-              const productItem = document.createElement("div");
-              productItem.className = "product-item";
-
-              const img = document.createElement("img");
-              img.className = "product-item__image";
-              const imageUrl = `https://pub-e828389e2f1e484c89d8fb652c540c12.r2.dev/${firstImage}`;
-              img.alt = product.product_description;
-              img.title = product.product_description;
-              
-              productItem.style.opacity = "0";
-              productItem.style.transform = "translateY(20px)";
-              productItem.style.transition = "opacity 0.5s ease, transform 0.5s ease";
-
-              productItem.addEventListener("click", () => {
-                console.log(`%c[Products] تم النقر على المنتج: ${product.productName}`, 'color: darkcyan');
-                if (window.showProductDetails) {
-                  const productDataForModal = {
-                    product_key: product.product_key,
-                    productName: product.productName,
-                    user_key: product.user_key,
-                    pricePerItem: product.product_price,
-                    image: `https://pub-e828389e2f1e484c89d8fb652c540c12.r2.dev/${firstImage}`,
-                    original_price: product.original_price,
-                    imageSrc: product.ImageName.split(',').map(name => `https://pub-e828389e2f1e484c89d8fb652c540c12.r2.dev/${name}`),
-                    availableQuantity: product.product_quantity,
-                    sellerMessage: product.user_message,
-                    description: product.product_description,
-                    sellerName: product.seller_username,
-                    sellerPhone: product.seller_phone,
-                    MainCategory: product.MainCategory,
-                    SubCategory: product.SubCategory
-                  };
-                  window.showProductDetails(productDataForModal);
-                }
-              });
-
-              img.onload = () => {
-                const productName = document.createElement("p");
-                productName.className = "product-item__name";
-                productName.id = `product-name-${product.product_key}`;
-                productName.textContent = product.productName || 'منتج غير مسمى';
-
-                productItem.appendChild(img);
-                productItem.appendChild(productName);
-                galleryContainer.appendChild(productItem);
-
-                setTimeout(() => {
-                  productItem.style.opacity = "1";
-                  productItem.style.transform = "translateY(0)";
-                  resolve();
-                }, 50);
-              };
-              img.onerror = () => {
-                console.warn(`[Products] فشل تحميل الصورة: ${imageUrl}`);
-                resolve();
-              };
-              img.src = imageUrl;
             });
-          };
-
-          for (const product of products) {
-            await loadProductItem(product);
           }
+        });
+
+      document
+        .getElementById("index-contact-btn")
+        .addEventListener("click", handleContactButtonClick);
+
+
+      // [خطوة 5.5] ربط زر "السلة".
+      document
+        .getElementById("index-cart-btn")
+        .addEventListener("click", () => {
+          const container = document.getElementById(
+            "index-cardPackage-container"
+          );
+          if (container.innerHTML == "") {
+            mainLoader(
+              "./pages/cardPackage.html",
+              "index-cardPackage-container",
+              0,
+              undefined,
+              "showHomeIcon",
+              true
+            );
+          } else {
+            mainLoader(
+              "./pages/cardPackage.html",
+              "index-cardPackage-container",
+              0,
+              undefined,
+              "showHomeIcon",
+              false
+            );
+          }
+        });
+
+      // [خطوة 5.6] ربط زر "الهدايا".
+      document
+        .getElementById("index-gifts-btn")
+        .addEventListener("click", () =>
+          handleProtectedLinkClick("./pages/gifts.html")
+        );
+
+    
+
+      // دالة معالجة النقر على زر "الرئيسية".
+      function handleHomeButtonClick() {
+        const container = document.getElementById("index-home-container");
+        if (container.innerHTML == "") {
+          mainLoader(
+            "pages/home.html",
+            "index-home-container",
+            0,
+            undefined,
+            "hiddenHomeIcon",
+            true
+          );
         } else {
-          console.log('[Products] لا توجد منتجات في هذه الفئة.');
-          currentGalleryCell.innerHTML = `<p class="no-products-message">لا توجد منتجات في هذه الفئة حالياً.</p>`;
+          mainLoader(
+            "pages/home.html",
+            "index-home-container",
+            0,
+            undefined,
+            "hiddenHomeIcon",
+            false
+          );
         }
       }
 
-    </script>
-    
-  </body>
+      // دالة معالجة النقر على زر "تسجيل الدخول / لوحة التحكم".
+      function handleLoginButtonClick() {
+        try {
+          if (userSession) {
+            // [أ] إذا كان المستخدم مسجلاً، يتم توجيهه إلى لوحة التحكم.
+            // إذا كان المستخدم مسجلاً، اذهب إلى لوحة التحكم
+            mainLoader(
+              "pages/user-dashboard.html",
+              "index-user-container",
+              0,
+              undefined,
+              "showHomeIcon",
+              true
+            );
+          } else {
+            // [ب] إذا لم يكن المستخدم مسجلاً، يتم توجيهه إلى صفحة تسجيل الدخول.
+            mainLoader(
+              "pages/login.html",
+              "index-user-container",
+              0,
+              undefined,
+              "showHomeIcon",
+              true
+            );
+          }
+        } catch (error) {
+          console.error("خطأ في التعامل مع زر تسجيل الدخول:", error);
+        }
+      }
+
+      // دالة معالجة النقر على زر "البحث".
+      function handleSearchButtonClick() {
+        const container = document.getElementById("index-search-container");
+        if (container.innerHTML == "") {
+          mainLoader(
+            "pages/search.html",
+            "index-search-container",
+            0,
+            undefined,
+            "showHomeIcon",
+            true
+          );
+        } else {
+          mainLoader(
+            "pages/search.html",
+            "index-search-container",
+            0,
+            undefined,
+            "showHomeIcon",
+            false
+          );
+        }
+      }
+
+      // دالة معالجة النقر على زر "اتصال".
+      function handleContactButtonClick() {
+        const container = document.getElementById("index-contact-btn");
+      
+          mainLoader(
+            "pages/contact.html",
+            "index-contact-container",
+            0,
+            undefined,
+            "showHomeIcon",
+            true
+          );
+      
+      }
+
+      // [خطوة 5.7] ربط زر "إضافة منتج".
+      const addProductBtn = document.getElementById("dash-add-product-btn");
+      if (addProductBtn) {
+        addProductBtn.addEventListener("click", showAddProductModal);
+      }
+
+      // [خطوة 5.8] ربط زر "منتجاتي".
+      const viewMyProductsBtn = document.getElementById(
+        "dash-view-my-products-btn"
+      );
+      if (viewMyProductsBtn) {
+        viewMyProductsBtn.addEventListener("click", async () => {
+          console.log(myProducts);
+          mainLoader(
+            "pages/product2Me.html",
+            "index-myProducts-container",
+            0,
+            undefined,
+            "showHomeIcon",
+            true
+          );
+        });
+      }
+      //#endregion
+
+      // [خطوة 6] منطق تحديد الزر النشط في شريط التنقل.
+      const headerButtons = document.querySelectorAll(".index-header-login-btn");
+
+      function setActiveButton(clickedBtn) {
+        // [أ] إزالة فئة 'active' من جميع الأزرار.
+        headerButtons.forEach((btn) => btn.classList.remove("active"));
+        if (clickedBtn) {
+          clickedBtn.classList.add("active");
+        }
+      }
+
+      headerButtons.forEach((btn) => {
+        // [ب] إضافة مستمع لكل زر لتطبيق الحالة النشطة عند النقر عليه.
+        btn.addEventListener("click", function () {
+          setActiveButton(this);
+        });
+      });
+
+      // [خطوة 7] تعيين زر "الرئيسية" كنشط افتراضيًا عند تحميل الصفحة.
+      const homeBtn = document.getElementById("index-home-btn");
+      if (homeBtn) {
+        setActiveButton(homeBtn);
+      }
+
+      // [خطوة 8] التحقق من وضع انتحال الشخصية (عندما يتصفح مسؤول كأنه مستخدم عادي) وإظهار علامة مائية إذا كان نشطًا.
+      checkImpersonationMode();
+    });
+
+  
+  </script>
+</body>
+
 </html>

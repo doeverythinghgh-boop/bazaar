@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" id="html-root">
+
+<head id="head-section">
+    <meta charset="UTF-8" id="meta-charset">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" id="meta-viewport">
+    <title id="page-title">شريط التقدم</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet"
+        id="font-link">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.2/css/all.css" id="fontawesome-link">
+
+    <link rel="stylesheet" href="style.css" id="main-stylesheet">
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" id="sweetalert-script"></script>
+    <script src="./main.js" type="module" id="main-script"></script>
+</head>
+
+<body id="body-content">
+    <div class="container" id="main-container">
+        <!-- عرض معلومات المستخدم الحالي (تم نقله إلى عنوان المتصفح) -->
+        <main id="main-content">
+            <!-- الشريط الرئيسي للحالات الأساسية -->
+
+            <!-- ✅ جديد: رابط عرض صور الطلب الخاص -->
+            <div style="text-align:center; margin-bottom:15px; display:none;" id="orderPhotoLinkContainer">
+                <a href="#" id="orderPhotoLink"
+                    style="color:#007bff; font-weight:bold; text-decoration:underline; font-size:1rem; display:inline-flex; align-items:center; gap:8px; padding: 5px 10px; background: #eef2f7; border-radius: 20px;">
+                    <i class="fas fa-images"></i> عرض صور الطلب الخاص
+                </a>
+            </div>
+
+            <div class="stepper-container" id="primary-stepper-container">
+                <div class="stepper-wrapper" id="primary-stepper-wrapper">
+                    <!-- الخطوة 1: مراجعة -->
+                    <div id="step-review" class="step-item review">
+                        <div class="step-circle" id="step-review-circle">
+                            <i class="fas fa-list-check" id="step-review-icon"></i>
+                        </div>
+                        <div class="step-label" id="step-review-label">مراجعة</div>
+                    </div>
+
+                    <!-- الخطوة 2: مؤكد -->
+                    <div id="step-confirmed" class="step-item confirmed">
+                        <div class="step-circle" id="step-confirmed-circle">
+                            <i class="fas fa-hand-peace" id="step-confirmed-icon"></i>
+                        </div>
+                        <div class="step-label" id="step-confirmed-label">مؤكد</div>
+                    </div>
+
+                    <!-- الخطوة 3: شُحن (نشطة) -->
+                    <div id="step-shipped" class="step-item shipped">
+                        <div class="step-circle" id="step-shipped-circle">
+                            <i class="fas fa-truck" id="step-shipped-icon"></i>
+                        </div>
+                        <div class="step-label" id="step-shipped-label">شُحن</div>
+                    </div>
+
+                    <!-- الخطوة 4: تم التسليم -->
+                    <div id="step-delivered" class="step-item delivered">
+                        <div class="step-circle" id="step-delivered-circle">
+                            <i class="fas fa-box-open" id="step-delivered-icon"></i>
+                        </div>
+                        <div class="step-label" id="step-delivered-label">تم التسليم</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- حاوية وصف الخطوة -->
+            <div id="step-description-container" class="step-description"
+                style="text-align: center; margin-top: 1.5rem; font-weight: bold; color: #007bff; font-size: 0.9rem;">
+                <!-- سيتم إدراج الوصف هنا بواسطة JavaScript -->
+            </div>
+
+            <!-- حاوية رسالة عدم السماح -->
+            <div id="permission-denied-message" class="alert-message"></div>
+
+            <!-- شريط منفصل للحالات النهائية -->
+            <div class="stepper-container" style="margin-top: 2.5rem;" id="secondary-stepper-container">
+                <div class="stepper-wrapper" style="justify-content: center; gap: 0rem;" id="secondary-stepper-wrapper">
+                    <!-- ملغي -->
+                    <div id="step-cancelled" class="step-item cancelled">
+                        <div class="step-circle" id="step-cancelled-circle">
+                            <i class="fa-solid fa-circle-xmark" id="step-cancelled-icon"></i>
+                        </div>
+                        <div class="step-label" id="step-cancelled-label">ملغي</div>
+                    </div>
+
+                    <!-- مرفوض -->
+                    <div id="step-rejected" class="step-item rejected">
+                        <div class="step-circle" id="step-rejected-circle">
+                            <i class="fas fa-thumbs-down" id="step-rejected-icon"></i>
+                        </div>
+                        <div class="step-label" id="step-rejected-label">مرفوض</div>
+                    </div>
+
+                    <!-- مرتجع -->
+                    <div id="step-returned" class="step-item returned">
+                        <div class="step-circle" id="step-returned-circle">
+                            <i class="fa-solid fa-arrow-rotate-left" id="step-returned-icon"></i>
+                        </div>
+                        <div class="step-label" id="step-returned-label">مرتجع</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- حاوية وصف الخطوات النهائية (5-7) -->
+            <div id="secondary-step-description-container"
+                style="text-align: center; margin-top: 1.5rem; font-weight: bold; color: red; font-size: 0.9rem;">
+            </div>
+        </main>
+    </div>
+</body>
+
+</html>
+<script type="module">
+    import { ordersData } from './config.js';
+
+    document.addEventListener('DOMContentLoaded', () => {
+        // Check for data availability
+        const checkData = setInterval(() => {
+            if (ordersData && ordersData.length > 0) {
+                clearInterval(checkData);
+                initPhotoLink();
+            }
+        }, 500);
+
+        function initPhotoLink() {
+            const linkContainer = document.getElementById('orderPhotoLinkContainer');
+            const link = document.getElementById('orderPhotoLink');
+
+            if (ordersData.length > 0) {
+                const order = ordersData[0];
+                const item = order.order_items && order.order_items[0];
+
+                console.log("[StepperOnly] Checking order for photo link:", {
+                    total_amount: order.total_amount,
+                    type: typeof order.total_amount,
+                    condition: (order.total_amount == 0)
+                });
+
+                // Only show for special orders where total_amount is 0
+                if (item && order.total_amount == 0) {
+                    // We assume the first item defines the context (User, Seller, Product)
+                    const u = order.user_key;
+                    const s = item.seller_key;
+                    // REVERT: Use product_key as 'p' because images are named with the Product Key.
+                    const p = item.product_key;
+                    // NEW: Pass order_key as 'o' for uniqueness check
+                    const o = order.order_key;
+
+                    link.onclick = (e) => {
+                        e.preventDefault();
+                        window.open(`../pages/orderPhoto.html?u=${u}&s=${s}&p=${p}&o=${o}`, '_blank');
+                    };
+
+                    linkContainer.style.display = 'block';
+                } else {
+                    linkContainer.style.display = 'none';
+                }
+            }
+        }
+    });
+</script>

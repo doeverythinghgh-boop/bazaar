@@ -16,6 +16,11 @@ const allowedHosts = [
 ];
 
 // ✅ تحسين: تبسيط منطق تحديد baseURL باستخدام مصفوفة.
+/**
+ * @description عنوان URL الأساسي لواجهة برمجة التطبيقات (API). يتم تحديده ديناميكيًا بناءً على بيئة التشغيل.
+ * @type {string}
+ * @const
+ */
 const baseURL = allowedHosts.includes(location.hostname) ? VERCEL_URL : "";
 
 /**
@@ -78,96 +83,6 @@ const ORDER_STATUS_MAP = {
  * @see ORDER_STATUS_MAP
  */
 const ORDER_STATUSES = Object.values(ORDER_STATUS_MAP);
-
-/**
- * @description كائن يمثل خريطة لأدوار المستخدمين، يربط الاسم النصي بالمعرف الرقمي المستخدم في قاعدة البيانات.
- *   يعتبر مصدر الحقيقة الوحيد لأدوار المستخدمين.
- * @type {Object<string, number>}
- * @const
- */
-const USER_ROLES_MAP = {
-  GUEST: -1, // زائر
-  CUSTOMER: 0, // عميل
-  SELLER: 1, // بائع
-  DELIVERY: 2, // خدمة توصيل
-  ADMIN: 3, // مسؤول
-};
-
-/**
- * @description يحول الاسم النصي للدور (مثل 'SELLER') إلى المعرف الرقمي المقابل له.
- * @function roleToNumber
- * @param {string} roleString - الاسم النصي للدور.
- * @returns {number} - المعرف الرقمي للدور. يعود بقيمة العميل (0) كقيمة افتراضية.
- */
-function roleToNumber(roleString) {
-  return USER_ROLES_MAP[roleString.toUpperCase()] ?? USER_ROLES_MAP.CUSTOMER;
-}
-
-
-
-/**
- * @description خريطة معكوسة لتسريع عملية تحويل المعرف الرقمي للدور إلى الاسم النصي.
- *   تُستخدم داخل دالة `numberToRole` للوصول المباشر (O(1)).
- * @type {Map<number, string>}
- * @const
- */
-const ROLE_NUMBER_TO_STRING_MAP = new Map(
-  Object.entries(USER_ROLES_MAP).map(([key, value]) => [value, key])
-);
-
-/**
- * @description يحول المعرف الرقمي للدور إلى الاسم النصي المقابل له (مثل 'SELLER') بكفاءة.
- * @function numberToRole
- * @param {number} roleNumber - المعرف الرقمي للدور.
- * @returns {string} - الاسم النصي للدور. يعود بـ 'CUSTOMER' كقيمة افتراضية.
- */
-function numberToRole(roleNumber) {
-  // ✅ تحسين: استخدام Map للوصول المباشر O(1) بدلاً من البحث الخطي O(n).
-  return ROLE_NUMBER_TO_STRING_MAP.get(roleNumber) || "GUEST";
-}
-function setUserType(typeUser, key) {
-  console.log("Setting user type with TRUE/FALSE:", typeUser, key);
-
-  // حفظ المفتاح
-  sessionStorage.setItem("userKey", key);
-
-  // إعادة ضبط جميع الأدوار
-  sessionStorage.setItem("isGUEST", false);
-  sessionStorage.setItem("isCUSTOMER", false);
-  sessionStorage.setItem("isSELLER", false);
-  sessionStorage.setItem("isDELIVERY", false);
-  sessionStorage.setItem("isADMIN", false);
-
-  // تفعيل الدور المطلوب
-  switch (typeUser) {
-    case -1:
-      sessionStorage.setItem("isGUEST", true);
-      console.log("user type is GUEST", key);
-      break;
-
-    case 0:
-      sessionStorage.setItem("isCUSTOMER", true);
-      console.log("user type is CUSTOMER", key);
-      break;
-
-    case 1:
-      sessionStorage.setItem("isSELLER", true);
-      console.log("user type is SELLER", key);
-      break;
-
-    case 2:
-      sessionStorage.setItem("isDELIVERY", true);
-      console.log("user type is DELIVERY", key);
-      break;
-
-    case 3:
-      sessionStorage.setItem("isADMIN", true);
-      console.log("user type is ADMIN", key);
-      break;
-
-    default:
-      console.warn("Unknown user type:", typeUser, key);
-  }
-}
+//متغير حاله المستخدم الحالي علي شكل جسون
 
 

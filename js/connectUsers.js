@@ -56,29 +56,7 @@ async function updateUser(userData) {
     body: userData,
   });
 }
-/**
- * @description يجلب بيانات مستخدم واحد بناءً على رقم هاتفه من واجهة برمجة التطبيقات (API).
- *   تُستخدم هذه الدالة بشكل أساسي عند تسجيل الدخول للتحقق من وجود المستخدم.
- * @function getUserByPhone
- * @param {string} phone - رقم هاتف المستخدم للبحث عنه.
- * @returns {Promise<Object|null>} - وعد (Promise) يحتوي على كائن بيانات المستخدم، أو `null` إذا لم يتم العثور عليه أو في حالة حدوث خطأ.
- * @see apiFetch
- */
-async function getUserByPhone(phone) {
-  try {
-    const data = await apiFetch(`/api/users?phone=${phone}`, {
-      specialHandlers: {
-        404: () => {
-          return null;
-        }
-      }
-    });
-    return data.error ? null : data;
-  } catch (error) {
-    console.error("%c[getUserByPhone] failed:", "color: red;", error);
-    return null;
-  }
-}
+
 
 /**
  * @description يجلب قائمة المستخدمين الذين لديهم دور "خدمة توصيل" (is_seller = 2).

@@ -43,7 +43,7 @@ async function updateProduct(productData) {
  * @returns {Promise<Object>} - وعد (Promise) يحتوي على كائن الاستجابة من الخادم.
  * @see apiFetch
  */
-async function deleteProduct(productKey) {
+async function deleteProduct_(productKey) {
   return await apiFetch(`/api/products?product_key=${productKey}`, {
     method: 'DELETE',
   });
@@ -394,7 +394,8 @@ function populateProductDetails(productData, onCloseCallback, options = {}) {
       }).then((result) => {
         if (result.isConfirmed) {
           console.log("[Modal] User chose to log in. Redirecting...");
-          window.location.href = "login.html"; // توجيه المستخدم لصفحة تسجيل الدخول
+                    mainLoader("./pages/login.html","index-user-container",0,undefined,"hiddenLoginIcon",true  );
+
         }
       });
     }
