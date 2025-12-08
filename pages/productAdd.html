@@ -757,7 +757,7 @@
             takePhotoBtn.addEventListener('click', () => {
                 // ✅ تفريغ fileInput0 من أي بيانات سابقة قبل البدء
                 // إزالة خاصية capture أولاً لتجنب أي تعارض
-                fileInput0.files = [];
+                fileInput0.files = null;
                 fileInput0.removeAttribute('capture');
                 fileInput0.value = '';
                 console.log('CLEAR 0000000000000000');
