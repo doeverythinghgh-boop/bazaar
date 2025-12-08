@@ -27,7 +27,7 @@ window.CameraUtils = (function () {
      * @param {string} pageId - معرف فريد للصفحة (مثل 'productAdd') يُستخدم كمفتاح في LocalStorage.
      * @param {Function} [reloadCallback] - دالة اختيارية لإعادة التحميل في حال لم يتم التعرف على الصفحة.
      */
-    async function openCamera(pageId, reloadCallback) {
+    async function openCamera(pageId) {
         // [Fix] تنظيف أي عناصر input سابقة قد تكون بقيت معلقة (مثلاً إذا ألغى المستخدم التصوير)
         // هذا يمنع تراكم العناصر المخفية الذي قد يسبب مشاكل في الذاكرة أو الكاميرا
         const existingInput = document.getElementById('temp-camera-input');
@@ -79,8 +79,8 @@ window.CameraUtils = (function () {
                             await mainLoader(
                                 "./pages/productAdd.html", // صفحة
                                 "index-product-container",   // حاوية
-                                0,                           // انتظار
-                                undefined,                   // cssRules (الافتراضي)
+                                300,                           // انتظار
+                                "checkSavedImagesCallback",                   // cssRules (الافتراضي)
                                 "showHomeIcon",              // callbackName
                                 false                        // reload force
                             );
@@ -88,7 +88,7 @@ window.CameraUtils = (function () {
                             // استدعاء دالة الفحص والاستعادة الخاصة بصفحة إضافة المنتج يدويًا
                             // بعد اكتمال mainLoader
                             if (typeof productModule00 !== 'undefined' && typeof productModule00.checkSavedImagesCallback === 'function') {
-                                productModule00.checkSavedImagesCallback();
+                            //    productModule00.checkSavedImagesCallback();
                             }
 
                             Swal.close();
