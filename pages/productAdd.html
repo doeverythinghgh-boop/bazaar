@@ -647,48 +647,76 @@
 
         let stop = 0;
         // --- معالجة ملفات عند اختيارها أو إفلاتها ---
-        async function handleNewFiles(fileList) {
-            stop++;
-            if (stop > 1) {
-                return;
+    async function handleNewFiles(fileList) {
+    console.log(`[ImageUploader] Handling ${fileList.length} file(s)`);
+    
+    // منع التكرار
+    if (window.isProcessingFiles) return;
+    window.isProcessingFiles = true;
+    
+    try {
+        // إخفاء رسالة الخطأ القديمة
+        clearError(uploaderEl);
+        
+        // تحويل FileList إلى مصفوفة
+        const filesArr = Array.from(fileList);
+        
+        // التحقق من العدد الأقصى
+        const availableSlots = MAX_FILES - images.length;
+        if (availableSlots <= 0) {
+            Swal.fire('تحذير', `لا يمكن إضافة أكثر من ${MAX_FILES} صور`, 'warning');
+            return;
+        }
+        
+        const filesToProcess = filesArr.slice(0, availableSlots);
+        
+        for (const file of filesToProcess) {
+            // التحقق من نوع الملف
+            if (!file.type.startsWith('image/')) {
+                console.warn(`[ImageUploader] Skipping non-image file: ${file.name}`);
+                continue;
             }
-            // إخفاء رسالة الخطأ الخاصة بالصور بمجرد محاولة إضافة صور جديدة
-            console.log(`[ImageUploader] Handling ${fileList.length} new files.`);
-            clearError(uploaderEl);
-
-            const filesArr = Array.from(fileList).slice(0, MAX_FILES - images.length);
-            for (const file of filesArr) {
-                if (!file.type.startsWith('image/')) continue;
-                const id = genId();
-                const state = { id, file, compressedBlob: null, status: 'pending' };
-                images.push(state); // إضافة الصورة الجديدة إلى مصفوفة الحالة
-                createPreviewItem(state);
-                // ضغط الصورة (غير متزامن، تحدث التحديثات على واجهة المعاينة)
-                try {
-                    console.log(`[ImageUploader] Compressing image: ${file.name}`);
-                    state.status = 'compressing';
-                    const compressed = await compressImage(file);
-                    state.compressedBlob = compressed;
-                    state.status = 'ready';
-                    console.log(`%c[ImageUploader] Image compressed successfully: ${file.name} -> ${formatBytes(compressed.size)}`, 'color: green;');
-                    // تحديث واجهة المستخدم بحجم الصورة بعد الضغط
-                    if (state._metaEl) {
-                        state._metaEl.textContent = formatBytes(compressed.size);
-                    }
-                } catch (err) {
-                    console.error('%c[ImageUploader] Error compressing image:', 'color: red;', err);
-                    state.status = 'error';
-                    if (state._metaEl) {
-                        state._metaEl.textContent = 'خطأ';
-                    }
+            
+            const id = genId();
+            const state = { 
+                id, 
+                file, 
+                fileName: file.name,
+                compressedBlob: null, 
+                status: 'pending' 
+            };
+            
+            images.push(state);
+            createPreviewItem(state);
+            
+            // ضغط الصورة
+            try {
+                state.status = 'compressing';
+                const compressed = await compressImage(file);
+                state.compressedBlob = compressed;
+                state.status = 'ready';
+                
+                // تحديث الواجهة بالحجم النهائي
+                if (state._metaEl) {
+                    state._metaEl.textContent = formatBytes(compressed.size);
+                }
+                
+            } catch (err) {
+                console.error('[ImageUploader] Compression error:', err);
+                state.status = 'error';
+                if (state._metaEl) {
+                    state._metaEl.textContent = 'خطأ في الضغط';
                 }
             }
-            // *** الإصلاح: إعادة تعيين قيمة حقل إدخال الملفات ***
-            // هذا يضمن أن حدث 'change' سيعمل حتى لو تم اختيار نفس الملف مرة أخرى
-            fileInput0.value = '';
-            stop = 0;
         }
-
+        
+    } catch (error) {
+        console.error('[ImageUploader] Critical error:', error);
+        Swal.fire('خطأ', 'حدث خطأ أثناء معالجة الصور', 'error');
+    } finally {
+        window.isProcessingFiles = false;
+    }
+}
         // --- رفع إلى الخادم (نموذجي - قم بتعديله ليتوافق مع API الخاص بك) ---
         async function uploadAll(progressCallback) {
             // تقمص سلوك رفع متسلسل: لكل صورة طلب منفصل
@@ -802,31 +830,61 @@
         });
 
         // التقاط صورة عبر الكاميرا: فتح ملف مع capture
-        takePhotoBtn.addEventListener('click', () => {
-            // ✅ تفريغ fileInput0 من أي بيانات سابقة قبل البدء
-            // إزالة خاصية capture أولاً لتجنب أي تعارض
-            // fileInput0.files = null; // ❌ خطأ: files خاصية للقراءة فقط
-            fileInput0.value = ''; // ✅ الصحيح: تصفير القيمة
-            fileInput0.removeAttribute('capture');
-
-            console.log('CLEAR 0000000000000000');
-            // ✅ منطق مشروط للكاميرا
-            // 1. التحقق إذا كان الجهاز محمولاً
-            const isMobile = /Mobi|Android|iPhone/i.test(navigator.userAgent);
-            console.log('isMobile', isMobile);
-            if (isMobile) {
-                // السلوك الحالي للهواتف: استخدام capture لفتح تطبيق الكاميرا الأصلي
-                console.log('[Camera] Mobile device detected. Using capture attribute.');
-                fileInput0.setAttribute('capture', 'environment');
-                fileInput0.click();
-                console.log('fileInput0 FINSH CAMERA 000000000000000');
-            } else {
-                // السلوك الجديد لأجهزة سطح المكتب: استخدام getUserMedia
-                console.log('[Camera] Desktop device detected. Using getUserMedia API.');
-                openDesktopCamera();
+    takePhotoBtn.addEventListener('click', () => {
+    console.log('[Camera] Take photo button clicked on mobile');
+    
+    // ✅ حل نهائي: إنشاء input جديد في كل مرة
+    const tempInput = document.createElement('input');
+    tempInput.type = 'file';
+    tempInput.accept = 'image/*';
+    tempInput.style.display = 'none';
+    
+    // للأجهزة المحمولة: فتح الكاميرا مباشرة
+    tempInput.setAttribute('capture', 'environment');
+    
+    // إضافة إلى الـ DOM مؤقتاً
+    document.body.appendChild(tempInput);
+    
+    // تعريف الحدث قبل النقر
+    tempInput.addEventListener('change', async (e) => {
+        if (e.target.files && e.target.files.length > 0) {
+            console.log('[Camera] File selected from camera:', e.target.files[0].name);
+            await handleNewFiles(e.target.files);
+        }
+        
+        // تنظيف: إزالة الـ input المؤقت من الـ DOM
+        if (tempInput.parentNode) {
+            tempInput.parentNode.removeChild(tempInput);
+        }
+    });
+    
+    // إضافة حدث error للتعامل مع المشاكل
+    tempInput.addEventListener('error', (e) => {
+        console.error('[Camera] Error with file input:', e);
+        if (tempInput.parentNode) {
+            tempInput.parentNode.removeChild(tempInput);
+        }
+        
+        // محاولة بديلة
+        Swal.fire({
+            icon: 'warning',
+            title: 'مشكلة في الكاميرا',
+            text: 'جرب فتح الكاميرا بطريقة أخرى',
+            showCancelButton: true,
+            confirmButtonText: 'اختيار من المعرض',
+            cancelButtonText: 'إلغاء'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                pickFilesBtn.click();
             }
         });
-
+    });
+    
+    // ✅ إطلاق النقر
+    setTimeout(() => {
+        tempInput.click();
+    }, 100);
+});
         /**
          * ✅ جديد: دالة لفتح كاميرا الويب على أجهزة سطح المكتب.
          */
