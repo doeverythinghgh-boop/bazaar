@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>اختبار CameraModule</title>
+    <link rel="stylesheet" href="/style/cameraPopup.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.2/css/all.css" />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://unpkg.com/@zxing/library@latest"></script>
+    <style>
+        body {
+            font-family: 'Tajawal', Arial, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 8px;
+        }
+
+        .test-section h2 {
+            color: #555;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+            transition: background 0.3s;
+        }
+
+        .btn:hover {
+            background: #2980b9;
+        }
+
+        .btn-success {
+            background: #27ae60;
+        }
+
+        .btn-success:hover {
+            background: #229954;
+        }
+
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-family: monospace;
+        }
+
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .image-preview {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .image-preview img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 5px;
+            border: 2px solid #ddd;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="test-container">
+        <h1><i class="fas fa-camera"></i> اختبار CameraModule</h1>
+
+        <!-- قسم التهيئة -->
+        <div class="test-section">
+            <h2>1. تهيئة الموديول</h2>
+            <button class="btn" onclick="testInit()">
+                <i class="fas fa-cog"></i> تهيئة CameraModule
+            </button>
+            <div id="init-status"></div>
+        </div>
+
+        <!-- قسم فتح الكاميرا -->
+        <div class="test-section">
+            <h2>2. فتح الكاميرا</h2>
+            <button class="btn" onclick="testOpenCamera()">
+                <i class="fas fa-camera"></i> فتح الكاميرا
+            </button>
+            <div id="camera-status"></div>
+        </div>
+
+        <!-- قسم الحصول على الصور -->
+        <div class="test-section">
+            <h2>3. الصور الملتقطة</h2>
+            <button class="btn btn-success" onclick="testGetImages()">
+                <i class="fas fa-images"></i> عرض الصور الملتقطة
+            </button>
+            <button class="btn" onclick="testClearImages()">
+                <i class="fas fa-trash"></i> مسح الصور
+            </button>
+            <div id="images-status"></div>
+            <div id="images-preview" class="image-preview"></div>
+        </div>
+
+        <!-- قسم معلومات النظام -->
+        <div class="test-section">
+            <h2>4. معلومات النظام</h2>
+            <button class="btn" onclick="testSystemInfo()">
+                <i class="fas fa-info-circle"></i> عرض المعلومات
+            </button>
+            <div id="system-status"></div>
+        </div>
+    </div>
+
+    <script src="/js/cameraModule.js"></script>
+    <script>
+        let isInitialized = false;
+
+        // اختبار التهيئة
+        async function testInit() {
+            const statusDiv = document.getElementById('init-status');
+            statusDiv.innerHTML = '<div class="status info">جاري التهيئة...</div>';
+
+            try {
+                await CameraModule.init({
+                    dbName: 'testCameraDB',
+                    storeName: 'testImages',
+                    enableBarcodeScanning: false
+                });
+
+                isInitialized = true;
+                statusDiv.innerHTML = '<div class="status success">✓ تم تهيئة CameraModule بنجاح!</div>';
+                console.log('CameraModule initialized successfully');
+            } catch (err) {
+                statusDiv.innerHTML = `<div class="status error">✗ فشل في التهيئة: ${err.message}</div>`;
+                console.error('Initialization failed:', err);
+            }
+        }
+
+        // اختبار فتح الكاميرا
+        async function testOpenCamera() {
+            const statusDiv = document.getElementById('camera-status');
+
+            if (!isInitialized) {
+                statusDiv.innerHTML = '<div class="status error">✗ يجب تهيئة الموديول أولاً!</div>';
+                return;
+            }
+
+            statusDiv.innerHTML = '<div class="status info">جاري فتح الكاميرا...</div>';
+
+            try {
+                await CameraModule.open();
+                statusDiv.innerHTML = '<div class="status success">✓ تم فتح الكاميرا بنجاح! التقط بعض الصور ثم أغلق النافذة.</div>';
+            } catch (err) {
+                statusDiv.innerHTML = `<div class="status error">✗ فشل في فتح الكاميرا: ${err.message}</div>`;
+                console.error('Camera open failed:', err);
+            }
+        }
+
+        // اختبار الحصول على الصور
+        function testGetImages() {
+            const statusDiv = document.getElementById('images-status');
+            const previewDiv = document.getElementById('images-preview');
+
+            if (!isInitialized) {
+                statusDiv.innerHTML = '<div class="status error">✗ يجب تهيئة الموديول أولاً!</div>';
+                return;
+            }
+
+            try {
+                const images = CameraModule.getCapturedImages();
+
+                if (images.length === 0) {
+                    statusDiv.innerHTML = '<div class="status info">لا توجد صور ملتقطة حالياً.</div>';
+                    previewDiv.innerHTML = '';
+                } else {
+                    statusDiv.innerHTML = `<div class="status success">✓ تم العثور على ${images.length} صورة</div>`;
+
+                    // عرض الصور
+                    previewDiv.innerHTML = '';
+                    images.forEach((img, index) => {
+                        const imgElement = document.createElement('img');
+                        imgElement.src = URL.createObjectURL(img.blob);
+                        imgElement.alt = `صورة ${index + 1}`;
+                        imgElement.title = `الحجم: ${(img.blob.size / 1024).toFixed(2)} KB\nالأبعاد: ${img.width}x${img.height}`;
+                        previewDiv.appendChild(imgElement);
+                    });
+                }
+            } catch (err) {
+                statusDiv.innerHTML = `<div class="status error">✗ خطأ: ${err.message}</div>`;
+                console.error('Get images failed:', err);
+            }
+        }
+
+        // اختبار مسح الصور
+        function testClearImages() {
+            const statusDiv = document.getElementById('images-status');
+            const previewDiv = document.getElementById('images-preview');
+
+            if (!isInitialized) {
+                statusDiv.innerHTML = '<div class="status error">✗ يجب تهيئة الموديول أولاً!</div>';
+                return;
+            }
+
+            try {
+                CameraModule.clearCapturedImages();
+                statusDiv.innerHTML = '<div class="status success">✓ تم مسح جميع الصور</div>';
+                previewDiv.innerHTML = '';
+            } catch (err) {
+                statusDiv.innerHTML = `<div class="status error">✗ خطأ: ${err.message}</div>`;
+                console.error('Clear images failed:', err);
+            }
+        }
+
+        // اختبار معلومات النظام
+        function testSystemInfo() {
+            const statusDiv = document.getElementById('system-status');
+
+            if (!isInitialized) {
+                statusDiv.innerHTML = '<div class="status error">✗ يجب تهيئة الموديول أولاً!</div>';
+                return;
+            }
+
+            try {
+                const cameras = CameraModule.getAvailableCameras();
+                const images = CameraModule.getCapturedImages();
+
+                let info = '<div class="status info">';
+                info += `<strong>معلومات النظام:</strong><br>`;
+                info += `- عدد الكاميرات المتاحة: ${cameras.length}<br>`;
+                info += `- عدد الصور الملتقطة: ${images.length}<br>`;
+                info += `- حالة التهيئة: ${isInitialized ? 'مهيأ' : 'غير مهيأ'}<br>`;
+                info += `- دعم ZXing: ${window.ZXing ? 'نعم' : 'لا'}<br>`;
+
+                if (cameras.length > 0) {
+                    info += `<br><strong>الكاميرات المتاحة:</strong><br>`;
+                    cameras.forEach((cam, i) => {
+                        info += `${i + 1}. ${cam.label || 'كاميرا ' + (i + 1)}<br>`;
+                    });
+                }
+
+                info += '</div>';
+                statusDiv.innerHTML = info;
+            } catch (err) {
+                statusDiv.innerHTML = `<div class="status error">✗ خطأ: ${err.message}</div>`;
+                console.error('System info failed:', err);
+            }
+        }
+
+        // تهيئة تلقائية عند تحميل الصفحة
+        window.addEventListener('DOMContentLoaded', () => {
+            console.log('Test page loaded');
+            console.log('CameraModule available:', typeof CameraModule !== 'undefined');
+            console.log('ZXing available:', typeof ZXing !== 'undefined');
+        });
+    </script>
+</body>
+
+</html>
