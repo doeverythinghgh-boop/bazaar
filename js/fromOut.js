@@ -1,11 +1,28 @@
-const fileInput0 = document.getElementById('fileInput00');
+
+let fileInput0 ;
+let pickFilesBtn ;
+let takePhotoBtn ;
+let previewsEl ;
+let uploaderEl ;
+let IMAGE_MAX_WIDTH = 1600; // أقصى عرض بعد الضغط
+let IMAGE_MAX_HEIGHT = 1600; // أقصى ارتفاع بعد الضغط
+let IMAGE_QUALITY = 0.75; // جودة ضغط 0..1
+let MAX_FILES = 6; // حد معقول من الصور
+const images = [];
+function getElements(){
+    fileInput0 = document.getElementById('fileInput00');
+pickFilesBtn = document.getElementById('pick-files-btn');
+ takePhotoBtn = document.getElementById('take-photo-btn');
+ previewsEl = document.getElementById('previews');
+ uploaderEl = document.getElementById('image-uploader');
+}
 
 // --- معالجة ملفات عند اختيارها أو إفلاتها ---
 async function handleNewFiles(fileList) {
 
     // إخفاء رسالة الخطأ الخاصة بالصور بمجرد محاولة إضافة صور جديدة
     console.log(`[ImageUploader] Handling ${fileList.length} new files.`);
-    clearError(uploaderEl);
+    //clearError(uploaderEl);
 
     const filesArr = Array.from(fileList).slice(0, MAX_FILES - images.length);
     for (const file of filesArr) {
