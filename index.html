@@ -40,6 +40,10 @@
       flex-direction: column;
       /* لجعل المحتوى الرئيسي والتذييل يترتبان عموديًا */
     }
+        .add-product-modal__hidden-file {
+        display: none;
+    }
+
 
     /* ✅ تعديل: إعادة تسمية الفئة وتطبيق Flexbox */
     .index-app-header {
@@ -261,7 +265,8 @@
       <span id="index-contact-text">تواصل معنا</span>
     </button>
   </header>
-
+  <input class="add-product-modal__hidden-file" id="fileInput00" type="file" accept="image/*" multiple
+    aria-hidden="true">
   <div id="index-home-container"></div>
   <div id="index-search-container"></div>
   <div id="index-user-container"></div>
@@ -279,9 +284,11 @@
 
   <script src="js/tools.js" id="index-script-tools-js"></script>
   <script src="js/globalVariable.js"></script>
-
+  <script src="js/fromOut.js"></script>
   <!---end region main javaScript files---->
   <script>
+  
+
     // دالة لإخفاء أيقونة "الرئيسية" عن طريق إضافة فئة CSS.
     function hiddenHomeIcon() {
       const homeButton = document.getElementById("index-home-btn");
