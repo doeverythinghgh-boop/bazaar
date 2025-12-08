@@ -58,8 +58,8 @@ window.CameraUtils = (function () {
                            mainLoader(
                                 "./pages/productAdd.html",
                                 "index-product-container",
-                                300,
-                                "checkSavedImagesCallback", // دالة سيتم استدعاؤها للتحقق من الصور
+                                0,
+                                undefined, // دالة سيتم استدعاؤها للتحقق من الصور
                                 "showHomeIcon",
                                 false
                             );

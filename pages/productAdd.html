@@ -415,16 +415,17 @@
          */
         function initializeAddProductForm() {
             console.log('%c[ProductForm] Initializing simplified form...', 'color: blue;');
+        
             const form = document.getElementById('add-product-form');
 
             // الوصول إلى مصفوفة الصور وحالة الموديول من النطاق الخارجي
-            const images = window.productModule.images;
+            const images = window.productModule00.images;
             images.length = 0; // إفراغ مصفوفة الصور عند كل تهيئة
 
             // تعيين وضع الإضافة فقط
             form.dataset.mode = 'add';
             console.log(`[ProductForm] Mode: ${form.dataset.mode}`);
-            window.productModule.originalImageNames = []; // إعادة تعيين
+            window.productModule00.originalImageNames = []; // إعادة تعيين
 
             console.log('%c[ProductForm] Simplified form initialized successfully.', 'color: green;');
         }

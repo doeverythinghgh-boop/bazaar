@@ -139,7 +139,7 @@ async function profileRestartScripts(container) {
  */
 function profileExecuteCallback(callbackName) {
     try {
-        if (!callbackName) return;
+        if (!callbackName || !window[callbackName]||typeof window[callbackName] !== "function"||window[callbackName] === undefined) return;
 
         const callback = window[callbackName];
 
