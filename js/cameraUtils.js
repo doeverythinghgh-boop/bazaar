@@ -85,17 +85,13 @@ window.CameraUtils = (function () {
                                 false                        // reload force
                             );
 
-                            
+
 
                             Swal.close();
                         } else {
                             console.error('[CameraUtils] mainLoader is not defined!');
-                            if (reloadCallback) reloadCallback();
+
                         }
-                    } else if (typeof reloadCallback === 'function') {
-                        Swal.close();
-                        console.log(`[CameraUtils] Image saved for ${pageId}. Triggering generic reload callback.`);
-                        reloadCallback();
                     }
 
                 } catch (error) {
@@ -198,20 +194,33 @@ window.CameraUtils = (function () {
         const newHeight = Math.round(height * ratio);
 
         // الرسم على Canvas
-        const canvas = document.createElement('canvas');
+        let canvas = document.createElement('canvas');
         canvas.width = newWidth;
         canvas.height = newHeight;
-        const ctx = canvas.getContext('2d');
+        let ctx = canvas.getContext('2d');
 
         // خلفية بيضاء (للصور الشفافة مثل PNG عند تحويلها لـ JPEG)
         ctx.fillStyle = '#ffffff';
         ctx.fillRect(0, 0, newWidth, newHeight);
         ctx.drawImage(imgBitmap, 0, 0, newWidth, newHeight);
 
+        // [Optimization] إغلاق الصورة الأصلية فوراً بعد الرسم لتحرير الذاكرة
+        if (imgBitmap && typeof imgBitmap.close === 'function') {
+            imgBitmap.close();
+        }
+        imgBitmap = null;
+
         // التحويل إلى Blob بصيغة JPEG
         const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', IMAGE_QUALITY));
 
-        imgBitmap.close(); // تحرير الذاكرة
+        // [Optimization] تنظيف الـ Canvas والمتغيرات الكبيرة
+        if (canvas) {
+            canvas.width = 0;
+            canvas.height = 0;
+            canvas = null;
+        }
+        ctx = null;
+
         return blob;
     }
 
