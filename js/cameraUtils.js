@@ -79,17 +79,13 @@ window.CameraUtils = (function () {
                             await mainLoader(
                                 "./pages/productAdd.html", // صفحة
                                 "index-product-container",   // حاوية
-                                300,                           // انتظار
+                                3000,                           // انتظار
                                 "checkSavedImagesCallback",                   // cssRules (الافتراضي)
                                 "showHomeIcon",              // callbackName
                                 false                        // reload force
                             );
 
-                            // استدعاء دالة الفحص والاستعادة الخاصة بصفحة إضافة المنتج يدويًا
-                            // بعد اكتمال mainLoader
-                            if (typeof productModule00 !== 'undefined' && typeof productModule00.checkSavedImagesCallback === 'function') {
-                            //    productModule00.checkSavedImagesCallback();
-                            }
+                            
 
                             Swal.close();
                         } else {
