@@ -413,27 +413,9 @@
     </div>
 
     <script>
-        /**
-         * دالة لتهيئة نموذج إضافة المنتج المبسط
-         */
-        function initializeAddProductForm() {
-            console.log('%c[ProductForm] Initializing simplified form...', 'color: blue;');
-            const form = document.getElementById('add-product-form');
-
-            // الوصول إلى مصفوفة الصور وحالة الموديول من النطاق الخارجي
-            const images = window.productModule.images;
-            images.length = 0; // إفراغ مصفوفة الصور عند كل تهيئة
-
-            // تعيين وضع الإضافة فقط
-            form.dataset.mode = 'add';
-            console.log(`[ProductForm] Mode: ${form.dataset.mode}`);
-            window.productModule.originalImageNames = []; // إعادة تعيين
-
-            console.log('%c[ProductForm] Simplified form initialized successfully.', 'color: green;');
-        }
-
-        // جعل الدوال والمتغيرات متاحة عالميًا ضمن نطاق النافذة
-        window.productModule = (function () {
+        // ✅ استخدام IIFE بسيط بدون تعيينه لـ window
+        (function () {
+            console.log('%c[ProductForm] Initializing product add form...', 'color: blue;');
             // --- إعدادات ضغط افتراضية ---
             const IMAGE_MAX_WIDTH = 1600; // أقصى عرض بعد الضغط
             const IMAGE_MAX_HEIGHT = 1600; // أقصى ارتفاع بعد الضغط
@@ -442,9 +424,6 @@
 
             // عناصر DOM
             const fileInput0 = document.getElementById('fileInput00');
-            //document.getElementById('fileInput0').addEventListener('change', (e) => {
-            //console.log('Files selected:', e.target.files);
-            //});
             const pickFilesBtn = document.getElementById('pick-files-btn');
             const takePhotoBtn = document.getElementById('take-photo-btn');
             const previewsEl = document.getElementById('previews');
@@ -1013,19 +992,7 @@
                 return serial;
             }
 
-            // إرجاع الدوال والمتغيرات التي تحتاجها
-            return {
-                images,
-                originalImageNames: [],
-                genId,
-                createPreviewItem
-            };
-
-        })(); // نهاية الوحدة
-
-        // تهيئة النموذج عند تحميل الصفحة
-
-        initializeAddProductForm();
+        })(); // نهاية IIFE
 
     </script>
 </body>
