@@ -861,7 +861,65 @@
 
                 } catch (err) {
                     console.error('[Camera] Error opening CameraModule:', err);
-                    Swal.fire('خطأ!', 'لم نتمكن من فتح الكاميرا. يرجى المحاولة مرة أخرى.', 'error');
+
+                    // جمع معلومات الخطأ للنسخ
+                    let errorTextForClipboard = `خطأ في فتح الكاميرا\n`;
+                    errorTextForClipboard += `الخطأ: ${err.message || err}\n`;
+                    errorTextForClipboard += `Stack: ${err.stack || 'غير متوفر'}\n\n`;
+                    errorTextForClipboard += `معلومات التشخيص:\n`;
+                    errorTextForClipboard += `- CameraModule موجود: ${window.CameraModule ? 'نعم' : 'لا'}\n`;
+                    errorTextForClipboard += `- حالة التهيئة: ${window.cameraModuleReady ? 'تم البدء' : 'لم يتم البدء'}\n`;
+
+                    // إنشاء رسالة خطأ تفصيلية
+                    let errorDetails = `<div style="text-align: right; direction: rtl;">`;
+                    errorDetails += `<p><strong>الخطأ:</strong> ${err.message || err}</p>`;
+                    errorDetails += `<hr style="margin: 10px 0;">`;
+                    errorDetails += `<p><strong>معلومات التشخيص:</strong></p>`;
+                    errorDetails += `<ul style="text-align: right; list-style: none; padding: 0;">`;
+                    errorDetails += `<li>• CameraModule موجود: ${window.CameraModule ? 'نعم ✓' : 'لا ✗'}</li>`;
+                    errorDetails += `<li>• حالة التهيئة: ${window.cameraModuleReady ? 'تم البدء' : 'لم يتم البدء ✗'}</li>`;
+                    if (window.cameraModuleReady) {
+                        try {
+                            const status = await window.cameraModuleReady;
+                            errorDetails += `<li>• نتيجة التهيئة: ${status ? 'نجحت ✓' : 'فشلت ✗'}</li>`;
+                            errorTextForClipboard += `- نتيجة التهيئة: ${status ? 'نجحت' : 'فشلت'}\n`;
+                        } catch (initErr) {
+                            errorDetails += `<li>• نتيجة التهيئة: فشلت - ${initErr.message}</li>`;
+                            errorTextForClipboard += `- نتيجة التهيئة: فشلت - ${initErr.message}\n`;
+                        }
+                    }
+
+                    errorDetails += `</ul>`;
+                    errorDetails += `<button id="copy-error-btn" style="margin-top: 15px; padding: 8px 16px; background: #3498db; color: white; border: none; border-radius: 5px; cursor: pointer;">📋 نسخ تفاصيل الخطأ</button>`;
+                    errorDetails += `</div>`;
+
+                    Swal.fire({
+                        title: 'خطأ في فتح الكاميرا',
+                        html: errorDetails,
+                        icon: 'error',
+                        confirmButtonText: 'حسناً',
+                        didOpen: () => {
+                            // إضافة حدث النسخ للكلب بورد
+                            const copyBtn = document.getElementById('copy-error-btn');
+                            if (copyBtn) {
+                                copyBtn.addEventListener('click', async () => {
+                                    try {
+                                        await navigator.clipboard.writeText(errorTextForClipboard);
+                                        copyBtn.textContent = '✓ تم النسخ';
+                                        copyBtn.style.background = '#27ae60';
+                                        setTimeout(() => {
+                                            copyBtn.textContent = '📋 نسخ تفاصيل الخطأ';
+                                            copyBtn.style.background = '#3498db';
+                                        }, 2000);
+                                    } catch (clipErr) {
+                                        console.error('فشل النسخ:', clipErr);
+                                        copyBtn.textContent = '✗ فشل النسخ';
+                                        copyBtn.style.background = '#e74c3c';
+                                    }
+                                });
+                            }
+                        }
+                    });
                 }
             });
 
@@ -1026,8 +1084,17 @@
         })(); // نهاية الوحدة
 
         // تهيئة النموذج عند تحميل الصفحة
-        document.addEventListener('DOMContentLoaded', function () {
+        // التحقق من حالة تحميل الصفحة - إذا كانت محملة بالفعل، قم بالتهيئة فوراً
+        if (document.readyState === 'loading') {
+            // لا تزال الصفحة قيد التحميل، انتظر DOMContentLoaded
+            document.addEventListener('DOMContentLoaded', function () {
+                console.log('[ProductForm] DOM loaded, initializing...');
+                initializeAddProductForm();
+            });
+        } else {
+            // الصفحة محملة بالفعل (تم تحميلها ديناميكياً عبر mainLoader)
+            console.log('[ProductForm] DOM already loaded, initializing immediately...');
             initializeAddProductForm();
-        });
+        }
     </script>
 </body>
