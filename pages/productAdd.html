@@ -430,7 +430,7 @@
             const form = document.getElementById('add-product-form');
 
             // الوصول إلى مصفوفة الصور وحالة الموديول من النطاق الخارجي (productModule00)
-            const images = productModule00.images;
+            const images = window.productModule00.images;
             images.length = 0; // إفراغ مصفوفة الصور عند كل تهيئة لضمان عدم تداخل البيانات
 
             // تعيين وضع النموذج إلى 'add' (إضافة)
@@ -438,7 +438,7 @@
             console.log(`[ProductForm] Mode: ${form.dataset.mode}`);
 
             // إعادة تعيين أسماء الصور الأصلية
-            productModule00.originalImageNames = [];
+            window.productModule00.originalImageNames = [];
 
             console.log('%c[ProductForm] Simplified form initialized successfully.', 'color: green;');
         }
@@ -448,9 +448,9 @@
          * @description الموديول الرئيسي الذي يحتوي على منطق الصفحة.
          * تم استخدام IIFE (Immediately Invoked Function Expression) لعزل المتغيرات
          * وتجنب تلويث النطاق العام (Global Scope).
-         * يتم تصدير الدوال والمتغيرات اللازمة عبر productModule00.
+         * يتم تصدير الدوال والمتغيرات اللازمة عبر window.productModule00.
          */
-        productModule00 = (function () {
+        window.productModule00 = (function () {
             // --- إعدادات ضغط ومعالجة الصور ---
             const IMAGE_MAX_WIDTH = 1600; // أقصى عرض للصورة بعد الضغط
             const IMAGE_MAX_HEIGHT = 1600; // أقصى ارتفاع للصورة بعد الضغط

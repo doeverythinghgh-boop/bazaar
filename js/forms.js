@@ -29,12 +29,12 @@ function profileHandleRegistry(containerId, reload) {
 
         // البحث عن الحاوية في المصفوفة
         const existingIndex = LOADER_REGISTRY.indexOf(containerId);
-        
+
         // إذا كانت الحاوية مسجلة بالفعل
         if (existingIndex !== -1) {
             const container = document.getElementById(containerId);
             if (container) container.style.display = "block";
-            
+
             // نقل الحاوية إلى نهاية المصفوفة لتصبح الأحدث
             LOADER_REGISTRY.splice(existingIndex, 1);
             LOADER_REGISTRY.push(containerId);
@@ -135,19 +135,25 @@ async function profileRestartScripts(container) {
 /**
  * @description تنفيذ دالة رد النداء (Callback) بعد اكتمال التحميل.
  * @function profileExecuteCallback
- * @param {string} callbackName - اسم دالة رد النداء في النطاق العام (window).
+ * @function profileExecuteCallback
+ * @param {string|string[]} callbackName - اسم دالة رد النداء (أو مصفوفة من الأسماء) في النطاق العام (window).
  */
 function profileExecuteCallback(callbackName) {
     try {
-        if (!callbackName || !window[callbackName]||typeof window[callbackName] !== "function"||window[callbackName] === undefined) return;
+        if (!callbackName) return;
+
+        // دعم تعدد الكول باك (Array of callbacks)
+        if (Array.isArray(callbackName)) {
+            callbackName.forEach(name => profileExecuteCallback(name));
+            return;
+        }
+
+        if (!window[callbackName] || typeof window[callbackName] !== "function") return;
 
         const callback = window[callbackName];
+        console.log(`✔ تم تنفيذ دالة رد النداء (Callback) باسم: ${callbackName}`);
+        callback();
 
-        if (typeof callback === "function") {
-            callback();
-        } else {
-            console.warn("❌ لم يتم العثور على دالة رد النداء (Callback) باسم:", callbackName);
-        }
     } catch (error) {
         console.error("خطأ في تنفيذ دالة رد النداء (profileExecuteCallback):", error);
     }
@@ -186,7 +192,7 @@ function profileClearOldContent(containerId) {
  * @param {string} containerId - الـ ID الخاص بالحاوية الهدف.
  * @param {number} [waitMs=300] - وقت الانتظار بالملي ثانية.
  * @param {string} [cssRules=...] - كود CSS يتم تطبيقه على الـ container (افتراضي جاهز).
- * @param {string} [callbackName] - اسم دالة رد النداء في النطاق العام (window) ليتم استدعاؤها بعد التحميل.
+ * @param {string|string[]} [callbackName] - اسم دالة رد النداء (أو مصفوفة أسماء) في النطاق العام (window) ليتم استدعاؤها بعد التحميل.
  * @param {boolean} [reload=false] - فرض إعادة تحميل المحتوى حتى لو كان مسجلاً.
  */
 async function mainLoader(
@@ -280,37 +286,37 @@ function containerGoBack() {
 
         // إزالة الحاوية الحالية من نهاية المصفوفة
         const currentContainerId = LOADER_REGISTRY.pop();
-        
+
         // الحصول على الحاوية السابقة (أصبحت الآن الأخيرة في المصفوفة)
         const previousContainerId = LOADER_REGISTRY[LOADER_REGISTRY.length - 1];
-        
+
         // إخفاء الحاوية الحالية
         const currentContainer = document.getElementById(currentContainerId);
         if (currentContainer) {
             currentContainer.style.display = "none";
         }
-        
+
         // تنظيف محتوى الحاوية الحالية إذا كانت لا تزال في الـ DOM
         profileClearOldContent(currentContainerId);
-        
+
         // إظهار الحاوية السابقة
         const previousContainer = document.getElementById(previousContainerId);
         if (previousContainer) {
             previousContainer.style.display = "block";
-            
+
             // تسجيل في console للتحليل
             console.log(
                 `%c↩ تم العودة من ${currentContainerId} إلى ${previousContainerId}\n` +
                 `السجل الحالي: [${LOADER_REGISTRY.join(", ")}]`,
                 "color: #1a73e8; font-weight: bold;"
             );
-            
+
             return true;
         } else {
             console.error(`❌ لم يتم العثور على الحاوية السابقة: ${previousContainerId}`);
             return false;
         }
-        
+
     } catch (error) {
         console.error("خطأ في دالة containerGoBack:", error);
         return false;

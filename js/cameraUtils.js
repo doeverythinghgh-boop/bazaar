@@ -79,9 +79,9 @@ window.CameraUtils = (function () {
                             await mainLoader(
                                 "./pages/productAdd.html", // صفحة
                                 "index-product-container",   // حاوية
-                                3000,                           // انتظار
-                                "checkSavedImagesCallback",                   // cssRules (الافتراضي)
-                                "showHomeIcon",              // callbackName
+                                300,                           // انتظار
+                                undefined,                   // cssRules (الافتراضي)
+                                ["showHomeIcon", "checkSavedImagesCallback"],              // callbackName
                                 false                        // reload force
                             );
 
