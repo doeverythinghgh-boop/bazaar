@@ -430,7 +430,7 @@
         }
 
         // جعل الدوال والمتغيرات متاحة عالميًا ضمن نطاق النافذة
-        window.productModule = (function () {
+        window.productModule00 = (function () {
             // --- إعدادات ضغط افتراضية ---
             const IMAGE_MAX_WIDTH = 1600; // أقصى عرض بعد الضغط
             const IMAGE_MAX_HEIGHT = 1600; // أقصى ارتفاع بعد الضغط
@@ -774,18 +774,8 @@
                     return;
                 }
 
-                CameraUtils.openCamera('productAdd', () => {
-                    // Callback لإعادة تحميل الصفحة بعد الحفظ
-                    console.log('[productAdd] Reloading page via mainLoader...');
-                    mainLoader(
-                        "./pages/productAdd.html",
-                        "index-product-container",
-                        0,
-                        undefined,
-                        "showHomeIcon",
-                        false
-                    );
-                });
+                // ✅ تعديل: استدعاء بدون callback لأن المنطق أصبح داخل CameraUtils
+                CameraUtils.openCamera('productAdd');
             });
 
             fileInput.addEventListener('change', (e) => handleNewFiles(e.target.files));
@@ -943,21 +933,24 @@
                 return serial;
             }
 
-            // ✅ فحص واستعادة الصور المحفوظة عند التحميل
-            if (typeof CameraUtils !== 'undefined') {
-                console.log('[ProductAdd] Calling CameraUtils.checkForSavedImages...');
-                CameraUtils.checkForSavedImages('productAdd', (blobs) => {
-                    console.log('[ProductAdd] checkForSavedImages callback triggered with:', blobs ? blobs.length : 'null');
-                    if (blobs && blobs.length > 0) {
-                        console.log(`[productAdd] Restoring ${blobs.length} images from storage.`);
-                        handleNewFiles(blobs);
-                    } else {
-                        console.log('[ProductAdd] No images to restore.');
-                    }
-                });
-            } else {
-                console.error('[ProductAdd] CameraUtils is undefined!');
-            }
+            // ✅ دالة رد النداء التي يستدعيها mainLoader بعد إعادة تحميل الصفحة
+            window.checkSavedImagesCallback = function () {
+                console.log('[ProductAdd] checkSavedImagesCallback triggered via mainLoader.');
+                // 1. تهيئة النموذج
+                try {
+                    //initializeAddProductForm();
+                } catch (e) { console.error(e); }
+
+                // 2. فحص الصور واستعادتها
+                if (typeof CameraUtils !== 'undefined') {
+                    CameraUtils.checkForSavedImages('productAdd', (blobs) => {
+                        if (blobs && blobs.length > 0) {
+                            console.log(`[productAdd] Restoring ${blobs.length} images.`);
+                            handleNewFiles(blobs);
+                        }
+                    });
+                }
+            };
 
             // إرجاع الدوال والمتغيرات التي تحتاجها
             return {
@@ -965,7 +958,8 @@
                 originalImageNames: [],
                 genId,
                 createPreviewItem,
-                handleNewFiles // تصدير الدالة لتكون متاحة إذا لزم الأمر
+                handleNewFiles,
+                checkSavedImagesCallback // تصدير الدالة أيضاً
             };
 
         })(); // نهاية الوحدة

@@ -49,10 +49,29 @@ window.CameraUtils = (function () {
                     // يمكننا تخزين مصفوفة من الصور أو صورة واحدة. هنا سنفترض التراكم (مصفوفة).
                     saveimageToStorage(pageId, base64);
 
-                    // 4. استدعاء دالة إعادة التحميل
-                    if (typeof reloadCallback === 'function') {
+                    // 4. استدعاء دالة إعادة التحميل حسب الصفحة
+                    if (pageId === 'productAdd') {
+                        console.log(`[CameraUtils] Reloading ${pageId} via mainLoader...`);
+                        // تنفيذ طلب المستخدم: الكود داخل cameraUtils
+                        // نستخدم دالة نصية كـ callback كما طلب المستخدم
+                        if (typeof mainLoader === 'function') {
+                           mainLoader(
+                                "./pages/productAdd.html",
+                                "index-product-container",
+                                300,
+                                "checkSavedImagesCallback", // دالة سيتم استدعاؤها للتحقق من الصور
+                                "showHomeIcon",
+                                false
+                            );
+                            productModule00.checkSavedImagesCallback();
+                            Swal.close();
+                        } else {
+                            console.error('[CameraUtils] mainLoader is not defined!');
+                            if (reloadCallback) reloadCallback();
+                        }
+                    } else if (typeof reloadCallback === 'function') {
                         Swal.close();
-                        console.log(`[CameraUtils] Image saved for ${pageId}. Triggering reload callback.`);
+                        console.log(`[CameraUtils] Image saved for ${pageId}. Triggering generic reload callback.`);
                         reloadCallback();
                     }
 
