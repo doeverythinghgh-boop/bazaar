@@ -1,842 +1,442 @@
-// cameraModule.js
-(function() {
-    'use strict';
-    
-    // المتغيرات الداخلية
-    let videoElement = null;
-    let codeReader = null;
-    let currentDeviceId = null;
-    let availableDevices = [];
-    let capturedImages = [];
-    let selectedThumbIndex = -1;
-    let options = {};
-    let db = null;
-    let dbVersion = 1;
-    let isScanning = false;
-    
-    // القيم الافتراضية
-    const defaultOptions = {
-        dbName: 'suzeBazaarIMAGES',
-        storeName: 'cameraImages',
-        // لا نستخدم maxWidth أو jpegQuality لأننا نحفظ الصور كما هي
-        enableBarcodeScanning: false, // تفعيل/تعطيل قراءة الباركود
-        scanInterval: 3000 // الفترة بين عمليات المسح (مللي ثانية)
-    };
-    
-    // إنشاء عناصر واجهة الكاميرا
-    function createCameraUI() {
-        if (document.getElementById('camera-popup')) return;
-        
-        const popup = document.createElement('div');
-        popup.id = 'camera-popup';
-        
-        popup.innerHTML = `
-            <div class="camera-box">
-                <button id="camera-close-btn">×</button>
-                
-                <!-- مؤشر تحميل -->
-                <div id="camera-loading" style="display:none; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); color:white;">
-                    جاري تحميل الكاميرا...
-                </div>
-                
-                <!-- حالة الباركود -->
-                <div id="barcode-status" style="display:none; position:absolute; top:20px; left:20px; background:rgba(0,0,0,0.7); color:#4CAF50; padding:10px; border-radius:5px;">
-                    جاري البحث عن باركود...
-                </div>
-                
-                <video id="camera-video" autoplay playsinline muted></video>
-                
-                <div class="camera-controls">
-                    <button id="camera-switch">تبديل الكاميرا</button>
-                    <button id="camera-capture">التقاط</button>
-                    <button id="camera-save-all">حفظ الكل</button>
-                    <button id="camera-toggle-scan" style="display:none;">تفعيل المسح</button>
-                </div>
-                
-                <div id="camera-thumbs" class="thumbs"></div>
-            </div>
-        `;
-        
-        document.body.appendChild(popup);
-        videoElement = document.getElementById('camera-video');
-        
-        // إضافة مستمعي الأحداث
-        document.getElementById('camera-close-btn').addEventListener('click', close);
-        document.getElementById('camera-switch').addEventListener('click', switchCamera);
-        document.getElementById('camera-capture').addEventListener('click', capture);
-        document.getElementById('camera-save-all').addEventListener('click', saveAllToDB);
-        document.getElementById('camera-toggle-scan').addEventListener('click', toggleBarcodeScanning);
-        
-        // إغلاق النافذة عند النقر خارجها
-        popup.addEventListener('click', function(e) {
-            if (e.target === this) close();
-        });
-    }
-    
-    // تهيئة قاعدة البيانات
-    function openDatabase(storeName) {
-        return new Promise((resolve, reject) => {
-            if (db) {
-                resolve(db);
-                return;
-            }
-            
-            const request = indexedDB.open(options.dbName, dbVersion);
-            
-            request.onerror = () => reject(request.error);
-            request.onsuccess = () => {
-                db = request.result;
-                resolve(db);
-            };
-            
-            request.onupgradeneeded = (event) => {
-                const db = event.target.result;
-                if (!db.objectStoreNames.contains(storeName)) {
-                    db.createObjectStore(storeName, { keyPath: 'id' });
-                }
-            };
-        });
-    }
-    
-    // تحميل مكتبة ZXing بشكل متزامن
-    function loadZXingLibrary() {
-        return new Promise((resolve, reject) => {
-            if (window.ZXing) {
-                resolve(window.ZXing);
-                return;
-            }
-            
-            // إذا لم تكن المكتبة محملة، نحاول تحميلها
-            console.warn('مكتبة ZXing غير محملة. تأكد من تحميلها قبل استخدام CameraModule.');
-            reject(new Error('مكتبة ZXing غير متوفرة'));
-        });
-    }
-    
-    // بدء تشغيل الكاميرا باستخدام ZXing
-    async function startCamera(deviceId = null) {
-        try {
-            document.getElementById('camera-loading').style.display = 'block';
-            
-            // تحميل مكتبة ZXing
-            const ZXing = await loadZXingLibrary();
-            
-            // إنشاء كائن CodeReader من ZXing
-            codeReader = new ZXing.BrowserBarcodeReader();
-            
-            // الحصول على قائمة أجهزة الكاميرا
-            availableDevices = await codeReader.getVideoInputDevices();
-            
-            if (availableDevices.length === 0) {
-                throw new Error('لا توجد كاميرا متاحة');
-            }
-            
-            // تحديد الجهاز المراد استخدامه
-            let selectedDeviceId = deviceId;
-            if (!selectedDeviceId) {
-                // محاولة استخدام الكاميرا الخلفية أولاً
-                const backCamera = availableDevices.find(device => 
-                    device.label.toLowerCase().includes('back') || 
-                    device.label.toLowerCase().includes('خلف')
-                );
-                selectedDeviceId = backCamera ? backCamera.deviceId : availableDevices[0].deviceId;
-            }
-            
-            currentDeviceId = selectedDeviceId;
-            
-            // بدء تشغيل الكاميرا باستخدام ZXing
-            await codeReader.decodeFromVideoDevice(
-                selectedDeviceId, 
-                videoElement, 
-                (result, error, controls) => {
-                    if (result && options.enableBarcodeScanning && isScanning) {
-                        handleBarcodeResult(result);
-                    }
-                    
-                    // تخزين عناصر التحكم لإيقاف المسح لاحقاً
-                    if (controls) {
-                        videoElement._controls = controls;
-                    }
-                }
-            );
-            
-            document.getElementById('camera-loading').style.display = 'none';
-            
-            // إظهار زر تفعيل المسح إذا كانت خاصية المسح مفعلة
-            if (options.enableBarcodeScanning) {
-                document.getElementById('camera-toggle-scan').style.display = 'inline-block';
-                document.getElementById('barcode-status').style.display = 'block';
-            }
-            
-            return true;
-            
-        } catch (err) {
-            document.getElementById('camera-loading').style.display = 'none';
-            console.error('فشل في تشغيل الكاميرا باستخدام ZXing:', err);
-            
-            // Fallback: استخدام MediaDevices API مباشرة
-            console.log('جرب استخدام واجهة المتصفح الأصلية كبديل...');
-            return startCameraFallback();
-        }
-    }
-    
-    // Fallback: استخدام MediaDevices API مباشرة
-    async function startCameraFallback() {
-        try {
-            const stream = await navigator.mediaDevices.getUserMedia({
-                video: {
-                    facingMode: 'environment'
-                },
-                audio: false
-            });
-            
-            videoElement.srcObject = stream;
-            // تخزين الـ stream للإغلاق لاحقاً
-            videoElement._stream = stream;
-            
-            // تحديث قائمة الأجهزة المتاحة
-            const devices = await navigator.mediaDevices.enumerateDevices();
-            availableDevices = devices.filter(device => device.kind === 'videoinput');
-            
-            return true;
-        } catch (err) {
-            console.error('فشل في Fallback للكاميرا:', err);
-            
-            // Fallback نهائي: استخدام input file
-            alert('لا يمكن الوصول إلى الكاميرا. يرجى السماح بالوصول أو استخدام تحميل الملفات.');
-            openFileInput();
-            return false;
-        }
-    }
-    
-    // فتح إدخال ملف كبديل
-    function openFileInput() {
-        const input = document.createElement('input');
-        input.type = 'file';
-        input.accept = 'image/*';
-        input.capture = 'environment';
-        
-        input.onchange = async (e) => {
-            const file = e.target.files[0];
-            if (file) {
-                // حفظ الصورة كما هي بدون معالجة
-                const metadata = {
-                    blob: file,
-                    width: 0,
-                    height: 0,
-                    mimeType: file.type,
-                    timestamp: Date.now(),
-                    source: 'file',
-                    facingMode: 'environment'
-                };
-                
-                // محاولة الحصول على أبعاد الصورة
-                const img = new Image();
-                const url = URL.createObjectURL(file);
-                
-                img.onload = () => {
-                    metadata.width = img.width;
-                    metadata.height = img.height;
-                    URL.revokeObjectURL(url);
-                    addCapturedImage(metadata);
-                };
-                
-                img.onerror = () => {
-                    URL.revokeObjectURL(url);
-                    addCapturedImage(metadata);
-                };
-                
-                img.src = url;
-            }
-        };
-        
-        input.click();
-    }
-    
-    // إيقاف الكاميرا
-    function stopCamera() {
-        // إيقاف مسح الباركود إذا كان قيد التشغيل
-        if (isScanning) {
-            toggleBarcodeScanning();
-        }
-        
-        // إيقاف كاميرا ZXing
-        if (codeReader) {
-            codeReader.reset();
-            codeReader = null;
-        }
-        
-        // إيقاف التحكم في ZXing إذا كان موجوداً
-        if (videoElement && videoElement._controls) {
-            videoElement._controls.stop();
-            delete videoElement._controls;
-        }
-        
-        // إيقاف stream الفيديو إذا كان من fallback
-        if (videoElement && videoElement.srcObject) {
-            const stream = videoElement.srcObject;
-            const tracks = stream.getTracks();
-            tracks.forEach(track => track.stop());
-            videoElement.srcObject = null;
-        }
-        
-        // إخفاء عناصر الواجهة
-        document.getElementById('camera-toggle-scan').style.display = 'none';
-        document.getElementById('barcode-status').style.display = 'none';
-    }
-    
-    // التقاط صورة من الفيديو (بدون ضغط)
-    function capture() {
-        if (!videoElement || videoElement.readyState !== 4) {
-            console.error('الفيديو غير جاهز');
-            return;
-        }
-        
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-        
-        // تعيين أبعاد الكانفاس لتتناسب مع دقة الفيديو الأصلية
-        canvas.width = videoElement.videoWidth;
-        canvas.height = videoElement.videoHeight;
-        
-        // رسم الفيديو على الكانفاس
-        ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
-        
-        // تحويل إلى Blob بدون ضغط وبجودة عالية
-        canvas.toBlob((blob) => {
-            const metadata = {
-                blob: blob,
-                width: canvas.width,
-                height: canvas.height,
-                mimeType: 'image/png', // استخدام PNG للحفاظ على الجودة
-                timestamp: Date.now(),
-                source: 'camera',
-                facingMode: getFacingModeFromDevice(currentDeviceId)
-            };
-            
-            addCapturedImage(metadata);
-            
-            // إشعار المستخدم بالتقاط الصورة
-            showNotification('تم التقاط الصورة بنجاح');
-        }, 'image/png', 1.0); // جودة 1.0 (بدون ضغط)
-    }
-    
-    // الحصول على وضع الكاميرا بناءً على معرف الجهاز
-    function getFacingModeFromDevice(deviceId) {
-        if (!deviceId || !availableDevices.length) return 'environment';
-        
-        const device = availableDevices.find(d => d.deviceId === deviceId);
-        if (!device) return 'environment';
-        
-        const label = device.label.toLowerCase();
-        if (label.includes('front') || label.includes('أمام')) {
-            return 'user';
-        }
-        return 'environment';
-    }
-    
-    // إضافة صورة مقتطعة إلى القائمة
-    function addCapturedImage(metadata) {
-        const id = 'img_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-        metadata.id = id;
-        capturedImages.push(metadata);
-        updateThumbnails();
-        selectThumb(capturedImages.length - 1);
-    }
-    
-    // تحديث الصور المصغرة
-    function updateThumbnails() {
-        const thumbsContainer = document.getElementById('camera-thumbs');
-        if (!thumbsContainer) return;
-        
-        thumbsContainer.innerHTML = '';
-        
-        capturedImages.forEach((img, index) => {
-            const thumbDiv = document.createElement('div');
-            thumbDiv.className = 'thumb-item';
-            if (index === selectedThumbIndex) {
-                thumbDiv.classList.add('selected');
-            }
-            
-            const imgUrl = URL.createObjectURL(img.blob);
-            thumbDiv.innerHTML = `
-                <img src="${imgUrl}" alt="صورة ${index + 1}">
-                <button class="thumb-delete" data-index="${index}">×</button>
-            `;
-            
-            thumbDiv.querySelector('img').onload = () => {
-                URL.revokeObjectURL(imgUrl);
-            };
-            
-            thumbDiv.addEventListener('click', (e) => {
-                if (!e.target.classList.contains('thumb-delete')) {
-                    selectThumb(index);
-                }
-            });
-            
-            thumbDiv.querySelector('.thumb-delete').addEventListener('click', (e) => {
-                e.stopPropagation();
-                deleteCapturedImage(index);
-            });
-            
-            thumbsContainer.appendChild(thumbDiv);
-        });
-    }
-    
-    // تحديد صورة مصغرة
-    function selectThumb(index) {
-        if (index >= 0 && index < capturedImages.length) {
-            selectedThumbIndex = index;
-            updateThumbnails();
-        }
-    }
-    
-    // حذف صورة مقتطعة
-    function deleteCapturedImage(index) {
-        if (index >= 0 && index < capturedImages.length) {
-            // تحرير الذاكرة
-            const imgUrl = URL.createObjectURL(capturedImages[index].blob);
-            URL.revokeObjectURL(imgUrl);
-            
-            capturedImages.splice(index, 1);
-            
-            if (selectedThumbIndex >= capturedImages.length) {
-                selectedThumbIndex = capturedImages.length - 1;
-            }
-            
-            updateThumbnails();
-        }
-    }
-    
-    // تبديل الكاميرا
-    async function switchCamera() {
-        if (availableDevices.length < 2) {
-            alert('لا توجد كاميرا أخرى للتبديل إليها');
-            return;
-        }
-        
-        // العثور على الفهرس الحالي
-        const currentIndex = availableDevices.findIndex(device => device.deviceId === currentDeviceId);
-        const nextIndex = (currentIndex + 1) % availableDevices.length;
-        const nextDevice = availableDevices[nextIndex];
-        
-        // إيقاف الكاميرا الحالية
-        stopCamera();
-        
-        // إعادة تشغيل الكاميرا الجديدة
-        await startCamera(nextDevice.deviceId);
-        
-        // تحديث حالة زر التبديل
-        const nextLabel = nextDevice.label || `كاميرا ${nextIndex + 1}`;
-        showNotification(`تم التبديل إلى: ${nextLabel}`);
-    }
-    
-    // تفعيل/تعطيل مسح الباركود
-    function toggleBarcodeScanning() {
-        if (!options.enableBarcodeScanning) {
-            alert('خاصية مسح الباركود غير مفعلة في الإعدادات');
-            return;
-        }
-        
-        isScanning = !isScanning;
-        const toggleBtn = document.getElementById('camera-toggle-scan');
-        const statusDiv = document.getElementById('barcode-status');
-        
-        if (isScanning) {
-            toggleBtn.textContent = 'تعطيل المسح';
-            statusDiv.style.display = 'block';
-            statusDiv.textContent = 'جاري البحث عن باركود...';
-            statusDiv.style.color = '#4CAF50';
-            showNotification('تم تفعيل مسح الباركود');
+/**
+ * @file js/cameraUtils.js
+ * @description موديول مشترك للتعامل مع الكاميرا، ضغط الصور، وحفظها مؤقتًا في IndexedDB (بدلاً من LocalStorage).
+ * التغييرات الرئيسية:
+ *  - الانتقال من LocalStorage إلى IndexedDB لتخزين الـ Blobs (أداء ومرونة أعلى).
+ *  - ضغط الصور داخل Web Worker باستخدام createImageBitmap + OffscreenCanvas (لتخفيف الـ UI thread).
+ *  - تخزين Blob مباشرة بدلاً من Base64 لتقليل الذاكرة ومساحة التخزين.
+ *  - تحسين إدارة الموارد: إغلاق ImageBitmap، تحرير المراجع، وإلغاء Object URLs إن وُجدت.
+ *  - تحسين التعامل مع عنصر <input>: عدم إزالته فورًا، وإضافة fallback للكاميرا الأمامية (user).
+ *
+ * متوافق مع متصفحات حديثة على الأجهزة المحمولة (Android/iOS) تدعم:
+ *  - IndexedDB
+ *  - createImageBitmap (في Worker أو main thread)
+ *  - OffscreenCanvas (إن وُجد؛ إذا لم يتوفر، يستخدم canvas في الـ Worker إن أمكن)
+ *
+ * استخدام:
+ *  - CameraUtils.openCamera('productAdd')
+ *  - CameraUtils.checkForSavedImages('productAdd', (filesArray) => { ... })
+ *  - CameraUtils.clearSavedImages('productAdd') // لحذف الصور المؤقتة
+ */
+
+window.CameraUtils = (function () {
+  // ---------- إعدادات وضوابط ----------
+  const IMAGE_MAX_WIDTH = 1600;
+  const IMAGE_MAX_HEIGHT = 1600;
+  const IMAGE_QUALITY = 0.75; // 0..1
+  const DB_NAME = 'camera_utils_db_v1';
+  const DB_STORE = 'camera_images';
+  const DB_VERSION = 1;
+
+  // حالة لتفادي تشغيل متزامن
+  let isProcessing = false;
+
+  // ---------- Web Worker: ضغط الصور خارج الـ UI Thread ----------
+  // ننشئ Worker ديناميكيًا من نص ليعمل في نفس الملف ولا يحتاج ملف خارجي.
+  const workerScript = `
+    self.onmessage = async function (ev) {
+      const { id, arrayBuffer, type, maxWidth, maxHeight, quality } = ev.data;
+      let result = { id, success: false, error: null, blobBuffer: null, blobType: 'image/jpeg' };
+      let imgBitmap = null;
+      try {
+        const uint8 = arrayBuffer instanceof ArrayBuffer ? arrayBuffer : arrayBuffer.buffer;
+        const blob = new Blob([uint8], { type });
+        // محاولة استخدام createImageBitmap داخل الـ Worker
+        if (self.createImageBitmap) {
+          imgBitmap = await createImageBitmap(blob);
         } else {
-            toggleBtn.textContent = 'تفعيل المسح';
-            statusDiv.style.display = 'none';
-            showNotification('تم تعطيل مسح الباركود');
+          throw new Error('createImageBitmap not supported in worker');
         }
-    }
-    
-    // معالجة نتيجة الباركود
-    function handleBarcodeResult(result) {
-        const statusDiv = document.getElementById('barcode-status');
-        statusDiv.textContent = `تم العثور على باركود: ${result.text}`;
-        statusDiv.style.color = '#FF9800';
-        
-        // عرض تنبيه
-        showNotification(`تم العثور على باركود: ${result.text}`);
-        
-        // إرسال الحدث
-        const event = new CustomEvent('barcodeScanned', { detail: result });
-        window.dispatchEvent(event);
-        
-        // إعادة تعيين الحالة بعد فترة
-        setTimeout(() => {
-            if (isScanning) {
-                statusDiv.textContent = 'جاري البحث عن باركود...';
-                statusDiv.style.color = '#4CAF50';
-            }
-        }, options.scanInterval);
-    }
-    
-    // حفظ جميع الصور إلى قاعدة البيانات
-    async function saveAllToDB() {
-        if (capturedImages.length === 0) {
-            alert('لا توجد صور لحفظها');
-            return;
+
+        const width = imgBitmap.width;
+        const height = imgBitmap.height;
+        const ratio = Math.min(1, maxWidth / width, maxHeight / height);
+        const newWidth = Math.max(1, Math.round(width * ratio));
+        const newHeight = Math.max(1, Math.round(height * ratio));
+
+        // استخدام OffscreenCanvas إذا توفر
+        let offscreen;
+        if (typeof OffscreenCanvas !== 'undefined') {
+          offscreen = new OffscreenCanvas(newWidth, newHeight);
+          const ctx = offscreen.getContext('2d');
+          // خلفية بيضاء للتعامل مع الشفافية عند التحويل إلى JPEG
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(0, 0, newWidth, newHeight);
+          ctx.drawImage(imgBitmap, 0, 0, newWidth, newHeight);
+          // convertToBlob متاحة على OffscreenCanvas
+          const outBlob = await offscreen.convertToBlob({ type: 'image/jpeg', quality });
+          const outBuffer = await outBlob.arrayBuffer();
+          result.blobBuffer = outBuffer;
+          result.blobType = outBlob.type || 'image/jpeg';
+        } else {
+          // إذا لم يكن OffscreenCanvas متاحًا، نرسم على Canvas عبر DOM عبر fallback بسيط
+          // ملاحظة: Worker بدون DOM لا يمكنه إنشاء عنصر canvas العادي، لذا نرمي خطأ واضح.
+          throw new Error('OffscreenCanvas not supported in worker');
         }
-        
-        const storeName = options.storeName;
-        try {
-            let savedCount = 0;
-            
-            for (const img of capturedImages) {
-                await saveToDB(storeName, img.blob, {
-                    width: img.width,
-                    height: img.height,
-                    mimeType: img.mimeType,
-                    timestamp: img.timestamp,
-                    source: img.source,
-                    facingMode: img.facingMode
-                });
-                savedCount++;
-            }
-            
-            showNotification(`تم حفظ ${savedCount} صورة في قاعدة البيانات`);
-            capturedImages = [];
-            updateThumbnails();
-            
-        } catch (err) {
-            console.error('فشل في حفظ الصور:', err);
-            alert('فشل في حفظ الصور: ' + err.message);
-        }
-    }
-    
-    // عرض إشعار
-    function showNotification(message) {
-        // إنشاء عنصر إشعار مؤقت
-        const notification = document.createElement('div');
-        notification.style.cssText = `
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: rgba(0, 150, 0, 0.9);
-            color: white;
-            padding: 15px 20px;
-            border-radius: 5px;
-            z-index: 10000;
-            font-family: Arial, sans-serif;
-            animation: fadeInOut 3s ease-in-out;
-        `;
-        
-        // إضافة أنيميشن
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes fadeInOut {
-                0% { opacity: 0; transform: translateY(-20px); }
-                10% { opacity: 1; transform: translateY(0); }
-                90% { opacity: 1; transform: translateY(0); }
-                100% { opacity: 0; transform: translateY(-20px); }
-            }
-        `;
-        document.head.appendChild(style);
-        
-        notification.textContent = message;
-        document.body.appendChild(notification);
-        
-        setTimeout(() => {
-            document.body.removeChild(notification);
-            document.head.removeChild(style);
-        }, 3000);
-    }
-    
-    // تعريف كائن CameraModule العام
-    window.CameraModule = {
-        // 1. تهيئة النظام
-        init: function(userOptions = {}) {
-            options = { ...defaultOptions, ...userOptions };
-            createCameraUI();
-            console.log('تم تهيئة وحدة الكاميرا مع ZXing والخيارات:', options);
-            return Promise.resolve();
-        },
-        
-        // 2. فتح نافذة الكاميرا
-        open: function() {
-            const popup = document.getElementById('camera-popup');
-            if (!popup) {
-                console.error('لم يتم تهيئة وحدة الكاميرا. قم باستدعاء init() أولاً.');
-                return Promise.reject('لم يتم تهيئة وحدة الكاميرا');
-            }
-            
-            popup.classList.add('active');
-            return startCamera().then(success => {
-                if (!success) {
-                    console.warn('فشل في بدء تشغيل الكاميرا باستخدام ZXing، تم استخدام البديل');
-                }
-                return success;
-            });
-        },
-        
-        // 3. إغلاق النافذة
-        close: function() {
-            const popup = document.getElementById('camera-popup');
-            if (popup) {
-                popup.classList.remove('active');
-            }
-            stopCamera();
-            capturedImages = [];
-            updateThumbnails();
-        },
-        
-        // 4. تبديل الكاميرا
-        switchCamera: function() {
-            return switchCamera();
-        },
-        
-        // 5. التقاط صورة
-        capture: function() {
-            return new Promise((resolve) => {
-                if (!videoElement || videoElement.readyState !== 4) {
-                    resolve(null);
-                    return;
-                }
-                
-                capture();
-                
-                setTimeout(() => {
-                    if (capturedImages.length > 0) {
-                        const lastImg = capturedImages[capturedImages.length - 1];
-                        resolve({
-                            blob: lastImg.blob,
-                            width: lastImg.width,
-                            height: lastImg.height,
-                            id: lastImg.id
-                        });
-                    } else {
-                        resolve(null);
-                    }
-                }, 100);
-            });
-        },
-        
-        // 6. حفظ صورة في قاعدة البيانات
-        saveToDB: async function(storeName, blob, meta = {}) {
-            try {
-                const db = await openDatabase(storeName);
-                
-                const id = meta.id || 'img_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-                const imageData = {
-                    id: id,
-                    blob: blob,
-                    width: meta.width || 0,
-                    height: meta.height || 0,
-                    mimeType: meta.mimeType || blob.type || 'image/png',
-                    timestamp: meta.timestamp || Date.now(),
-                    source: meta.source || 'imported',
-                    facingMode: meta.facingMode || 'environment'
-                };
-                
-                return new Promise((resolve, reject) => {
-                    const transaction = db.transaction([storeName], 'readwrite');
-                    const store = transaction.objectStore(storeName);
-                    const request = store.add(imageData);
-                    
-                    request.onsuccess = () => resolve(id);
-                    request.onerror = () => reject(request.error);
-                });
-            } catch (err) {
-                console.error('فشل في حفظ الصورة في قاعدة البيانات:', err);
-                throw err;
-            }
-        },
-        
-        // 7. جلب الصور من قاعدة البيانات
-        getImages: async function(storeName) {
-            try {
-                const db = await openDatabase(storeName);
-                
-                return new Promise((resolve, reject) => {
-                    const transaction = db.transaction([storeName], 'readonly');
-                    const store = transaction.objectStore(storeName);
-                    const request = store.getAll();
-                    
-                    request.onsuccess = () => resolve(request.result);
-                    request.onerror = () => reject(request.error);
-                });
-            } catch (err) {
-                console.error('فشل في جلب الصور من قاعدة البيانات:', err);
-                throw err;
-            }
-        },
-        
-        // 8. حذف صورة من قاعدة البيانات
-        deleteImage: async function(storeName, id) {
-            try {
-                const db = await openDatabase(storeName);
-                
-                return new Promise((resolve, reject) => {
-                    const transaction = db.transaction([storeName], 'readwrite');
-                    const store = transaction.objectStore(storeName);
-                    const request = store.delete(id);
-                    
-                    request.onsuccess = () => resolve(true);
-                    request.onerror = () => reject(request.error);
-                });
-            } catch (err) {
-                console.error('فشل في حذف الصورة من قاعدة البيانات:', err);
-                throw err;
-            }
-        },
-        
-        // 9. مسح جميع الصور من مخزن محدد
-        clearStore: async function(storeName) {
-            try {
-                const db = await openDatabase(storeName);
-                
-                return new Promise((resolve, reject) => {
-                    const transaction = db.transaction([storeName], 'readwrite');
-                    const store = transaction.objectStore(storeName);
-                    const request = store.clear();
-                    
-                    request.onsuccess = () => resolve(true);
-                    request.onerror = () => reject(request.error);
-                });
-            } catch (err) {
-                console.error('فشل في مسح المخزن:', err);
-                throw err;
-            }
-        },
-        
-        // 10. جلب صور خارجية (اختياري)
-        fetchExternalImages: async function(url) {
-            try {
-                const response = await fetch(url);
-                if (!response.ok) throw new Error(`فشل HTTP: ${response.status}`);
-                
-                const data = await response.json();
-                
-                if (!Array.isArray(data.images)) {
-                    throw new Error('تنسيق البيانات غير صحيح');
-                }
-                
-                const results = [];
-                for (const imgUrl of data.images) {
-                    try {
-                        const imgResponse = await fetch(imgUrl);
-                        const blob = await imgResponse.blob();
-                        
-                        const id = 'ext_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-                        
-                        results.push({
-                            id: id,
-                            url: imgUrl,
-                            blob: blob
-                        });
-                    } catch (err) {
-                        console.warn(`فشل في جلب الصورة ${imgUrl}:`, err);
-                    }
-                }
-                
-                return results;
-            } catch (err) {
-                console.error('فشل في جلب الصور الخارجية:', err);
-                throw err;
-            }
-        },
-        
-        // 11. قراءة الباركود من صورة (استخدام ZXing)
-        scanBarcodeFromImage: function(imageBlob) {
-            return new Promise(async (resolve, reject) => {
-                try {
-                    const ZXing = await loadZXingLibrary();
-                    const codeReader = new ZXing.BrowserBarcodeReader();
-                    
-                    // تحويل Blob إلى URL
-                    const imageUrl = URL.createObjectURL(imageBlob);
-                    const img = new Image();
-                    
-                    img.onload = async () => {
-                        try {
-                            const canvas = document.createElement('canvas');
-                            const ctx = canvas.getContext('2d');
-                            canvas.width = img.width;
-                            canvas.height = img.height;
-                            ctx.drawImage(img, 0, 0);
-                            
-                            const result = await codeReader.decodeFromCanvas(canvas);
-                            URL.revokeObjectURL(imageUrl);
-                            resolve(result);
-                        } catch (err) {
-                            URL.revokeObjectURL(imageUrl);
-                            reject(err);
-                        }
-                    };
-                    
-                    img.onerror = () => {
-                        URL.revokeObjectURL(imageUrl);
-                        reject(new Error('فشل في تحميل الصورة'));
-                    };
-                    
-                    img.src = imageUrl;
-                    
-                } catch (err) {
-                    reject(err);
-                }
-            });
-        },
-        
-        // 12. تفعيل/تعطيل مسح الباركود من الكاميرا
-        toggleBarcodeScan: function() {
-            toggleBarcodeScanning();
-        },
-        
-        // 13. الحصول على أجهزة الكاميرا المتاحة
-        getAvailableCameras: function() {
-            return availableDevices;
-        },
-        
-        // 14. التبديل إلى كاميرا محددة
-        switchToCamera: function(deviceId) {
-            if (!deviceId) {
-                console.error('يجب تحديد معرف الجهاز');
-                return Promise.reject('يجب تحديد معرف الجهاز');
-            }
-            
-            const deviceExists = availableDevices.some(device => device.deviceId === deviceId);
-            if (!deviceExists) {
-                console.error('جهاز الكاميرا غير موجود');
-                return Promise.reject('جهاز الكاميرا غير موجود');
-            }
-            
-            stopCamera();
-            return startCamera(deviceId);
-        },
-        
-        // 15. الحصول على الصور الملتقطة في الجلسة الحالية
-        getCapturedImages: function() {
-            return capturedImages;
-        },
-        
-        // 16. مسح الصور الملتقطة في الجلسة الحالية
-        clearCapturedImages: function() {
-            capturedImages.forEach(img => {
-                const imgUrl = URL.createObjectURL(img.blob);
-                URL.revokeObjectURL(imgUrl);
-            });
-            capturedImages = [];
-            updateThumbnails();
-        },
-        
-        // 17. تحديث إعدادات ZXing
-        updateZXingSettings: function(newOptions) {
-            options = { ...options, ...newOptions };
-            
-            // إذا كانت خاصية المسح قد تغيرت، نحدث الواجهة
-            if (newOptions.enableBarcodeScanning !== undefined) {
-                const toggleBtn = document.getElementById('camera-toggle-scan');
-                if (toggleBtn) {
-                    toggleBtn.style.display = newOptions.enableBarcodeScanning ? 'inline-block' : 'none';
-                }
-            }
-            
-            return options;
-        }
+
+        // تنظيف
+        try { if (imgBitmap && typeof imgBitmap.close === 'function') imgBitmap.close(); } catch(e) {}
+        imgBitmap = null;
+
+        result.success = true;
+      } catch (err) {
+        result.error = (err && err.message) ? err.message : String(err);
+        try { if (imgBitmap && typeof imgBitmap.close === 'function') imgBitmap.close(); } catch(e) {}
+        imgBitmap = null;
+      }
+      // نرسل النتيجة؛ ننقل ArrayBuffer باستخدام transferable لتحسين الأداء
+      if (result.blobBuffer) {
+        self.postMessage(result, [result.blobBuffer]);
+      } else {
+        self.postMessage(result);
+      }
     };
+  `;
+
+  const workerBlob = new Blob([workerScript], { type: 'application/javascript' });
+  const workerUrl = URL.createObjectURL(workerBlob);
+
+  // ننشئ Worker واحد يعاد استخدامه طوال جلسة الصفحة
+  const compressWorker = new Worker(workerUrl);
+
+  // ---------- IndexedDB Helpers ----------
+  function openDB() {
+    return new Promise((resolve, reject) => {
+      const req = indexedDB.open(DB_NAME, DB_VERSION);
+      req.onupgradeneeded = function (e) {
+        const db = e.target.result;
+        if (!db.objectStoreNames.contains(DB_STORE)) {
+          const store = db.createObjectStore(DB_STORE, { keyPath: 'id', autoIncrement: true });
+          store.createIndex('pageId', 'pageId', { unique: false });
+        }
+      };
+      req.onsuccess = function (e) {
+        resolve(e.target.result);
+      };
+      req.onerror = function (e) {
+        reject(e.target.error || new Error('IndexedDB open error'));
+      };
+    });
+  }
+
+  async function addImageToDB(pageId, blob) {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(DB_STORE, 'readwrite');
+      const store = tx.objectStore(DB_STORE);
+      const entry = {
+        pageId,
+        blob,
+        createdAt: Date.now()
+      };
+      const req = store.add(entry);
+      req.onsuccess = function () {
+        resolve(req.result);
+      };
+      req.onerror = function (e) {
+        reject(e.target.error || new Error('IndexedDB add error'));
+      };
+    });
+  }
+
+  async function getImagesFromDB(pageId) {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(DB_STORE, 'readonly');
+      const store = tx.objectStore(DB_STORE);
+      const index = store.index('pageId');
+      const req = index.getAll(IDBKeyRange.only(pageId));
+      req.onsuccess = function () {
+        // نعيد مصفوفة من Blobs مع الـ id
+        const results = (req.result || []).map(r => ({ id: r.id, blob: r.blob, createdAt: r.createdAt }));
+        resolve(results);
+      };
+      req.onerror = function (e) {
+        reject(e.target.error || new Error('IndexedDB getAll error'));
+      };
+    });
+  }
+
+  async function clearImagesFromDB(pageId) {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(DB_STORE, 'readwrite');
+      const store = tx.objectStore(DB_STORE);
+      const index = store.index('pageId');
+      const req = index.openCursor(IDBKeyRange.only(pageId));
+      req.onsuccess = function (e) {
+        const cursor = e.target.result;
+        if (cursor) {
+          cursor.delete();
+          cursor.continue();
+        } else {
+          resolve(true);
+        }
+      };
+      req.onerror = function (e) {
+        reject(e.target.error || new Error('IndexedDB clear error'));
+      };
+    });
+  }
+
+  // ---------- Helpers: تحويل File -> ArrayBuffer واستخدام الـ Worker ----------
+  function fileToArrayBuffer(file) {
+    return file.arrayBuffer(); // متاح في الملفات الحديثة
+  }
+
+  function compressWithWorker(arrayBuffer, type) {
+    return new Promise((resolve, reject) => {
+      const id = Math.random().toString(36).slice(2, 9);
+      const onMessage = function (ev) {
+        const data = ev.data;
+        if (!data || data.id !== id) return;
+        compressWorker.removeEventListener('message', onMessage);
+        if (data.success) {
+          // re-create a Blob from the returned buffer
+          try {
+            const outBlob = new Blob([data.blobBuffer], { type: data.blobType || 'image/jpeg' });
+            resolve(outBlob);
+          } catch (e) {
+            reject(e);
+          }
+        } else {
+          reject(new Error(data.error || 'Compression failed in worker'));
+        }
+      };
+      // مؤقت: listener واحد يعالج أي id لكن البايت موزع مع id في الرسالة
+      compressWorker.addEventListener('message', onMessage);
+
+      // نرسل العمل إلى الـ Worker. نرسل buffer مع transferable إذا أمكن
+      try {
+        compressWorker.postMessage({
+          id,
+          arrayBuffer,
+          type,
+          maxWidth: IMAGE_MAX_WIDTH,
+          maxHeight: IMAGE_MAX_HEIGHT,
+          quality: IMAGE_QUALITY
+        }, [arrayBuffer]);
+      } catch (e) {
+        // لو فشل الاتقال، نرسل بدون transferable (أبطأ)
+        try {
+          compressWorker.postMessage({
+            id,
+            arrayBuffer,
+            type,
+            maxWidth: IMAGE_MAX_WIDTH,
+            maxHeight: IMAGE_MAX_HEIGHT,
+            quality: IMAGE_QUALITY
+          });
+        } catch (err) {
+          compressWorker.removeEventListener('message', onMessage);
+          reject(err);
+        }
+      }
+    });
+  }
+
+  // ---------- الدالة الأساسية: فتح الكاميرا والتقاط الصورة ----------
+  async function openCamera(pageId) {
+    if (isProcessing) {
+      console.warn('[CameraUtils] Another operation in progress.');
+      return;
+    }
+    isProcessing = true;
+
+    // نحاول environment ثم user كـ fallback
+    let triedEnv = false;
+    let triedUser = false;
+    let keepLoop = true;
+
+    // helper لإنشاء input (لا نضيفه إلى DOM مرئي)
+    const createInput = (captureMode) => {
+      // إزالة عنصر سابق إن وجد (آمن)
+      const prev = document.getElementById('temp-camera-input');
+      if (prev) prev.remove();
+
+      const input = document.createElement('input');
+      input.id = 'temp-camera-input';
+      input.type = 'file';
+      input.accept = 'image/*';
+      if (captureMode) {
+        try {
+          input.setAttribute('capture', captureMode);
+        } catch (e) {
+          // تجاهل إذا لم يقبل المتصفح السمة
+        }
+      }
+      input.style.display = 'none';
+      document.body.appendChild(input);
+      return input;
+    };
+
+    try {
+      while (keepLoop) {
+        let captureMode = null;
+        if (!triedEnv) {
+          captureMode = 'environment';
+          triedEnv = true;
+        } else if (!triedUser) {
+          captureMode = 'user';
+          triedUser = true;
+        } else {
+          break;
+        }
+
+        const input = createInput(captureMode);
+
+        // ننشئ Promise للـ change event
+        const chosenPromise = new Promise((resolve) => {
+          const onChange = function (e) {
+            input.removeEventListener('change', onChange);
+            resolve({ e, input });
+          };
+          input.addEventListener('change', onChange, { once: true });
+        });
+
+        // نضغط على input لفتح الكاميرا/المعرض
+        try {
+          input.click();
+        } catch (err) {
+          console.warn('[CameraUtils] input.click failed:', err);
+        }
+
+        const { e, input: usedInput } = await chosenPromise;
+
+        if (!e.target.files || e.target.files.length === 0) {
+          // المستخدم ألغى — نجرب fallback إذا لم نعطه سابقًا
+          if (captureMode === 'environment' && !triedUser) {
+            // نزيل هذا الـ input ثم نكرر الحلقة مع user
+            if (usedInput && usedInput.parentNode) usedInput.remove();
+            continue;
+          } else {
+            // إلغاء نهائي
+            if (usedInput && usedInput.parentNode) usedInput.remove();
+            break;
+          }
+        }
+
+        const file = e.target.files[0];
+        // نعرض loading
+        try {
+          Swal.fire({
+            title: 'جاري معالجة الصورة...',
+            text: 'يرجى الانتظار بينما يتم ضغط وحفظ الصورة.',
+            allowOutsideClick: false,
+            didOpen: () => Swal.showLoading()
+          });
+        } catch (swalErr) { /* ignore if Swal not available */ }
+
+        try {
+          // 1) نحصل على ArrayBuffer من الملف (هذا لا يخلق سلسلة Base64 كبيرة)
+          const arrayBuffer = await fileToArrayBuffer(file);
+
+          // 2) نضغط الصورة داخل الـ Worker — سيرجع Blob مضغوط
+          const compressedBlob = await compressWithWorker(arrayBuffer, file.type || 'image/jpeg');
+
+          // 3) نحفظ الـ Blob مباشرة في IndexedDB
+          await addImageToDB(pageId, compressedBlob);
+
+          // 4) عند الحاجة لإعادة تحميل الصفحة لصفحة معينة، ندعو mainLoader كما قبلاً
+          if (pageId === 'productAdd') {
+            if (typeof mainLoader === 'function') {
+              try {
+                await mainLoader(
+                  "./pages/productAdd.html",
+                  "index-product-container",
+                  300,
+                  undefined,
+                  ["showHomeIcon", "checkSavedImagesCallback"],
+                  false
+                );
+              } catch (loaderErr) {
+                console.error('[CameraUtils] mainLoader error:', loaderErr);
+              }
+            } else {
+              console.error('[CameraUtils] mainLoader is not defined!');
+            }
+          }
+
+          // إغلاق التنبيه
+          try { Swal.close(); } catch (e) {}
+
+          // تنظيف: إزالة الـ input الآن بعد إتمام المعالجة
+          if (usedInput && usedInput.parentNode) usedInput.remove();
+
+          // نجحنا في التقاط صورة واحدة — لا نعيد فتح الكاميرا تلقائيًا
+          keepLoop = false;
+          break;
+        } catch (processErr) {
+          console.error('[CameraUtils] processing error:', processErr);
+          try {
+            Swal.fire('خطأ', 'حدث خطأ أثناء معالجة الصورة. ' + (processErr.message || ''), 'error');
+          } catch (e) {}
+
+          // تنظيف input بعد الخطأ
+          if (usedInput && usedInput.parentNode) usedInput.remove();
+
+          // لو كانت المحاولة الأولى environment فنجرب user كـ fallback
+          if (captureMode === 'environment' && !triedUser) {
+            continue;
+          } else {
+            // لا مزيد من المحاولات
+            keepLoop = false;
+            break;
+          }
+        }
+      } // نهاية الحلقة
+    } finally {
+      isProcessing = false;
+    }
+  }
+
+  // ---------- استعادة الصور من IndexedDB للصفحة عند التحميل ----------
+  // onImagesRestored يستقبل مصفوفة من File/Blob objects
+  async function checkForSavedImages(pageId, onImagesRestored) {
+    try {
+      const items = await getImagesFromDB(pageId); // [{id, blob, createdAt}, ...]
+      if (items && items.length > 0) {
+        // نحول كل Blob إلى File (مع اسم قابل للعرض)
+        const files = items.map((it, idx) => {
+          const fileName = `restored_image_${it.id || idx}.jpg`;
+          try {
+            return new File([it.blob], fileName, { type: it.blob.type || 'image/jpeg' });
+          } catch (e) {
+            // بعض البيئات لا تدعم File constructor جيدًا، نعيد Blob كبديل
+            return it.blob;
+          }
+        });
+
+        // نمررها للنداء المرجعي
+        if (typeof onImagesRestored === 'function') {
+          try {
+            onImagesRestored(files);
+          } catch (cbErr) {
+            console.error('[CameraUtils] onImagesRestored callback error:', cbErr);
+          }
+        }
+
+        // بعد الاستعادة، نحذف العناصر من DB لتفريغ المساحة
+        try {
+          await clearImagesFromDB(pageId);
+        } catch (clearErr) {
+          console.error('[CameraUtils] clearing saved images error:', clearErr);
+        }
+      }
+    } catch (err) {
+      console.error('[CameraUtils] checkForSavedImages error:', err);
+    }
+  }
+
+  // واجهة مساعدة لمسح الصور المؤقتة إن احتجت
+  async function clearSavedImages(pageId) {
+    return clearImagesFromDB(pageId);
+  }
+
+  // ---------- إرجاع الـ API ----------
+  return {
+    openCamera,
+    checkForSavedImages,
+    clearSavedImages
+  };
 })();
