@@ -759,20 +759,22 @@
                 // إزالة خاصية capture أولاً لتجنب أي تعارض
                 fileInput0.removeAttribute('capture');
                 fileInput0.value = '';
-
+console.log('takePhotoBtn clicked');
                 // ✅ منطق مشروط للكاميرا
                 // 1. التحقق إذا كان الجهاز محمولاً
                 const isMobile = /Mobi|Android|iPhone/i.test(navigator.userAgent);
-
+console.log('isMobile', isMobile);
                 if (isMobile) {
                     // السلوك الحالي للهواتف: استخدام capture لفتح تطبيق الكاميرا الأصلي
                     console.log('[Camera] Mobile device detected. Using capture attribute.');
                     fileInput0.setAttribute('capture', 'environment');
                     fileInput0.click();
+                    console.log('fileInput0 clicked');
                     // ✅ تفريغ مرة أخرى بعد فتح الكاميرا لضمان الحالة النظيفة
                     setTimeout(() => {
                         fileInput0.value = '';
                     }, 100);
+                    console.log('fileInput0 value cleared');
                 } else {
                     // السلوك الجديد لأجهزة سطح المكتب: استخدام getUserMedia
                     console.log('[Camera] Desktop device detected. Using getUserMedia API.');
