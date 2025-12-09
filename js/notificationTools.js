@@ -1,5 +1,3 @@
-
-
 /**
  * @description دالة مخصصة ليتم استدعاؤها من كود الأندرويد الأصلي.
  *   تقوم هذه الدالة باستلام بيانات إشعار كـ JSON string وحفظه في IndexedDB.
@@ -165,3 +163,88 @@ async function getUsersTokens(usersKeys) {
     }
 }
 
+/**
+ * @description دالة مساعدة لإرسال توكن FCM إلى الخادم.
+ * @function sendTokenToServer
+ * @param {string} userKey - المفتاح التعريفي للمستخدم.
+ * @param {string} token - توكن FCM الذي سيتم إرساله.
+ * @param {string} platform - منصة الجهاز (مثل "android" أو "web").
+ * @returns {Promise<void>} - وعد (Promise) لا يُرجع قيمة عند الاكتمال، ولكنه يعالج الاستجابة من الخادم.
+ * @throws {Error} - في حالة فشل الاتصال بالشبكة أو وجود مشكلة في استجابة الخادم.
+ */
+async function sendTokenToServer(userKey, token, platform) {
+    console.log(`%c[FCM] Sending token to server...`, "color: #fd7e14");
+    console.log(`[FCM] User Key: ${userKey} [FCM] FCM Token: ${token} [FCM] Platform: ${platform}`);
+
+    try {
+        const response = await fetch(`${baseURL}/api/tokens`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                user_key: userKey,
+                token: token,
+                platform: platform,
+            }),
+        });
+
+        const responseData = await response.json();
+        if (response.ok) {
+            console.log(
+                "%c[FCM] Server successfully saved/updated the token.",
+                "color: #28a745",
+                responseData
+            );
+        } else {
+            console.error(
+                "[FCM] Server failed to save token. Status:",
+                response.status,
+                "Response:",
+                responseData
+            );
+        }
+    } catch (networkError) {
+        console.error(
+            "%c[FCM] Network error while sending token:",
+            "color: #dc3545",
+            networkError
+        );
+    }
+}
+
+/**
+ * @description تطلب إذن الإشعارات من النظام الأصلي (Native) إذا كان التطبيق يعمل ضمن بيئة Android،
+ *   وذلك باستخدام واجهة `window.Android` المعرفة.
+ * @function askForNotificationPermission
+ * @async
+ * @returns {Promise<void>} - يُرجع وعدًا (Promise) لا يُرجع قيمة عند الاكتمال.
+ */
+async function askForNotificationPermission() {
+    // التحقق من وجود الكائن 'Android' للتأكد من أن الكود يعمل داخل تطبيق أندرويد
+    if (
+        window.Android &&
+        typeof window.Android.requestNotificationPermission === "function"
+    ) {
+        console.log(
+            "Calling native function to request notification permission..."
+        );
+        window.Android.requestNotificationPermission();
+    } else {
+        console.log("Android interface not available.");
+    }
+}
+
+
+function onUserLoggedOutAndroid() {
+    if (
+        window.Android &&
+        typeof window.Android.onUserLoggedOut === "function"
+    ) {
+        console.log("[Auth] إعلام الواجهة الأصلية بتسجيل خروج المستخدم...");
+        window.Android.onUserLoggedOut(userSession.user_key);
+        // ✅ إضافة: حذف توكن الأندرويد من localStorage
+        localStorage.removeItem("android_fcm_key");
+        console.log(
+            "[Auth] تم حذف توكن الأندرويد (android_fcm_key) من localStorage."
+        );
+    }
+}

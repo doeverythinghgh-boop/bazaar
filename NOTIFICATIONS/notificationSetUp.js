@@ -180,54 +180,6 @@ async function setupFirebaseWeb() {
 // ===============================
 
 /**
- * @description دالة مساعدة لإرسال توكن FCM إلى الخادم.
- * @function sendTokenToServer
- * @param {string} userKey - المفتاح التعريفي للمستخدم.
- * @param {string} token - توكن FCM الذي سيتم إرساله.
- * @param {string} platform - منصة الجهاز (مثل "android" أو "web").
- * @returns {Promise<void>} - وعد (Promise) لا يُرجع قيمة عند الاكتمال، ولكنه يعالج الاستجابة من الخادم.
- * @throws {Error} - في حالة فشل الاتصال بالشبكة أو وجود مشكلة في استجابة الخادم.
- */
-async function sendTokenToServer(userKey, token, platform) {
-    console.log(`%c[FCM] Sending token to server...`, "color: #fd7e14");
-    console.log(`[FCM] User Key: ${userKey} [FCM] FCM Token: ${token} [FCM] Platform: ${platform}`);
-
-    try {
-        const response = await fetch(`${baseURL}/api/tokens`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                user_key: userKey,
-                token: token,
-                platform: platform,
-            }),
-        });
-
-        const responseData = await response.json();
-        if (response.ok) {
-            console.log(
-                "%c[FCM] Server successfully saved/updated the token.",
-                "color: #28a745",
-                responseData
-            );
-        } else {
-            console.error(
-                "[FCM] Server failed to save token. Status:",
-                response.status,
-                "Response:",
-                responseData
-            );
-        }
-    } catch (networkError) {
-        console.error(
-            "%c[FCM] Network error while sending token:",
-            "color: #dc3545",
-            networkError
-        );
-    }
-}
-
-/**
  * @description تنتظر حتى يتم حفظ `android_fcm_key` في `localStorage` ثم تستدعي دالة رد الاتصال (callback).
  * @function waitForFcmKey
  * @param {function(string): void} callback - الدالة التي سيتم استدعاؤها مع مفتاح FCM بمجرد توفره.

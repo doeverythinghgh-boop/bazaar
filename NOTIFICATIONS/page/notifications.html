@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الإشعارات - Bazaar App</title>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- الأنماط -->
+    <link rel="stylesheet" href="notifications.css">
+    
+    <!-- مكتبة SweetAlert للتنبيهات -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+    <!-- الحاوية الرئيسية -->
+    <div class="notifications-container" id="notifications-container">
+        
+        <!-- الهيدر -->
+        <header class="notifications-header">
+            <div class="header-content">
+                <div class="header-title">
+                    <i class="fas fa-bell"></i>
+                    <h1>الإشعارات</h1>
+                </div>
+                
+                <!-- الإحصائيات -->
+                <div class="header-stats" id="notifications-stats">
+                    <div class="stat-card">
+                        <div class="stat-value" id="total-count">0</div>
+                        <div class="stat-label">إجمالي الإشعارات</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="unread-count">0</div>
+                        <div class="stat-label">غير مقروء</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="sent-count">0</div>
+                        <div class="stat-label">مرسلة</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="received-count">0</div>
+                        <div class="stat-label">مستلمة</div>
+                    </div>
+                </div>
+                
+                <!-- أدوات التحكم -->
+                <div class="controls-bar">
+                    <!-- مجموعة الفلاتر -->
+                    <div class="controls-group">
+                        <label for="filter-type"><i class="fas fa-filter"></i> النوع:</label>
+                        <select id="filter-type">
+                            <option value="all">الكل</option>
+                            <option value="sent">مرسلة</option>
+                            <option value="received">مستلمة</option>
+                        </select>
+                    </div>
+                    
+                    <div class="controls-group">
+                        <label for="filter-status"><i class="fas fa-circle"></i> الحالة:</label>
+                        <select id="filter-status">
+                            <option value="all">الكل</option>
+                            <option value="read">مقروء</option>
+                            <option value="unread">غير مقروء</option>
+                        </select>
+                    </div>
+                    
+                    <div class="controls-group">
+                        <label for="search-input"><i class="fas fa-search"></i> بحث:</label>
+                        <input type="text" id="search-input" placeholder="ابحث في الإشعارات...">
+                    </div>
+                    
+                    <div class="controls-group">
+                        <label for="sort-select"><i class="fas fa-sort"></i> الترتيب:</label>
+                        <select id="sort-select">
+                            <option value="newest">الأحدث أولاً</option>
+                            <option value="oldest">الأقدم أولاً</option>
+                        </select>
+                    </div>
+                    
+                    <!-- أزرار التحكم -->
+                    <div class="control-buttons">
+                        <button class="btn btn-primary" id="refresh-btn">
+                            <i class="fas fa-sync-alt"></i> تحديث
+                        </button>
+                        
+                        <div class="toggle-switch">
+                            <label class="switch">
+                                <input type="checkbox" id="auto-refresh-toggle" checked>
+                                <span class="slider"></span>
+                            </label>
+                            <span>تحديث تلقائي</span>
+                        </div>
+                        
+                        <button class="btn btn-secondary" id="mark-all-read-btn">
+                            <i class="fas fa-check-double"></i> تحديد الكل كمقروء
+                        </button>
+                        
+                        <button class="btn btn-secondary" id="clear-filters-btn">
+                            <i class="fas fa-times"></i> مسح الفلاتر
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+        
+        <!-- قائمة الإشعارات -->
+        <main class="notifications-list" id="notifications-list">
+            <!-- سيتم ملء الإشعارات هنا بواسطة JavaScript -->
+        </main>
+        
+        <!-- حالات الصفحة -->
+        <div class="state-container" id="loading-state">
+            <div class="loading-state">
+                <i class="fas fa-spinner fa-spin"></i>
+                <h3>جاري تحميل الإشعارات...</h3>
+            </div>
+        </div>
+        
+        <div class="state-container" id="empty-state">
+            <div class="empty-state">
+                <i class="far fa-bell-slash"></i>
+                <h3>لا توجد إشعارات حتى الآن</h3>
+                <p>سيظهر هنا أي إشعارات تصل إليك</p>
+            </div>
+        </div>
+        
+        <div class="state-container" id="error-state">
+            <div class="error-state">
+                <i class="fas fa-exclamation-triangle"></i>
+                <h3>حدث خطأ أثناء تحميل الإشعارات</h3>
+                <p class="error-message">فشل في تحميل الإشعارات. تأكد من اتصالك بالإنترنت.</p>
+                <button class="btn btn-primary" onclick="window.location.reload()">
+                    <i class="fas fa-redo"></i> إعادة المحاولة
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- الإعلان عن دوال IndexedDB (لأغراض التطوير) -->
+    <script>
+        // إذا لم تكن دوال IndexedDB موجودة، نعرف دوال وهمية للتجربة
+        if (typeof initDB === 'undefined') {
+            console.warn('دوال IndexedDB غير موجودة - استخدام بيانات تجريبية');
+            
+            // دوال وهمية لأغراض التطوير
+            window.initDB = async function() {
+                console.log('[Dev] تهيئة قاعدة البيانات الوهمية');
+                return Promise.resolve();
+            };
+            
+            window.getNotificationLogs = async function(type = 'all', limit = 50) {
+                console.log(`[Dev] جلب ${limit} إشعار من النوع ${type}`);
+                
+                // بيانات تجريبية
+                return Array.from({length: 10}, (_, i) => ({
+                    id: i + 1,
+                    messageId: `msg_${Date.now()}_${i}`,
+                    type: i % 2 === 0 ? 'sent' : 'received',
+                    title: i % 2 === 0 ? 'تم إرسال إشعار' : 'إشعار جديد',
+                    body: 'هذا محتوى تجريبي للإشعار رقم ' + (i + 1),
+                    timestamp: new Date(Date.now() - i * 3600000).toISOString(),
+                    status: i < 5 ? 'unread' : 'read',
+                    relatedUser: {
+                        key: 'user_' + i,
+                        name: i % 2 === 0 ? 'المستخدم' : 'الإدارة'
+                    },
+                    payload: { example: 'data' }
+                }));
+            };
+            
+            window.addNotificationLog = async function(data) {
+                console.log('[Dev] إضافة إشعار جديد:', data);
+                
+                // إرسال حدث إضافة إشعار جديد
+                const event = new CustomEvent('notificationLogAdded', {
+                    detail: { ...data, id: Date.now() }
+                });
+                setTimeout(() => window.dispatchEvent(event), 1000);
+                
+                return Promise.resolve(Date.now());
+            };
+        }
+    </script>
+    
+    <!-- ملفات JavaScript -->
+    <script src="notification-global.js"></script>
+    <script src="../js/notification-db-manager.js"></script>
+    <script src="notifications.js"></script>
+    
+    <script>
+        // تهيئة العداد العالمي إذا لم يتم تحميله تلقائياً
+        if (window.GLOBAL_NOTIFICATIONS && typeof window.GLOBAL_NOTIFICATIONS.init === 'function') {
+            window.GLOBAL_NOTIFICATIONS.init();
+        }
+        
+        // طلب إذن الإشعارات من المتصفح
+        document.addEventListener('DOMContentLoaded', function() {
+            if ('Notification' in window && Notification.permission === 'default') {
+                Notification.requestPermission();
+            }
+        });
+    </script>
+</body>
+</html>

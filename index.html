@@ -19,7 +19,7 @@
   <script src="/shared/categoryModal.js"></script>
   <script src="/js/cloudFileManager.js"></script>
   <script src="/js/cardPackage.js"></script>
-  <script src="/js/order.js"></script>
+
   <script src="/js/forms.js"></script>
 
   <!-- ربط ملف الأنماط الخارجي -->
@@ -40,8 +40,9 @@
       flex-direction: column;
       /* لجعل المحتوى الرئيسي والتذييل يترتبان عموديًا */
     }
-        .add-product-modal__hidden-file {
-        display: none;
+
+    .add-product-modal__hidden-file {
+      display: none;
     }
 
 
@@ -259,6 +260,12 @@
       <span>منتجاتي</span>
     </button>
 
+    <!-- زر الإشعارات -->
+    <button class="index-header-login-btn" id="index-notifications-btn">
+      <i class="fas fa-bell index-user-icon" id="index-notifications-icon"></i>
+      <span id="index-notifications-text">إشعارات</span>
+    </button>
+
     <!-- زر تواصل معنا -->
     <button class="index-header-login-btn" id="index-contact-btn">
       <i class="fas fa-phone index-user-icon" id="index-contact-icon"></i>
@@ -279,14 +286,15 @@
   <script src="js/connectUsers.js"></script>
   <script src="js/connectProduct.js"></script>
   <script src="js/network.js" id="index-script-network-js"></script>
-<script src="js/notificationSetUp.js"></script>
-<script src="js/notificationTools.js"></script>
+  <script src="js/notificationSetUp.js"></script>
+  <script src="js/notificationTools.js"></script>
+  <script src="js/notification-db-manager.js"></script>
   <script src="js/tools.js" id="index-script-tools-js"></script>
   <script src="js/globalVariable.js"></script>
 
   <!---end region main javaScript files---->
   <script>
-  
+
 
     // دالة لإخفاء أيقونة "الرئيسية" عن طريق إضافة فئة CSS.
     function hiddenHomeIcon() {
@@ -388,6 +396,15 @@
               }
             });
           }
+        });
+
+      // [خطوة 5.9] ربط زر "الإشعارات".
+      document
+        .getElementById("index-notifications-btn")
+        .addEventListener("click", () => {
+          console.log("🔔 تم الضغط على زر الإشعارات - Notifications Button Clicked");
+          console.log("الوقت:", new Date().toLocaleString('ar-EG'));
+          console.log("المستخدم:", userSession ? userSession.username : "غير مسجل");
         });
 
       document
