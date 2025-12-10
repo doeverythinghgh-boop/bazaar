@@ -132,6 +132,7 @@ window.GLOBAL_NOTIFICATIONS = {
             const isDisplayed = notificationsContainer.offsetParent !== null ||
                 window.getComputedStyle(notificationsContainer).display !== 'none';
             isPageVisible = hasContent && isDisplayed;
+            console.log(`[Global] فحص ظهور صفحة الإشعارات: hasContent=${hasContent}, isDisplayed=${isDisplayed}, isPageVisible=${isPageVisible}`);
         }
 
         if (isPageVisible) {

@@ -273,11 +273,19 @@ const NotificationPage = {
         // حدث إضافة إشعار جديد
         window.addEventListener('notificationLogAdded', async (event) => {
             console.log('[Notifications] حدث إشعار جديد:', event.detail);
+
+            // التحقق من أن الصفحة مهيأة ومفتوحة
+            if (!this.state || !this.elements || !this.elements.list) {
+                console.log('[Notifications] الصفحة غير مهيأة - تجاهل الحدث');
+                return;
+            }
+
             // إعادة تحميل البيانات من قاعدة البيانات بدلاً من الإضافة المباشرة
             // لتجنب التكرار (لأن notification-global.js يستمع لنفس الحدث)
             await this.refreshNotifications();
 
             // إظهار toast فقط للإشعارات المستلمة (received) وليس المرسلة (sent)
+            // وفقط إذا كانت الصفحة مفتوحة ومرئية
             if (!document.hidden && event.detail && event.detail.type === 'received') {
                 this.showToast('تم استقبال إشعار جديد', 'info');
             }
@@ -770,7 +778,7 @@ const NotificationPage = {
      */
     showToast(message, type = 'info') {
         // تشغيل صوت التنبيه
-    //playNotificationSound();
+        //playNotificationSound();
 
         // إنشاء عنصر toast
         const toast = document.createElement('div');
