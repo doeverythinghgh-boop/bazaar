@@ -83,17 +83,19 @@ function clearMainContainers() {
  * @returns {Promise<void>}
  */
 async function clearAndNavigateToLogin() {
-  //const fcmToken = localStorage.getItem("fcm_token") || localStorage.getItem("android_fcm_key");
+  const fcmToken = localStorage.getItem("fcm_token") || localStorage.getItem("android_fcm_key");
 
   // 1. إعلام واجهة Android (إن وجدت)
-  /*if (window.Android && typeof window.Android.onUserLoggedOut === "function") {
-    console.log("[Auth] إعلام الواجهة الأصلية بتسجيل خروج المستخدم...");
-    window.Android.onUserLoggedOut(JSON.stringify({ user_key: userSession?.user_key }));
-  }*/
+  if (typeof onUserLoggedOutAndroid === "function") {
+    onUserLoggedOutAndroid();
+  } else if (window.Android && typeof window.Android.onUserLoggedOut === "function") {
+    window.Android.onUserLoggedOut(userSession?.user_key);
+  }
 
   // 2. محاولة حذف التوكن من الخادم (إذا كان المستخدم والتوكن موجودين)
   /*if (fcmToken && userSession?.user_key) {
     try {
+      // إرسال طلب للحذف (اختياري، يعتمد على دعم الـ API)
       await fetch(`${baseURL}/api/tokens`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
@@ -108,21 +110,21 @@ async function clearAndNavigateToLogin() {
         "[FCM] فشل إرسال طلب حذف التوكن من الخادم. الخطأ:",
         error
       );
-      // ملاحظة: حتى لو فشل الحذف من الخادم، ستستمر عملية تسجيل الخروج من جانب العميل.
     }
   }*/
+
   // 3. مسح جميع بيانات المتصفح
   console.log("[Auth] جاري مسح جميع بيانات المتصفح...");
   await clearAllBrowserData();
   clearMainContainers();
   console.log("[Auth] تم مسح بيانات المتصفح بنجاح.");
-userSession=null;
-//
-  setUserNameInIndexBar(); 
-checkImpersonationMode();
+  userSession = null;
+  //
+  setUserNameInIndexBar();
+  checkImpersonationMode();
   // [خطوة 1] استدعاء `mainLoader` لتحميل محتوى صفحة تسجيل الدخول في حاوية المستخدم الرئيسية.
   console.log("[Auth] دخلنا دالة clearAndNavigateToLogin 00000000000. جاري تحميل صفحة تسجيل الدخول...");
-await mainLoader(
+  await mainLoader(
     "pages/login.html",
     "index-user-container",
     0,

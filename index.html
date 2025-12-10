@@ -11,6 +11,7 @@
   <link id="font-tajawal" href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap"
     rel="stylesheet" />
   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.2/css/all.css" />
+  <link rel="stylesheet" href="notification/page/notifications.css">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="https://unpkg.com/@zxing/library@latest"></script>
 
@@ -279,6 +280,7 @@
   <div id="index-cardPackage-container"></div>
   <div id="index-myProducts-container"></div>
   <div id="index-contact-container"></div>
+  <div id="index-notifications-container"></div>
   <!---region main javaScript files---->
   <script src="js/auth.js" id="index-script-auth-js"></script>
   <!-- ملف الإعدادات العامة للمشروع (مثل baseURL) -->
@@ -286,12 +288,13 @@
   <script src="js/connectUsers.js"></script>
   <script src="js/connectProduct.js"></script>
   <script src="js/network.js" id="index-script-network-js"></script>
-  <script src="NOTIFICATIONS/notificationSetUp.js"></script>
-  <script src="NOTIFICATIONS/notificationTools.js"></script>
-  <script src="NOTIFICATIONS/notification-db-manager.js"></script>
+  <script src="notification/notificationSetUp.js"></script>
+  <script src="notification/notificationTools.js"></script>
+  <script src="notification/notification-db-manager.js"></script>
   <script src="js/tools.js" id="index-script-tools-js"></script>
   <script src="js/globalVariable.js"></script>
-
+    <script src="notification/page/notification-global.js"></script>
+    <script src="notification/page/notifications.js"></script>
   <!---end region main javaScript files---->
   <script>
 
@@ -402,9 +405,7 @@
       document
         .getElementById("index-notifications-btn")
         .addEventListener("click", () => {
-          console.log("🔔 تم الضغط على زر الإشعارات - Notifications Button Clicked");
-          console.log("الوقت:", new Date().toLocaleString('ar-EG'));
-          console.log("المستخدم:", userSession ? userSession.username : "غير مسجل");
+          mainLoader("./notification/page/notifications.html","index-notifications-container",0,undefined,"hiddenHomeIcon",true);
         });
 
       document

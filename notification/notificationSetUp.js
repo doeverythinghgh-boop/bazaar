@@ -36,10 +36,11 @@ async function registerServiceWorker() {
         return false;
     }
 
-    // منع الفشل على HTTP
-    if (location.protocol !== "https:" && location.hostname !== "localhost") {
-        console.warn("[FCM] يجب تشغيل الموقع عبر HTTPS لتفعيل الإشعارات.");
-        return false;
+    // تحذير عند العمل بدون HTTPS
+    const isLocalhost = location.hostname === "localhost" || location.hostname === "127.0.0.1";
+    if (location.protocol !== "https:" && !isLocalhost) {
+        console.warn("[FCM] تنبيه: الموقع يعمل عبر HTTP. قد يفشل تسجيل Service Worker إلا إذا تم تكوين المتصفح للسماح بذلك.");
+        // لن نوقف التنفيذ هنا، سنترك المتصفح يقرر ما إذا كان سيقبل التسجيل أم لا
     }
 
     try {

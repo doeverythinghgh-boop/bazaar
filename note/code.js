@@ -15,7 +15,7 @@ mainLoader(
 /////////////////////////////////////////////////////
   const user = JSON.parse(localStorage.getItem("loggedInUser"));
 
-//if (Number(userSession.is_seller) >= 1) 
+//userSession.user_key != "guest_user" 
 //userSession.user_key
 //  /////////////////////////////////////////////////////////
 /*console.log(

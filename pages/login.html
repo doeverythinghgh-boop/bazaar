@@ -320,7 +320,7 @@
       </div>
       <button type="submit" class="button login_btn">تسجيل الدخول</button>
       <div id="login_form-footer" class="login_form-footer">
-        <a href="register.html" id="login_go-to-register-link" class="login_form-footer-link">ليس لديك حساب؟ <strong>سجل
+        <a href="#" id="login_go-to-register-link" class="login_form-footer-link">ليس لديك حساب؟ <strong>سجل
             الآن</strong></a>
         <a id="login_guest-btn" class="login_guest-link">أو يمكنك <strong>الدخول كضيف</strong> لتصفح المنتجات</a>
       </div>
@@ -348,7 +348,7 @@
       if (Number(userSession?.is_seller) >= 1) {
         // محاولة تهيئة الإشعارات للمستخدم الحالي إذا كان مسجلاً دخوله.
         if (typeof initializeNotifications === "function") {
-        //  initializeNotifications();
+          //  initializeNotifications();
         }
         // إيقاف التنفيذ لإتاحة الفرصة لإعادة التوجيه (المفروض أن يتم إعادة التوجيه في مكان آخر)
         return;
@@ -425,9 +425,25 @@
         loginGuestBtn.addEventListener("click", login_handleGuestLogin);
       }
 
+      // 5. ربط الحدث برابط "سجل الآن"
+      const registerLink = document.getElementById("login_go-to-register-link");
+      if (registerLink) {
+        registerLink.addEventListener("click", login_handleRegisterClick);
+      }
+
     } catch (error) {
       console.error("🚫 حدث خطأ في دالة login_setupLoginForm:", error);
     }
+  }
+
+  /**
+   * @description يعالج النقر على رابط "سجل الآن".
+   * @function login_handleRegisterClick
+   * @param {Event} e - كائن الحدث
+   */
+  function login_handleRegisterClick(e) {
+    e.preventDefault();
+    mainLoader("./pages/register.html","index-user-container",0,undefined,"hiddenLoginIcon",true  );
   }
 
 
@@ -556,13 +572,9 @@
       userSession = user; // تحديث الكائن العام لجلسة المستخدم
       setUserNameInIndexBar();
       // 2. إعداد إشعارات FCM إذا كان المستخدم مؤهلاً
-      if (Number(userSession?.is_seller) >= 1) {
-      
-      /*  console.log("[Login Page] المستخدم مؤهل، جاري استدعاء setupFCM() الآن...");
-        if (typeof setupFCM === "function") {
-          await setupFCM();
-          await login_askForNotificationPermission();
-        }*/
+      if (userSession.user_key != "guest_user") {
+        await setupFCM();
+        await askForNotificationPermission();
       } else {
         console.log(
           "[Login Page] المستخدم غير مؤهل للإشعارات، تم تخطي استدعاء setupFCM()."
@@ -599,30 +611,6 @@
     }
   }
 
-  /**
-   * @description تطلب إذن الإشعارات من النظام الأصلي (Native) إذا كان التطبيق يعمل ضمن بيئة Android.
-   * @function login_askForNotificationPermission
-   * @async
-   * @returns {Promise<void>} - يُرجع وعدًا (Promise) لا يُرجع قيمة عند الاكتمال.
-   */
-  async function login_askForNotificationPermission() {
-    try {
-      // التحقق من وجود الكائن 'Android' للتأكد من أن الكود يعمل داخل تطبيق أندرويد
-      if (
-        window.Android &&
-        typeof window.Android.requestNotificationPermission === "function"
-      ) {
-        console.log(
-          "Calling native function to request notification permission..."
-        );
-        window.Android.requestNotificationPermission();
-      } else {
-        console.log("واجهة الأندرويد غير متاحة.");
-      }
-    } catch (error) {
-      console.error("🚫 حدث خطأ في دالة login_askForNotificationPermission:", error);
-    }
-  }
 
   /**
    * @description يعالج عملية تسجيل الدخول كضيف.

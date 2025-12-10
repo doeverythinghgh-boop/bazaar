@@ -17,7 +17,7 @@ function checkImpersonationMode() {
           <span>وضع المسؤول: تتصفح بصلاحيات المستخدم</span>
         `;
     document.body.appendChild(watermark);
-  }else{
+  } else {
     const watermark = document.querySelector(".admin-watermark");
     if (watermark) {
       watermark.remove();
@@ -181,10 +181,19 @@ async function clearAllBrowserData() {
     console.warn("localStorage clear failed:", e);
   }
 
+  // -----------------------------
+  // 2) مسح sessionStorage
+  // -----------------------------
+  try {
+    sessionStorage.clear();
+  } catch (e) {
+    console.warn("sessionStorage clear failed:", e);
+  }
+
 
 
   // -----------------------------
-  // 5) مسح IndexedDB
+  // 3) مسح IndexedDB
   // -----------------------------
   try {
     if ("indexedDB" in window) {
