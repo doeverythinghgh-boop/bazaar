@@ -122,10 +122,20 @@ window.GLOBAL_NOTIFICATIONS = {
      * @description إعلام Callback بتحديث العداد وتحديث شارة الإشعارات في الواجهة
      */
     notifyCountUpdate: function () {
-        // أولاً: تحديث شارة الإشعارات في الصفحة الرئيسية
-        this.updateNotificationBadge();
+        // نتحقق مما إذا كانت صفحة الإشعارات معروضة حالياً
+        const notificationsContainer = document.getElementById('index-notifications-container');
+        const isPageVisible = notificationsContainer && notificationsContainer.style.display !== 'none' && notificationsContainer.innerHTML.trim() !== '';
 
-        // ثانياً: استدعاء الـ Callback إذا وجد
+        if (isPageVisible) {
+            // إذا كانت الصفحة مفتوحة، نُخفي الشارة بغض النظر عن العدد (لأن المستخدم يرى الإشعارات الآن)
+            const badge = document.getElementById('notifications-badge');
+            if (badge) badge.style.display = 'none';
+        } else {
+            // إذا كانت الصفحة مغلقة، نُحدث الشارة بناءً على العدد
+            this.updateNotificationBadge();
+        }
+
+        // استدعاء الـ Callback إذا وجد
         if (typeof this.onCountUpdate === 'function') {
             try {
                 this.onCountUpdate(this.unreadCount);
@@ -139,28 +149,23 @@ window.GLOBAL_NOTIFICATIONS = {
      * @description تحديث شارة الإشعارات في الزر الرئيسي
      */
     updateNotificationBadge: function () {
-        const notifButton = document.getElementById("index-notifications-btn");
-        if (!notifButton) return;
+        // استخدام الشارة الموجودة فعلياً في index.html
+        const badge = document.getElementById('notifications-badge');
 
-        const badgeId = 'notification-count-badge';
-        let badge = document.getElementById(badgeId);
-
-        // إذا لم تكن الشارة موجودة، قم بإنشائها
         if (!badge) {
-            badge = document.createElement('span');
-            badge.id = badgeId;
-            badge.className = 'cart-badge'; // استخدام نفس تنسيق شارة السلة
-            // تخصيص لون الخلفية ليكون أحمر للإشعارات
-            badge.style.backgroundColor = '#dc3545';
-            badge.style.color = '#fff';
-            notifButton.appendChild(badge);
+            console.warn('[Global] لم يتم العثور على عنصر الشارة notifications-badge');
+            return;
         }
 
         // تحديث المحتوى والعرض
         if (this.unreadCount > 0) {
             badge.textContent = this.unreadCount > 99 ? '99+' : this.unreadCount;
+            // إظهار الشارة (flex لأن التصميم يعتمد عليها للتوسيط)
             badge.style.display = 'flex';
+            // تأكيد اللون (احترازي)
+            badge.style.backgroundColor = '#dc3545';
         } else {
+            // إخفاء الشارة
             badge.style.display = 'none';
         }
     },

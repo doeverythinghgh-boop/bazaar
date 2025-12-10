@@ -232,13 +232,14 @@
       <span id="index-search-text">بحث</span>
     </button>
 
-      <!-- زر الإشعارات -->
+    <!-- زر الإشعارات -->
     <button class="index-header-login-btn" id="index-notifications-btn">
       <i class="fas fa-bell index-user-icon" id="index-notifications-icon"></i>
+      <span class="cart-badge" id="notifications-badge">0</span>
       <span id="index-notifications-text">إشعارات</span>
     </button>
 
-      <!-- زر السلة -->
+    <!-- زر السلة -->
     <button class="index-header-login-btn" id="index-cart-btn">
       <i class="fas fa-shopping-cart index-user-icon" id="index-cart-icon"></i>
       <span id="index-cart-text">السلة</span>
@@ -282,7 +283,7 @@
   <div id="index-contact-container"></div>
   <div id="index-notifications-container"></div>
   <div id="index-salesMovement-container"></div>
-  
+
   <!---region main javaScript files---->
   <script src="js/auth.js" id="index-script-auth-js"></script>
   <!-- ملف الإعدادات العامة للمشروع (مثل baseURL) -->
@@ -554,33 +555,32 @@
       );
       if (viewMyProductsBtn) {
         viewMyProductsBtn.addEventListener("click", async () => {
-              console.log(myProducts);
-            const container = document.getElementById(
-              "index-myProducts-container"
+          console.log(myProducts);
+          const container = document.getElementById(
+            "index-myProducts-container"
+          );
+          if (container.innerHTML == "") {
+            mainLoader(
+              "pages/product2Me.html",
+              "index-myProducts-container",
+              0,
+              undefined,
+              "showHomeIcon",
+              true
             );
-            if (container.innerHTML == "") {
-  mainLoader(
-            "pages/product2Me.html",
-            "index-myProducts-container",
-            0,
-            undefined,
-            "showHomeIcon",
-            true
-          );
-            }
-            else
-            {
-  mainLoader(
-            "pages/product2Me.html",
-            "index-myProducts-container",
-            0,
-            undefined,
-            "showHomeIcon",
-            false
-          );
-            }
-      
-        
+          }
+          else {
+            mainLoader(
+              "pages/product2Me.html",
+              "index-myProducts-container",
+              0,
+              undefined,
+              "showHomeIcon",
+              false
+            );
+          }
+
+
         });
       }
       //#endregion

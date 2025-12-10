@@ -244,7 +244,8 @@
     height: 16px;
     width: 16px;
     right: 4px;
-    bottom: 4px;    background-color: var(--bg-color-white);
+    bottom: 4px;
+    background-color: var(--bg-color-white);
     transition: .4s;
     border-radius: 50%;
 }
@@ -263,7 +264,8 @@ input:checked+.slider:before {
 .notifications-list {
     display: flex;
     flex-direction: column;
-    gap: 22px; /* ✅ تعديل: زيادة المسافة الرأسية بين الرسائل */
+    gap: 22px;
+    /* ✅ تعديل: زيادة المسافة الرأسية بين الرسائل */
     align-items: center;
     /* ✅ جديد: توسيط المحتوى أفقيًا للسماح للرسائل بالانكماش */
     padding: 20px 15px;
@@ -296,7 +298,7 @@ input:checked+.slider:before {
 /* فقاعة الإشعار الأساسية */
 .notification-item {
     max-width: 75%;
-    padding: 12px 16px; 
+    padding: 12px 16px;
     border-radius: 18px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     position: relative;
@@ -313,7 +315,8 @@ input:checked+.slider:before {
 
 .notification-item:hover {
     transform: translateY(-1px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08); /* ظل أعمق عند التحويم */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+    /* ظل أعمق عند التحويم */
 }
 
 @keyframes notification-pop-in {
@@ -333,8 +336,10 @@ input:checked+.slider:before {
     align-self: flex-end;
     /* ✅ تعديل: flex-end لليمين في RTL */
     background-color: var(--bg-color-white, #ffffff);
-    border-top-right-radius: 4px; /* زاوية حادة لإنشاء "ذيل" الرسالة */
-    margin-right: 8px; /* مسافة لإظهار الذيل */
+    border-top-right-radius: 4px;
+    /* زاوية حادة لإنشاء "ذيل" الرسالة */
+    margin-right: 8px;
+    /* مسافة لإظهار الذيل */
 }
 
 /* ✅ جديد: إنشاء "ذيل" الرسالة المستلمة باستخدام عنصر زائف */
@@ -344,7 +349,8 @@ input:checked+.slider:before {
     top: 0;
     right: -8px;
     border: 8px solid transparent;
-    border-top-color: var(--bg-color-white, #ffffff); /* لون مطابق للخلفية */
+    border-top-color: var(--bg-color-white, #ffffff);
+    /* لون مطابق للخلفية */
     border-left: 0;
     border-bottom: 0;
 }
@@ -353,8 +359,10 @@ input:checked+.slider:before {
 .notification-item.sent {
     align-self: flex-start;
     /* ✅ تعديل: flex-start لليسار في RTL */
-    background-color: #dcf8c6; /* لون أخضر فاتح مميز للرسائل الصادرة */
-    border-top-left-radius: 4px; /* زاوية حادة لإنشاء "ذيل" الرسالة */
+    background-color: #dcf8c6;
+    /* لون أخضر فاتح مميز للرسائل الصادرة */
+    border-top-left-radius: 4px;
+    /* زاوية حادة لإنشاء "ذيل" الرسالة */
     margin-left: 8px;
 }
 
@@ -365,7 +373,8 @@ input:checked+.slider:before {
     top: 0;
     left: -8px;
     border: 8px solid transparent;
-    border-top-color: #dcf8c6; /* لون مطابق للخلفية */
+    border-top-color: #dcf8c6;
+    /* لون مطابق للخلفية */
     border-right: 0;
     border-bottom: 0;
 }
@@ -381,7 +390,8 @@ input:checked+.slider:before {
 .sender-name {
     font-weight: 700;
     font-size: 0.85rem;
-    color: var(--primary-color, #007bff); /* لون مميز للاسم */
+    color: var(--primary-color, #007bff);
+    /* لون مميز للاسم */
 }
 
 /* نص الرسالة */
@@ -449,7 +459,7 @@ input:checked+.slider:before {
     opacity: 0.5;
 }
 
-.empty-state p{
+.empty-state p {
     color: #1b46e5;
 }
 
@@ -476,19 +486,25 @@ input:checked+.slider:before {
 /* رسائل Toast */
 .toast {
     position: fixed;
-    bottom: var(--spacing-lg);
-    left: var(--spacing-lg);
+    bottom: 20px;
+    right: 20px;
+    /* تغيير من left إلى right لدعم RTL بشكل أفضل */
+    left: auto;
     background: var(--bg-color-white);
-    padding: var(--spacing-sm);
-    border-radius: var(--border-radius-sm);
-    box-shadow: var(--shadow-lg);
+    padding: 12px 16px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     display: flex;
     align-items: center;
-    gap: var(--spacing-sm);
+    gap: 12px;
     min-width: 300px;
-    z-index: 1000;
+    max-width: 90vw;
+    z-index: 9999;
+    /* رفع الطبقة لتظهر فوق العناصر الأخرى */
     animation: slideIn 0.3s ease;
     border-right: 4px solid var(--info-color);
+    direction: rtl;
+    /* تأكيد الاتجاه */
 }
 
 .toast-success {
@@ -534,7 +550,8 @@ input:checked+.slider:before {
 
 @keyframes slideIn {
     from {
-        transform: translateX(-100%);
+        transform: translateX(100%);
+        /* الدخول من اليمين */
         opacity: 0;
     }
 
@@ -559,7 +576,8 @@ input:checked+.slider:before {
 }
 
 /* إخفاء العناصر غير المستخدمة تماماً */
-.controls-bar, .header-stats {
+.controls-bar,
+.header-stats {
     display: none !important;
 }
 

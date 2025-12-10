@@ -104,11 +104,33 @@ async function sendNotificationsToTokens(allTokens, title, body) {
 
     // 3. إرسال جميع الإشعارات بالتوازي
     try {
-        await Promise.all(notificationPromises);
-        console.log(`[Notifications SUCCESS] تم إرسال ${notificationPromises.length} إشعار بنجاح. انتهت عملية الإشعار.`);
+        const results = await Promise.all(notificationPromises);
+
+        let successCount = 0;
+        let diffLog = [];
+
+        results.forEach((result, index) => {
+            if (result && result.error) {
+                console.error(`[Notifications ERROR] إشعار رقم ${index + 1} فشل:`, result.error);
+                diffLog.push({ index: index + 1, status: 'failed', error: result.error });
+            } else {
+                successCount++;
+            }
+        });
+
+        if (diffLog.length > 0) {
+            console.warn(`[Notifications PARTIAL SUCCESS] تم إرسال ${successCount} بنجاح، وفشل ${diffLog.length}.`, diffLog);
+            // اختياري: إظهار تنبيه للمستخدم أو المطور إذا كان الفشل كلياً
+            if (successCount === 0) {
+                console.error("[Notifications FATAL] فشل إرسال جميع الإشعارات. راجع الخطأ أعلاه.");
+            }
+        } else {
+            console.log(`[Notifications SUCCESS] تم إرسال ${successCount} إشعار بنجاح. انتهت عملية الإشعار.`);
+        }
+
     } catch (error) {
-        // تسجيل الأخطاء المتعلقة بفشل الإرسال (دون إيقاف العملية الرئيسية)
-        console.error("[Notifications ERROR] فشل في إرسال بعض الإشعارات. تحقق من سجلات sendNotification الفردية.", error);
+        // تسجيل الأخطاء غير المتوقعة (مثل خطأ في Promise.all نفسه)
+        console.error("[Notifications ERROR] حدث خطأ غير متوقع أثناء إرسال الإشعارات.", error);
     }
 }
 

@@ -163,29 +163,30 @@ async function setupFirebaseWeb() {
         return;
     }
 
-    let savedToken = localStorage.getItem("fcm_token");
+    // تحديث: دائماً نطلب التوكن الحالي من FCM ونرسله للخادم لضمان المزامنة
+    try {
+        const currentToken = await messaging.getToken({
+            vapidKey: "BK1_lxS32198GdKm0Gf89yk1eEGcKvKLu9bn1sg9DhO8_eUUhRCAW5tjynKGRq4igNhvdSaR0-eL74V3ACl3AIY"
+        });
 
-    if (!savedToken) {
-        console.log("[FCM Web] لا يوجد توكن — طلب توكن جديد...");
+        if (currentToken) {
+            const savedToken = localStorage.getItem("fcm_token");
 
-        try {
-            const newToken = await messaging.getToken({
-                vapidKey: "BK1_lxS32198GdKm0Gf89yk1eEGcKvKLu9bn1sg9DhO8_eUUhRCAW5tjynKGRq4igNhvdSaR0-eL74V3ACl3AIY"
-            });
-
-            if (newToken) {
-                localStorage.setItem("fcm_token", newToken);
-                console.log("[FCM Web] تم الحصول على توكن جديد:", newToken);
-
-                await sendTokenToServer(userSession.user_key, newToken, "web");
+            // إذا كان التوكن مختلفاً أو غير محفوظ محلياً، نحدثه محلياً
+            if (savedToken !== currentToken) {
+                localStorage.setItem("fcm_token", currentToken);
+                console.log("[FCM Web] تم تحديث التوكن المحلي.");
             }
 
-        } catch (err) {
-            console.error("[FCM Web] خطأ أثناء طلب التوكن:", err);
+            // إرسال التوكن للخادم (دائماً لضمان وجوده في قاعدة البيانات)
+            console.log("[FCM Web] جاري مزامنة التوكن مع الخادم...");
+            await sendTokenToServer(userSession.user_key, currentToken, "web");
+        } else {
+            console.warn("[FCM Web] لم يتم استلام أي توكن.");
         }
 
-    } else {
-        console.log("[FCM Web] التوكن موجود محليًا — لا حاجة لإعادة الإرسال.");
+    } catch (err) {
+        console.error("[FCM Web] خطأ أثناء طلب/تحديث التوكن:", err);
     }
 }
 
