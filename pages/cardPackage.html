@@ -585,22 +585,9 @@
             style="position:absolute; top:10px; left:10px; background:none; border:none; cursor:pointer; color:#155724; font-size:1.2rem;">&times;</button>
     </div>
 
-    <script>
-        // Check for photo order message
-        document.addEventListener('DOMContentLoaded', () => {
-            if (localStorage.getItem('showOrderPhotoMessage') === 'true') {
-                const msgEl = document.getElementById('cartPage_photoOrderMessage');
-                if (msgEl) {
-                    // Move inside container at bottom
-                    const container = document.getElementById('cartPage_mainContainer');
-                    if (container) container.appendChild(msgEl);
-                    msgEl.style.display = 'block';
-                }
-            }
-        });
-    </script>
 
-
+    <script src="js/cart-modal.js"></script>
+    <script src="js/connect1.js"></script>
     <script>
         // المتغيرات العامة
         let cartPage_currentProductKeyForNote = '';

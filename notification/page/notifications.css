@@ -17,7 +17,7 @@
 /* الهيدر */
 .notifications-header {
     background: linear-gradient(135deg, var(--primary-600) 0%, var(--primary-800) 100%);
-    color: white;
+    color: var(--bg-color-white);
     padding: var(--spacing-lg);
     position: relative;
     overflow: hidden;
@@ -94,7 +94,7 @@
 
 /* أدوات التحكم */
 .controls-bar {
-    background: white;
+    background: var(--bg-color-white);
     padding: var(--spacing-md);
     border-bottom: 1px solid var(--border-color);
     display: flex;
@@ -161,7 +161,7 @@
 
 .btn-primary {
     background: var(--primary-600);
-    color: white;
+    color: var(--bg-color-white);
 }
 
 .btn-primary:hover {
@@ -181,7 +181,7 @@
 
 .btn-danger {
     background: var(--danger-color);
-    color: white;
+    color: var(--bg-color-white);
 }
 
 .btn-danger:hover {
@@ -244,8 +244,7 @@
     height: 16px;
     width: 16px;
     right: 4px;
-    bottom: 4px;
-    background-color: white;
+    bottom: 4px;    background-color: var(--bg-color-white);
     transition: .4s;
     border-radius: 50%;
 }
@@ -258,211 +257,171 @@ input:checked+.slider:before {
     transform: translateX(-26px);
 }
 
-/* قائمة الإشعارات */
+/* --- تصميم عصري للإشعارات (شات) --- */
+
+/* حاوية القائمة الرئيسية */
 .notifications-list {
-    padding: var(--spacing-md);
-    max-height: 600px;
-    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 22px; /* ✅ تعديل: زيادة المسافة الرأسية بين الرسائل */
+    align-items: center;
+    /* ✅ جديد: توسيط المحتوى أفقيًا للسماح للرسائل بالانكماش */
+    padding: 20px 15px;
+    background-color: var(--bg-color-light, #f0f2f5);
+    min-height: 100vh;
+    font-family: var(--font-primary, "Tajawal", sans-serif);
+    overflow-x: hidden;
 }
 
-/* عنصر إشعار */
-.notification-item {
-    background: var(--bg-card);
-    border-radius: var(--border-radius-sm);
-    margin-bottom: var(--spacing-sm);
-    border: 1px solid var(--border-color);
-    overflow: hidden;
-    transition: all 0.3s;
+/* فاصل التاريخ */
+.date-divider {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
     position: relative;
+    z-index: 1;
+}
+
+.date-divider span {
+    background-color: var(--border-color-soft, #e4e6eb);
+    color: var(--text-color-medium, #65676b);
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    backdrop-filter: blur(5px);
+}
+
+/* فقاعة الإشعار الأساسية */
+.notification-item {
+    max-width: 75%;
+    padding: 12px 16px; 
+    border-radius: 18px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    position: relative;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: var(--text-color-dark, #050505);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    animation: notification-pop-in 0.3s ease-out;
+    transition: transform 0.2s;
+    margin-top: 15px;
 }
 
 .notification-item:hover {
-    border-color: var(--primary-300);
-    box-shadow: var(--shadow-md);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08); /* ظل أعمق عند التحويم */
 }
 
-.notification-item.unread {
-    border-right: 4px solid var(--primary-500);
-    background: var(--primary-50);
+@keyframes notification-pop-in {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
 }
 
-.notification-item.unread::before {
+/* === الرسائل المستلمة (وارد) - تظهر على اليمين في العربية === */
+.notification-item.received {
+    align-self: flex-end;
+    /* ✅ تعديل: flex-end لليمين في RTL */
+    background-color: var(--bg-color-white, #ffffff);
+    border-top-right-radius: 4px; /* زاوية حادة لإنشاء "ذيل" الرسالة */
+    margin-right: 8px; /* مسافة لإظهار الذيل */
+}
+
+/* ✅ جديد: إنشاء "ذيل" الرسالة المستلمة باستخدام عنصر زائف */
+.notification-item.received::before {
     content: '';
     position: absolute;
-    right: 12px;
-    top: 12px;
-    width: 8px;
-    height: 8px;
-    background: var(--primary-500);
-    border-radius: 50%;
+    top: 0;
+    right: -8px;
+    border: 8px solid transparent;
+    border-top-color: var(--bg-color-white, #ffffff); /* لون مطابق للخلفية */
+    border-left: 0;
+    border-bottom: 0;
 }
 
+/* === الرسائل المرسلة (صادر) - تظهر على اليسار في العربية === */
+.notification-item.sent {
+    align-self: flex-start;
+    /* ✅ تعديل: flex-start لليسار في RTL */
+    background-color: #dcf8c6; /* لون أخضر فاتح مميز للرسائل الصادرة */
+    border-top-left-radius: 4px; /* زاوية حادة لإنشاء "ذيل" الرسالة */
+    margin-left: 8px;
+}
+
+/* ✅ جديد: إنشاء "ذيل" الرسالة المرسلة */
+.notification-item.sent::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -8px;
+    border: 8px solid transparent;
+    border-top-color: #dcf8c6; /* لون مطابق للخلفية */
+    border-right: 0;
+    border-bottom: 0;
+}
+
+/* اسم المرسل */
 .notification-header {
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    padding: var(--spacing-sm);
-    gap: var(--spacing-sm);
-    cursor: pointer;
-    user-select: none;
+    margin-bottom: 2px;
 }
 
-.notification-icon {
-    width: 40px;
-    height: 40px;
-    background: var(--primary-100);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--primary-600);
-    flex-shrink: 0;
+.sender-name {
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: var(--primary-color, #007bff); /* لون مميز للاسم */
 }
 
-.notification-info {
-    flex: 1;
-    min-width: 0;
+/* نص الرسالة */
+.notification-body p {
+    margin: 0;
+    white-space: pre-wrap;
+    word-wrap: break-word;
 }
 
-.notification-title {
-    font-size: 1rem;
-    font-weight: 600;
-    color: var(--text-primary);
-    margin-bottom: 0.25rem;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
+/* البيانات الوصفية (الوقت والحالة) */
 .notification-meta {
     display: flex;
-    gap: var(--spacing-sm);
-    font-size: 0.875rem;
-    color: var(--text-secondary);
-    flex-wrap: wrap;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 6px;
+    margin-top: 4px;
+    opacity: 0.8;
 }
 
-.notification-meta i {
-    margin-left: 0.25rem;
+.notification-time {
+    font-size: 0.7rem;
+    color: var(--text-color-medium, #65676b);
 }
 
-.notification-type {
-    padding: 0.125rem 0.5rem;
-    border-radius: 12px;
-    font-size: 0.75rem;
-    font-weight: 500;
-}
-
-.notification-type.sent {
-    background: var(--primary-100);
-    color: var(--primary-700);
-}
-
-.notification-type.received {
-    background: var(--success-color);
-    color: white;
-}
-
-.notification-actions {
-    display: flex;
-    gap: 0.5rem;
-}
-
-.btn-toggle-details,
-.btn-mark-read {
-    width: 32px;
-    height: 32px;
-    border: none;
-    border-radius: 50%;
-    background: var(--bg-secondary);
-    color: var(--text-secondary);
-    cursor: pointer;
+/* أيقونات حالة القراءة */
+.read-status {
+    font-size: 0.9rem;
+    line-height: 1;
     display: flex;
     align-items: center;
-    justify-content: center;
-    transition: all 0.2s;
 }
 
-.btn-toggle-details:hover {
-    background: var(--primary-100);
-    color: var(--primary-600);
+.read-status.read {
+    color: var(--info-color, #3498db);
+    /* أزرق للقراءة */
 }
 
-.btn-mark-read {
-    color: var(--primary-500);
-}
-
-.btn-mark-read:hover {
-    background: var(--primary-100);
-}
-
-/* جسم الإشعار */
-.notification-body {
-    padding: 0 var(--spacing-sm) var(--spacing-sm);
-    border-top: 1px solid var(--border-color);
-    margin-top: var(--spacing-sm);
-}
-
-.notification-content {
-    color: var(--text-secondary);
-    line-height: 1.6;
-    margin-bottom: var(--spacing-sm);
-}
-
-.notification-details {
-    background: var(--bg-secondary);
-    padding: var(--spacing-sm);
-    border-radius: var(--border-radius-sm);
-    margin-top: var(--spacing-sm);
-}
-
-.details-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: var(--spacing-sm);
-    margin-bottom: var(--spacing-sm);
-}
-
-.detail-item {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-}
-
-.detail-label {
-    font-size: 0.75rem;
-    color: var(--text-muted);
-    font-weight: 500;
-}
-
-.detail-value {
-    font-size: 0.875rem;
-    color: var(--text-primary);
-}
-
-.status-unread {
-    color: var(--primary-600);
-    font-weight: 500;
-}
-
-.status-read {
-    color: var(--success-color);
-    font-weight: 500;
-}
-
-.notification-payload h5 {
-    font-size: 0.875rem;
-    color: var(--text-secondary);
-    margin-bottom: 0.5rem;
-}
-
-.notification-payload pre {
-    background: var(--bg-tertiary);
-    padding: var(--spacing-sm);
-    border-radius: var(--border-radius-sm);
-    font-size: 0.75rem;
-    overflow-x: auto;
-    max-height: 200px;
-    overflow-y: auto;
+.read-status.unread {
+    color: var(--text-color-light, #bcc0c4);
+    /* رمادي للغير مقروء */
 }
 
 /* الحالات المختلفة */
@@ -502,7 +461,7 @@ input:checked+.slider:before {
 
 .error-message {
     color: var(--danger-color);
-    background: #fee2e2;
+    background: var(--danger-color-light);
     padding: var(--spacing-sm);
     border-radius: var(--border-radius-sm);
     max-width: 400px;
@@ -514,7 +473,7 @@ input:checked+.slider:before {
     position: fixed;
     bottom: var(--spacing-lg);
     left: var(--spacing-lg);
-    background: white;
+    background: var(--bg-color-white);
     padding: var(--spacing-sm);
     border-radius: var(--border-radius-sm);
     box-shadow: var(--shadow-lg);
@@ -582,21 +541,21 @@ input:checked+.slider:before {
 
 /* التمرير */
 .notifications-list::-webkit-scrollbar {
-    width: 8px;
+    width: 6px;
 }
 
 .notifications-list::-webkit-scrollbar-track {
-    background: var(--bg-secondary);
-    border-radius: 4px;
+    background: transparent;
 }
 
 .notifications-list::-webkit-scrollbar-thumb {
-    background: var(--primary-300);
-    border-radius: 4px;
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
 }
 
-.notifications-list::-webkit-scrollbar-thumb:hover {
-    background: var(--primary-400);
+/* إخفاء العناصر غير المستخدمة تماماً */
+.controls-bar, .header-stats {
+    display: none !important;
 }
 
 /* التجاوب */
@@ -638,7 +597,6 @@ input:checked+.slider:before {
     }
 
     .notification-meta {
-        flex-direction: column;
         gap: 0.5rem;
     }
 

@@ -260,3 +260,92 @@ function onUserLoggedOutAndroid() {
         );
     }
 }
+
+/**
+ * @description إدارة عملية الإشعار عند إتمام أمر شراء.
+ * تقوم بإخطار الإدارة والبائعين المعنيين.
+ * @function handlePurchaseNotifications
+ * @param {Object} order - كائن الطلب الذي تم إنشاؤه.
+ * @returns {Promise<void>}
+ */
+async function handlePurchaseNotifications(order) {
+    console.log('[Notifications] معالجة إشعارات الشراء للطلب:', order.id);
+
+    try {
+        // 1. إشعار الإدارة
+        await notifyAdminOnPurchase(order);
+
+        // 2. إشعار البائعين
+        await notifySellersOnPurchase(order);
+
+    } catch (error) {
+        console.error('[Notifications] خطأ في معالجة إشعارات الشراء:', error);
+    }
+}
+
+/**
+ * @description إرسال إشعار للإدارة بوجود طلب جديد.
+ * @function notifyAdminOnPurchase
+ * @param {Object} order
+ * @returns {Promise<void>}
+ */
+async function notifyAdminOnPurchase(order) {
+    try {
+        const adminTokens = await getAdminTokens();
+        if (adminTokens.length > 0) {
+            const title = "طلب شراء جديد";
+            const body = `تم استلام طلب جديد رقم #${order.id || 'N/A'}. تحقق من التفاصيل في لوحة التحكم.`;
+            await sendNotificationsToTokens(adminTokens, title, body);
+            console.log('[Notifications] تم إرسال إشعار للإدارة.');
+        } else {
+            console.warn('[Notifications] لم يتم العثور على توكنات للإدارة.');
+        }
+    } catch (error) {
+        console.error('[Notifications] فشل إرسال إشعار الإدارة:', error);
+    }
+}
+
+/**
+ * @description إرسال إشعارات للبائعين الذين تم شراء منتجاتهم.
+ * @function notifySellersOnPurchase
+ * @param {Object} order
+ * @returns {Promise<void>}
+ */
+async function notifySellersOnPurchase(order) {
+    if (!order.items || !Array.isArray(order.items)) return;
+
+    // تجميع البائعين الفريدين
+    const sellersMap = new Map();
+
+    order.items.forEach(item => {
+        // نفترض أن كل عنصر يحتوي على seller_key أو user_key للبائع
+        const sellerKey = item.seller_key || item.user_key || item.vendor_id;
+
+        if (sellerKey) {
+            if (!sellersMap.has(sellerKey)) {
+                sellersMap.set(sellerKey, []);
+            }
+            sellersMap.get(sellerKey).push(item.name || item.title || 'منتج');
+        }
+    });
+
+    console.log(`[Notifications] تم العثور على ${sellersMap.size} بائعين لإخطارهم.`);
+
+    // إرسال الإشعارات لكل بائع
+    for (const [sellerKey, products] of sellersMap) {
+        try {
+            const sellerTokens = await getUsersTokens([sellerKey]);
+
+            if (sellerTokens.length > 0) {
+                const productCount = products.length;
+                const title = "مبيعات جديدة!";
+                const body = `لقد باع ${productCount} من منتجاتك (${products[0]}${productCount > 1 ? ' وآخرين' : ''}). تفقد الطلبات الآن.`;
+
+                await sendNotificationsToTokens(sellerTokens, title, body);
+                console.log(`[Notifications] تم إرسال إشعار للبائع ${sellerKey}.`);
+            }
+        } catch (error) {
+            console.error(`[Notifications] فشل إرسال إشعار للبائع ${sellerKey}:`, error);
+        }
+    }
+}
