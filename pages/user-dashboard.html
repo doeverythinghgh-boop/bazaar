@@ -6,15 +6,7 @@
   * ========================================
   */
 
-    /* --- Page Body and Welcome Message --- */
-    body {
-        /* خلفية متدرجة ناعمة */
-        background: linear-gradient(180deg,
-                var(--bg-color-light, #f8f9fa) 0%,
-                var(--border-color-soft, #eef2f7) 100%);
-        padding: 20px;
-        font-family: "Tajawal", sans-serif;
-    }
+
 
     #dash-welcome-message {
         text-align: center;
@@ -27,19 +19,7 @@
     }
 
     /* --- Action Buttons Grid --- */
-    .dash-action-buttons {
-        display: grid;
-        /* إنشاء عمودين متساويين، مع عرض أدنى 150 بكسل لكل زر */
-        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-        gap: 20px;
-        /* مسافة بين الأزرار */
-        max-width: 800px;
-        margin: 0 auto;
-        /* توسيط الحاوية */
-        animation: fadeInUp 0.6s ease-out 0.2s;
-        animation-fill-mode: both;
-        /* لضمان بقاء الحالة النهائية للحركة */
-    }
+    
 
     /* --- Button Styling --- */
     .dash-button {
@@ -49,19 +29,17 @@
         justify-content: center;
         gap: 12px;
         /* مسافة بين الأيقونة والنص */
-        padding: 25px 15px;
-        font-size: 1rem;
+        padding: 0px;
+        font-size: 0.8rem;
+        max-width: fit-content;
         font-weight: 600;
         color: var(--dark-blue, #03478f);
-        background-color: var(--bg-color-white, #fff);
-        border: 1px solid var(--border-color-soft, #eef2f7);
-        border-radius: 15px;
+        background-color: transparent;
         /* حواف أكثر دائرية */
         cursor: pointer;
         text-align: center;
         transition: transform 0.2s ease, box-shadow 0.2s ease,
             border-color 0.2s ease;
-        box-shadow: var(--shadow-soft);
     }
 
     .dash-button i {
@@ -77,10 +55,6 @@
     }
 
     /* تمييز زر تسجيل الخروج */
-    #dash-logout-btn-alt {
-        background-color: var(--danger-color-light, #ffeeee);
-        border-color: var(--danger-color, #dc3545);
-    }
 
     #dash-logout-btn-alt i {
         color: var(--danger-color, #dc3545);

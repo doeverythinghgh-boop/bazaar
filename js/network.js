@@ -1,5 +1,5 @@
 /**
- * @file js/helpers/network.js
+ * @file js/network.js
  * @description يدير حالة الاتصال بالشبكة في التطبيق ويقدم دالة مركزية لإجراء طلبات API.
  *   يشمل آليات للتحقق الدوري من الاتصال، وعرض إشعارات عدم الاتصال، وتخزين حالة الاتصال مؤقتًا.
  */
@@ -96,22 +96,28 @@ async function performActualConnectionCheck() {
 
     // 🔹 إظهار Snackbar ثابت *مرة واحدة فقط*
     if (!offlineToast) {
-      offlineToast = Swal.fire({
-        toast: true,
-        position: 'bottom',
-        // ✅ تعديل: استخدام html لتنسيق الرسالة في سطر واحد
-        html: '<i class="fas fa-wifi-slash" style="color: #fff; margin-left: 8px;"></i> لا يوجد اتصال بالإنترنت',
-        showConfirmButton: false,
-        timer: undefined,          // ← بدون مؤقت
-        timerProgressBar: false,   // ← إخفاء عدّاد الوقت
-        background: '#d32f2f',
-        color: '#fff',
-        customClass: {
-          // ✅ تعديل: إزالة الحشو الزائد لجعل الرسالة أصغر
-          popup: 'animate__animated animate__slideInUp no-padding-toast',
-          popup: 'animate__animated animate__slideInUp'
-        }
-      });
+    offlineToast = Swal.fire({
+  toast: true,
+  position: 'bottom',
+  html: `
+    <div style="display: grid; align-items:center;justify-items: center;margin:0;padding:0;">
+      <i class="fas fa-wifi-slash" style=""></i>
+      <span style="font-size:14px;">الاتصال بالانترنت ضعيف او منقطع</span>
+    </div>
+  `,
+  showConfirmButton: false,
+  background: '#979797d9',
+  color: 'white',
+  padding:0,
+width: 300,
+  timer: undefined,
+  timerProgressBar: false,
+  customClass: {
+
+  }
+});
+
+
     }
 
     return false;

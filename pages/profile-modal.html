@@ -12,14 +12,13 @@
         background-color: rgba(255, 255, 255, 0.85);
         backdrop-filter: blur(10px);
         -webkit-backdrop-filter: blur(10px);
-        padding: 30px;
+        padding-right: 30px;
+        padding-left: 30px;
         border-radius: 20px;
-        box-shadow: var(--shadow-soft);
-        border: 1px solid var(--border-color-soft);
         animation: profileSlideIn 0.4s ease-out; /* تم تغيير اسم الانيميشن */
         overflow-x: hidden;
         max-width: 500px; /* تحديد عرض أقصى للحاوية */
-        margin: 20px auto; /* توسيط الحاوية */
+        margin: 0px; /* توسيط الحاوية */
     }
 
     .profile-content h3 {
@@ -107,7 +106,7 @@
     }
 
     .profile-modal-footer .profile-button {
-        width: 100%; /* ✅ تعديل: جعل الأزرار تملأ المساحة المتاحة */
+        width: fit-content; /* ✅ تعديل: جعل الأزرار تملأ المساحة المتاحة */
         border: none;
         border-radius: 10px;
         font-weight: 600;
@@ -123,8 +122,8 @@
 
     /* ✅ تحديث: تصميم زر الحفظ كزر أساسي */
     .profile-modal-footer .profile-save-btn {
-        background-color: var(--primary-color);
-        color: white;
+        background-color: transparent;
+        color: var(--primary-color);
         box-shadow: var(--shadow-interactive);
     }
 

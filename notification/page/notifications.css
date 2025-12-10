@@ -429,6 +429,7 @@ input:checked+.slider:before {
     text-align: center;
     padding: var(--spacing-xl);
     display: none;
+    margin-top: 20px;
 }
 
 .empty-state,
@@ -446,6 +447,10 @@ input:checked+.slider:before {
     font-size: 4rem;
     color: var(--primary-300);
     opacity: 0.5;
+}
+
+.empty-state p{
+    color: #1b46e5;
 }
 
 .error-state i {
