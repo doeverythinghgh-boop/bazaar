@@ -273,7 +273,14 @@ const NotificationPage = {
         // حدث إضافة إشعار جديد
         window.addEventListener('notificationLogAdded', async (event) => {
             console.log('[Notifications] حدث إشعار جديد:', event.detail);
-            await this.handleNewNotification(event.detail);
+            // إعادة تحميل البيانات من قاعدة البيانات بدلاً من الإضافة المباشرة
+            // لتجنب التكرار (لأن notification-global.js يستمع لنفس الحدث)
+            await this.refreshNotifications();
+
+            // إظهار toast فقط للإشعارات المستلمة (received) وليس المرسلة (sent)
+            if (!document.hidden && event.detail && event.detail.type === 'received') {
+                this.showToast('تم استقبال إشعار جديد', 'info');
+            }
         });
 
         // تحديث عند عودة الصفحة للتركيز
@@ -685,36 +692,6 @@ const NotificationPage = {
         } catch (error) {
             console.error('[Notifications] خطأ في تحديد الكل كمقروء:', error);
             if (!silent) this.showToast('حدث خطأ أثناء العملية', 'error');
-        }
-    },
-
-    /**
-     * @description معالجة إشعار جديد
-     * @param {object} notification
-     * @async
-     */
-    async handleNewNotification(notification) {
-        // تحديث الإشعارات إذا كانت الصفحة مفتوحة
-        if (!document.hidden) {
-            // إذا كانت الصفحة مفتوحة، نحدد الإشعار كمقروء فوراً
-            if (notification.status === 'unread') {
-                notification.status = 'read';
-                if (typeof updateNotificationStatusInDB === 'function') {
-                    updateNotificationStatusInDB(notification.id, 'read').catch(e => console.error('[Notifications] Auto-read error:', e));
-                }
-            }
-
-            // إضافة الإشعار الجديد للقائمة
-            this.state.notifications.unshift(notification);
-
-            // تحديث الإحصائيات
-            this.updateStats(this.state.notifications);
-
-            // تطبيق الفلاتر
-            this.applyFilters();
-
-            // إظهار toast
-            this.showToast('تم استقبال إشعار جديد', 'info');
         }
     },
 
