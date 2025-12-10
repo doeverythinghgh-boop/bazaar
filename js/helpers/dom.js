@@ -99,31 +99,6 @@ async function loadAndShowModal(modalId, templatePath, initCallback, onCloseCall
 }
 
 /**
- * @description تفتح نافذة سجل الإشعارات مباشرة في الصفحة الحالية بعد التحقق من تسجيل دخول المستخدم وأهليته لاستقبال الإشعارات.
- * @function showNotificationsModal
- * @returns {Promise<void>} - وعد (Promise) لا يُرجع قيمة عند الاكتمال.
- * @see isUserEligibleForNotifications
- * @see showNotificationsLogModal
- */
-async function showNotificationsModal() {
-  const loggedInUserJSON = localStorage.getItem("loggedInUser");
-
-  if (loggedInUserJSON) {
-    const user = JSON.parse(loggedInUserJSON);
-
-    // التأكد من أن المستخدم مسجل دخوله ومؤهل لرؤية الإشعارات
-    if (typeof isUserEligibleForNotifications === 'function' && isUserEligibleForNotifications(user)) {
-      // التأكد من وجود دالة عرض النافذة قبل استدعائها
-      if (typeof showNotificationsLogModal === 'function') {
-        await showNotificationsLogModal();
-      } else {
-        console.error('[Utils] الدالة showNotificationsLogModal() غير موجودة. تأكد من تحميل السكريبت الخاص بها.');
-      }
-    }
-  }
-}
-
-/**
  * @description دالة مركزية لتوليد HTML لبطاقة المنتج.
  *   تقلل من تكرار الكود وتضمن التناسق في عرض المنتجات عبر التطبيق.
  * @function generateProductCardHTML
