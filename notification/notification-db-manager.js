@@ -51,7 +51,7 @@ async function initDB() {
     if (db) {
       return resolve(db);
     }
-    
+
     const request = indexedDB.open(DB_NAME, DB_VERSION);
 
     request.onerror = (event) => {
@@ -148,24 +148,31 @@ async function addNotificationLog(notificationData) {
  * @see addNotificationLog
  */
 function addRecord(store, notificationData, resolve, reject) {
-    const request = store.add(notificationData);
+  const request = store.add(notificationData);
 
-    request.onsuccess = () => {
-      console.log('[DB] تم إضافة سجل إشعار بنجاح:', notificationData.type);
-      // ✅ جديد: إرسال حدث مخصص لإعلام التطبيق بوجود سجل جديد.
-      // هذا يسمح بتحديث الواجهات المفتوحة (مثل نافذة سجل الإشعارات) بشكل فوري.
+  request.onsuccess = () => {
+    console.log('[DB] تم إضافة سجل إشعار بنجاح:', notificationData.type);
+    // ✅ جديد: إرسال حدث مخصص لإعلام التطبيق بوجود سجل جديد.
+    // هذا يسمح بتحديث الواجهات المفتوحة (مثل نافذة سجل الإشعارات) بشكل فوري.
+    // التحقق من وجود window قبل إرسال الحدث (للتوافق مع Service Worker)
+    if (typeof window !== 'undefined') {
       const newLogEvent = new CustomEvent('notificationLogAdded', {
         // نمرر بيانات الإشعار مع المعرف الجديد الذي تم إنشاؤه بواسطة IndexedDB.
         detail: { ...notificationData, id: request.result }
       });
       window.dispatchEvent(newLogEvent);
-      resolve(request.result); // إرجاع المفتاح الجديد كما كان
-    };
+    } else {
+      // يمكن هنا إضافة منطق للمراسلة مع Client في Service Worker إذا لزم الأمر
+      // ولكن الحفظ في DB كافٍ حالياً لأن الصفحة ستقرأ منه عند التحديث
+      console.log('[DB] بيئة Service Worker: تم الحفظ دون إرسال حدث نافذة.');
+    }
+    resolve(request.result); // إرجاع المفتاح الجديد كما كان
+  };
 
-    request.onerror = (event) => {
-      console.error('[DB] فشل إضافة سجل إشعار:', event.target.error);
-      reject('فشل إضافة السجل.');
-    };
+  request.onerror = (event) => {
+    console.error('[DB] فشل إضافة سجل إشعار:', event.target.error);
+    reject('فشل إضافة السجل.');
+  };
 }
 
 /**
@@ -240,3 +247,91 @@ async function clearNotificationLogs() {
 }
 // ✅ إصلاح: إزالة الاستدعاء الفوري من هنا.
 // سيتم استدعاء initDB عند الحاجة إليها فقط، والآلية الجديدة ستمنع التكرار.
+
+/**
+ * @description تحديث حالة الإشعار في قاعدة البيانات
+ * @function updateNotificationStatusInDB
+ * @param {number} id - معرف الإشعار
+ * @param {string} status - الحالة الجديدة ('read' | 'unread')
+ * @returns {Promise<void>}
+ */
+async function updateNotificationStatusInDB(id, status) {
+  const db = await initDB();
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction([NOTIFICATIONS_STORE], 'readwrite');
+    const store = transaction.objectStore(NOTIFICATIONS_STORE);
+    const request = store.get(id);
+
+    request.onsuccess = (event) => {
+      const data = event.target.result;
+      if (data) {
+        data.status = status;
+        const updateRequest = store.put(data);
+
+        updateRequest.onsuccess = () => {
+          console.log(`[DB] تم تحديث حالة الإشعار ${id} إلى ${status}`);
+          // إرسال حدث لتحديث العدادات في الوقت الفعلي
+          if (typeof window !== 'undefined') {
+            window.dispatchEvent(new CustomEvent('notificationStatusUpdated', {
+              detail: { id, status }
+            }));
+          }
+          resolve();
+        };
+
+        updateRequest.onerror = (e) => {
+          console.error('[DB] فشل تحديث حالة الإشعار:', e.target.error);
+          reject(e.target.error);
+        };
+      } else {
+        console.warn(`[DB] الإشعار ${id} غير موجود`);
+        resolve();
+      }
+    };
+
+    request.onerror = (event) => {
+      console.error('[DB] فشل جلب الإشعار للتحديث:', event.target.error);
+      reject(event.target.error);
+    };
+  });
+}
+
+/**
+ * @description تحديد جميع الإشعارات كمقروءة في قاعدة البيانات
+ * @function markAllNotificationsAsReadInDB
+ * @returns {Promise<void>}
+ */
+async function markAllNotificationsAsReadInDB() {
+  const db = await initDB();
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction([NOTIFICATIONS_STORE], 'readwrite');
+    const store = transaction.objectStore(NOTIFICATIONS_STORE);
+    // نستخدم الفهرس للبحث عن الرسائل غير المقروءة فقط لتسريع العملية
+    const index = store.index('status');
+    const request = index.openCursor(IDBKeyRange.only('unread'));
+
+    request.onsuccess = (event) => {
+      const cursor = event.target.result;
+      if (cursor) {
+        const updateData = cursor.value;
+        updateData.status = 'read';
+        cursor.update(updateData);
+        cursor.continue();
+      } else {
+        // انتهت العملية - إطلاق حدث واحد لتحديث الواجهة
+        console.log('[DB] تم تحديد جميع الإشعارات كمقروءة');
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('notificationStatusUpdated', {
+            detail: { id: 'all', status: 'read' }
+          }));
+        }
+        resolve();
+      }
+    };
+
+    request.onerror = (e) => {
+      console.error('[DB] فشل تحديث الكل:', e.target.error);
+      reject(e.target.error);
+    };
+  });
+}

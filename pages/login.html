@@ -301,7 +301,7 @@
   }
 </style>
 
-<div id="header-container1" style="height: 70px"></div>
+<div id="header-container1X" style="height: 70px"></div>
 
 <div id="login_form-wrapper" class="login_page-wrapper" style="display: none">
   <div id="login_form-container" class="login_container">
@@ -644,7 +644,7 @@
           "index-home-container",
           0,
           undefined,
-          "hiddenHomeIcon"
+          "hiddenHomeIcon",true
         );
       }
     } catch (error) {
@@ -652,8 +652,10 @@
     }
   }
 
+
+
   loadPage();
 
   // يتم إدراج هذا العنصر بالطريقة المتبعة في المشروع (hgh_sec)
-  insertUniqueSnapshot("../pages/header.html", "header-container1", 300);
+  insertUniqueSnapshot("/pages/header.html", "header-container1X", 300);
 </script>

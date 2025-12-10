@@ -3,69 +3,6 @@
  * @description أنماط صفحة الإشعارات
  */
 
-:root {
-    /* ألوان أساسية - درجات الأزرق */
-    --primary-50: #eff6ff;
-    --primary-100: #dbeafe;
-    --primary-200: #bfdbfe;
-    --primary-300: #93c5fd;
-    --primary-400: #60a5fa;
-    --primary-500: #3b82f6;
-    --primary-600: #2563eb;
-    --primary-700: #1d4ed8;
-    --primary-800: #1e40af;
-    --primary-900: #1e3a8a;
-    
-    /* ألوان الحالة */
-    --success-color: #10b981;
-    --warning-color: #f59e0b;
-    --danger-color: #ef4444;
-    --info-color: #3b82f6;
-    
-    /* ألوان النص */
-    --text-primary: #1f2937;
-    --text-secondary: #6b7280;
-    --text-muted: #9ca3af;
-    
-    /* خلفيات */
-    --bg-primary: #ffffff;
-    --bg-secondary: #f9fafb;
-    --bg-tertiary: #f3f4f6;
-    --bg-card: #ffffff;
-    
-    /* حدود */
-    --border-color: #e5e7eb;
-    --border-radius: 12px;
-    --border-radius-sm: 8px;
-    
-    /* ظلال */
-    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-    
-    /* مسافات */
-    --spacing-xs: 0.5rem;
-    --spacing-sm: 1rem;
-    --spacing-md: 1.5rem;
-    --spacing-lg: 2rem;
-    --spacing-xl: 3rem;
-}
-
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
-    color: var(--text-primary);
-    min-height: 100vh;
-    padding: var(--spacing-md);
-    direction: rtl;
-}
-
 /* الحاوية الرئيسية */
 .notifications-container {
     max-width: 1200px;
@@ -93,7 +30,7 @@ body {
     right: -50%;
     width: 200%;
     height: 200%;
-    background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
     background-size: 50px 50px;
     opacity: 0.1;
 }
@@ -260,8 +197,13 @@ body {
 }
 
 @keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 /* تبديل التحديث التلقائي */
@@ -308,11 +250,11 @@ body {
     border-radius: 50%;
 }
 
-input:checked + .slider {
+input:checked+.slider {
     background-color: var(--success-color);
 }
 
-input:checked + .slider:before {
+input:checked+.slider:before {
     transform: translateX(-26px);
 }
 
@@ -631,6 +573,7 @@ input:checked + .slider:before {
         transform: translateX(-100%);
         opacity: 0;
     }
+
     to {
         transform: translateX(0);
         opacity: 1;
@@ -661,44 +604,44 @@ input:checked + .slider:before {
     body {
         padding: var(--spacing-xs);
     }
-    
+
     .notifications-container {
         border-radius: var(--border-radius-sm);
     }
-    
+
     .header-stats {
         grid-template-columns: repeat(2, 1fr);
     }
-    
+
     .controls-bar {
         flex-direction: column;
         align-items: stretch;
         gap: var(--spacing-sm);
     }
-    
+
     .control-buttons {
         margin-right: 0;
         justify-content: center;
         flex-wrap: wrap;
     }
-    
+
     .controls-group {
         justify-content: space-between;
     }
-    
+
     .controls-group input {
         width: 100%;
     }
-    
+
     .details-grid {
         grid-template-columns: 1fr;
     }
-    
+
     .notification-meta {
         flex-direction: column;
         gap: 0.5rem;
     }
-    
+
     .toast {
         left: var(--spacing-xs);
         right: var(--spacing-xs);
@@ -710,17 +653,17 @@ input:checked + .slider:before {
     .header-stats {
         grid-template-columns: 1fr;
     }
-    
+
     .stat-card {
         text-align: center;
     }
-    
+
     .notification-header {
         flex-direction: column;
         align-items: flex-start;
         gap: var(--spacing-xs);
     }
-    
+
     .notification-actions {
         align-self: flex-end;
     }

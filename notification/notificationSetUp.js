@@ -4,10 +4,11 @@
 //   FCM - Main Entry Point
 // ===============================
 async function setupFCM() {
-    if (sessionStorage.getItem("fcmInitialized")) {
-        console.log("[FCM] تم التهيئة مسبقًا – سيتم التخطي.");
-        return;
-    }
+    // [تحديث] إزالة التحقق من fcmInitialized للسماح بإعادة التهيئة عند تحديث الصفحة
+    // if (sessionStorage.getItem("fcmInitialized")) {
+    //     console.log("[FCM] تم التهيئة مسبقًا – سيتم التخطي.");
+    //     return;
+    // }
 
     // التأكد من المستخدم
     if (!userSession || !userSession.user_key) {
@@ -97,9 +98,18 @@ async function setupFirebaseWeb() {
     const swReg = await registerServiceWorker();
     if (!swReg) return;
 
-    // استيراد Firebase ديناميكيًا
-    const { initializeApp } = await import("https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js");
-    const { getMessaging, getToken, onMessage } = await import("https://www.gstatic.com/firebasejs/12.5.0/firebase-messaging.js");
+    // استيراد Firebase ديناميكيًا (تحميل السكربتات العالمية)
+    // ملاحظة: إصدارات v8 UMD تقوم بتعيين المتغير العام 'firebase' عند تحميلها ولا تدعم التصدير عبر ES Modules بشكل قياسي.
+    if (!window.firebase) {
+        await import("https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js");
+        await import("https://www.gstatic.com/firebasejs/8.10.1/firebase-messaging.js");
+    }
+
+    const firebase = window.firebase;
+    if (!firebase) {
+        console.error("[FCM] فشل تحميل مكتبة Firebase.");
+        return;
+    }
 
     // تكوين Firebase
     const firebaseConfig = {
@@ -112,30 +122,36 @@ async function setupFirebaseWeb() {
         measurementId: "G-P8FMC3KR7M",
     };
 
-    const app = initializeApp(firebaseConfig);
-    const messaging = getMessaging(app);
+    if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+    }
+    const messaging = firebase.messaging();
 
     // استقبال إشعار foreground
-    onMessage(messaging, (payload) => {
-        console.log("[FCM Web] إشعار أثناء فتح الصفحة:", payload);
+    messaging.onMessage((payload) => {
+        console.log('%c[FCM Web] 🔔 تم استقبال رسالة أثناء التصفح (Foreground):', 'color: #00e676; font-weight: bold; font-size: 14px;', payload);
+        console.log('[FCM Web] تفاصيل الرسالة:', JSON.stringify(payload, null, 2));
+
+        // البيانات قد تكون في notification أو data حسب نوع الرسالة
+        const data = payload.notification || payload.data || {};
 
         Swal.fire({
             icon: "info",
-            title: payload.data.title,
-            text: payload.data.body,
+            title: data.title,
+            text: data.body,
             confirmButtonText: "موافق",
         });
 
         if (typeof addNotificationLog === "function") {
             addNotificationLog({
-                messageId: payload.messageId,
+                messageId: payload.messageId || `web_${Date.now()}`,
                 type: "received",
-                title: payload.data.title,
-                body: payload.data.body,
+                title: data.title,
+                body: data.body,
                 timestamp: new Date(),
                 status: "unread",
                 relatedUser: { key: "admin", name: "الإدارة" },
-                payload: payload.data,
+                payload: payload.data, // الاحتفاظ بالبيانات الخام
             });
         }
     });
@@ -153,9 +169,8 @@ async function setupFirebaseWeb() {
         console.log("[FCM Web] لا يوجد توكن — طلب توكن جديد...");
 
         try {
-            const newToken = await getToken(messaging, {
-                vapidKey:
-                    "BK1_lxS32198GdKm0Gf89yk1eEGcKvKLu9bn1sg9DhO8_eUUhRCAW5tjynKGRq4igNhvdSaR0-eL74V3ACl3AIY",
+            const newToken = await messaging.getToken({
+                vapidKey: "BK1_lxS32198GdKm0Gf89yk1eEGcKvKLu9bn1sg9DhO8_eUUhRCAW5tjynKGRq4igNhvdSaR0-eL74V3ACl3AIY"
             });
 
             if (newToken) {

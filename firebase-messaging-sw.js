@@ -42,6 +42,9 @@ firebase.initializeApp({
  */
 const messaging = firebase.messaging();
 
+// استيراد مدير قاعدة البيانات لحفظ الإشعارات
+importScripts("/notification/notification-db-manager.js");
+
 /**
  * @description يتعامل مع رسائل FCM (Firebase Cloud Messaging) عندما يكون التطبيق في الخلفية أو مغلقًا.
  * هذه الوظيفة تستمع لرسائل الدفع وتقوم بعرض إشعار للمستخدم.
@@ -54,18 +57,37 @@ const messaging = firebase.messaging();
  * @returns {Promise<void>} - وعد (Promise) يتم حله بعد عرض الإشعار بنجاح.
  */
 messaging.onBackgroundMessage((payload) => {
-  console.log('[firebase-messaging-sw.js] تم استقبال رسالة في الخلفية: ', payload);
-  
+  console.log('%c[FCM SW] 📩 تم استقبال رسالة في الخلفية (Background):', 'color: #ff00ff; font-weight: bold; font-size: 14px;', payload);
+  console.log('[FCM SW] تفاصيل الرسالة:', JSON.stringify(payload, null, 2));
+
   // ✅ تحديث: استخدام منطق موحد لجلب البيانات من `notification` أو `data`.
   const notificationData = payload.notification || payload.data || {};
   const { title, body } = notificationData;
-  
+
   // تأكد أن هناك عنوانًا أو نصًا للإشعار
   if (!title && !body) {
     console.warn('[firebase-messaging-sw.js] لا يوجد عنوان أو محتوى للإشعار في الرسالة:', payload);
     return;
   }
-  
+
+  // حفظ الإشعار في IndexedDB
+  if (typeof addNotificationLog === 'function') {
+    addNotificationLog({
+      messageId: payload.messageId || `bg_${Date.now()}`,
+      type: 'received',
+      title: title,
+      body: body,
+      timestamp: new Date(),
+      status: 'unread',
+      relatedUser: { key: 'system', name: 'النظام' }, // أو يمكن استخلاص معلومات المستخدم من data إذا وجدت
+      payload: payload.data
+    }).then(() => {
+      console.log('[SW] تم حفظ إشعار الخلفية في قاعدة البيانات.');
+    }).catch(err => {
+      console.error('[SW] فشل حفظ إشعار الخلفية:', err);
+    });
+  }
+
   // عرض الإشعار
   // ملاحظة: تم تعديل مسار الأيقونة ليتوافق مع مسار المشروع الحالي.
   return self.registration.showNotification(title, {

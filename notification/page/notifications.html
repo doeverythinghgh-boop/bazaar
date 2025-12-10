@@ -1,103 +1,129 @@
-
 <body>
-        <!-- ملفات JavaScript -->
+    <!-- ملفات JavaScript -->
 
     <!-- الحاوية الرئيسية -->
     <div class="notifications-container" id="notifications-container">
-        
+
         <!-- الهيدر -->
-        <header class="notifications-header">
-            <div class="header-content">
-                <div class="header-title">
-                    <i class="fas fa-bell"></i>
-                    <h1>الإشعارات</h1>
-                </div>
-                
-                <!-- الإحصائيات -->
-                <div class="header-stats" id="notifications-stats">
-                    <div class="stat-card">
-                        <div class="stat-value" id="total-count">0</div>
-                        <div class="stat-label">إجمالي الإشعارات</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value" id="unread-count">0</div>
-                        <div class="stat-label">غير مقروء</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value" id="sent-count">0</div>
-                        <div class="stat-label">مرسلة</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value" id="received-count">0</div>
-                        <div class="stat-label">مستلمة</div>
-                    </div>
-                </div>
-                
-                <!-- أدوات التحكم -->
-                <div class="controls-bar">
-                    <!-- مجموعة الفلاتر -->
-                    <div class="controls-group">
-                        <label for="filter-type"><i class="fas fa-filter"></i> النوع:</label>
-                        <select id="filter-type">
-                            <option value="all">الكل</option>
-                            <option value="sent">مرسلة</option>
-                            <option value="received">مستلمة</option>
-                        </select>
-                    </div>
-                    
-                    <div class="controls-group">
-                        <label for="filter-status"><i class="fas fa-circle"></i> الحالة:</label>
-                        <select id="filter-status">
-                            <option value="all">الكل</option>
-                            <option value="read">مقروء</option>
-                            <option value="unread">غير مقروء</option>
-                        </select>
-                    </div>
-                    
-                    <div class="controls-group">
-                        <label for="search-input"><i class="fas fa-search"></i> بحث:</label>
-                        <input type="text" id="search-input" placeholder="ابحث في الإشعارات...">
-                    </div>
-                    
-                    <div class="controls-group">
-                        <label for="sort-select"><i class="fas fa-sort"></i> الترتيب:</label>
-                        <select id="sort-select">
-                            <option value="newest">الأحدث أولاً</option>
-                            <option value="oldest">الأقدم أولاً</option>
-                        </select>
-                    </div>
-                    
-                    <!-- أزرار التحكم -->
-                    <div class="control-buttons">
-                        <button class="btn btn-primary" id="refresh-btn">
-                            <i class="fas fa-sync-alt"></i> تحديث
-                        </button>
-                        
-                        <div class="toggle-switch">
-                            <label class="switch">
-                                <input type="checkbox" id="auto-refresh-toggle" checked>
-                                <span class="slider"></span>
-                            </label>
-                            <span>تحديث تلقائي</span>
-                        </div>
-                        
-                        <button class="btn btn-secondary" id="mark-all-read-btn">
-                            <i class="fas fa-check-double"></i> تحديد الكل كمقروء
-                        </button>
-                        
-                        <button class="btn btn-secondary" id="clear-filters-btn">
-                            <i class="fas fa-times"></i> مسح الفلاتر
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </header>
-        
+        <style>
+            /* WhatsApp Style Notifications */
+            .notifications-list {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+                padding: 10px;
+                background-color: #e5ddd5;
+                /* WhatsApp default bg color */
+                min-height: 100vh;
+            }
+
+            .date-divider {
+                text-align: center;
+                margin: 10px 0;
+                position: relative;
+            }
+
+            .date-divider span {
+                background-color: #e1f3fb;
+                color: #1f2c33;
+                padding: 5px 12px;
+                border-radius: 8px;
+                font-size: 0.85rem;
+                box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+            }
+
+            .notification-item {
+                max-width: 80%;
+                padding: 6px 7px 8px 9px;
+                border-radius: 8px;
+                box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+                position: relative;
+                font-size: 14.2px;
+                line-height: 19px;
+                color: #111b21;
+                margin-bottom: 2px;
+                display: flex;
+                flex-direction: column;
+            }
+
+            /* Received messages (Left, White) */
+            .notification-item.received {
+                align-self: flex-start;
+                background-color: #ffffff;
+                border-top-left-radius: 0;
+            }
+
+            /* Sent messages (Right, Light Green) */
+            .notification-item.sent {
+                align-self: flex-end;
+                background-color: #d9fdd3;
+                border-top-right-radius: 0;
+            }
+
+            .notification-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 4px;
+                font-weight: bold;
+                font-size: 13px;
+                color: #e542a3;
+                /* Sender name color */
+            }
+
+            .notification-body p {
+                margin: 0;
+                white-space: pre-wrap;
+            }
+
+            .notification-meta {
+                display: flex;
+                justify-content: flex-end;
+                align-items: center;
+                margin-top: 2px;
+                gap: 4px;
+            }
+
+            .notification-time {
+                font-size: 11px;
+                color: #667781;
+            }
+
+            .read-status {
+                font-size: 16px;
+            }
+
+            .read-status.read {
+                color: #53bdeb;
+                /* Blue ticks */
+            }
+
+            .read-status.unread {
+                color: #8696a0;
+                /* Gray ticks */
+            }
+
+            /* Hide complex controls */
+            .controls-bar,
+            .header-stats {
+                display: none !important;
+            }
+
+            .notification-details {
+                border-top: 1px solid rgba(0, 0, 0, 0.05);
+                margin-top: 5px;
+                padding-top: 5px;
+                font-size: 12px;
+                color: #555;
+            }
+        </style>
+        <!-- Header Removed as requested -->
+
         <!-- قائمة الإشعارات -->
         <main class="notifications-list" id="notifications-list">
             <!-- سيتم ملء الإشعارات هنا بواسطة JavaScript -->
         </main>
-        
+
         <!-- حالات الصفحة -->
         <div class="state-container" id="loading-state">
             <div class="loading-state">
@@ -105,7 +131,7 @@
                 <h3>جاري تحميل الإشعارات...</h3>
             </div>
         </div>
-        
+
         <div class="state-container" id="empty-state">
             <div class="empty-state">
                 <i class="far fa-bell-slash"></i>
@@ -113,7 +139,7 @@
                 <p>سيظهر هنا أي إشعارات تصل إليك</p>
             </div>
         </div>
-        
+
         <div class="state-container" id="error-state">
             <div class="error-state">
                 <i class="fas fa-exclamation-triangle"></i>
@@ -125,66 +151,22 @@
             </div>
         </div>
     </div>
-    
+
     <!-- الإعلان عن دوال IndexedDB (لأغراض التطوير) -->
     <script>
-        // إذا لم تكن دوال IndexedDB موجودة، نعرف دوال وهمية للتجربة
-        if (typeof initDB === 'undefined') {
-            console.warn('دوال IndexedDB غير موجودة - استخدام بيانات تجريبية');
-            
-            // دوال وهمية لأغراض التطوير
-            window.initDB = async function() {
-                console.log('[Dev] تهيئة قاعدة البيانات الوهمية');
-                return Promise.resolve();
-            };
-            
-            window.getNotificationLogs = async function(type = 'all', limit = 50) {
-                console.log(`[Dev] جلب ${limit} إشعار من النوع ${type}`);
-                
-                // بيانات تجريبية
-                return Array.from({length: 10}, (_, i) => ({
-                    id: i + 1,
-                    messageId: `msg_${Date.now()}_${i}`,
-                    type: i % 2 === 0 ? 'sent' : 'received',
-                    title: i % 2 === 0 ? 'تم إرسال إشعار' : 'إشعار جديد',
-                    body: 'هذا محتوى تجريبي للإشعار رقم ' + (i + 1),
-                    timestamp: new Date(Date.now() - i * 3600000).toISOString(),
-                    status: i < 5 ? 'unread' : 'read',
-                    relatedUser: {
-                        key: 'user_' + i,
-                        name: i % 2 === 0 ? 'المستخدم' : 'الإدارة'
-                    },
-                    payload: { example: 'data' }
-                }));
-            };
-            
-            window.addNotificationLog = async function(data) {
-                console.log('[Dev] إضافة إشعار جديد:', data);
-                
-                // إرسال حدث إضافة إشعار جديد
-                const event = new CustomEvent('notificationLogAdded', {
-                    detail: { ...data, id: Date.now() }
-                });
-                setTimeout(() => window.dispatchEvent(event), 1000);
-                
-                return Promise.resolve(Date.now());
-            };
+        // تهيئة صفحة الإشعارات
+        if (typeof NotificationPage !== 'undefined') {
+            NotificationPage.init();
         }
-    </script>
-    
 
-    
-    <script>
         // تهيئة العداد العالمي إذا لم يتم تحميله تلقائياً
         if (window.GLOBAL_NOTIFICATIONS && typeof window.GLOBAL_NOTIFICATIONS.init === 'function') {
             window.GLOBAL_NOTIFICATIONS.init();
         }
-        
+
         // طلب إذن الإشعارات من المتصفح
-        document.addEventListener('DOMContentLoaded', function() {
-            if ('Notification' in window && Notification.permission === 'default') {
-                Notification.requestPermission();
-            }
-        });
+        if ('Notification' in window && Notification.permission === 'default') {
+            Notification.requestPermission();
+        }
     </script>
 </body>

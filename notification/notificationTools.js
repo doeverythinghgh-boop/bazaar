@@ -8,7 +8,7 @@
  */
 function saveNotificationFromAndroid(notificationJson) {
     // [خطوة 1] تسجيل البيانات القادمة من الأندرويد لأغراض التصحيح.
-    console.log("[Auth] تم استدعاء saveNotificationFromAndroid من الأندرويد:", notificationJson);
+    console.log('%c[FCM Android] 📱 تم استقبال رسالة من تطبيق الأندرويد:', 'color: #ff9100; font-weight: bold; font-size: 14px;', notificationJson);
     try {
         // [خطوة 2] محاولة تحليل سلسلة JSON إلى كائن JavaScript.
         const notificationData = JSON.parse(notificationJson);
@@ -70,6 +70,18 @@ async function sendNotificationsToTokens(allTokens, title, body) {
     if (!Array.isArray(allTokens) || allTokens.length === 0) {
         console.warn("[Notifications] لا توجد توكنات صالحة في المصفوفة. سيتم إنهاء العملية.");
         return;
+    }
+
+    // تسجيل الإشعار المرسل في السجل المحلي
+    if (typeof addNotificationLog === 'function') {
+        addNotificationLog({
+            type: 'sent',
+            title: title,
+            body: body,
+            timestamp: new Date(),
+            status: 'read',
+            relatedUser: { name: 'المستخدم' } // يمكن تخصيص هذا لاحقاً
+        }).catch(e => console.error('[Notifications] فشل حفظ الإشعار المرسل:', e));
     }
 
     // 2. تهيئة مصفوفة لتخزين وعود الإرسال

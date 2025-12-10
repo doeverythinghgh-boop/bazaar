@@ -293,8 +293,8 @@
   <script src="notification/notification-db-manager.js"></script>
   <script src="js/tools.js" id="index-script-tools-js"></script>
   <script src="js/globalVariable.js"></script>
-    <script src="notification/page/notification-global.js"></script>
-    <script src="notification/page/notifications.js"></script>
+  <script src="notification/page/notification-global.js"></script>
+  <script src="notification/page/notifications.js"></script>
   <!---end region main javaScript files---->
   <script>
 
@@ -405,7 +405,7 @@
       document
         .getElementById("index-notifications-btn")
         .addEventListener("click", () => {
-          mainLoader("./notification/page/notifications.html","index-notifications-container",0,undefined,"hiddenHomeIcon",true);
+          mainLoader("./notification/page/notifications.html", "index-notifications-container", 0, undefined, "showHomeIcon", true);
         });
 
       document
@@ -593,6 +593,11 @@
 
       // [خطوة 8] التحقق من وضع انتحال الشخصية (عندما يتصفح مسؤول كأنه مستخدم عادي) وإظهار علامة مائية إذا كان نشطًا.
       checkImpersonationMode();
+
+      // [خطوة 9] تهيئة FCM تلقائياً إذا كان المستخدم مسجلاً الدخول مسبقاً
+      if (userSession && userSession.user_key) {
+        setupFCM();
+      }
     });
 
 

@@ -128,6 +128,16 @@ function populateUsersTable(users) {
 
         const loginAction = `<button class="btn-delivery-status" style="background-color: #17a2b8;" onclick="loginAsUser('${user.user_key}')">دخول</button>`;
 
+        // Input and Button for Notification
+        const notifyAction = `
+            <div style="display: flex; gap: 5px; justify-content: center; align-items: center;">
+                <input type="text" id="notify-input-${user.user_key}" placeholder="رسالة" style="padding: 5px; width: 100px; border: 1px solid #ccc; border-radius: 4px;">
+                <button class="btn-delivery-status" style="background-color: #ffc107; color: #000; padding: 5px 10px;" onclick="sendAdminNotification('${user.user_key}')">
+                   <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        `;
+
         row.innerHTML = `
             <td>${user.user_key || 'غير متوفر'}</td>
             <td>${user.username || 'غير متوفر'}</td>
@@ -137,6 +147,7 @@ function populateUsersTable(users) {
             <td class="${tokenClass}">${tokenText}</td>
             <td>${user.tokenPlatform || 'N/A'}</td>
             <td style="text-align: center;">${deliveryAction}</td>
+            <td style="text-align: center;">${notifyAction}</td>
             <td style="text-align: center;">${loginAction}</td>
         `;
         tbody.appendChild(row);
@@ -172,6 +183,26 @@ async function initializeAdminPanel() {
 
                 const cell = target.closest('td');
                 if (!cell || cell.colSpan > 1) return;
+
+                // [Highlight Logic]
+                // 1. Remove 'selected-row' from all other rows
+                const allRows = tbody.querySelectorAll('tr');
+                allRows.forEach(row => row.classList.remove('selected-row'));
+
+                // 2. Add 'selected-row' to the clicked row
+                const clickedRow = target.closest('tr');
+                if (clickedRow) {
+                    clickedRow.classList.add('selected-row');
+
+                    // [Display Username in Title]
+                    const usernameCell = clickedRow.cells[1];
+                    const selectedUserDisplay = document.getElementById('selected-user-display');
+                    if (usernameCell && selectedUserDisplay) {
+                        selectedUserDisplay.innerText = `(${usernameCell.innerText})`;
+                    }
+                }
+
+                // [Copy Logic]
 
                 const textToCopy = cell.innerText.trim();
                 if (textToCopy && !['غير متوفر', 'لا يوجد', '-', 'N/A'].includes(textToCopy)) {
@@ -421,6 +452,58 @@ window.loginAsUser = async (targetUserKey) => {
             title: 'خطأ',
             text: 'فشل تبديل المستخدم: ' + error.message
         });
+    }
+};
+
+
+/**
+ * @description إرسال إشعار فوري للمستخدم من لوحة التحكم
+ */
+window.sendAdminNotification = async (userKey) => {
+    const inputElement = document.getElementById(`notify-input-${userKey}`);
+    const messageBody = inputElement ? inputElement.value.trim() : '';
+
+    if (!messageBody) {
+        Swal.fire({
+            toast: true,
+            icon: 'warning',
+            title: 'الرجاء كتابة نص الرسالة',
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 2000
+        });
+        return;
+    }
+
+    try {
+        Swal.showLoading();
+
+        // 1. Get User Tokens
+        const tokens = await getUsersTokens([userKey]);
+
+        if (!tokens || tokens.length === 0) {
+            Swal.fire('خطأ', 'هذا المستخدم ليس لديه توكن إشعارات (FCM Token) مسجل.', 'error');
+            return;
+        }
+
+        // 2. Send Notification
+        await sendNotificationsToTokens(tokens, "إشعار من الإدارة", messageBody);
+
+        Swal.fire({
+            toast: true,
+            icon: 'success',
+            title: 'تم الإرسال بنجاح',
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 2000
+        });
+
+        // Clear input
+        if (inputElement) inputElement.value = '';
+
+    } catch (error) {
+        console.error(error);
+        Swal.fire('خطأ', 'فشل الإرسال: ' + error.message, 'error');
     }
 };
 

@@ -89,32 +89,45 @@
 }
 
 /* صفوف الجدول */
-.admin-panel-users-tbody tr:hover {
+#admin-panel-users-tbody tr:hover {
     background-color: #f1f3f5;
 }
 
-.admin-panel-users-tbody td {
+#admin-panel-users-tbody td {
     font-size: 14px;
     color: #495057;
 }
 
+/* تنسيق الصف المختار */
+#admin-panel-users-tbody tr.selected-row {
+    background-color: #ffe8cc !important;
+    /* لون برتقالي فاتح مميز */
+    border: 2px solid #fd7e14;
+    transition: background-color 0.2s;
+}
+
+#admin-panel-users-tbody tr.selected-row td {
+    font-weight: bold;
+    color: #000;
+}
+
 /* تنسيق خاص بعمود "لديه توكن" */
-.admin-panel-users-tbody .has-token-true {
+#admin-panel-users-tbody .has-token-true {
     color: var(--success-color);
     font-weight: bold;
 }
 
-.admin-panel-users-tbody .has-token-false {
+#admin-panel-users-tbody .has-token-false {
     color: var(--danger-color);
 }
 
 /* أيقونات لتوضيح حالة التوكن */
-.admin-panel-users-tbody .has-token-true::before {
+#admin-panel-users-tbody .has-token-true::before {
     content: '✓ ';
     /* علامة صح */
 }
 
-.admin-panel-users-tbody .has-token-false::before {
+#admin-panel-users-tbody .has-token-false::before {
     content: '✗ ';
     /* علامة خطأ */
 }
