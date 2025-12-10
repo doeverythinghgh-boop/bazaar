@@ -221,6 +221,47 @@ function showNotificationsModal() {
       mainLoader("./notification/page/notifications.html", "index-notifications-container", 500, undefined, "showHomeIcon", true);
 }
 
+
+// متغير عام لإعادة استخدام AudioContext
+let suzeAudioContext = null;
+
+/**
+ * @description تشغيل صوت تنبيه باستخدام Web Audio API
+ */
+function playNotificationSound() {
+    try {
+        // إنشاء AudioContext عند الحاجة فقط
+        if (!suzeAudioContext) {
+            suzeAudioContext = new (window.AudioContext || window.webkitAudioContext)();
+        }
+
+        // إصلاح حالة إذا كان المتصفح أوقف الـ AudioContext
+        if (suzeAudioContext.state === "suspended") {
+            suzeAudioContext.resume();
+        }
+
+        const oscillator = suzeAudioContext.createOscillator();
+        const gainNode = suzeAudioContext.createGain();
+
+        oscillator.connect(gainNode);
+        gainNode.connect(suzeAudioContext.destination);
+
+        oscillator.type = "sine";
+        oscillator.frequency.value = 600;
+
+        const now = suzeAudioContext.currentTime;
+        gainNode.gain.setValueAtTime(0.3, now);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+
+        oscillator.start(now);
+        oscillator.stop(now + 0.25);
+
+    } catch (error) {
+        console.warn("[Sound] فشل تشغيل صوت التنبيه:", error);
+    }
+}
+
+
 const pageSnapshots = {};
 
 async function insertUniqueSnapshot(pageUrl, containerId) {
