@@ -2,9 +2,10 @@
  * @description التحقق مما إذا كان يجب إرسال الإشعار بناءً على الإعدادات
  * @param {string} eventKey
  * @param {string} role ('buyer' | 'admin' | 'seller' | 'delivery')
- * @returns {boolean}
+ * @returns {Promise<boolean>}
  */
-function shouldNotify(eventKey, role) {
+let cachedDefaultConfig = null;
+async function shouldNotify(eventKey, role) {
     try {
         const stored = localStorage.getItem('notification_config');
         if (stored) {
@@ -17,19 +18,35 @@ function shouldNotify(eventKey, role) {
         console.warn('[Notifications] Error reading config, using defaults:', e);
     }
 
-    // Fallback Defaults (Based on User's Table)
-    const defaults = {
+    // Fallback Defaults (Fetched from JSON if possible)
+    if (!cachedDefaultConfig) {
+        try {
+            const response = await fetch('/notification_config.json');
+            if (response.ok) {
+                cachedDefaultConfig = await response.json();
+            } else {
+                console.warn('[Notifications] Failed to fetch defaults from JSON.');
+            }
+        } catch (e) {
+            console.warn('[Notifications] Error fetching JSON defaults:', e);
+        }
+    }
+
+    const defaults = cachedDefaultConfig || {
+        // Hardcoded specific fallback if JSON completely fails (safety net)
         'purchase': { buyer: false, admin: true, seller: true, delivery: false },
-        'step-review': { buyer: true, admin: true, seller: false, delivery: false },
-        'step-cancelled': { buyer: false, admin: true, seller: true, delivery: false },
-        'step-confirmed': { buyer: true, admin: true, seller: false, delivery: true },
-        'step-rejected': { buyer: true, admin: true, seller: false, delivery: false },
-        'step-shipped': { buyer: true, admin: true, seller: false, delivery: true },
-        'step-delivered': { buyer: true, admin: true, seller: false, delivery: true },
-        'step-returned': { buyer: false, admin: false, seller: false, delivery: false }
+        // ... other critical defaults could be here, but usually JSON should load or stored config exists.
     };
 
-    return defaults[eventKey] ? defaults[eventKey][role] : true;
+    // If we have defaults (from JSON)
+    if (defaults && defaults[eventKey]) {
+        return defaults[eventKey][role] !== false; // Default to true if not explicitly false, or match logic
+    }
+
+    // Safety fallback: only purchase notification to admin is critical true by default if EVERYTHING fails
+    if (eventKey === 'purchase' && role === 'admin') return true;
+
+    return true; // Default permissive or restrictive? Usually permissive if config missing is better to not lose notification
 }
 
 /**
@@ -370,14 +387,14 @@ async function handlePurchaseNotifications(order) {
 
     try {
         // 1. إشعار الإدارة
-        if (shouldNotify('purchase', 'admin')) {
+        if (await shouldNotify('purchase', 'admin')) {
             await notifyAdminOnPurchase(order);
         } else {
             console.log('[Notifications] تم تخطي إشعار الإدارة (شراء) بناءً على الإعدادات.');
         }
 
         // 2. إشعار البائعين
-        if (shouldNotify('purchase', 'seller')) {
+        if (await shouldNotify('purchase', 'seller')) {
             await notifySellersOnPurchase(order);
         } else {
             console.log('[Notifications] تم تخطي إشعار البائعين (شراء) بناءً على الإعدادات.');
@@ -612,14 +629,14 @@ async function notifyOnStepActivation({
         const notificationPromises = [];
 
         // 1. إشعار المشتري
-        if (buyerKey && shouldNotify(stepId, 'buyer')) {
+        if (buyerKey && await shouldNotify(stepId, 'buyer')) {
             notificationPromises.push(
                 notifyBuyerOnStepChange(buyerKey, stepId, stepName, orderId)
             );
         }
 
         // 2. إشعار الإدارة
-        if (shouldNotify(stepId, 'admin')) {
+        if (await shouldNotify(stepId, 'admin')) {
             notificationPromises.push(
                 notifyAdminOnStepChange(stepId, stepName, orderId, userName)
             );
@@ -627,7 +644,7 @@ async function notifyOnStepActivation({
 
         // 3. إشعار خدمات التوصيل
         if (['step-confirmed', 'step-shipped', 'step-delivered'].includes(stepId)) {
-            if (deliveryKeys && deliveryKeys.length > 0 && shouldNotify(stepId, 'delivery')) {
+            if (deliveryKeys && deliveryKeys.length > 0 && await shouldNotify(stepId, 'delivery')) {
                 notificationPromises.push(
                     notifyDeliveryOnStepChange(deliveryKeys, stepId, stepName, orderId)
                 );
@@ -721,12 +738,12 @@ async function notifyOnSubStepActivation({
         switch (stepId) {
             case 'step-cancelled':
                 // ملغي: إشعار البائعين + الإدارة
-                if (sellerKeys && sellerKeys.length > 0 && shouldNotify('step-cancelled', 'seller')) {
+                if (sellerKeys && sellerKeys.length > 0 && await shouldNotify('step-cancelled', 'seller')) {
                     notificationPromises.push(
                         notifySellerOnStepChange(sellerKeys, stepId, stepName, orderId)
                     );
                 }
-                if (shouldNotify('step-cancelled', 'admin')) {
+                if (await shouldNotify('step-cancelled', 'admin')) {
                     notificationPromises.push(
                         notifyAdminOnStepChange(stepId, stepName, orderId, userName)
                     );
@@ -735,7 +752,7 @@ async function notifyOnSubStepActivation({
 
             case 'step-rejected':
                 // مرفوض: إشعار المشتري + الإدارة
-                if (buyerKey && shouldNotify('step-rejected', 'buyer')) {
+                if (buyerKey && await shouldNotify('step-rejected', 'buyer')) {
                     // تحديث رسالة المشتري للمرحلة "مرفوض"
                     const title = "منتجات مرفوضة";
                     const body = `تم رفض بعض المنتجات من طلبك${orderId ? ` رقم #${orderId}` : ''} لعدم توفرها.`;
@@ -746,7 +763,7 @@ async function notifyOnSubStepActivation({
                         );
                     }
                 }
-                if (shouldNotify('step-rejected', 'admin')) {
+                if (await shouldNotify('step-rejected', 'admin')) {
                     notificationPromises.push(
                         notifyAdminOnStepChange(stepId, stepName, orderId, userName)
                     );
@@ -755,12 +772,12 @@ async function notifyOnSubStepActivation({
 
             case 'step-returned':
                 // مرتجع: إشعار البائعين + الإدارة
-                if (sellerKeys && sellerKeys.length > 0 && shouldNotify('step-returned', 'seller')) {
+                if (sellerKeys && sellerKeys.length > 0 && await shouldNotify('step-returned', 'seller')) {
                     notificationPromises.push(
                         notifySellerOnStepChange(sellerKeys, stepId, stepName, orderId)
                     );
                 }
-                if (shouldNotify('step-returned', 'admin')) {
+                if (await shouldNotify('step-returned', 'admin')) {
                     notificationPromises.push(
                         notifyAdminOnStepChange(stepId, stepName, orderId, userName)
                     );

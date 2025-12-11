@@ -5,31 +5,39 @@
  */
 
 // القيم الافتراضية كما تم تحديدها من قبل المستخدم
-var notifiSetting_DEFAULT_CONFIG = {
-    // Event Key: { buyer, admin, seller, delivery }
-    'purchase': { label: 'شراء (Purchase)', buyer: false, admin: true, seller: true, delivery: false },
-    'step-review': { label: 'مراجعة (Review)', buyer: true, admin: true, seller: false, delivery: false },
-    'step-cancelled': { label: 'ملغي (Cancelled)', buyer: false, admin: true, seller: true, delivery: false },
-    'step-confirmed': { label: 'تأكيد (Confirmed)', buyer: true, admin: true, seller: false, delivery: true },
-    'step-rejected': { label: 'مرفوض (Rejected)', buyer: true, admin: true, seller: false, delivery: false },
-    'step-shipped': { label: 'شحن (Shipped)', buyer: true, admin: true, seller: false, delivery: true },
-    'step-delivered': { label: 'تسليم (Delivered)', buyer: true, admin: true, seller: false, delivery: true },
-    'step-returned': { label: 'مرتجع (Returned)', buyer: false, admin: false, seller: false, delivery: false }
-};
+// القيم الافتراضية سيتم تحميلها من ملف JSON
+let notifiSetting_DEFAULT_CONFIG = {};
 
-var notifiSetting_STORAGE_KEY = 'notification_config';
+const notifiSetting_STORAGE_KEY = 'notification_config';
 
-var notifiSetting_Controller = {
+const notifiSetting_Controller = {
     notifiSetting_config: {},
 
-    notifiSetting_init() {
+    async notifiSetting_init() {
         try {
+            await this.notifiSetting_loadDefaults();
             this.notifiSetting_loadConfig();
             this.notifiSetting_renderTable();
             this.notifiSetting_setupEventListeners();
         } catch (notifiSetting_error) {
             console.error('حدث خطأ أثناء تهيئة إعدادات الإشعارات:', notifiSetting_error);
             this.notifiSetting_showToast('فشل تحميل الصفحة بشكل صحيح ❌');
+        }
+    },
+
+    async notifiSetting_loadDefaults() {
+        try {
+            // Adjust path if necessary. Assuming notification_config.json is at root "/" or relative to this file.
+            // Since this JS is in /notification/page/, and json is in /bazaar/ (root web), we use /notification_config.json
+            const response = await fetch('/notification_config.json');
+            if (!response.ok) throw new Error('Failed to load configuration file');
+            notifiSetting_DEFAULT_CONFIG = await response.json();
+            console.log('تم تحميل الإعدادات الافتراضية من JSON:', notifiSetting_DEFAULT_CONFIG);
+        } catch (error) {
+            console.error('فشل تحميل ملف الإعدادات JSON:', error);
+            this.notifiSetting_showToast('فشل تحميل ملف الإعدادات الافتراضية ⚠️');
+            // Empty defaults or hardcoded fallback could go here if needed
+            notifiSetting_DEFAULT_CONFIG = {};
         }
     },
 
@@ -42,7 +50,7 @@ var notifiSetting_Controller = {
                     const notifiSetting_parsed = JSON.parse(notifiSetting_stored);
                     this.notifiSetting_config = { ...notifiSetting_DEFAULT_CONFIG };
 
-                    // تحديث القيم المنطقية فقط، والإبقاء على التسميات من الكود
+                    // تحديث القيم المنطقية فقط، والإبقاء على التسميات من الكود/JSON
                     for (const notifiSetting_key in notifiSetting_parsed) {
                         if (this.notifiSetting_config[notifiSetting_key]) {
                             this.notifiSetting_config[notifiSetting_key] = {
@@ -192,9 +200,9 @@ var notifiSetting_Controller = {
 
 // التهيئة عند جاهزية الـ DOM
 
-    try {
-        notifiSetting_Controller.notifiSetting_init();
-    } catch (notifiSetting_error) {
-        console.error('فشل بدء التطبيق:', notifiSetting_error);
-    }
+try {
+    notifiSetting_Controller.notifiSetting_init();
+} catch (notifiSetting_error) {
+    console.error('فشل بدء التطبيق:', notifiSetting_error);
+}
 
