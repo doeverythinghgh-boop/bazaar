@@ -73,19 +73,17 @@ export function initializeState() {
     // سنقوم بتعديل الاستيراد في الأعلى ليشمل globalStepperAppData.
 
     let state;
-    let shouldSyncServer = false;
 
     if (globalStepperAppData && Object.keys(globalStepperAppData).length > 0) {
         console.log("Found initial globalStepperAppData, using it:", globalStepperAppData);
         state = { ...globalStepperAppData }; // Use a copy to avoid mutation issues
-        // حفظ الحالة الموجودة في المتغير العام إلى LocalStorage لضمان التزامن (محلياً فقط)
-        console.log("  [State] initializeState: Syncing global data to LocalStorage (skip server update).");
-        localStorage.setItem(getAppKey(), JSON.stringify(state));
+        // حفظ الحالة الموجودة في المتغير العام إلى LocalStorage لضمان التزامن
+        saveAppState(state);
     } else {
         console.log("  [State] initializeState: No initial globalStepperAppData found, loading from LocalStorage.");
         state = getAppState();
-        // وضع علامة لتحديث السيرفر لاحقاً لأننا جلبنا البيانات من LocalStorage
-        shouldSyncServer = true;
+        // تحديث المتغير العام بالقيمة الحالية عند البدء
+        updateGlobalStepperAppData(state);
     }
 
     let updated = false;
@@ -99,9 +97,7 @@ export function initializeState() {
         console.log("  [State] initializeState: 'dates' property missing, initializing.");
         updated = true;
     }
-
-    // التحديث الموحد: إذا حدث أي تغيير أو كان مطلوباً المزامنة من البداية
-    if (updated || shouldSyncServer) {
+    if (updated) {
         saveAppState(state);
     }
 
