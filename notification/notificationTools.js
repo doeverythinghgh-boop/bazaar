@@ -626,7 +626,8 @@ async function notifyDeliveryOnStepChange(deliveryKeys, stepId, stepName, orderI
 async function notifyOnStepActivation({
     stepId,
     stepName,
-    buyerKey,
+    buyerKey = '',
+    sellerKeys = [], // استقبال مفاتيح البائعين
     deliveryKeys = [],
     orderId = '',
     userName = ''
@@ -651,7 +652,14 @@ async function notifyOnStepActivation({
             );
         }
 
-        // 3. إشعار خدمات التوصيل
+        // 3. إشعار البائعين (جديد: يشمل step-delivered وأي مرحلة أخرى مفعلة للبائع)
+        if (sellerKeys && sellerKeys.length > 0 && await shouldNotify(stepId, 'seller')) {
+            notificationPromises.push(
+                notifySellerOnStepChange(sellerKeys, stepId, stepName, orderId)
+            );
+        }
+
+        // 4. إشعار خدمات التوصيل
         if (['step-confirmed', 'step-shipped', 'step-delivered'].includes(stepId)) {
             if (deliveryKeys && deliveryKeys.length > 0 && await shouldNotify(stepId, 'delivery')) {
                 notificationPromises.push(
@@ -701,6 +709,14 @@ async function notifySellerOnStepChange(sellerKeys, stepId, stepName, orderId = 
                 case "step-returned":
                     title = "منتجات مرتجعة";
                     body = `المشتري أرجع بعض منتجاتك من الطلب${orderId ? ` #${orderId}` : ''}.`;
+                    break;
+                case "step-delivered":
+                    title = "تم تسليم الطلب";
+                    body = `تم تسليم الطلب${orderId ? ` #${orderId}` : ''} بنجاح للعميل.`;
+                    break;
+                case "step-confirmed":
+                    title = "تم تأكيد الطلب";
+                    body = `تم تأكيد الطلب${orderId ? ` #${orderId}` : ''}، يرجى الاستعداد.`;
                     break;
                 default:
                     title = "تحديث الطلب";

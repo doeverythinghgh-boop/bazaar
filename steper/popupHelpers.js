@@ -152,6 +152,7 @@ function sendStepActivationNotifications(stepToActivate, controlData, ordersData
         // استخراج البيانات من ordersData
         let buyerKey = '';
         let deliveryKeys = [];
+        let sellerKeys = []; // تعريف مصفوفة مفاتيح البائعين
         let orderId = '';
         let userName = '';
 
@@ -166,28 +167,33 @@ function sendStepActivationNotifications(stepToActivate, controlData, ordersData
                 userName = controlData.currentUser.name || controlData.currentUser.idUser || '';
             }
 
-            // استخراج مفاتيح خدمات التوصيل من جميع المنتجات
+            // استخراج مفاتيح خدمات التوصيل ومفاتيح البائعين
             const deliveryKeysSet = new Set();
+            const sellerKeysSet = new Set(); // مجموعة لتخزين مفاتيح البائعين الفريدة
+
             ordersData.forEach(order => {
                 if (order.order_items && Array.isArray(order.order_items)) {
                     order.order_items.forEach(item => {
+                        // استخراج مفتاح خدمة التوصيل
                         if (item.supplier_delivery && item.supplier_delivery.delivery_key) {
                             const deliveryKey = item.supplier_delivery.delivery_key;
-
-                            // دعم delivery_key كـ string أو array
                             if (Array.isArray(deliveryKey)) {
-                                deliveryKey.forEach(key => {
-                                    if (key) deliveryKeysSet.add(key);
-                                });
+                                deliveryKey.forEach(key => { if (key) deliveryKeysSet.add(key); });
                             } else if (deliveryKey) {
                                 deliveryKeysSet.add(deliveryKey);
                             }
+                        }
+
+                        // استخراج مفتاح البائع
+                        if (item.seller_key) {
+                            sellerKeysSet.add(item.seller_key);
                         }
                     });
                 }
             });
 
             deliveryKeys = Array.from(deliveryKeysSet);
+            sellerKeys = Array.from(sellerKeysSet); // تحويل المجموعة إلى مصفوفة
         }
 
         // استدعاء دالة الإشعارات الرئيسية
@@ -196,6 +202,7 @@ function sendStepActivationNotifications(stepToActivate, controlData, ordersData
             stepName: stepToActivate.name || stepToActivate.id,
             buyerKey: buyerKey,
             deliveryKeys: deliveryKeys,
+            sellerKeys: sellerKeys, // تمرير مفاتيح البائعين
             orderId: orderId,
             userName: userName
         });
