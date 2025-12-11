@@ -158,6 +158,47 @@ async function getAdminTokens() {
 }
 
 /**
+ * @description يجلب قائمة الموزعين النشطين المرتبطين ببائع معين.
+ *   يستخدم الفلتر `activeOnly=true` لجلب البيانات بكفاءة من الخادم.
+ * @function getActiveDeliveryRelations
+ * @param {string} sellerKey - المفتاح الفريد للبائع (`user_key`).
+ * @returns {Promise<Array<Object>|null>} - وعد (Promise) يحتوي على مصفوفة من كائنات الموزعين النشطين، أو `null` في حالة حدوث خطأ.
+ * @throws {Error} - إذا فشل جلب البيانات من API.
+ * @see apiFetch
+ */
+async function getActiveDeliveryRelations(sellerKey) {
+    try {
+        const relations = await apiFetch(`/api/suppliers-deliveries?sellerKey=${sellerKey}&activeOnly=true`);
+        if (relations.error) {
+            throw new Error(relations.error);
+        }
+        console.log(`%c[API] getActiveDeliveryRelations successful for seller ${sellerKey}.`, "color: green;", relations);
+        return relations;
+    } catch (error) {
+        console.error(`%c[getActiveDeliveryRelations] for seller ${sellerKey} failed:`, "color: red;", error);
+        return null;
+    }
+}
+
+
+/**
+ * @description يجلب توكنات الإشعارات (FCM tokens) لجميع خدمات التوصيل النشطة المرتبطة ببائع معين.
+ * @async
+ * @function getTokensForActiveDelivery2Seller
+ * @param {string} sellerKey - المفتاح الفريد للبائع (`user_key`).
+ * @returns {Promise<string[]|undefined>} - وعد (Promise) يحتوي على مصفوفة من توكنات الإشعارات، أو `undefined` في حالة عدم وجود علاقات.
+ * @see getActiveDeliveryRelations - الدالة التي تجلب علاقات التوصيل النشطة.
+ */
+async function getTokensForActiveDelivery2Seller(sellerKey) {
+    const deliveryUsers = await getActiveDeliveryRelations(sellerKey);
+    const deliveryTokens = deliveryUsers
+        ?.map((user) => user.fcmToken)
+        .filter(Boolean); // استخراج التوكنات الصالحة فقط
+    return deliveryTokens;
+}
+
+
+/**
 * @description تجلب توكنات إشعارات Firebase (FCM Tokens) للمستخدمين.
 * تعتمد على نقطة النهاية `/api/tokens` التي تقبل قائمة المفاتيح عبر `userKeys` كـ Query Parameter.
 * @function getUsersTokens
@@ -371,3 +412,319 @@ async function notifySellersOnPurchase(order) {
         }
     }
 }
+
+/**
+ * @description إرسال إشعار للمشتري عند تغيير حالة المرحلة.
+ * @function notifyBuyerOnStepChange
+ * @param {string} buyerKey - مفتاح المشتري.
+ * @param {string} stepId - معرف المرحلة المفعلة.
+ * @param {string} stepName - اسم المرحلة بالعربية.
+ * @param {string} orderId - رقم الطلب (اختياري).
+ * @returns {Promise<void>}
+ */
+async function notifyBuyerOnStepChange(buyerKey, stepId, stepName, orderId = '') {
+    try {
+        const buyerTokens = await getUsersTokens([buyerKey]);
+
+        if (buyerTokens.length > 0) {
+            let title = "";
+            let body = "";
+
+            // تخصيص الرسالة حسب المرحلة
+            switch (stepId) {
+                case "step-review":
+                    title = "تم استلام طلبك";
+                    body = `تم استلام طلبك${orderId ? ` رقم #${orderId}` : ''}. يرجى مراجعة المنتجات.`;
+                    break;
+                case "step-confirmed":
+                    title = "تم تأكيد الطلب";
+                    body = `تم تأكيد طلبك${orderId ? ` رقم #${orderId}` : ''} من قبل البائع. جاري التجهيز للشحن.`;
+                    break;
+                case "step-shipped":
+                    title = "تم شحن الطلب";
+                    body = `تم شحن طلبك${orderId ? ` رقم #${orderId}` : ''}. في الطريق إليك!`;
+                    break;
+                case "step-delivered":
+                    title = "تم التسليم";
+                    body = `تم تسليم طلبك${orderId ? ` رقم #${orderId}` : ''} بنجاح. نتمنى أن تكون راضياً عن الخدمة.`;
+                    break;
+                default:
+                    title = "تحديث الطلب";
+                    body = `تم تحديث حالة طلبك${orderId ? ` رقم #${orderId}` : ''} إلى: ${stepName}`;
+            }
+
+            await sendNotificationsToTokens(buyerTokens, title, body);
+            console.log(`[Notifications] تم إرسال إشعار للمشتري ${buyerKey} عن المرحلة ${stepName}`);
+        } else {
+            console.warn(`[Notifications] لم يتم العثور على توكنات للمشتري ${buyerKey}`);
+        }
+    } catch (error) {
+        console.error(`[Notifications] فشل إرسال إشعار للمشتري:`, error);
+    }
+}
+
+/**
+ * @description إرسال إشعار للإدارة عند تغيير حالة المرحلة.
+ * @function notifyAdminOnStepChange
+ * @param {string} stepId - معرف المرحلة المفعلة.
+ * @param {string} stepName - اسم المرحلة بالعربية.
+ * @param {string} orderId - رقم الطلب (اختياري).
+ * @param {string} userName - اسم المستخدم الذي فعّل المرحلة (اختياري).
+ * @returns {Promise<void>}
+ */
+async function notifyAdminOnStepChange(stepId, stepName, orderId = '', userName = '') {
+    try {
+        const adminTokens = await getAdminTokens();
+
+        if (adminTokens.length > 0) {
+            const title = "تحديث حالة الطلب";
+            const userInfo = userName ? ` بواسطة ${userName}` : '';
+            const body = `تم تفعيل مرحلة "${stepName}"${orderId ? ` للطلب #${orderId}` : ''}${userInfo}.`;
+
+            await sendNotificationsToTokens(adminTokens, title, body);
+            console.log(`[Notifications] تم إرسال إشعار للإدارة عن المرحلة ${stepName}`);
+        } else {
+            console.warn('[Notifications] لم يتم العثور على توكنات للإدارة');
+        }
+    } catch (error) {
+        console.error('[Notifications] فشل إرسال إشعار للإدارة:', error);
+    }
+}
+
+/**
+ * @description إرسال إشعار لخدمات التوصيل عند تغيير حالة المرحلة.
+ * @function notifyDeliveryOnStepChange
+ * @param {Array<string>} deliveryKeys - مصفوفة مفاتيح خدمات التوصيل.
+ * @param {string} stepId - معرف المرحلة المفعلة.
+ * @param {string} stepName - اسم المرحلة بالعربية.
+ * @param {string} orderId - رقم الطلب (اختياري).
+ * @returns {Promise<void>}
+ */
+async function notifyDeliveryOnStepChange(deliveryKeys, stepId, stepName, orderId = '') {
+    if (!deliveryKeys || deliveryKeys.length === 0) {
+        console.log('[Notifications] لا توجد خدمات توصيل لإرسال إشعارات لها');
+        return;
+    }
+
+    try {
+        const deliveryTokens = await getUsersTokens(deliveryKeys);
+
+        if (deliveryTokens.length > 0) {
+            let title = "";
+            let body = "";
+
+            // تخصيص الرسالة حسب المرحلة
+            switch (stepId) {
+                case "step-confirmed":
+                    title = "طلب جديد للتوصيل";
+                    body = `تم تأكيد طلب${orderId ? ` #${orderId}` : ''} وجاهز للشحن. يرجى الاستعداد للتوصيل.`;
+                    break;
+                case "step-shipped":
+                    title = "تم الشحن";
+                    body = `تم شحن الطلب${orderId ? ` #${orderId}` : ''}. يرجى التوصيل للعميل.`;
+                    break;
+                case "step-delivered":
+                    title = "تم التسليم";
+                    body = `تم تسليم الطلب${orderId ? ` #${orderId}` : ''} بنجاح.`;
+                    break;
+                default:
+                    title = "تحديث الطلب";
+                    body = `تم تحديث حالة الطلب${orderId ? ` #${orderId}` : ''} إلى: ${stepName}`;
+            }
+
+            await sendNotificationsToTokens(deliveryTokens, title, body);
+            console.log(`[Notifications] تم إرسال إشعار لخدمات التوصيل (${deliveryKeys.length}) عن المرحلة ${stepName}`);
+        } else {
+            console.warn('[Notifications] لم يتم العثور على توكنات لخدمات التوصيل');
+        }
+    } catch (error) {
+        console.error('[Notifications] فشل إرسال إشعار لخدمات التوصيل:', error);
+    }
+}
+
+/**
+ * @description الدالة الرئيسية لإرسال الإشعارات عند تفعيل مرحلة جديدة.
+ * تقوم بإرسال إشعارات للمشتري والإدارة وخدمات التوصيل بناءً على المرحلة المفعلة.
+ * @function notifyOnStepActivation
+ * @param {Object} params - معاملات الإشعار.
+ * @param {string} params.stepId - معرف المرحلة (مثل: "step-confirmed").
+ * @param {string} params.stepName - اسم المرحلة بالعربية (مثل: "تأكيد").
+ * @param {string} params.buyerKey - مفتاح المشتري.
+ * @param {Array<string>} [params.deliveryKeys] - مصفوفة مفاتيح خدمات التوصيل (اختياري).
+ * @param {string} [params.orderId] - رقم الطلب (اختياري).
+ * @param {string} [params.userName] - اسم المستخدم الذي فعّل المرحلة (اختياري).
+ * @returns {Promise<void>}
+ */
+async function notifyOnStepActivation({
+    stepId,
+    stepName,
+    buyerKey,
+    deliveryKeys = [],
+    orderId = '',
+    userName = ''
+}) {
+    console.log(`[Notifications] بدء إرسال إشعارات تفعيل المرحلة: ${stepName} (${stepId})`);
+
+    try {
+        // إرسال الإشعارات بالتوازي لتحسين الأداء
+        const notificationPromises = [];
+
+        // 1. إشعار المشتري (دائماً)
+        if (buyerKey) {
+            notificationPromises.push(
+                notifyBuyerOnStepChange(buyerKey, stepId, stepName, orderId)
+            );
+        }
+
+        // 2. إشعار الإدارة (دائماً)
+        notificationPromises.push(
+            notifyAdminOnStepChange(stepId, stepName, orderId, userName)
+        );
+
+        // 3. إشعار خدمات التوصيل (إذا كانت المرحلة متعلقة بالشحن/التوصيل)
+        if (['step-confirmed', 'step-shipped', 'step-delivered'].includes(stepId)) {
+            if (deliveryKeys && deliveryKeys.length > 0) {
+                notificationPromises.push(
+                    notifyDeliveryOnStepChange(deliveryKeys, stepId, stepName, orderId)
+                );
+            }
+        }
+
+        // انتظار إرسال جميع الإشعارات
+        await Promise.all(notificationPromises);
+
+        console.log(`[Notifications] ✅ تم إرسال جميع الإشعارات بنجاح للمرحلة: ${stepName}`);
+
+    } catch (error) {
+        console.error(`[Notifications] ❌ خطأ في إرسال إشعارات المرحلة ${stepName}:`, error);
+    }
+}
+
+/**
+ * @description إرسال إشعار للبائعين عند تغيير حالة المرحلة.
+ * @function notifySellerOnStepChange
+ * @param {Array<string>} sellerKeys - مصفوفة مفاتيح البائعين.
+ * @param {string} stepId - معرف المرحلة المفعلة.
+ * @param {string} stepName - اسم المرحلة بالعربية.
+ * @param {string} orderId - رقم الطلب (اختياري).
+ * @returns {Promise<void>}
+ */
+async function notifySellerOnStepChange(sellerKeys, stepId, stepName, orderId = '') {
+    if (!sellerKeys || sellerKeys.length === 0) {
+        console.log('[Notifications] لا يوجد بائعون لإرسال إشعارات لهم');
+        return;
+    }
+
+    try {
+        const sellerTokens = await getUsersTokens(sellerKeys);
+
+        if (sellerTokens.length > 0) {
+            let title = "";
+            let body = "";
+
+            // تخصيص الرسالة حسب المرحلة
+            switch (stepId) {
+                case "step-cancelled":
+                    title = "منتجات ملغاة";
+                    body = `المشتري ألغى بعض منتجاتك في الطلب${orderId ? ` #${orderId}` : ''}.`;
+                    break;
+                case "step-returned":
+                    title = "منتجات مرتجعة";
+                    body = `المشتري أرجع بعض منتجاتك من الطلب${orderId ? ` #${orderId}` : ''}.`;
+                    break;
+                default:
+                    title = "تحديث الطلب";
+                    body = `تم تحديث حالة الطلب${orderId ? ` #${orderId}` : ''} إلى: ${stepName}`;
+            }
+
+            await sendNotificationsToTokens(sellerTokens, title, body);
+            console.log(`[Notifications] تم إرسال إشعار للبائعين (${sellerKeys.length}) عن المرحلة ${stepName}`);
+        } else {
+            console.warn('[Notifications] لم يتم العثور على توكنات للبائعين');
+        }
+    } catch (error) {
+        console.error('[Notifications] فشل إرسال إشعار للبائعين:', error);
+    }
+}
+
+/**
+ * @description الدالة الرئيسية لإرسال الإشعارات للمراحل الفرعية (ملغي، مرفوض، مرتجع).
+ * تُستدعى بعد تأكيد المرحلة الرئيسية المرتبطة بها.
+ * @function notifyOnSubStepActivation
+ * @param {Object} params - معاملات الإشعار.
+ * @param {string} params.stepId - معرف المرحلة الفرعية.
+ * @param {string} params.stepName - اسم المرحلة بالعربية.
+ * @param {string} [params.buyerKey] - مفتاح المشتري (للمرحلة "مرفوض").
+ * @param {Array<string>} [params.sellerKeys] - مفاتيح البائعين (للمراحل "ملغي" و "مرتجع").
+ * @param {string} [params.orderId] - رقم الطلب.
+ * @param {string} [params.userName] - اسم المستخدم الذي فعّل المرحلة.
+ * @returns {Promise<void>}
+ */
+async function notifyOnSubStepActivation({
+    stepId,
+    stepName,
+    buyerKey = '',
+    sellerKeys = [],
+    orderId = '',
+    userName = ''
+}) {
+    console.log(`[Notifications] بدء إرسال إشعارات المرحلة الفرعية: ${stepName} (${stepId})`);
+
+    try {
+        const notificationPromises = [];
+
+        // حسب نوع المرحلة الفرعية
+        switch (stepId) {
+            case 'step-cancelled':
+                // ملغي: إشعار البائعين + الإدارة
+                if (sellerKeys && sellerKeys.length > 0) {
+                    notificationPromises.push(
+                        notifySellerOnStepChange(sellerKeys, stepId, stepName, orderId)
+                    );
+                }
+                notificationPromises.push(
+                    notifyAdminOnStepChange(stepId, stepName, orderId, userName)
+                );
+                break;
+
+            case 'step-rejected':
+                // مرفوض: إشعار المشتري + الإدارة
+                if (buyerKey) {
+                    // تحديث رسالة المشتري للمرحلة "مرفوض"
+                    const title = "منتجات مرفوضة";
+                    const body = `تم رفض بعض المنتجات من طلبك${orderId ? ` رقم #${orderId}` : ''} لعدم توفرها.`;
+                    const buyerTokens = await getUsersTokens([buyerKey]);
+                    if (buyerTokens.length > 0) {
+                        notificationPromises.push(
+                            sendNotificationsToTokens(buyerTokens, title, body)
+                        );
+                    }
+                }
+                notificationPromises.push(
+                    notifyAdminOnStepChange(stepId, stepName, orderId, userName)
+                );
+                break;
+
+            case 'step-returned':
+                // مرتجع: إشعار البائعين + الإدارة
+                if (sellerKeys && sellerKeys.length > 0) {
+                    notificationPromises.push(
+                        notifySellerOnStepChange(sellerKeys, stepId, stepName, orderId)
+                    );
+                }
+                notificationPromises.push(
+                    notifyAdminOnStepChange(stepId, stepName, orderId, userName)
+                );
+                break;
+        }
+
+        // انتظار إرسال جميع الإشعارات
+        await Promise.all(notificationPromises);
+
+        console.log(`[Notifications] ✅ تم إرسال جميع إشعارات المرحلة الفرعية: ${stepName}`);
+
+    } catch (error) {
+        console.error(`[Notifications] ❌ خطأ في إرسال إشعارات المرحلة الفرعية ${stepName}:`, error);
+    }
+}
+

@@ -56,7 +56,7 @@ async function ensureToken2cf() {
  * @see ensureToken2cf
  */
 async function uploadFile2cf(blob, fileName, onLog = console.log) {
-  
+
   if (!(blob instanceof Blob) || !fileName) {
     throw new Error("❌ يجب توفير ملف Blob واسم الملف.");
   }
@@ -98,7 +98,7 @@ async function uploadFile2cf(blob, fileName, onLog = console.log) {
  * @see ensureToken2cf
  */
 async function downloadFile2cf(fileName, onLog = console.log) {
- 
+
   if (!fileName) {
     throw new Error("❌ يجب توفير اسم الملف.");
   }

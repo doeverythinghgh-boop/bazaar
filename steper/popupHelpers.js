@@ -112,6 +112,10 @@ export function addStatusToggleListener(controlData, ordersData) {
                                 stepNo: stepToActivate.no,
                                 status: "active",
                             });
+
+                            // إرسال الإشعارات للأطراف المعنية
+                            sendStepActivationNotifications(stepToActivate, controlData, ordersData);
+
                             // تحديث الواجهة فوراً
                             updateCurrentStepFromState(controlData, ordersData);
                             Swal.close(); // إغلاق النافذة المنبثقة
@@ -127,3 +131,174 @@ export function addStatusToggleListener(controlData, ordersData) {
         console.error("Error in addStatusToggleListener:", listenerError);
     }
 }
+
+/**
+ * @function sendStepActivationNotifications
+ * @description دالة مساعدة لإرسال الإشعارات عند تفعيل مرحلة جديدة.
+ * تقوم باستخراج البيانات اللازمة من ordersData واستدعاء دالة الإشعارات الرئيسية.
+ * 
+ * @param {object} stepToActivate - كائن المرحلة المفعلة.
+ * @param {object} controlData - بيانات التحكم.
+ * @param {Array<object>} ordersData - بيانات الطلبات.
+ */
+function sendStepActivationNotifications(stepToActivate, controlData, ordersData) {
+    try {
+        // التحقق من توفر الدالة (قد لا تكون محملة في بعض الحالات)
+        if (typeof notifyOnStepActivation !== 'function') {
+            console.warn('[Notifications] دالة notifyOnStepActivation غير متاحة. تأكد من تحميل notificationTools.js');
+            return;
+        }
+
+        // استخراج البيانات من ordersData
+        let buyerKey = '';
+        let deliveryKeys = [];
+        let orderId = '';
+        let userName = '';
+
+        if (ordersData && ordersData.length > 0) {
+            // استخراج مفتاح المشتري من أول طلب
+            const firstOrder = ordersData[0];
+            buyerKey = firstOrder.user_key || '';
+            orderId = firstOrder.id || firstOrder.order_id || '';
+
+            // استخراج اسم المستخدم الحالي
+            if (controlData.currentUser) {
+                userName = controlData.currentUser.name || controlData.currentUser.idUser || '';
+            }
+
+            // استخراج مفاتيح خدمات التوصيل من جميع المنتجات
+            const deliveryKeysSet = new Set();
+            ordersData.forEach(order => {
+                if (order.order_items && Array.isArray(order.order_items)) {
+                    order.order_items.forEach(item => {
+                        if (item.supplier_delivery && item.supplier_delivery.delivery_key) {
+                            const deliveryKey = item.supplier_delivery.delivery_key;
+
+                            // دعم delivery_key كـ string أو array
+                            if (Array.isArray(deliveryKey)) {
+                                deliveryKey.forEach(key => {
+                                    if (key) deliveryKeysSet.add(key);
+                                });
+                            } else if (deliveryKey) {
+                                deliveryKeysSet.add(deliveryKey);
+                            }
+                        }
+                    });
+                }
+            });
+
+            deliveryKeys = Array.from(deliveryKeysSet);
+        }
+
+        // استدعاء دالة الإشعارات الرئيسية
+        notifyOnStepActivation({
+            stepId: stepToActivate.id,
+            stepName: stepToActivate.name || stepToActivate.id,
+            buyerKey: buyerKey,
+            deliveryKeys: deliveryKeys,
+            orderId: orderId,
+            userName: userName
+        });
+
+        console.log(`[Notifications] تم استدعاء دالة الإشعارات للمرحلة: ${stepToActivate.name || stepToActivate.id}`);
+
+        // إرسال إشعارات المراحل الفرعية إذا وجدت
+        sendSubStepNotifications(stepToActivate, controlData, ordersData);
+
+    } catch (error) {
+        console.error('[Notifications] خطأ في sendStepActivationNotifications:', error);
+    }
+}
+
+/**
+ * @function sendSubStepNotifications
+ * @description إرسال إشعارات للمراحل الفرعية (ملغي، مرفوض، مرتجع) بعد تأكيد المرحلة الرئيسية.
+ * 
+ * @param {object} stepToActivate - كائن المرحلة المفعلة.
+ * @param {object} controlData - بيانات التحكم.
+ * @param {Array<object>} ordersData - بيانات الطلبات.
+ */
+function sendSubStepNotifications(stepToActivate, controlData, ordersData) {
+    try {
+        // التحقق من توفر الدالة
+        if (typeof notifyOnSubStepActivation !== 'function') {
+            return; // الدالة غير متوفرة، تجاهل
+        }
+
+        const stepId = stepToActivate.id;
+        let buyerKey = '';
+        let sellerKeys = [];
+        let orderId = '';
+        let userName = '';
+
+        // استخراج البيانات الأساسية
+        if (ordersData && ordersData.length > 0) {
+            const firstOrder = ordersData[0];
+            buyerKey = firstOrder.user_key || '';
+            orderId = firstOrder.id || firstOrder.order_id || '';
+
+            if (controlData.currentUser) {
+                userName = controlData.currentUser.name || controlData.currentUser.idUser || '';
+            }
+
+            // استخراج مفاتيح البائعين من جميع المنتجات
+            const sellerKeysSet = new Set();
+            ordersData.forEach(order => {
+                if (order.order_items && Array.isArray(order.order_items)) {
+                    order.order_items.forEach(item => {
+                        if (item.seller_key) {
+                            sellerKeysSet.add(item.seller_key);
+                        }
+                    });
+                }
+            });
+            sellerKeys = Array.from(sellerKeysSet);
+        }
+
+        // حسب المرحلة الرئيسية المفعلة، تحقق من وجود مراحل فرعية
+        if (stepId === 'step-review') {
+            // بعد تفعيل "مراجعة"، تحقق من وجود منتجات ملغاة
+            const reviewState = loadStepState('step-review');
+            if (reviewState && reviewState.unselectedKeys && reviewState.unselectedKeys.length > 0) {
+                console.log('[Notifications] تم اكتشاف منتجات ملغاة، إرسال إشعارات...');
+                notifyOnSubStepActivation({
+                    stepId: 'step-cancelled',
+                    stepName: 'ملغي',
+                    sellerKeys: sellerKeys,
+                    orderId: orderId,
+                    userName: userName
+                });
+            }
+        } else if (stepId === 'step-confirmed') {
+            // بعد تفعيل "تأكيد"، تحقق من وجود منتجات مرفوضة
+            const confirmedState = loadStepState('step-confirmed');
+            if (confirmedState && confirmedState.deselectedKeys && confirmedState.deselectedKeys.length > 0) {
+                console.log('[Notifications] تم اكتشاف منتجات مرفوضة، إرسال إشعارات...');
+                notifyOnSubStepActivation({
+                    stepId: 'step-rejected',
+                    stepName: 'مرفوض',
+                    buyerKey: buyerKey,
+                    orderId: orderId,
+                    userName: userName
+                });
+            }
+        } else if (stepId === 'step-delivered') {
+            // بعد تفعيل "تسليم"، تحقق من وجود منتجات مرتجعة
+            const deliveredState = loadStepState('step-delivered');
+            if (deliveredState && deliveredState.returnedKeys && deliveredState.returnedKeys.length > 0) {
+                console.log('[Notifications] تم اكتشاف منتجات مرتجعة، إرسال إشعارات...');
+                notifyOnSubStepActivation({
+                    stepId: 'step-returned',
+                    stepName: 'مرتجع',
+                    sellerKeys: sellerKeys,
+                    orderId: orderId,
+                    userName: userName
+                });
+            }
+        }
+
+    } catch (error) {
+        console.error('[Notifications] خطأ في sendSubStepNotifications:', error);
+    }
+}
+

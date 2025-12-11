@@ -59,36 +59,43 @@ export var appDataControl = {
         {
             id: "step-review",
             no: "1",
+            name: "مراجعة",
             description: "الطلب تم إرساله وينتظر تأكيد البائع "
         },
         {
             id: "step-confirmed",
             no: "2",
+            name: "تأكيد",
             description: "البائع وافق على الطلب وسيبدأ في التجهيز والشحن "
         },
         {
             id: "step-shipped",
             no: "3",
+            name: "شحن",
             description: "المنتج تم تسليمه لشركة الشحن "
         },
         {
             id: "step-delivered",
             no: "4",
+            name: "تسليم",
             description: "المشتري استلم المنتج "
         },
         {
             id: "step-cancelled",
             no: "5",
+            name: "ملغي",
             description: "بعض الطلبات أُلغيت من قبل المشتري "
         },
         {
             id: "step-rejected",
             no: "6",
+            name: "مرفوض",
             description: "البائع او الاداره رفضت تنفيذ الطلبات لنفاد الكمية أو مشكلة في المنتج"
         },
         {
             id: "step-returned",
             no: "7",
+            name: "مرتجع",
             description: "المشتري أعاد بعض المنتجات بعد استلامه وتم قبول الإرجاع "
         }
     ]
@@ -196,11 +203,11 @@ export function updateGlobalStepperAppData(newData) {
                     order_status: JSON.stringify(globalStepperAppData)
                 })
             })
-            .then(res => res.json())
-            .then(data => {
-                console.log("  [Config] updateGlobalStepperAppData: Server responded successfully.", data);
-            })
-            .catch(err => console.error("  [Config] updateGlobalStepperAppData: Fetch request failed.", err));
+                .then(res => res.json())
+                .then(data => {
+                    console.log("  [Config] updateGlobalStepperAppData: Server responded successfully.", data);
+                })
+                .catch(err => console.error("  [Config] updateGlobalStepperAppData: Fetch request failed.", err));
             console.log("✅ [Config] updateGlobalStepperAppData: Global variable updated locally.", globalStepperAppData);
         }
     } catch (error) {
