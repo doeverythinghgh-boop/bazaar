@@ -132,7 +132,7 @@ window.GLOBAL_NOTIFICATIONS = {
             const isDisplayed = notificationsContainer.offsetParent !== null ||
                 window.getComputedStyle(notificationsContainer).display !== 'none';
             isPageVisible = hasContent && isDisplayed;
-            console.log(`[Global] فحص ظهور صفحة الإشعارات: hasContent=${hasContent}, isDisplayed=${isDisplayed}, isPageVisible=${isPageVisible}`);
+            //console.log(`[Global] فحص ظهور صفحة الإشعارات: hasContent=${hasContent}, isDisplayed=${isDisplayed}, isPageVisible=${isPageVisible}`);
         }
 
         if (isPageVisible) {
@@ -166,7 +166,7 @@ window.GLOBAL_NOTIFICATIONS = {
             return;
         }
 
-        console.log(`[Global] تحديث الشارة: العدد = ${this.unreadCount}`);
+        //console.log(`[Global] تحديث الشارة: العدد = ${this.unreadCount}`);
 
         // تحديث المحتوى والعرض
         if (this.unreadCount > 0) {
@@ -175,11 +175,11 @@ window.GLOBAL_NOTIFICATIONS = {
             badge.style.display = 'flex';
             // تأكيد اللون (احترازي)
             badge.style.backgroundColor = '#dc3545';
-            console.log(`[Global] ✅ تم إظهار الشارة بالعدد: ${badge.textContent}`);
+            //console.log(`[Global] ✅ تم إظهار الشارة بالعدد: ${badge.textContent}`);
         } else {
             // إخفاء الشارة
             badge.style.display = 'none';
-            console.log('[Global] ⭕ تم إخفاء الشارة (العدد = 0)');
+            //console.log('[Global] ⭕ تم إخفاء الشارة (العدد = 0)');
         }
     },
 
