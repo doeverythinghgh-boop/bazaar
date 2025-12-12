@@ -1,11 +1,57 @@
-//{"id":6,"username":"هشام جابر 2","phone":"01026546550","Password":"1111","Address":null,"user_key":"682dri6b","is_seller":3}
-window.userSession = null; //بيانات المستخدم
-window.productSession = null; //بيانات منتج للعرض
-window.mainCategorySelectToAdd = null; //الفئه الرئيسية المختارة عند اضافة منتج
-window.subCategorySelectToAdd = null; //الفئه الفرعية المختارة عند اضافة منتج
-window.productTypeToAdd = null; //نوع المنتج المختار المختارة عند اضافة منتج
-window.myProducts = null; //نوع المنتج المختار عند اضافة منتج
+/**
+ * @file js/globalVariable.js
+ * @description تعريف المتغيرات العامة والدوال المسؤولة عن توجيه الصفحات وتخطيط العرض (Layout)
+ *   الخاص بالمنتجات (إضافة، عرض، تعديل).
+ */
 
+/**
+ * @description بيانات المستخدم المسجل حالياً.
+ * @type {object|null}
+ * @global
+ */
+window.userSession = null;
+
+/**
+ * @description بيانات المنتج المعروض حالياً (للتفاصيل أو التعديل).
+ * @type {Array|object|null}
+ * @global
+ */
+window.productSession = null;
+
+/**
+ * @description المعرف (ID) للفئة الرئيسية المختارة عند إضافة منتج.
+ * @type {string|number|null}
+ * @global
+ */
+window.mainCategorySelectToAdd = null;
+
+/**
+ * @description المعرف (ID) للفئة الفرعية المختارة عند إضافة منتج.
+ * @type {string|number|null}
+ * @global
+ */
+window.subCategorySelectToAdd = null;
+
+/**
+ * @description نوع المنتج المختار عند الإضافة (0 = افتراضي، 2 = خدمي، etc).
+ * @type {number|null}
+ * @global
+ */
+window.productTypeToAdd = null;
+
+/**
+ * @description قائمة بمنتجات المستخدم الحالي (للعرض في صفحة "منتجاتي").
+ * @type {Array|null}
+ * @global
+ */
+window.myProducts = null;
+
+/**
+ * @description يقوم بتحميل وعرض صفحة تفاصيل المنتج بناءً على نوع العرض المطلوب.
+ * @function productViewLayout
+ * @param {string} View - نوع العرض ('0' للعرض العادي، '2' للعرض البديل).
+ * @returns {void}
+ */
 function productViewLayout(View) {
   console.log('------------------------نوع الخدمه-------------------', View);
   //في الارسال
@@ -36,13 +82,19 @@ function productViewLayout(View) {
   }
 }
 
+/**
+ * @description يوجه المستخدم إلى صفحة إضافة منتج جديد، مع تحديد نوع المنتج بناءً على الفئة المختارة.
+ * @function productAddLayout
+ * @param {boolean} [editMode=false] - هل الوضع هو تعديل منتج موجود؟ (حالياً غير مستخدم بالكامل في هذا المنطق).
+ * @returns {void}
+ */
 function productAddLayout(editMode = false) {
   if (mainCategorySelectToAdd == 6) {
     productTypeToAdd = 2; //نوع المنتج خدمي
   } else {
     productTypeToAdd = 0; //نوع المنتج افتراضي
   }
-  if (editMode==false) {
+  if (editMode == false) {
     mainLoader(
       "./pages/productAdd.html",
       "index-product-container",
@@ -55,6 +107,11 @@ function productAddLayout(editMode = false) {
 
 }
 
+/**
+ * @description يوجه المستخدم إلى صفحة تعديل المنتج، مع تحديد نوع المنتج بناءً على الفئة المختارة.
+ * @function productEditLayout
+ * @returns {void}
+ */
 function productEditLayout() {
   if (mainCategorySelectToAdd == 6) {
     productTypeToAdd = 2; //نوع المنتج خدمي

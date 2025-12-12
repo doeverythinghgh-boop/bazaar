@@ -1,4 +1,4 @@
-// shared/categoryModal.js
+// pages/category/categoryModal.js
 // نافذة اختيار الفئات - مع فصل HTML وCSS وعزل الأنماط
 
 window.CategoryModal = (function () {
@@ -10,9 +10,9 @@ window.CategoryModal = (function () {
     const MODAL_ID = 'category-modal';
     const DEFAULT_TITLE = '📋 تحديد فئة المنتج الجديد';
     const CATEGORIES_URL = './shared/list.json';
-    const HTML_URL = './shared/categoryModal.html';
-    const CSS_URL = './shared/categoryModal.css';
-    
+    const HTML_URL = 'pages/category/categoryModal.html';
+    const CSS_URL = 'pages/category/categoryModal.css';
+
     let categoriesData = [];
     let isInitialized = false;
     let shadowRoot = null;
@@ -21,15 +21,23 @@ window.CategoryModal = (function () {
     // ============================================
     // 2. دالة تحميل الملفات الخارجية
     // ============================================
+    /**
+     * @function loadExternalFile
+     * @description تحميل محتوى ملف خارجي (HTML/CSS) عبر fetch.
+     * @param {string} url - رابط الملف.
+     * @param {string} [type='text'] - نوع الاستجابة المتوقع (حالياً يتم التعامل معه كنص دائماً).
+     * @returns {Promise<string>} محتوى الملف كنص.
+     * @throws {Error} إذا فشل التحميل.
+     */
     async function loadExternalFile(url, type = 'text') {
         try {
             console.log(`[CategoryModal] جاري تحميل ${url}...`);
             const response = await fetch(url);
-            
+
             if (!response.ok) {
                 throw new Error(`فشل تحميل الملف: ${response.status} ${response.statusText}`);
             }
-            
+
             return await response.text();
         } catch (error) {
             console.error(`[CategoryModal] خطأ في تحميل ${url}:`, error);
@@ -40,6 +48,11 @@ window.CategoryModal = (function () {
     // ============================================
     // 3. إنشاء Shadow DOM وعزل الأنماط
     // ============================================
+    /**
+     * @function createModalDOM
+     * @description إنشاء هيكل النافذة وعزل الأنماط باستخدام Shadow DOM.
+     * @returns {Promise<boolean>} returns true إذا تم الإنشاء بنجاح أو كانت موجودة.
+     */
     async function createModalDOM() {
         console.log('[CategoryModal] إنشاء عناصر النافذة مع Shadow DOM...');
 
@@ -77,11 +90,11 @@ window.CategoryModal = (function () {
 
             // إنشاء Shadow DOM
             shadowRoot = container.attachShadow({ mode: 'open' });
-            
+
             // إضافة الأنماط (CSS) إلى Shadow DOM
             styleElement = document.createElement('style');
             styleElement.id = 'category-modal-styles';
-            
+
             if (cssContent.status === 'fulfilled') {
                 styleElement.textContent = cssContent.value;
             } else {
@@ -114,7 +127,7 @@ window.CategoryModal = (function () {
             // إضافة HTML إلى Shadow DOM
             const template = document.createElement('template');
             template.innerHTML = htmlContent.value;
-            
+
             // إضافة العناصر إلى Shadow DOM
             shadowRoot.appendChild(styleElement);
             shadowRoot.appendChild(template.content.cloneNode(true));
@@ -134,7 +147,7 @@ window.CategoryModal = (function () {
 
         } catch (error) {
             console.error('[CategoryModal] خطأ في إنشاء النافذة:', error);
-            
+
             // محاولة استخدام طريقة احتياطية بدون Shadow DOM
             return createFallbackModal();
         }
@@ -143,9 +156,15 @@ window.CategoryModal = (function () {
     // ============================================
     // 4. طريقة احتياطية بدون Shadow DOM
     // ============================================
+    /**
+     * @function createFallbackModal
+     * @description طريقة احتياطية لإنشاء النافذة إذا فشل Shadow DOM.
+     * تقوم بإضافة HTML و CSS مباشرة إلى المستند الرئيسي.
+     * @returns {Promise<boolean>} returns true إذا نجحت العملية.
+     */
     async function createFallbackModal() {
         console.log('[CategoryModal] استخدام الطريقة الاحتياطية...');
-        
+
         try {
             // تحميل الأنماط بشكل تقليدي
             const cssResponse = await fetch(CSS_URL);
@@ -164,13 +183,13 @@ window.CategoryModal = (function () {
                 const container = document.createElement('div');
                 container.innerHTML = htmlText;
                 document.body.appendChild(container.firstElementChild);
-                
+
                 console.log('[CategoryModal] تم إنشاء النافذة بالطريقة الاحتياطية');
                 return true;
             }
-            
+
             throw new Error('فشل تحميل الملفات في الطريقة الاحتياطية');
-            
+
         } catch (error) {
             console.error('[CategoryModal] فشل الطريقة الاحتياطية:', error);
             return false;
@@ -180,6 +199,12 @@ window.CategoryModal = (function () {
     // ============================================
     // 5. جلب بيانات الفئات من JSON
     // ============================================
+    /**
+     * @function fetchCategoriesData
+     * @description جلب بيانات الفئات من ملف JSON الخارجي.
+     * @returns {Promise<Array>} مصفوفة الفئات.
+     * @throws {Error} إذا فشل جلب البيانات.
+     */
     async function fetchCategoriesData() {
         if (categoriesData && categoriesData.length > 0) {
             return categoriesData;
@@ -208,6 +233,11 @@ window.CategoryModal = (function () {
     // ============================================
     // 6. الحصول على عناصر من Shadow DOM أو DOM العادي
     // ============================================
+    /**
+     * @function getModalElement
+     * @description الحصول على العنصر الجذر للنافذة (من Shadow DOM أو document).
+     * @returns {HTMLElement|null} عنصر النافذة.
+     */
     function getModalElement() {
         if (shadowRoot) {
             return shadowRoot.getElementById(MODAL_ID);
@@ -215,6 +245,12 @@ window.CategoryModal = (function () {
         return document.getElementById(MODAL_ID);
     }
 
+    /**
+     * @function querySelector
+     * @description بحث عن عنصر داخل نطاق النافذة (Shadow DOM أو document).
+     * @param {string} selector - استعلام CSS.
+     * @returns {HTMLElement|null} العنصر المطابق.
+     */
     function querySelector(selector) {
         if (shadowRoot) {
             return shadowRoot.querySelector(selector);
@@ -225,6 +261,11 @@ window.CategoryModal = (function () {
     // ============================================
     // 7. تحديث عنوان النافذة
     // ============================================
+    /**
+     * @function updateModalTitle
+     * @description تحديث النص الظاهر في عنوان النافذة.
+     * @param {string} title - العنوان الجديد.
+     */
     function updateModalTitle(title) {
         const titleElement = querySelector('.category-modal-title');
         if (titleElement && title) {
@@ -235,10 +276,18 @@ window.CategoryModal = (function () {
     // ============================================
     // 8. إعداد وعرض النافذة (الوظيفة الرئيسية)
     // ============================================
+    /**
+     * @function showCategoryModal
+     * @description الوظيفة الداخلية الرئيسية لفتح النافذة وإدارة دورة حياتها.
+     * @param {string|null} [initialMainId=null] - معرف الفئة الرئيسية الأولية.
+     * @param {string|null} [initialSubId=null] - معرف الفئة الفرعية الأولية.
+     * @param {string|null} [customTitle=null] - عنوان مخصص.
+     * @returns {Promise<object>} وعد يتم حله عند إغلاق النافذة بنجاح أو إلغاء.
+     */
     function showCategoryModal(initialMainId = null, initialSubId = null, customTitle = null) {
-        console.log('[CategoryModal] فتح النافذة', { 
-            initialMainId, 
-            initialSubId, 
+        console.log('[CategoryModal] فتح النافذة', {
+            initialMainId,
+            initialSubId,
             customTitle,
             // تسجيل جميع المعلمات التي تم تمريرها
             argumentsLength: arguments.length,
@@ -254,22 +303,22 @@ window.CategoryModal = (function () {
                 // show('1', '33') - مع فئتين
                 // show('1', '33', 'عنوان مخصص') - مع فئتين وعنوان
                 // show(null, null, 'عنوان فقط') - مع عنوان فقط
-                
+
                 let titleToUse = DEFAULT_TITLE;
-                
+
                 // تحديد إذا كان المعامل الثالث هو العنوان
                 if (arguments.length === 3 && customTitle !== null) {
                     titleToUse = customTitle;
                 }
                 // إذا مرر معلمتين فقط وكانت الثانية نصاً (ليست رقم/معرف)
-                else if (arguments.length === 2 && typeof initialSubId === 'string' && 
-                         isNaN(initialSubId) && initialSubId.trim() !== '') {
+                else if (arguments.length === 2 && typeof initialSubId === 'string' &&
+                    isNaN(initialSubId) && initialSubId.trim() !== '') {
                     titleToUse = initialSubId;
                     initialSubId = null; // إعادة ضبط لأنها كانت العنوان
                 }
                 // إذا مرر معلمة واحدة وكانت نصاً (ليست رقم/معرف)
-                else if (arguments.length === 1 && typeof initialMainId === 'string' && 
-                         isNaN(initialMainId) && initialMainId.trim() !== '') {
+                else if (arguments.length === 1 && typeof initialMainId === 'string' &&
+                    isNaN(initialMainId) && initialMainId.trim() !== '') {
                     titleToUse = initialMainId;
                     initialMainId = null;
                 }
@@ -509,7 +558,7 @@ window.CategoryModal = (function () {
                     cancelBtn.removeEventListener('click', handleCancel);
                     modalElement.removeEventListener('click', handleBackdropClick);
                     document.removeEventListener('keydown', handleEscKey);
-                    
+
                     // إعادة العنوان إلى القيمة الافتراضية
                     updateModalTitle(DEFAULT_TITLE);
                 }
@@ -551,13 +600,17 @@ window.CategoryModal = (function () {
     // ============================================
     // 9. دالة إغلاق النافذة يدوياً
     // ============================================
+    /**
+     * @function closeCategoryModal
+     * @description إغلاق النافذة يدوياً وإخفائها من الواجهة.
+     */
     function closeCategoryModal() {
         const modalElement = getModalElement();
         if (modalElement) {
             modalElement.classList.remove('show');
             document.body.style.overflow = '';
             console.log('[CategoryModal] تم إغلاق النافذة يدوياً');
-            
+
             // إعادة العنوان إلى القيمة الافتراضية
             updateModalTitle(DEFAULT_TITLE);
         }
@@ -566,6 +619,11 @@ window.CategoryModal = (function () {
     // ============================================
     // 10. دالة التحقق من حالة النافذة
     // ============================================
+    /**
+     * @function isModalOpen
+     * @description التحقق مما إذا كانت النافذة مفتوحة حالياً (تحتوي على فئة 'show').
+     * @returns {boolean} true إذا كانت مفتوحة.
+     */
     function isModalOpen() {
         const modalElement = getModalElement();
         return modalElement ? modalElement.classList.contains('show') : false;
@@ -574,6 +632,10 @@ window.CategoryModal = (function () {
     // ============================================
     // 11. دالة إعادة تعيين النافذة
     // ============================================
+    /**
+     * @function resetModal
+     * @description إعادة تعيين حقول النافذة (القوائم المنسدلة، العنوان) إلى الحالة الافتراضية.
+     */
     function resetModal() {
         const modalElement = getModalElement();
         if (!modalElement) return;
@@ -588,7 +650,7 @@ window.CategoryModal = (function () {
             subSelect.disabled = true;
         }
         if (validationMsg) validationMsg.textContent = '';
-        
+
         // إعادة العنوان إلى القيمة الافتراضية
         updateModalTitle(DEFAULT_TITLE);
     }
@@ -596,22 +658,26 @@ window.CategoryModal = (function () {
     // ============================================
     // 12. دالة تنظيف الذاكرة
     // ============================================
+    /**
+     * @function destroy
+     * @description إزالة النافذة وعناصرها تماماً من DOM وتنظيف المتغيرات.
+     */
     function destroy() {
         const container = document.getElementById('category-modal-container');
         if (container) {
             container.remove();
         }
-        
+
         const fallbackStyle = document.getElementById('category-modal-styles-fallback');
         if (fallbackStyle) {
             fallbackStyle.remove();
         }
-        
+
         shadowRoot = null;
         styleElement = null;
         isInitialized = false;
         categoriesData = [];
-        
+
         console.log('[CategoryModal] تم تنظيف جميع الموارد');
     }
 
@@ -664,7 +730,7 @@ window.CategoryModal = (function () {
          * تغيير عنوان النافذة يدوياً
          * @param {string} title - العنوان الجديد
          */
-        setTitle: function(title) {
+        setTitle: function (title) {
             updateModalTitle(title);
         },
 
@@ -672,7 +738,7 @@ window.CategoryModal = (function () {
          * الحصول على العنوان الحالي
          * @returns {string}
          */
-        getTitle: function() {
+        getTitle: function () {
             const titleElement = querySelector('.category-modal-title');
             return titleElement ? titleElement.textContent : DEFAULT_TITLE;
         },
@@ -699,10 +765,10 @@ window.CategoryModal = (function () {
                 // تحميل البيانات والملفات مسبقاً
                 await Promise.all([
                     fetchCategoriesData(),
-                    loadExternalFile(HTML_URL).catch(() => {}),
-                    loadExternalFile(CSS_URL).catch(() => {})
+                    loadExternalFile(HTML_URL).catch(() => { }),
+                    loadExternalFile(CSS_URL).catch(() => { })
                 ]);
-                
+
                 if (!isInitialized) {
                     const created = await createModalDOM();
                     isInitialized = created;
@@ -737,7 +803,7 @@ window.CategoryModal = (function () {
 if (typeof window !== 'undefined') {
     window.addEventListener('DOMContentLoaded', function () {
         console.log('[CategoryModal] الصفحة محملة، جاهز للاستخدام');
-        
+
         // رسائل مفيدة للمطور
         console.log('[CategoryModal] يمكنك استخدام:');
         console.log('1. CategoryModal.show() - فتح النافذة');

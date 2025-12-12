@@ -1,11 +1,16 @@
 /**
- * @file js/format.js
- * @description يوفر دوال مساعدة لتنسيق النصوص والأرقام، مثل تحويل الأرقام الهندية إلى إنجليزية وتوحيد النص العربي.
+ * @file js/tools.js
+ * @description يوفر دوال مساعدة عامة لتنسيق النصوص والأرقام، إدارة الجلسات، التفاعل مع التخزين المحلي، وتشغيل التنبيهات.
  */
 
 
 
-// دالة للتحقق من وجود جلسة مسؤول أصلية في التخزين المحلي.
+/**
+ * @description تتحقق من وجود جلسة مسؤول أصلية (originalAdminSession) في التخزين المحلي.
+ *   إذا وجدت، تعرض علامة مائية (Watermark) تشير إلى أن المسؤول يتصفح بصفة مستخدم آخر.
+ * @function checkImpersonationMode
+ * @returns {void}
+ */
 function checkImpersonationMode() {
   const originalAdminSession = localStorage.getItem("originalAdminSession");
   if (originalAdminSession) {
@@ -156,6 +161,13 @@ const clearError = (input) => {
   // تفريغ نص رسالة الخطأ.
   errorDiv.textContent = "";
 };
+/**
+ * @description تقوم بتحديث نص تسجيل الدخول في الشريط العلوي للصفحة.
+ *   إذا كان هناك مستخدم مسجل، تعرض اسمه (مقتطعاً إذا كان طويلاً).
+ *   إذا لم يكن، تعرض "تسجيل الدخول".
+ * @function setUserNameInIndexBar
+ * @returns {void}
+ */
 function setUserNameInIndexBar() {
   let loginTextElement = document.getElementById("index-login-text");
 
@@ -172,6 +184,14 @@ function setUserNameInIndexBar() {
 
   }
 }
+/**
+ * @description تمسح جميع البيانات المخزنة محلياً في المتصفح والمتعلقة بالتطبيق،
+ *   بما في ذلك `localStorage`، `sessionStorage`، وإهمال قواعد بيانات `IndexedDB`.
+ *   تستخدم عادة عند تسجيل الخروج الكامل أو لتنظيف التطبيق.
+ * @function clearAllBrowserData
+ * @async
+ * @returns {Promise<boolean>} - وعد (Promise) يعود بـ `true` عند الانتهاء.
+ */
 async function clearAllBrowserData() {
   // -----------------------------
   // 1) مسح localStorage
@@ -217,6 +237,11 @@ async function clearAllBrowserData() {
   return true;
 }
 
+/**
+ * @description تعرض نافذة الإشعارات المنبثقة باستخدام `mainLoader`.
+ * @function showNotificationsModal
+ * @returns {void}
+ */
 function showNotificationsModal() {
   //  mainLoader("./notification/page/notifications.html", "index-notifications-container", 500, undefined, "showHomeIcon", true);
 }
@@ -229,41 +254,51 @@ let suzeAudioContext = null;
  * @description تشغيل صوت تنبيه باستخدام Web Audio API
  */
 function playNotificationSound() {
-    try {
-        // إنشاء AudioContext عند الحاجة فقط
-        if (!suzeAudioContext) {
-            suzeAudioContext = new (window.AudioContext || window.webkitAudioContext)();
-        }
-
-        // إصلاح حالة إذا كان المتصفح أوقف الـ AudioContext
-        if (suzeAudioContext.state === "suspended") {
-            suzeAudioContext.resume();
-        }
-
-        const oscillator = suzeAudioContext.createOscillator();
-        const gainNode = suzeAudioContext.createGain();
-
-        oscillator.connect(gainNode);
-        gainNode.connect(suzeAudioContext.destination);
-
-        oscillator.type = "sine";
-        oscillator.frequency.value = 600;
-
-        const now = suzeAudioContext.currentTime;
-        gainNode.gain.setValueAtTime(0.3, now);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
-
-        oscillator.start(now);
-        oscillator.stop(now + 0.25);
-
-    } catch (error) {
-        console.warn("[Sound] فشل تشغيل صوت التنبيه:", error);
+  try {
+    // إنشاء AudioContext عند الحاجة فقط
+    if (!suzeAudioContext) {
+      suzeAudioContext = new (window.AudioContext || window.webkitAudioContext)();
     }
+
+    // إصلاح حالة إذا كان المتصفح أوقف الـ AudioContext
+    if (suzeAudioContext.state === "suspended") {
+      suzeAudioContext.resume();
+    }
+
+    const oscillator = suzeAudioContext.createOscillator();
+    const gainNode = suzeAudioContext.createGain();
+
+    oscillator.connect(gainNode);
+    gainNode.connect(suzeAudioContext.destination);
+
+    oscillator.type = "sine";
+    oscillator.frequency.value = 600;
+
+    const now = suzeAudioContext.currentTime;
+    gainNode.gain.setValueAtTime(0.3, now);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+
+    oscillator.start(now);
+    oscillator.stop(now + 0.25);
+
+  } catch (error) {
+    console.warn("[Sound] فشل تشغيل صوت التنبيه:", error);
+  }
 }
 
 
 const pageSnapshots = {};
 
+/**
+ * @description يقوم بجلب محتوى صفحة HTML وتخزينه مؤقتًا، ثم إدراجه في حاوية محددة.
+ *   يضمن عدم تحميل نفس الصفحة مرارًا وتكرارًا من الشبكة إذا كانت مخزنة بالفعل.
+ *   كما يعيد تشغيل السكربتات الموجودة في الصفحة المحملة.
+ * @function insertUniqueSnapshot
+ * @async
+ * @param {string} pageUrl - رابط الصفحة المراد جلبها.
+ * @param {string} containerId - معرف الحاوية التي سيتم إدراج المحتوى فيها.
+ * @returns {Promise<void>}
+ */
 async function insertUniqueSnapshot(pageUrl, containerId) {
   try {
     // حفظ النسخة إذا لم تكن موجودة

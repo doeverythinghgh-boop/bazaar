@@ -1,17 +1,25 @@
 /**
- * معالجة إرسال نموذج المنتج
+ * @file js/productFormSubmit.js
+ * @description يحتوي على منطق معالجة تقديم نموذج المنتج، بما في ذلك التحقق من الصحة، رفع الصور، وحفظ البيانات.
+ */
+
+/**
+ * @description يربط معالج حدث الإرسال بنموذج إضافة المنتج.
+ *   يقوم بإزالة أي معالجات سابقة لتجنب التكرار.
+ * @function productSetupFormSubmit
+ * @returns {void}
  */
 function productSetupFormSubmit() {
   const form = document.getElementById('add-product-form');
-  
+
   if (!form) {
     console.error('Form element not found for submit handler');
     return;
   }
-  
+
   // إزالة أي مستمعين سابقين لمنع التكرار
   form.removeEventListener('submit', productHandleFormSubmit);
-  
+
   form.addEventListener('submit', productHandleFormSubmit);
 }
 
@@ -28,10 +36,10 @@ async function productHandleFormSubmit(e) {
   e.preventDefault();
   const form = document.getElementById('add-product-form');
   const extendedMode = form ? form.dataset.extendedMode : 'unknown';
-  
-  console.log(`%c[Submit] 🚀 Form submission in mode: ${extendedMode}`, 
+
+  console.log(`%c[Submit] 🚀 Form submission in mode: ${extendedMode}`,
     'color: blue; font-weight: bold;');
-  
+
   // التحقق من الصحة
   if (!productValidateForm()) {
     console.warn('[ProductForm] Validation failed. Submission aborted.');
@@ -55,9 +63,9 @@ async function productHandleFormSubmit(e) {
 async function productProcessFormSubmission() {
   const form = document.getElementById('add-product-form');
   const extendedMode = form ? form.dataset.extendedMode : 'unknown';
-  
+
   console.log(`%c[ProductForm] Validation passed. Starting submission process in mode: ${extendedMode}.`, 'color: green;');
-  
+
   // استخدام SweetAlert2 إذا متاح، وإلا استخدام confirm عادي
   if (typeof Swal !== 'undefined') {
     Swal.fire({
@@ -73,7 +81,7 @@ async function productProcessFormSubmission() {
   }
 
   try {
-    const productSerial = form.dataset.mode === 'edit' ? 
+    const productSerial = form.dataset.mode === 'edit' ?
       form.dataset.productKey : productGenerateProductSerial();
 
     // حذف الصور القديمة في وضع التعديل
@@ -83,19 +91,19 @@ async function productProcessFormSubmission() {
 
     // رفع الصور الجديدة والحصول على أسماء الملفات
     const uploadedImageFiles = await productUploadImages(productSerial);
-    
+
     // تجميع بيانات المنتج مع الصور المحدثة
     const productData = productPrepareProductData(productSerial, uploadedImageFiles);
-    
+
     // حفظ في قاعدة البيانات
     await productSaveToDatabase(productData, form.dataset.mode);
-    
+
     // عرض رسالة النجاح
     await productShowSuccessMessage(form.dataset.mode);
 
   } catch (error) {
     console.error('%c[ProductForm] Submission failed with critical error:', 'color: red; font-weight: bold;', error);
-    
+
     if (typeof Swal !== 'undefined') {
       Swal.fire('خطأ!', `فشل في حفظ المنتج: ${error.message}`, 'error');
     } else {
@@ -115,7 +123,7 @@ async function productProcessFormSubmission() {
 async function productHandleImageDeletion() {
   const originalImageNames = window.productModule.originalImageNames || [];
   const currentImages = window.productModule.images || [];
-  
+
   // الحصول على أسماء الصور الحالية (القديمة والجديدة)
   const currentImageNames = currentImages.map(state => {
     // إذا كانت الصورة مرفوعة مسبقًا، استخدم fileName، وإلا فهي جديدة وسيتم رفعها
@@ -124,13 +132,13 @@ async function productHandleImageDeletion() {
 
   console.log('[ProductForm] Original images:', originalImageNames);
   console.log('[ProductForm] Current images:', currentImageNames);
-  
+
   // تحديد الصور المحذوفة: الموجودة في الأصلية وغير موجودة في الحالية
   const imagesToDelete = originalImageNames.filter(name => !currentImageNames.includes(name));
-  
+
   if (imagesToDelete.length > 0) {
     console.log("[ProductForm] Deleting old images:", imagesToDelete);
-    await Promise.all(imagesToDelete.map(name => 
+    await Promise.all(imagesToDelete.map(name =>
       deleteFile2cf(name, (msg) => console.log('[CloudflareDelete]', msg))
         .catch(err => console.error(`فشل حذف الملف ${name}:`, err))
     ));
@@ -152,37 +160,37 @@ async function productHandleImageDeletion() {
 async function productUploadImages(productSerial) {
   const uploadedImageFiles = [];
   const imagesToUpload = window.productModule.images.filter(s => s.status === 'ready');
-  
+
   console.log(`[ProductForm] Uploading ${imagesToUpload.length} new images...`);
-  
+
   for (let i = 0; i < window.productModule.images.length; i++) {
     const state = window.productModule.images[i];
-    
+
     // رفع الصور الجديدة فقط (status === 'ready')
     if (state.status !== 'ready' || !state.compressedBlob) continue;
 
     // إنشاء اسم ملف فريد
     const timestamp = Date.now();
     const fileName = `${i + 1}_${productSerial}_${timestamp}.webp`;
-    
+
     // التحقق من وجود دالة الرفع
     if (typeof uploadFile2cf !== 'function') {
       throw new Error('دالة رفع الملفات غير متاحة (uploadFile2cf)');
     }
-    
+
     console.log(`[ProductForm] Uploading new image: ${fileName}`);
-    const result = await uploadFile2cf(state.compressedBlob, fileName, 
+    const result = await uploadFile2cf(state.compressedBlob, fileName,
       (msg) => console.log('[CloudflareUpload]', msg));
-    
+
     console.log(`[ProductForm] New image uploaded: ${result.file}`);
-    
+
     // تحديث حالة الصورة لتعكس أنها مرفوعة الآن
     state.status = 'uploaded';
     state.fileName = result.file;
-    
+
     uploadedImageFiles.push(result.file);
   }
-  
+
   return uploadedImageFiles;
 }
 
@@ -205,13 +213,13 @@ function productPrepareProductData(productSerial, uploadedImageFiles) {
 
   const mainCatForSubmit = document.getElementById('main-category').value;
   let finalServiceType = 0;
-  
+
   // معالجة الفئة الخدمات
   if (mainCatForSubmit === SERVICE_CATEGORY_NoPrice_ID) {
     console.log('[ProductForm] Service category detected. Forcing price and quantity to 0 before submission.');
     document.getElementById('product-price').value = 0;
     document.getElementById('product-quantity').value = 0;
-    
+
     const selectedServiceTypeRadio = document.querySelector('input[name="serviceType"]:checked');
     if (selectedServiceTypeRadio) {
       finalServiceType = parseInt(selectedServiceTypeRadio.value, 10);
@@ -220,14 +228,14 @@ function productPrepareProductData(productSerial, uploadedImageFiles) {
 
   // تجميع جميع أسماء الصور النهائية
   const finalImageNames = [];
-  
+
   // إضافة الصور الحالية (القديمة والجديدة)
   window.productModule.images.forEach(state => {
     if (state.fileName) {
       finalImageNames.push(state.fileName);
     }
   });
-  
+
   // إضافة الصور التي تم رفعها حديثًا (في حالة عدم وجود fileName في state)
   uploadedImageFiles.forEach(fileName => {
     if (!finalImageNames.includes(fileName)) {
@@ -267,7 +275,7 @@ function productPrepareProductData(productSerial, uploadedImageFiles) {
  */
 async function productSaveToDatabase(productData, mode) {
   let dbResult;
-  
+
   if (mode === 'edit') {
     console.log('[ProductForm] Sending UPDATE request to backend...');
     if (typeof updateProduct !== 'function') {
@@ -299,19 +307,19 @@ async function productSaveToDatabase(productData, mode) {
  * @see Swal.fire
  */
 async function productShowSuccessMessage(mode) {
-  const successMessage = mode === 'edit' ? 
+  const successMessage = mode === 'edit' ?
     'تم تحديث المنتج بنجاح.' : 'تم إضافة المنتج بنجاح.';
-  
+
   if (typeof Swal !== 'undefined') {
     await Swal.fire('تم بنجاح!', successMessage, 'success');
   } else {
     alert(successMessage);
   }
-  
+
   // إغلاق النافذة المنبثقة
   const closeBtn = document.getElementById("add-product-modal-close-btn");
   if (closeBtn) closeBtn.click();
-  
+
   // تحديث عرض "منتجاتي"
   const loggedInUser = JSON.parse(localStorage.getItem("loggedInUser"));
   if (loggedInUser && typeof showMyProducts === 'function') {

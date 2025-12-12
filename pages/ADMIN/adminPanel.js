@@ -234,7 +234,11 @@ async function initializeAdminPanel() {
 }
 
 /**
- * @description عرض نافذة إدارة العلاقات للمستخدم
+ * @function showRelationsModal
+ * @description عرض نافذة إدارة العلاقات للمستخدم (بائعين أو موزعين).
+ * @param {string} userKey - مفتاح المستخدم.
+ * @param {string} username - اسم المستخدم.
+ * @returns {Promise<void>}
  */
 async function showRelationsModal(userKey, username) {
     Swal.fire({
@@ -282,7 +286,12 @@ async function showRelationsModal(userKey, username) {
 }
 
 /**
- * @description إنشاء HTML لقائمة العلاقات
+ * @function createRelationsListHtml
+ * @description إنشاء HTML لقائمة العلاقات.
+ * @param {Array<object>} list - قائمة العلاقات.
+ * @param {string} currentUserKey - مفتاح المستخدم الحالي.
+ * @param {string} currentRoleContext - سياق الدور الحالي ('seller' أو 'delivery').
+ * @returns {string} كود HTML للقائمة.
  */
 function createRelationsListHtml(list, currentUserKey, currentRoleContext) {
     let html = '<ul style="list-style: none; padding: 0; margin: 0;">';
@@ -312,7 +321,10 @@ function createRelationsListHtml(list, currentUserKey, currentRoleContext) {
 }
 
 /**
- * @description معالجة إضافة علاقة جديدة
+ * @function handleAddRelation
+ * @description معالجة إضافة علاقة جديدة بين المستخدمين.
+ * @param {string} currentUserKey - مفتاح المستخدم صاحب النافذة.
+ * @returns {Promise<void>}
  */
 window.handleAddRelation = async (currentUserKey) => {
     const targetUserKey = document.getElementById('newRelUserKey').value.trim();
@@ -359,7 +371,13 @@ window.handleAddRelation = async (currentUserKey) => {
 };
 
 /**
- * @description معالجة تبديل حالة العلاقة
+ * @function handleToggleRelation
+ * @description معالجة تبديل حالة العلاقة (تفعيل/تعطيل).
+ * @param {string} sellerKey - مفتاح البائع.
+ * @param {string} deliveryKey - مفتاح الموزع.
+ * @param {boolean} newStatus - الحالة الجديدة المطلوب تعيينها.
+ * @param {string} modalOwnerKey - مفتاح المستخدم صاحب النافذة (لإعادة التحديث).
+ * @returns {Promise<void>}
  */
 window.handleToggleRelation = async (sellerKey, deliveryKey, newStatus, modalOwnerKey) => {
     try {
@@ -389,7 +407,11 @@ window.handleToggleRelation = async (sellerKey, deliveryKey, newStatus, modalOwn
 };
 
 /**
- * @description تسجيل الدخول كمسؤول باسم مستخدم آخر (Impersonation)
+ * @function loginAsUser
+ * @description تسجيل الدخول كمسؤول باسم مستخدم آخر (Impersonation).
+ * يقوم هذا بتبديل الجلسة الحالية بجلسة المستخدم المحدد.
+ * @param {string} targetUserKey - مفتاح المستخدم المستهدف.
+ * @returns {Promise<void>}
  */
 window.loginAsUser = async (targetUserKey) => {
     try {
@@ -457,7 +479,10 @@ window.loginAsUser = async (targetUserKey) => {
 
 
 /**
- * @description إرسال إشعار فوري للمستخدم من لوحة التحكم
+ * @function sendAdminNotification
+ * @description إرسال إشعار فوري للمستخدم من لوحة التحكم.
+ * @param {string} userKey - مفتاح المستخدم المستهدف.
+ * @returns {Promise<void>}
  */
 window.sendAdminNotification = async (userKey) => {
     const inputElement = document.getElementById(`notify-input-${userKey}`);

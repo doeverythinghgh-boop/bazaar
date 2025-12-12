@@ -1,4 +1,10 @@
 /**
+ * @file notification/notificationTools.js
+ * @description مكتبة شاملة لإدارة أدوات الإشعارات، بما في ذلك إرسال الإشعارات عبر FCM،
+ *   التعامل مع البيئة الأصلية (Android)، وإدارة منطق الإشعارات لمختلف أحداث النظام (الشراء، تغيير المراحل، إلخ).
+ */
+
+/**
  * @description التحقق مما إذا كان يجب إرسال الإشعار بناءً على الإعدادات
  * @param {string} eventKey
  * @param {string} role ('buyer' | 'admin' | 'seller' | 'delivery')
@@ -369,6 +375,12 @@ async function askForNotificationPermission() {
 }
 
 
+/**
+ * @description يتم استدعاؤها عند تسجيل خروج المستخدم في بيئة الأندرويد.
+ *   تقوم بإبلاغ الواجهة الأصلية وحذف توكن الأندرويد المخزن محلياً.
+ * @function onUserLoggedOutAndroid
+ * @returns {void}
+ */
 function onUserLoggedOutAndroid() {
     if (
         window.Android &&

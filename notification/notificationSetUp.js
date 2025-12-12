@@ -1,8 +1,22 @@
 
+/**
+ * @file notification/notificationSetUp.js
+ * @description نقطة الدخول الرئيسية لتهيئة نظام إشعارات Firebase (FCM).
+ *   تتولى هذه الوحدة تحديد البيئة (ويب أو أندرويد) وتشغيل إجراءات التهيئة المناسبة،
+ *   بما في ذلك تسجيل Service Worker وطلب الأذونات ومزامنة التوكنات مع الخادم.
+ */
 
 // ===============================
 //   FCM - Main Entry Point
 // ===============================
+
+/**
+ * @description الدالة الرئيسية لتهيئة FCM.
+ *   تقوم بالتحقق من وجود مستخدم مسجل، وتحديد المنصة (أندرويد أو ويب)، وتوجيه التهيئة للدالة المناسبة.
+ * @function setupFCM
+ * @async
+ * @returns {Promise<void>}
+ */
 async function setupFCM() {
     // [تحديث] إزالة التحقق من fcmInitialized للسماح بإعادة التهيئة عند تحديث الصفحة
     // if (sessionStorage.getItem("fcmInitialized")) {
@@ -31,6 +45,14 @@ async function setupFCM() {
 // ===============================
 //   1) Service Worker Registrar
 // ===============================
+
+/**
+ * @description تقوم بتسجيل Service Worker الخاص بـ Firebase Messaging.
+ *   تتحقق أولاً من دعم المتصفح وتتعامل مع تحذيرات HTTP/HTTPS.
+ * @function registerServiceWorker
+ * @async
+ * @returns {Promise<ServiceWorkerRegistration|boolean>} - كائن التسجيل عند النجاح، أو `false` عند الفشل.
+ */
 async function registerServiceWorker() {
     if (!("serviceWorker" in navigator)) {
         console.warn("[FCM] المتصفح لا يدعم Service Workers.");
@@ -65,6 +87,14 @@ async function registerServiceWorker() {
 // ===============================
 //   2) FCM for Android WebView
 // ===============================
+
+/**
+ * @description تقوم بتهيئة FCM خصيصاً لبيئة الأندرويد (WebView).
+ *   تتواصل مع الواجهة الأصلية (Android Interface) لطلب التوكن، وتنتظر الاستجابة، ثم ترسله للخادم.
+ * @function setupFirebaseAndroid
+ * @async
+ * @returns {Promise<void>}
+ */
 async function setupFirebaseAndroid() {
     console.log("[Android FCM] تهيئة FCM للاندرويد...");
 
@@ -96,6 +126,15 @@ async function setupFirebaseAndroid() {
 // ===============================
 //   3) FCM for Web Browsers
 // ===============================
+
+/**
+ * @description تقوم بتهيئة FCM لبيئة الويب (المتصفحات).
+ *   تشمل الخطوات: تسجيل Service Worker، استيراد مكتبات Firebase، تهيئة التطبيق، طلب الأذونات،
+ *   الحصول على التوكن، ومزامنته مع الخادم.
+ * @function setupFirebaseWeb
+ * @async
+ * @returns {Promise<void>}
+ */
 async function setupFirebaseWeb() {
     console.log("[Web FCM] تهيئة FCM للويب...");
 

@@ -12,30 +12,30 @@
 function productUpdateExtendedMode() {
   const form = document.getElementById('add-product-form');
   if (!form) return '';
-  
+
   const baseMode = form.dataset.mode; // 'add' أو 'edit'
   const mainCategorySelect = document.getElementById('main-category');
   const mainCategory = mainCategorySelect ? mainCategorySelect.value : '';
-  
+
   let extendedMode = baseMode;
-  
+
   // تحديد إذا كانت فئة الخدمات
   if (mainCategory === SERVICE_CATEGORY_NoPrice_ID) {
     extendedMode = baseMode + 'InServiceCategory';
   }
-  
+
   // تحديث الخاصية
   form.dataset.extendedMode = extendedMode;
-  
+
 
   // تحديث لون خلفية النموذج
   productUpdateModalBackground(extendedMode);
-  
+
 
   // تسجيل التغيير للمطور
-  console.log(`%c[ProductForm] 🎯 Extended Mode: ${extendedMode}`, 
+  console.log(`%c[ProductForm] 🎯 Extended Mode: ${extendedMode}`,
     'color: purple; font-weight: bold; font-size: 14px;');
-  
+
   return extendedMode;
 }
 
@@ -48,9 +48,9 @@ function productUpdateExtendedMode() {
 function productLogCurrentState(action = 'State Update') {
   const form = document.getElementById('add-product-form');
   const mainCategory = document.getElementById('main-category');
-  
+
   if (!form || !mainCategory) return;
-  
+
   console.group(`%c📊 Product Form State - ${action}`, 'color: navy; font-weight: bold;');
   console.log(`📍 Base Mode: ${form.dataset.mode || 'undefined'}`);
   console.log(`🎯 Extended Mode: ${form.dataset.extendedMode || 'undefined'}`);
@@ -73,39 +73,39 @@ function productLogCurrentState(action = 'State Update') {
  */
 async function productInitializeAddProductForm(editProductData = null) {
   console.log('%c[ProductForm] Initializing form...', 'color: blue;');
-  
+
   // تنظيف الوحدة السابقة أولاً
   if (window.productModule && window.productModule.cleanup) {
     window.productModule.cleanup();
   }
-  
+
   // ⭐⭐ الإصلاح: إعادة تعيين النص والعنوان أولاً ⭐⭐
   const titleElement = document.getElementById('addProductTitle');
   const submitButton = document.querySelector('.add-product-modal__submit-container .btn');
-  
+
   const isEditMode = editProductData !== null;
-  
+
   // ⭐⭐ تحديد النص بناءً على الوضع الحقيقي ⭐⭐
   if (titleElement) {
-    titleElement.innerHTML = isEditMode 
+    titleElement.innerHTML = isEditMode
       ? '<i class="fas fa-edit"></i> تعديل المنتج'
       : '<i class="fas fa-cart-plus"></i> إضافة منتج جديد';
   }
-  
+
   if (submitButton) {
     submitButton.textContent = isEditMode ? 'حفظ التعديلات' : 'اضف المنتج الآن';
   }
-  
+
   // تهيئة وحدات JavaScript أولاً
   if (!productInitializeModules()) {
     console.error('Failed to initialize product modules');
     return false;
   }
-  
+
   const mainCategorySelect = document.getElementById("main-category");
   const subCategorySelect = document.getElementById("sub-category");
   const form = document.getElementById('add-product-form');
-  
+
   if (!mainCategorySelect || !subCategorySelect || !form) {
     console.error('Required form elements not found');
     return false;
@@ -118,7 +118,7 @@ async function productInitializeAddProductForm(editProductData = null) {
   // ⭐⭐ التحديث: استخدام isEditMode بدلاً من إعادة التعيين ⭐⭐
   form.dataset.mode = isEditMode ? 'edit' : 'add';
   console.log(`[ProductForm] Mode: ${form.dataset.mode}`);
-  
+
   if (isEditMode) {
     form.dataset.productKey = editProductData.product_key;
     console.log(`[ProductForm] Editing product with key: ${editProductData.product_key}`);
@@ -144,7 +144,7 @@ async function productInitializeAddProductForm(editProductData = null) {
     const mainCategoryHandler = productHandleMainCategoryChange(categories);
     mainCategorySelect.removeEventListener('change', mainCategoryHandler);
     mainCategorySelect.addEventListener("change", mainCategoryHandler);
-    
+
   } catch (error) {
     console.error("%c[ProductForm] Failed to load categories:", 'color: red;', error);
     productShowError(mainCategorySelect, 'فشل في تحميل الفئات. يرجى المحاولة مرة أخرى.');
@@ -168,25 +168,30 @@ async function productInitializeAddProductForm(editProductData = null) {
   productSetupCharacterCounters();
   productSetupFormSubmit();
   productSetupCloseButtonListener();
-  
+
   console.log('%c[ProductForm] Form initialized successfully', 'color: green;');
   return true;
 }
 
-// ⭐⭐ دالة جديدة لتنظيف الحقول في وضع الإضافة ⭐⭐
+/**
+ * @description تقوم بإعادة تعيين حقول نموذج المنتج إلى حالتها الافتراضية.
+ *   تُستخدم عند فتح النموذج في وضع "إضافة منتج جديد" لضمان عدم وجود بيانات متبقية من عمليات سابقة.
+ * @function productResetFormFields
+ * @returns {void}
+ */
 function productResetFormFields() {
   console.log('[ProductForm] Resetting form fields for add mode');
-  
+
   const fieldsToReset = [
     'product-name',
-    'product-description', 
+    'product-description',
     'seller-message',
     'product-notes',
     'product-quantity',
     'product-price',
     'original-price'
   ];
-  
+
   fieldsToReset.forEach(fieldId => {
     const field = document.getElementById(fieldId);
     if (field) {
@@ -194,46 +199,46 @@ function productResetFormFields() {
       productClearError(field);
     }
   });
-  
+
   // إعادة تعيين الفئات
   const mainCategorySelect = document.getElementById('main-category');
   const subCategorySelect = document.getElementById('sub-category');
   const subCategoryGroup = document.getElementById('sub-category-group');
-  
+
   if (mainCategorySelect) {
     mainCategorySelect.value = '';
     productClearError(mainCategorySelect);
   }
-  
+
   if (subCategorySelect) {
     subCategorySelect.value = '';
     subCategorySelect.disabled = true;
     productClearError(subCategorySelect);
   }
-  
+
   if (subCategoryGroup) {
     subCategoryGroup.style.display = 'none';
   }
-  
+
   // إعادة تعيين نوع الخدمة
   const serviceTypeOptions = document.getElementById('service-type-options');
   const serviceTypeRadios = document.querySelectorAll('input[name="serviceType"]');
-  
+
   if (serviceTypeOptions) {
     serviceTypeOptions.style.display = 'none';
   }
-  
+
   serviceTypeRadios.forEach(radio => {
     radio.checked = false;
     radio.required = false;
   });
-  
+
   // إعادة تعيين الصور
   if (window.productModule && window.productModule.images) {
     window.productModule.images.length = 0;
     window.productModule.originalImageNames = [];
   }
-  
+
   const previewsEl = document.getElementById('previews');
   if (previewsEl) {
     previewsEl.innerHTML = '';
@@ -249,7 +254,7 @@ function productResetFormFields() {
  */
 function productInitializeModules() {
   console.log('[ProductForm] Initializing all modules...');
-  
+
   // تهيئة وحدة المنتج
   if (window.productModule && window.productModule.init) {
     if (!window.productModule.init()) {
@@ -260,7 +265,7 @@ function productInitializeModules() {
     console.error('Product module not available');
     return false;
   }
-  
+
   return true;
 }
 
@@ -348,11 +353,11 @@ function productHandleMainCategoryChange(categories) {
  */
 function productPopulateEditForm(editProductData) {
   console.log('[ProductForm] Populating form with existing product data.');
-  
+
   // تحديث العنوان وزر الإرسال
   const titleElement = document.getElementById('addProductTitle');
   const submitButton = document.querySelector('.add-product-modal__submit-container .btn');
-  
+
   if (titleElement) {
     titleElement.innerHTML = '<i class="fas fa-edit"></i> تعديل المنتج';
   }
@@ -374,7 +379,7 @@ function productPopulateEditForm(editProductData) {
     quantityInput.value = isServiceCategory ? 0 : (editProductData.product_quantity || '');
     priceInput.value = isServiceCategory ? 0 : (editProductData.product_price || '');
   }
-  
+
   const originalPriceInput = document.getElementById('original-price');
   if (originalPriceInput) {
     originalPriceInput.value = editProductData.original_price || '';
@@ -398,7 +403,7 @@ function productPopulateEditForm(editProductData) {
     console.log('[ProductForm] Loading existing images:', editProductData.ImageName);
     const imageNames = editProductData.ImageName.split(',');
     window.productModule.originalImageNames = [...imageNames];
-    
+
     imageNames.forEach(name => {
       if (!name) return;
       const id = window.productModule.genId();
@@ -424,10 +429,10 @@ function productPopulateEditForm(editProductData) {
     mainCategorySelect.value = mainCatId;
     mainCategorySelect.dispatchEvent(new Event('change'));
   }
-  
+
   if (subCatId && subCategorySelect) {
-    setTimeout(() => { 
-      subCategorySelect.value = subCatId; 
+    setTimeout(() => {
+      subCategorySelect.value = subCatId;
     }, 100);
   }
 
@@ -457,13 +462,13 @@ function productSetupCharacterCounters() {
   fields.forEach(field => {
     const element = document.getElementById(field.id);
     const counter = document.getElementById(field.counterId);
-    
+
     if (element && counter) {
       element.addEventListener('input', () => {
         const currentLength = element.value.length;
         const maxLength = element.maxLength;
         counter.textContent = `${currentLength} / ${maxLength}`;
-        
+
         // التحقق في الوقت الفعلي
         if (currentLength > 0) {
           productQuickValidateField(element);
@@ -546,7 +551,7 @@ function productSetupNumberFields() {
         value = parts[0] + '.' + parts.slice(1).join('');
       }
       originalPriceInput.value = value;
-      
+
       // التحقق من أن السعر الأصلي أكبر من السعر الحالي
       const priceInput = document.getElementById('product-price');
       if (originalPriceInput.value && priceInput && priceInput.value) {
@@ -566,13 +571,13 @@ function productSetupNumberFields() {
   // التحقق من الفئات عند التغيير
   const mainCategorySelect = document.getElementById('main-category');
   const subCategorySelect = document.getElementById('sub-category');
-  
+
   if (mainCategorySelect) {
     mainCategorySelect.addEventListener('change', () => {
       productClearError(mainCategorySelect);
     });
   }
-  
+
   if (subCategorySelect) {
     subCategorySelect.addEventListener('change', () => {
       productClearError(subCategorySelect);
@@ -590,10 +595,10 @@ function productSetupNumberFields() {
  */
 function productUpdateModalBackground(extendedMode) {
   console.group('%c[ProductForm] 🎨 Background Update - Targeting Correct Element', 'color: orange; font-weight: bold;');
-  
+
   // العنصر الصحيح هو .add-product-modal فقط
   const targetElement = document.querySelector('.add-product-modal');
-  
+
   if (!targetElement) {
     console.error('%c[ProductForm] 🎨 Target element .add-product-modal not found!', 'color: red;');
     console.groupEnd();
@@ -614,27 +619,27 @@ function productUpdateModalBackground(extendedMode) {
   console.log('%c[ProductForm] 🎨 Service background to apply:', 'color: purple;', serviceBackground);
 
   const isServiceMode = extendedMode === 'addInServiceCategory' || extendedMode === 'editInServiceCategory';
-  
+
   if (isServiceMode) {
     // تطبيق خلفية الخدمات على العنصر الصحيح فقط
     console.log('%c[ProductForm] 🎨 APPLYING SERVICE BACKGROUND TO .add-product-modal', 'color: green; font-weight: bold;');
-    
+
     // طريقة مباشرة وقوية
     targetElement.style.backgroundColor = serviceBackground;
     targetElement.style.background = serviceBackground;
     targetElement.classList.add('service-category-active');
-    
+
     console.log('%c[ProductForm] 🎨 Service background applied to correct element', 'color: green;');
-    
+
   } else {
     // إعادة الخلفية الأصلية
     console.log('%c[ProductForm] 🎨 RESTORING ORIGINAL BACKGROUND', 'color: blue; font-weight: bold;');
-    
+
     const originalBackground = targetElement.dataset.originalBackground;
     targetElement.style.backgroundColor = originalBackground;
     targetElement.style.background = originalBackground;
     targetElement.classList.remove('service-category-active');
-    
+
     console.log('%c[ProductForm] 🎨 Original background restored to correct element', 'color: blue;');
   }
 
@@ -654,10 +659,10 @@ function productUpdateModalBackground(extendedMode) {
  */
 function productResetModalBackground() {
   console.log('%c[ProductForm] 🎨 RESET Background - Targeting .add-product-modal only', 'color: red; font-weight: bold;');
-  
+
   // استهدف فقط .add-product-modal
   const targetElement = document.querySelector('.add-product-modal');
-  
+
   if (!targetElement) {
     console.error('%c[ProductForm] 🎨 Target element .add-product-modal not found for reset!', 'color: red;');
     return;
@@ -676,11 +681,11 @@ function productResetModalBackground() {
     targetElement.style.removeProperty('background');
     console.log('%c[ProductForm] 🎨 Removed background properties', 'color: green;');
   }
-  
+
   // إزالة الكلاسات
   targetElement.classList.remove('service-category-active');
   targetElement.classList.remove('service-category-mode');
-  
+
   console.log('%c[ProductForm] 🎨 Background reset completed for .add-product-modal', 'color: green; font-weight: bold;');
 }
 
@@ -697,18 +702,18 @@ function productResetModalBackground() {
 function productDebugBackground() {
   const modal = document.querySelector('.add-product-modal');
   const modalMainContent = document.getElementById('modal-main-content');
-  
+
   console.group('%c[ProductForm] 🎨 Background Debug', 'color: orange; font-weight: bold;');
   console.log('Modal element:', modal);
   console.log('Modal main content:', modalMainContent);
-  
+
   if (modal) {
     const computedStyle = window.getComputedStyle(modal);
     console.log('Modal computed background:', computedStyle.backgroundColor);
     console.log('Modal inline background:', modal.style.backgroundColor);
     console.log('Modal dataset original:', modal.dataset.originalBackground);
   }
-  
+
   if (modalMainContent) {
     const computedStyle = window.getComputedStyle(modalMainContent);
     console.log('Main content computed background:', computedStyle.backgroundColor);
@@ -726,14 +731,14 @@ function productDebugBackground() {
 function productSetupCloseButtonListener() {
   const closeButton = document.getElementById('add-product-modal-close-btn');
   const modalContainer = document.querySelector('.add-product-modal');
-  
+
   if (closeButton) {
     // إزالة أي مستمعين سابقين لمنع التكرار
     closeButton.removeEventListener('click', productHandleCloseButton);
     closeButton.addEventListener('click', productHandleCloseButton);
     console.log('%c[ProductForm] 🔒 Close button listener setup', 'color: gray;');
   }
-  
+
   if (modalContainer) {
     // أيضًا نستمع لأي حدث إغلاق خارجي
     modalContainer.removeEventListener('close', productHandleCloseButton);
@@ -750,20 +755,20 @@ function productSetupCloseButtonListener() {
  */
 function productHandleCloseButton() {
   console.log('%c[ProductForm] 🔒 Close button - RESETTING .add-product-modal ONLY', 'color: red; font-weight: bold;');
-  
+
   // إعادة تعيين فورية للعنصر الصحيح فقط
   setTimeout(() => {
     if (typeof productResetModalBackground === 'function') {
       productResetModalBackground();
     }
-    
+
     // تنظيف إضافي مضمون
     const modalElement = document.querySelector('.add-product-modal');
     if (modalElement) {
       modalElement.style.cssText = '';
       modalElement.className = modalElement.className.replace(/service-category-\w+/g, '');
     }
-    
+
     console.log('%c[ProductForm] 🔒 .add-product-modal background fully reset after close', 'color: green;');
   }, 50);
 }

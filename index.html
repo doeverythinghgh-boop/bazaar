@@ -17,7 +17,7 @@
 
   <!-- ✅ ربط ملف المتغيرات لاستخدامها في الأنماط الداخلية -->
   <link rel="stylesheet" href="style/variables.css" />
-  <script src="/shared/categoryModal.js"></script>
+  <script src="pages/category/categoryModal.js"></script>
   <script src="/js/cloudFileManager.js"></script>
   <script src="/js/cardPackage.js"></script>
 
@@ -467,7 +467,7 @@
 
       // دالة معالجة النقر على زر "الرئيسية".
       function handleHomeButtonClick() {
-        // [خطوة 0] التحقق من وجود واجهة Android ودالة التحديث.
+        // التحقق من وجود واجهة Android ودالة التحديث.
         if (window.Android && typeof window.Android.checkForUpdates === "function") {
           window.Android.checkForUpdates();
         }

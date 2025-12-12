@@ -10,9 +10,22 @@ let notifiSetting_DEFAULT_CONFIG = {};
 
 const notifiSetting_STORAGE_KEY = 'notification_config';
 
+/**
+ * @description المتحكم الرئيسي لصفحة إعدادات الإشعارات.
+ * @namespace notifiSetting_Controller
+ */
 const notifiSetting_Controller = {
+    /**
+     * @description إعدادات الإشعارات الحالية
+     * @type {object}
+     */
     notifiSetting_config: {},
 
+    /**
+     * @description تهيئة الصفحة وتحميل الإعدادات
+     * @async
+     * @returns {Promise<void>}
+     */
     async notifiSetting_init() {
         try {
             await this.notifiSetting_loadDefaults();
@@ -25,6 +38,11 @@ const notifiSetting_Controller = {
         }
     },
 
+    /**
+     * @description تحميل الإعدادات الافتراضية من ملف JSON
+     * @async
+     * @returns {Promise<void>}
+     */
     async notifiSetting_loadDefaults() {
         try {
             // Adjust path if necessary. Assuming notification_config.json is at root "/" or relative to this file.
@@ -41,6 +59,10 @@ const notifiSetting_Controller = {
         }
     },
 
+    /**
+     * @description تحميل الإعدادات المخزنة محلياً ودمجها مع الافتراضيات
+     * @returns {void}
+     */
     notifiSetting_loadConfig() {
         try {
             const notifiSetting_stored = localStorage.getItem(notifiSetting_STORAGE_KEY);
@@ -75,6 +97,10 @@ const notifiSetting_Controller = {
         }
     },
 
+    /**
+     * @description حفظ الإعدادات الحالية في localStorage
+     * @returns {void}
+     */
     notifiSetting_saveConfig() {
         try {
             localStorage.setItem(notifiSetting_STORAGE_KEY, JSON.stringify(this.notifiSetting_config));
@@ -86,6 +112,10 @@ const notifiSetting_Controller = {
         }
     },
 
+    /**
+     * @description استعادة الإعدادات الافتراضية
+     * @returns {void}
+     */
     notifiSetting_resetDefaults() {
         try {
             if (confirm('هل أنت متأكد من استعادة الافتراضيات؟')) {
@@ -98,6 +128,13 @@ const notifiSetting_Controller = {
         }
     },
 
+    /**
+     * @description تحديث قيمة إعداد واحد
+     * @param {string} notifiSetting_eventKey
+     * @param {string} notifiSetting_role
+     * @param {boolean} notifiSetting_isChecked
+     * @returns {void}
+     */
     notifiSetting_updateSetting(notifiSetting_eventKey, notifiSetting_role, notifiSetting_isChecked) {
         try {
             if (this.notifiSetting_config[notifiSetting_eventKey]) {
@@ -109,6 +146,10 @@ const notifiSetting_Controller = {
         }
     },
 
+    /**
+     * @description رسم جدول الإعدادات
+     * @returns {void}
+     */
     notifiSetting_renderTable() {
         try {
             const notifiSetting_tbody = document.getElementById('notifiSetting_settings-body');
@@ -138,6 +179,13 @@ const notifiSetting_Controller = {
         }
     },
 
+    /**
+     * @description إنشاء HTML لمربع اختيار (Checkbox)
+     * @param {string} notifiSetting_eventKey
+     * @param {string} notifiSetting_role
+     * @param {boolean} notifiSetting_checked
+     * @returns {string} HTML string
+     */
     notifiSetting_createCheckbox(notifiSetting_eventKey, notifiSetting_role, notifiSetting_checked) {
         try {
             // إنشاء سلسلة HTML لمربع الاختيار
@@ -157,6 +205,11 @@ const notifiSetting_Controller = {
         }
     },
 
+    /**
+     * @description معالجة تغيير حالة مربع الاختيار
+     * @param {HTMLInputElement} notifiSetting_input
+     * @returns {void}
+     */
     notifiSetting_handleCheckboxChange(notifiSetting_input) {
         try {
             const notifiSetting_eventKey = notifiSetting_input.dataset.event;
@@ -169,6 +222,10 @@ const notifiSetting_Controller = {
         }
     },
 
+    /**
+     * @description إعداد مستمعي الأحداث للأزرار
+     * @returns {void}
+     */
     notifiSetting_setupEventListeners() {
         try {
             const notifiSetting_resetBtn = document.getElementById('notifiSetting_reset-btn');
@@ -182,6 +239,11 @@ const notifiSetting_Controller = {
         }
     },
 
+    /**
+     * @description إظهار رسالة تنبيه (Toast)
+     * @param {string} notifiSetting_message
+     * @returns {void}
+     */
     notifiSetting_showToast(notifiSetting_message) {
         try {
             const notifiSetting_toast = document.getElementById('notifiSetting_toast');

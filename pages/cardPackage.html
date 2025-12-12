@@ -585,9 +585,114 @@
     </div>
 
 
-    <script src="js/cart-modal.js"></script>
-    <script src="js/connect1.js"></script>
     <script>
+        
+async function sendOrder2Excution() {
+  // 1. جلب البيانات
+  const cart = getCart();
+
+  // 2. التحقق من الجلسة (إصلاح الشرط المعكوس)
+  if (!userSession || userSession.user_key == "guest_user") {
+    Swal.fire({
+      title: "مطلوب التسجيل",
+      text: "لإتمام عملية الشراء، يجب عليك تسجيل الدخول أو إنشاء حساب جديد.",
+      icon: "info",
+      showCancelButton: true,
+      confirmButtonText: "تسجيل الدخول",
+      cancelButtonText: "إلغاء",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        mainLoader(
+          "./pages/login.html",
+          "index-user-container",
+          0,
+          undefined,
+          "hiddenLoginIcon",
+          true
+        );
+      }
+    });
+    return;
+  }
+
+  // 3. التحقق من السلة
+  if (cart.length === 0) {
+    Swal.fire("السلة فارغة", "لا توجد منتجات في السلة لإتمام الشراء.", "info");
+    return;
+  }
+
+  // 4. حساب المبلغ الإجمالي وإنشاء مفتاح الطلب
+  const totalAmount = cart.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0
+  );
+  const orderKey = generateOrderKey();
+
+  // 5. بناء بيانات الطلب (إزالة التكرار)
+  const orderData = {
+    order_key: orderKey,
+    user_key: userSession.user_key,
+    total_amount: totalAmount,
+    items: cart.map((item) => ({
+      product_key: item.product_key,
+      quantity: item.quantity,
+      seller_key: item.seller_key,
+      note: item.note || "",
+    })),
+  };
+  console.log("[Checkout] جاري إرسال بيانات الطلب:", orderData);
+
+  // 6. إظهار رسالة تأكيد
+  const result = await Swal.fire({
+    title: "تأكيد الطلب",
+    text: `المبلغ الإجمالي هو ${totalAmount.toFixed(2)} جنيه. هل تريد المتابعة؟`,
+    icon: "question",
+    showCancelButton: true,
+    confirmButtonText: "نعم، أرسل الطلب!",
+    cancelButtonText: "إلغاء",
+    showLoaderOnConfirm: true,
+    preConfirm: async () => {
+      try {
+        const response = await createOrder(orderData);
+        console.log("[Checkout] الاستجابة من الخادم:", response);
+        return response;
+      } catch (error) {
+        Swal.showValidationMessage(`فشل الطلب: ${error.message || error}`);
+        return null;
+      }
+    },
+    allowOutsideClick: () => !Swal.isLoading(),
+  });
+
+  // 7. معالجة النتيجة
+  if (result.isConfirmed && result.value && !result.value.error) {
+    const createdOrderKey = result.value.order_key;
+    console.log(`[Checkout] تم إنشاء الطلب بنجاح: ${createdOrderKey}`);
+
+    // 8. إرسال الإشعارات باستخدام الدالة الجديدة
+    if (typeof handlePurchaseNotifications === 'function') {
+      const finalOrderForNotify = { ...orderData, id: createdOrderKey };
+      handlePurchaseNotifications(finalOrderForNotify)
+        .catch(err => console.error('[Checkout] خطأ في إرسال الإشعارات:', err));
+    } else {
+      console.warn('[Checkout] دالة handlePurchaseNotifications غير متوفرة');
+    }
+
+    // 9. تنظيف السلة وإظهار رسالة النجاح
+    clearCart();
+    await Swal.fire({
+      title: "تم إتمام طلبك بنجاح! 🎉",
+      text: `رقم الطلب: #${createdOrderKey}`,
+      icon: "success",
+      confirmButtonText: "حسناً"
+    });
+
+  } else if (result.value && result.value.error) {
+    console.error("[Checkout] فشل إنشاء الطلب:", result.value.error);
+    Swal.fire("حدث خطأ", `فشل إرسال الطلب: ${result.value.error}`, "error");
+  }
+}
+
         // المتغيرات العامة
         let cartPage_currentProductKeyForNote = '';
 
