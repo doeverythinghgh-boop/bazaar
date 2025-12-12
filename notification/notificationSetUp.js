@@ -47,7 +47,12 @@ async function registerServiceWorker() {
     try {
         console.log("[SW] جاري تسجيل Service Worker...");
         const reg = await navigator.serviceWorker.register("firebase-messaging-sw.js");
-        console.log("[SW] تم التسجيل بنجاح.");
+
+        // الانتظار حتى يصبح Service Worker نشطاً تماماً
+        // هذا يمنع خطأ "no active Service Worker" عند طلب التوكن
+        await navigator.serviceWorker.ready;
+
+        console.log("[SW] تم التسجيل بنجاح وهو جاهز.");
         return reg;
     } catch (err) {
         console.error("[SW] فشل تسجيل Service Worker:", err);
@@ -166,7 +171,8 @@ async function setupFirebaseWeb() {
     // تحديث: دائماً نطلب التوكن الحالي من FCM ونرسله للخادم لضمان المزامنة
     try {
         const currentToken = await messaging.getToken({
-            vapidKey: "BK1_lxS32198GdKm0Gf89yk1eEGcKvKLu9bn1sg9DhO8_eUUhRCAW5tjynKGRq4igNhvdSaR0-eL74V3ACl3AIY"
+            vapidKey: "BK1_lxS32198GdKm0Gf89yk1eEGcKvKLu9bn1sg9DhO8_eUUhRCAW5tjynKGRq4igNhvdSaR0-eL74V3ACl3AIY",
+            serviceWorkerRegistration: swReg
         });
 
         if (currentToken) {

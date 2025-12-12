@@ -95,3 +95,12 @@ messaging.onBackgroundMessage((payload) => {
     icon: '/images/icons/icon-192x192.png',
   });
 });
+
+// Added to ensure immediate activation
+self.addEventListener('install', (event) => {
+  self.skipWaiting();
+});
+
+self.addEventListener('activate', (event) => {
+  event.waitUntil(self.clients.claim());
+});
