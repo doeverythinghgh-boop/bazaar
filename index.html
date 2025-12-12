@@ -319,10 +319,7 @@
 
     // [نقطة البداية] يتم تنفيذ هذا الكود بعد تحميل محتوى DOM بالكامل.
     document.addEventListener("DOMContentLoaded", async () => {
-      // [خطوة 0] التحقق من وجود واجهة Android ودالة التحديث.
-      if (window.Android && typeof window.Android.checkForUpdates === "function") {
-        window.Android.checkForUpdates();
-      }
+    
       // [خطوة 0] تحميل إعدادات الإشعارات من السيرفر (المصدر الوحيد للحقيقة)
       try {
         const response = await fetch('/notification_config.json');
@@ -470,6 +467,10 @@
 
       // دالة معالجة النقر على زر "الرئيسية".
       function handleHomeButtonClick() {
+        // [خطوة 0] التحقق من وجود واجهة Android ودالة التحديث.
+        if (window.Android && typeof window.Android.checkForUpdates === "function") {
+          window.Android.checkForUpdates();
+        }
         const container = document.getElementById("index-home-container");
         if (container.innerHTML == "") {
           mainLoader(
