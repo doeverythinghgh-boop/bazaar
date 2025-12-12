@@ -19,7 +19,7 @@
     }
 
     /* --- Action Buttons Grid --- */
-    
+
 
     /* --- Button Styling --- */
     .dash-button {
@@ -62,6 +62,10 @@
 </style>
 
 <!-- حاوية لعرض الهيدر بشكل ديناميكي -->
+<!-- 
+@file pages/user-dashboard.html
+@description User Dashboard page acting as a central hub for user actions (profile editing, admin panel access, logout).
+-->
 <div id="dash-header-container" style="height: 70px"></div>
 
 <div id="dash-profile-modal-container" class="modal">
@@ -95,7 +99,9 @@
 
 
 <script>
-
+    /**
+     * @description Dynamically inserts the header component into the dashboard page.
+     */
     insertUniqueSnapshot("../pages/header.html", "dash-header-container", 300);
 
 </script>

@@ -184,6 +184,7 @@ window.GLOBAL_NOTIFICATIONS = {
 
     /**
      * @description تحديث شارة الإشعارات في الزر الرئيسي
+     * @returns {void}
      */
     updateNotificationBadge: function () {
         // استخدام الشارة الموجودة فعلياً في index.html

@@ -389,7 +389,7 @@
         </h3>
         <div class="productView_description_box" id="productView_description_container">
             <h4 id="productView_description_header">
-                <i class="fas fa-file-alt"></i>وصف الخدمة
+                <i class="fas fa-file-alt"></i>Service Description
             </h4>
             <p id="productView_description_text"></p>
         </div>
@@ -397,28 +397,28 @@
         <div class="productView_seller_message_box" id="productView_seller_message_container">
             <h4 id="productView_seller_message_header">
                 <i class="fas fa-comment-dots" id="productView_seller_message_icon"></i>
-                رسالة من صاحب الخدمة
+                Seller's Message
             </h4>
             <p id="productView_seller_message_text"></p>
         </div>
 
-        <!-- ✅ جديد: قسم طلب الصور والملاحظات -->
+        <!-- New: Order Photos and Notes Section -->
         <div class="productView_order_box" id="productView_order_box">
-            <h4><i class="fas fa-camera"></i> طلب صور خاصة</h4>
+            <h4><i class="fas fa-camera"></i> Request Special Photos</h4>
 
             <textarea id="productView_note" maxlength="300"
-                placeholder="أضف ملاحظاتك حول الصور المطلوبة (اختياري - بحد أقصى 300 حرف)..."></textarea>
+                placeholder="Add your notes about requested photos (optional - max 300 chars)..."></textarea>
 
             <div class="productView_uploader" id="productView_uploader_area">
-                <div style="font-weight:600; color:#555;">اضغط أو اسحب الصور هنا</div>
-                <div style="font-size:0.8rem; color:#888; margin-top:5px;">(الحد الأقصى 4 صور - 5 ميجا للصورة)</div>
+                <div style="font-weight:600; color:#555;">Click or Drag Photos Here</div>
+                <div style="font-size:0.8rem; color:#888; margin-top:5px;">(Max 4 photos - 5MB per photo)</div>
 
                 <input type="file" id="productView_fileInput" accept="image/*" multiple style="display:none">
 
                 <div class="productView_uploader_actions">
-                    <div class="productView_uploader_btn" id="productView_pickImgBtn" title="اختر صور"><i
+                    <div class="productView_uploader_btn" id="productView_pickImgBtn" title="Choose Photos"><i
                             class="fas fa-folder-open"></i></div>
-                    <div class="productView_uploader_btn" id="productView_camBtn" title="الكاميرا"><i
+                    <div class="productView_uploader_btn" id="productView_camBtn" title="Camera"><i
                             class="fas fa-camera"></i></div>
                 </div>
 
@@ -426,19 +426,19 @@
             </div>
 
             <button id="productView_sendBtn" class="productView_send_btn">
-                <i class="fas fa-paper-plane"></i> إرسال الطلب
+                <i class="fas fa-paper-plane"></i> Send Request
             </button>
         </div>
     </div>
 </div>
 <script>
     /**
-     * @fileoverview Product View Details Logic (productView_ module)
-     * @author Hisham (BidStory Project) - Updated with 3D Slider
+     * @fileoverview Product View Details Logic with 3D Slider (productView_ module)
+     * @description Handles product details display, 3D image slider, and custom photo order requests.
      */
 
     // ==============================================
-    //  الوصول إلى عناصر DOM
+    //  DOM Elements Access
     // ==============================================
 
     const productView_domElements = {
@@ -456,7 +456,7 @@
 
 
     // ==============================================
-    //  منطق السلايدر (3D Slider Logic)
+    //  3D Slider Logic
     // ==============================================
 
     let productView_sliderState = {
@@ -468,13 +468,14 @@
     };
 
     /**
-     * يبني ويعرض شريط تمرير (Slider) لصور المنتج.
-     * @param {string[]} images - مصفوفة روابط الصور.
+     * @function productView_buildSlider
+     * @description Builds and renders the 3D image slider for the product.
+     * @param {string[]} images - Array of image URLs.
      */
     function productView_buildSlider(images) {
         const { sliderTrack, sliderDots, prevBtn, nextBtn, sliderContainer } = productView_domElements;
 
-        // إعادة تعيين الحالة
+        // Reset state
         productView_sliderState = {
             currentIndex: 0,
             slides: [],
@@ -483,33 +484,33 @@
             images: images
         };
 
-        // تنظيف المحتوى السابق
+        // Clear previous content
         sliderTrack.innerHTML = '';
         sliderDots.innerHTML = '';
 
-        // إخفاء الأزرار مؤقتًا
+        // Hide buttons temporarily
         prevBtn.style.display = 'none';
         nextBtn.style.display = 'none';
 
         if (!images || images.length === 0) {
-            sliderTrack.innerHTML = '<p style="text-align:center; color:#666; width:100%;">لا توجد صور للمنتج</p>';
+            sliderTrack.innerHTML = '<p style="text-align:center; color:#666; width:100%;">No product images available</p>';
             return;
         }
 
-        // إنشاء الشرائح والنقاط
+        // Create slides and dots
         images.forEach((imageUrl, index) => {
             // Slide
             const slide = document.createElement('div');
             slide.className = 'productView_slide';
             slide.style.backgroundImage = `url('${imageUrl}')`;
 
-            // أحداث التوقف/التشغيل
+            // Pause/Play events
             slide.addEventListener('mousedown', productView_pauseAutoPlay);
             slide.addEventListener('mouseup', productView_startAutoPlay);
             slide.addEventListener('touchstart', productView_pauseAutoPlay, { passive: true });
             slide.addEventListener('touchend', productView_startAutoPlay);
 
-            // النقر على الشريحة الجانبية لتفعيلها
+            // Click side slide to activate
             slide.onclick = () => productView_goToSlide(index);
 
             sliderTrack.appendChild(slide);
@@ -519,14 +520,14 @@
             const dot = document.createElement('div');
             dot.className = 'productView_slider-dot';
             dot.onclick = (e) => {
-                e.stopPropagation(); // منع انتقال النقر
+                e.stopPropagation(); // Prevent click propagation
                 productView_goToSlide(index);
             };
             sliderDots.appendChild(dot);
             productView_sliderState.dots.push(dot);
         });
 
-        // إعداد عناصر التحكم
+        // Setup controls
         if (images.length > 1) {
             prevBtn.style.display = 'flex';
             nextBtn.style.display = 'flex';
@@ -534,66 +535,72 @@
             prevBtn.onclick = () => productView_goToSlide(productView_sliderState.currentIndex - 1);
             nextBtn.onclick = () => productView_goToSlide(productView_sliderState.currentIndex + 1);
 
-            // بدء التشغيل التلقائي
+            // Start auto play
             productView_startAutoPlay();
         } else {
-            // إخفاء النقاط إذا صورة واحدة
+            // Hide dots if only one image
             sliderDots.style.display = 'none';
         }
 
-        // عرض الشريحة الأولى
+        // Show first slide
         productView_goToSlide(0);
     }
 
     /**
-     * الانتقال إلى شريحة محددة مع تأثير 3D.
+     * @function productView_goToSlide
+     * @description Navigates to a specific slide with 3D effect.
+     * @param {number} index - Index of the target slide.
      */
     function productView_goToSlide(index) {
         const { slides, dots } = productView_sliderState;
         if (slides.length === 0) return;
 
-        // حساب الفهرس الدائري
+        // Calculate circular index
         const total = slides.length;
         const newIndex = (index + total) % total;
         productView_sliderState.currentIndex = newIndex;
 
         slides.forEach((slide, i) => {
             const directOffset = i - newIndex;
-            // حساب المسافة الأقصر في الحلقة الدائرية
+            // Calculate shortest distance in circular loop
             const wrapOffset = directOffset > 0 ? directOffset - total : directOffset + total;
             const offset = Math.abs(directOffset) < Math.abs(wrapOffset) ? directOffset : wrapOffset;
 
             const isActive = offset === 0;
 
-            // حساب التحويلات
-            const translateX = offset * 40; // 40% إزاحة
+            // Calculate transforms
+            const translateX = offset * 40; // 40% offset
             const scale = isActive ? 1 : 0.7;
-            const translateZ = -Math.abs(offset) * 50; // عمق
+            const translateZ = -Math.abs(offset) * 50; // Depth
 
             slide.style.transform = `translateX(${translateX}%) translateZ(${translateZ}px) scale(${scale})`;
 
-            // تحديث الكلاسات
+            // Update classes
             if (isActive) {
                 slide.classList.add('active');
                 slide.style.zIndex = 10;
             } else {
                 slide.classList.remove('active');
-                slide.style.zIndex = 1; // القيم الأقل في الخلف
+                slide.style.zIndex = 1; // Lower values in back
             }
         });
 
-        // تحديث النقاط
+        // Update dots
         dots.forEach((dot, i) => {
             if (i === newIndex) dot.classList.add('active');
             else dot.classList.remove('active');
         });
 
-        // إعادة ضبط المؤقت
+        // Reset timer
         if (slides.length > 1) {
             productView_resetAutoPlay();
         }
     }
 
+    /**
+     * @function productView_startAutoPlay
+     * @description Starts the auto-play timer for the slider.
+     */
     function productView_startAutoPlay() {
         if (productView_sliderState.images.length <= 1) return;
         if (productView_sliderState.autoPlayInterval) clearInterval(productView_sliderState.autoPlayInterval);
@@ -602,10 +609,18 @@
         }, 4000);
     }
 
+    /**
+     * @function productView_pauseAutoPlay
+     * @description Pauses the auto-play timer.
+     */
     function productView_pauseAutoPlay() {
         if (productView_sliderState.autoPlayInterval) clearInterval(productView_sliderState.autoPlayInterval);
     }
 
+    /**
+     * @function productView_resetAutoPlay
+     * @description Resets the auto-play timer (pause then start).
+     */
     function productView_resetAutoPlay() {
         productView_pauseAutoPlay();
         productView_startAutoPlay();
@@ -626,6 +641,12 @@
         return false;
     })();
 
+    /**
+     * @function compressImage
+     * @description Compresses an image file and converts it to WebP if supported.
+     * @param {File} file - The image file to compress.
+     * @returns {Promise<Blob>} The compressed image blob.
+     */
     async function compressImage(file) {
         // Create an ImageBitmap from the file
         // Note: createImageBitmap does not support all formats in all browsers (e.g. TIF might fail here).
@@ -678,22 +699,24 @@
 
 
     // ==============================================
-    //  الدالة الرئيسية
+    //  Main Function
     // ==============================================
 
     /**
-     * تعرض تفاصيل المنتج وتهيئ السلايدر.
+     * @function productView_viewDetails
+     * @description Displays product details and initializes the slider.
+     * @param {object} productData - The product data object.
      */
     function productView_viewDetails(productData) {
         try {
-            console.log("[productView_] عرض التفاصيل بالسلايدر...");
+            console.log("[productView_] Displaying details with slider...");
             const { name, description, sellerMessage } = productView_domElements;
 
-            name.textContent = productData.productName || "غير متوفر";
-            description.textContent = productData.description || "لا يوجد وصف متاح.";
-            sellerMessage.textContent = productData.sellerMessage || "لا توجد رسالة من البائع.";
+            name.textContent = productData.productName || "Not Available";
+            description.textContent = productData.description || "No description available.";
+            sellerMessage.textContent = productData.sellerMessage || "No message from seller.";
 
-            // بناء السلايدر
+            // Build slider
             const images = productData.imageSrc || [];
             productView_buildSlider(images);
 
@@ -701,15 +724,15 @@
             console.error("productView_viewDetails - Error:", error);
             Swal.fire({
                 icon: "error",
-                title: "خطأ",
-                text: "حدث خطأ أثناء عرض المنتج.",
+                title: "Error",
+                text: "An error occurred while displaying the product.",
                 customClass: { popup: 'fullscreen-swal' },
             });
         }
     }
 
     // ==============================================
-    //  منطق طلب الصور (Order Photo Logic)
+    //  Order Photo Logic
     // ==============================================
 
     let productView_orderImages = []; // Stores file objects
@@ -727,6 +750,10 @@
         sendBtn: document.getElementById('productView_sendBtn')
     };
 
+    /**
+     * @function productView_initOrderLogic
+     * @description Initializes listeners and state for the photo order request form.
+     */
     function productView_initOrderLogic() {
         // Reset state
         productView_orderImages = [];
@@ -747,7 +774,7 @@
                 productView_orderEls.fileInput.setAttribute('capture', 'environment');
                 productView_orderEls.fileInput.click();
             } else {
-                Swal.fire('تنبيه', 'يرجى استخدام زر اختيار الملفات على الكمبيوتر', 'info');
+                Swal.fire('Alert', 'Please use the file picker button on desktop', 'info');
             }
         };
 
@@ -763,18 +790,23 @@
         };
     }
 
+    /**
+     * @function productView_handleFiles
+     * @description Processes selected files (validation, compression, preview).
+     * @param {File[]} files - Array of selected files.
+     */
     async function productView_handleFiles(files) {
         // Allowed extensions (Web-supported) - Relaxed because we try to compress
         // If it's an image that the browser can decode, it will be compressed/converted.
 
         if (productView_orderImages.length + files.length > MAX_ORDER_IMAGES) {
-            Swal.fire('تنبيه', `الحد الأقصى هو ${MAX_ORDER_IMAGES} صور`, 'warning');
+            Swal.fire('Warning', `Maximum allowed images is ${MAX_ORDER_IMAGES}`, 'warning');
             return;
         }
 
         // Processing
         Swal.fire({
-            title: 'جاري معالجة الصور...',
+            title: 'Processing Images...',
             didOpen: () => Swal.showLoading(),
             allowOutsideClick: false
         });
@@ -795,7 +827,7 @@
                 productView_createPreview(processedBlob);
             } catch (err) {
                 console.error("Error processing file", file.name, err);
-                Swal.fire('خطأ', `تعذر معالجة الملف: ${file.name}`, 'error');
+                Swal.fire('Error', `Failed to process file: ${file.name}`, 'error');
             }
         }
 
@@ -803,6 +835,11 @@
         productView_orderEls.fileInput.value = ''; // Reset
     }
 
+    /**
+     * @function productView_createPreview
+     * @description Creates a visual preview for an uploaded image.
+     * @param {Blob} file - The image blob to preview.
+     */
     function productView_createPreview(file) {
         const reader = new FileReader();
         reader.onload = (e) => {
@@ -823,7 +860,12 @@
         reader.readAsDataURL(file);
     }
 
-    // Must be global or accessible
+    /**
+     * @function productView_removeImage
+     * @description Removes an image from the order list and DOM (Global/Window).
+     * @param {HTMLElement} btn - The remove button element.
+     * @param {string} fileName - Name of the file (unused in logic but good for debug).
+     */
     window.productView_removeImage = (btn, fileName) => {
         const div = btn.parentElement;
         const file = div.fileRef;
@@ -831,16 +873,20 @@
         div.remove();
     };
 
+    /**
+     * @function productView_sendOrder
+     * @description Submits the new order request with notes and images.
+     */
     async function productView_sendOrder() {
         // Validation
         if (!userSession) {
-            Swal.fire('تنبيه', 'يجب عليك تسجيل الدخول أولاً', 'warning');
+            Swal.fire('Alert', 'You must login first', 'warning');
             return;
         }
 
         const note = productView_orderEls.note.value.trim();
         if (productView_orderImages.length === 0 && !note) {
-            Swal.fire('تنبيه', 'يرجى كتابة ملاحظة او رفع صورة على الاقل', 'warning');
+            Swal.fire('Alert', 'Please add a note or at least one photo', 'warning');
             return;
         }
 
@@ -854,8 +900,8 @@
 
         // Show loading
         Swal.fire({
-            title: 'جاري الإرسال...',
-            html: 'يرجى الانتظار بينما نقوم برفع الصور وإنشاء الطلب',
+            title: 'Sending...',
+            html: 'Please wait while we upload images and create the order',
             allowOutsideClick: false,
             didOpen: () => Swal.showLoading()
         });
@@ -916,7 +962,7 @@
             });
 
             if (!res.ok) {
-                throw new Error('فشل في إنشاء الطلب');
+                throw new Error('Failed to create order');
             }
 
             // Success
@@ -924,9 +970,9 @@
 
             Swal.fire({
                 icon: 'success',
-                title: 'تم الإرسال بنجاح',
-                html: `تم رفع الصور وإنشاء الطلب.<br><small style="color:#777">الملفات المرفوعة:<br>${uploadedFileNames.join('<br>')}</small>`,
-                confirmButtonText: 'حسناً'
+                title: 'Sent Successfully',
+                html: `Images uploaded and order created.<br><small style="color:#777">Uploaded files:<br>${uploadedFileNames.join('<br>')}</small>`,
+                confirmButtonText: 'OK'
             }).then(() => {
                 const modal = document.getElementById('productView_modal_content');
                 if (modal && modal.parentElement) {
@@ -936,10 +982,15 @@
 
         } catch (error) {
             console.error(error);
-            Swal.fire('خطأ', 'حدث خطأ أثناء الإرسال: ' + error.message, 'error');
+            Swal.fire('Error', 'An error occurred during submission: ' + error.message, 'error');
         }
     }
 
+    /**
+     * @function generateOrderSerial
+     * @description Generates a random alphanumeric serial for the order.
+     * @returns {string} Random 6-character string.
+     */
     function generateOrderSerial() {
         const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
         let serial = "";
@@ -951,12 +1002,12 @@
 
 
     // ==============================================
-    //  نقطة الدخول
+    //  Entry Point
     // ==============================================
 
     try {
         console.log("Initializing product view 3D slider...", productSession);
-        // التحقق من وجود Session وتنظيف المؤقتات القديمة إذا وجدت (كإجراء احترازي عند إعادة التحميل)
+        // Check session and clear old intervals if any
         if (typeof productView_sliderState !== 'undefined' && productView_sliderState.autoPlayInterval) {
             clearInterval(productView_sliderState.autoPlayInterval);
         }
@@ -967,6 +1018,6 @@
         productView_initOrderLogic();
 
     } catch (error) {
-        console.error("خطأ في تهيئة نافذة المنتج:", error);
+        console.error("Error initializing product view:", error);
     }
 </script>

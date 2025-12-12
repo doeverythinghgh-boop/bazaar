@@ -1,3 +1,7 @@
+<!--
+@file pages/contact.html
+@description Contact Us page. Includes FAQ, Contact Form, Service descriptions, and Legal page tabs (Privacy, Delete Account).
+-->
 <style>
   /*
          * ========================================
@@ -241,11 +245,9 @@
   }
 
   .contact_submit-btn {
-    background: linear-gradient(
-      to right,
-      var(--primary-color),
-      var(--secondary-color)
-    );
+    background: linear-gradient(to right,
+        var(--primary-color),
+        var(--secondary-color));
     color: var(--bg-color-white);
     border: none;
     padding: 15px 30px;
@@ -288,36 +290,45 @@
     /* ✅ تعديل: تغيير التخطيط من شبكة إلى عمود */
     display: flex;
     flex-direction: column;
-    gap: 15px; /* تقليل المسافة بين العناصر */
+    gap: 15px;
+    /* تقليل المسافة بين العناصر */
   }
 
 
   .contact_service-card {
     /* ✅ تعديل: تغيير التخطيط الداخلي للبطاقة ليصبح صفًا */
     display: flex;
-    align-items: center; /* محاذاة الأيقونة والنص عموديًا */
-    gap: 20px; /* مسافة بين الأيقونة والنص */
+    align-items: center;
+    /* محاذاة الأيقونة والنص عموديًا */
+    gap: 20px;
+    /* مسافة بين الأيقونة والنص */
     background-color: var(--bg-color-white);
-    padding: 20px; /* تقليل الحشو قليلًا */
+    padding: 20px;
+    /* تقليل الحشو قليلًا */
     border-radius: 10px;
-    text-align: right; /* محاذاة النص لليمين */
+    text-align: right;
+    /* محاذاة النص لليمين */
   }
 
   .contact_service-icon {
     background-color: var(--primary-color-light);
-    width: 60px; /* تصغير حجم الأيقونة */
+    width: 60px;
+    /* تصغير حجم الأيقونة */
     height: 60px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    flex-shrink: 0; /* منع الأيقونة من التقلص */
+    flex-shrink: 0;
+    /* منع الأيقونة من التقلص */
     color: var(--primary-color);
-    font-size: 1.6rem; /* تصغير حجم الخط داخل الأيقونة */
+    font-size: 1.6rem;
+    /* تصغير حجم الخط داخل الأيقونة */
   }
 
   .contact_service-card h4 {
-    margin: 0 0 5px 0; /* تعديل الهوامش */
+    margin: 0 0 5px 0;
+    /* تعديل الهوامش */
     color: var(--secondary-color);
   }
 
@@ -519,6 +530,7 @@
     from {
       opacity: 0;
     }
+
     to {
       opacity: 1;
     }
@@ -579,33 +591,24 @@
 </style>
 
 <body id="contact_body">
-  <div
-    id="header-container101"
-    style="height: 70px; margin-left: 20px; margin-right: 20px"
-  ></div>
+  <div id="header-container101" style="height: 70px; margin-left: 20px; margin-right: 20px"></div>
 
   <!-- Contact Section -->
   <div class="contact_container" id="contact_main_container">
     <!-- FAQ Section -->
     <div class="contact_faq-section" id="contact_faq_section">
-      <h3
-        class=""
-        style="
+      <h3 class="" style="
           color: var(--primary-color);
           margin-bottom: 25px;
           padding-bottom: 10px;
           border-bottom: 2px solid var(--accent-color);
-        "
-        id="contact_faq_title"
-      >
+        " id="contact_faq_title">
         الأسئلة الشائعة
       </h3>
 
       <div class="contact_faq-item" id="contact_faq_item_1">
         <div class="contact_faq-question" id="contact_faq_question_1">
-          <span id="contact_faq_q_span_1"
-            >كيف يعمل suez bazaar في التسجيل و بيع منتج او شرائه؟</span
-          >
+          <span id="contact_faq_q_span_1">كيف يعمل suez bazaar في التسجيل و بيع منتج او شرائه؟</span>
           <i class="fas fa-chevron-down" id="contact_faq_q_icon_1"></i>
         </div>
         <div class="contact_faq-answer" id="contact_faq_answer_1">
@@ -622,9 +625,7 @@
 
       <div class="contact_faq-item" id="contact_faq_item_2">
         <div class="contact_faq-question" id="contact_faq_question_2">
-          <span id="contact_faq_q_span_2"
-            >كيف يمكني عمل اعلان او حمله تسويقيه مجانا او مخصصة؟</span
-          >
+          <span id="contact_faq_q_span_2">كيف يمكني عمل اعلان او حمله تسويقيه مجانا او مخصصة؟</span>
           <i class="fas fa-chevron-down" id="contact_faq_q_icon_2"></i>
         </div>
         <div class="contact_faq-answer" id="contact_faq_answer_2">
@@ -640,9 +641,7 @@
 
       <div class="contact_faq-item" id="contact_faq_item_3">
         <div class="contact_faq-question" id="contact_faq_question_3">
-          <span id="contact_faq_q_span_3"
-            >هل تقدمون خدمات تسويقية للشركات الصغيرة؟</span
-          >
+          <span id="contact_faq_q_span_3">هل تقدمون خدمات تسويقية للشركات الصغيرة؟</span>
           <i class="fas fa-chevron-down" id="contact_faq_q_icon_3"></i>
         </div>
         <div class="contact_faq-answer" id="contact_faq_answer_3">
@@ -656,9 +655,7 @@
 
       <div class="contact_faq-item" id="contact_faq_item_4">
         <div class="contact_faq-question" id="contact_faq_question_4">
-          <span id="contact_faq_q_span_4"
-            >كيف تقيسون نجاح الحملات التسويقية؟</span
-          >
+          <span id="contact_faq_q_span_4">كيف تقيسون نجاح الحملات التسويقية؟</span>
           <i class="fas fa-chevron-down" id="contact_faq_q_icon_4"></i>
         </div>
         <div class="contact_faq-answer" id="contact_faq_answer_4">
@@ -727,384 +724,377 @@
           <!-- Contact Form -->
           <div class="contact_form contact_tab_content" id="contact_form_div" data-content="form">
             <form id="contact_contactForm">
-          <div class="contact_form-group" id="contact_form_group_name">
-            <label for="contact_name" id="contact_label_name"
-              >الاسم الكامل *</label
-            >
-            <input
-              type="text"
-              id="contact_name"
-              class="contact_form-control"
-              required
-            />
-          </div>
+              <div class="contact_form-group" id="contact_form_group_name">
+                <label for="contact_name" id="contact_label_name">الاسم الكامل *</label>
+                <input type="text" id="contact_name" class="contact_form-control" required />
+              </div>
 
-          <div class="contact_form-group" id="contact_form_group_email">
-            <label for="contact_email" id="contact_label_email"
-              >البريد الإلكتروني *</label
-            >
-            <input
-              type="email"
-              id="contact_email"
-              class="contact_form-control"
-              required
-            />
-          </div>
+              <div class="contact_form-group" id="contact_form_group_email">
+                <label for="contact_email" id="contact_label_email">البريد الإلكتروني *</label>
+                <input type="email" id="contact_email" class="contact_form-control" required />
+              </div>
 
-          <div class="contact_form-group" id="contact_form_group_phone">
-            <label for="contact_phone" id="contact_label_phone"
-              >رقم الهاتف</label
-            >
-            <input type="tel" id="contact_phone" class="contact_form-control" />
-          </div>
+              <div class="contact_form-group" id="contact_form_group_phone">
+                <label for="contact_phone" id="contact_label_phone">رقم الهاتف</label>
+                <input type="tel" id="contact_phone" class="contact_form-control" />
+              </div>
 
-          <div class="contact_form-group" id="contact_form_group_service">
-            <label for="contact_service" id="contact_label_service"
-              >نوع الخدمة المطلوبة</label
-            >
-            <select id="contact_service" class="contact_form-control">
-              <option value="" id="contact_option_default">اختر خدمة</option>
-              <option value="consulting" id="contact_option_consulting">
-                استشارات تسويقية
-              </option>
-              <option value="digital" id="contact_option_digital">
-                تسويق رقمي
-              </option>
-              <option value="branding" id="contact_option_branding">
-                تصميم الهوية البصرية
-              </option>
-              <option value="social" id="contact_option_social">
-                إدارة وسائل التواصل الاجتماعي
-              </option>
-              <option value="seo" id="contact_option_seo">
-                تحسين محركات البحث
-              </option>
-              <option value="other" id="contact_option_other">خدمة أخرى</option>
-            </select>
-          </div>
+              <div class="contact_form-group" id="contact_form_group_service">
+                <label for="contact_service" id="contact_label_service">نوع الخدمة المطلوبة</label>
+                <select id="contact_service" class="contact_form-control">
+                  <option value="" id="contact_option_default">اختر خدمة</option>
+                  <option value="consulting" id="contact_option_consulting">
+                    استشارات تسويقية
+                  </option>
+                  <option value="digital" id="contact_option_digital">
+                    تسويق رقمي
+                  </option>
+                  <option value="branding" id="contact_option_branding">
+                    تصميم الهوية البصرية
+                  </option>
+                  <option value="social" id="contact_option_social">
+                    إدارة وسائل التواصل الاجتماعي
+                  </option>
+                  <option value="seo" id="contact_option_seo">
+                    تحسين محركات البحث
+                  </option>
+                  <option value="other" id="contact_option_other">خدمة أخرى</option>
+                </select>
+              </div>
 
-          <div class="contact_form-group" id="contact_form_group_message">
-            <label for="contact_message" id="contact_label_message"
-              >الرسالة *</label
-            >
-            <textarea
-              id="contact_message"
-              class="contact_form-control"
-              required
-            ></textarea>
-          </div>
+              <div class="contact_form-group" id="contact_form_group_message">
+                <label for="contact_message" id="contact_label_message">الرسالة *</label>
+                <textarea id="contact_message" class="contact_form-control" required></textarea>
+              </div>
 
-          <button
-            type="submit"
-            class="contact_submit-btn"
-            id="contact_submit_button"
-          >
-            <i class="fas fa-paper-plane" id="contact_submit_icon"></i> إرسال
-            الرسالة
-          </button>
+              <button type="submit" class="contact_submit-btn" id="contact_submit_button">
+                <i class="fas fa-paper-plane" id="contact_submit_icon"></i> إرسال
+                الرسالة
+              </button>
             </form>
           </div>
           <!-- Services Section -->
           <div class="contact_info contact_tab_content" id="contact_services_section" data-content="services">
             <div class="contact_services-grid" id="contact_services_grid">
-        <!-- ✅ تعديل: تم دمج العنوان والوصف داخل حاوية واحدة -->
-        <div class="contact_service-card" id="contact_service_card_digital">
-          <div class="contact_service-icon" id="contact_service_icon_1">
-            <i class="fas fa-bullhorn" id="contact_service_i_1"></i>
-          </div>
-          <div id="contact_service_text_1">
-            <h4 id="contact_service_title_1">التسويق الرقمي</h4>
-            <p id="contact_service_p_1">
-              حلول تسويق رقمي متكاملة لزيادة وصول علامتك التجارية
-            </p>
-          </div>
-        </div>
+              <!-- ✅ تعديل: تم دمج العنوان والوصف داخل حاوية واحدة -->
+              <div class="contact_service-card" id="contact_service_card_digital">
+                <div class="contact_service-icon" id="contact_service_icon_1">
+                  <i class="fas fa-bullhorn" id="contact_service_i_1"></i>
+                </div>
+                <div id="contact_service_text_1">
+                  <h4 id="contact_service_title_1">التسويق الرقمي</h4>
+                  <p id="contact_service_p_1">
+                    حلول تسويق رقمي متكاملة لزيادة وصول علامتك التجارية
+                  </p>
+                </div>
+              </div>
 
-        <div class="contact_service-card" id="contact_service_card_market">
-          <div class="contact_service-icon" id="contact_service_icon_2">
-            <i class="fas fa-chart-bar" id="contact_service_i_2"></i>
-          </div>
-          <div id="contact_service_text_2">
-            <h4 id="contact_service_title_2">تحليل السوق</h4>
-            <p id="contact_service_p_2">
-              دراسات وتحليلات متعمقة لفهم السوق المستهدف
-            </p>
-          </div>
-        </div>
+              <div class="contact_service-card" id="contact_service_card_market">
+                <div class="contact_service-icon" id="contact_service_icon_2">
+                  <i class="fas fa-chart-bar" id="contact_service_i_2"></i>
+                </div>
+                <div id="contact_service_text_2">
+                  <h4 id="contact_service_title_2">تحليل السوق</h4>
+                  <p id="contact_service_p_2">
+                    دراسات وتحليلات متعمقة لفهم السوق المستهدف
+                  </p>
+                </div>
+              </div>
 
-        <div class="contact_service-card" id="contact_service_card_ads">
-          <div class="contact_service-icon" id="contact_service_icon_3">
-            <i class="fas fa-ad" id="contact_service_i_3"></i>
+              <div class="contact_service-card" id="contact_service_card_ads">
+                <div class="contact_service-icon" id="contact_service_icon_3">
+                  <i class="fas fa-ad" id="contact_service_i_3"></i>
+                </div>
+                <div id="contact_service_text_3">
+                  <h4 id="contact_service_title_3">الإعلانات</h4>
+                  <p id="contact_service_p_3">
+                    إدارة حملات إعلانية فعالة عبر suez bazaar
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
-          <div id="contact_service_text_3">
-            <h4 id="contact_service_title_3">الإعلانات</h4>
-            <p id="contact_service_p_3">
-              إدارة حملات إعلانية فعالة عبر suez bazaar
-            </p>
-          </div>
-        </div>
-      </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- Footer -->
-  <footer class="contact_footer" id="contact_footer">
-    <div class="contact_container" id="contact_footer_container">
-      <!-- Legal Pages Section -->
-      <div class="contact_legal-section" id="contact_legal_section">
-        <div class="contact_legal-tabs" id="contact_legal_tabs">
-          <button class="contact_legal-tab" id="contact_legal_tab_privacy" data-tab="privacy">
-            <i class="fas fa-shield-alt" id="contact_legal_icon_privacy"></i>
-            <span id="contact_legal_text_privacy">سياسة الخصوصية</span>
-          </button>
-          <button class="contact_legal-tab" id="contact_legal_tab_delete" data-tab="delete">
-            <i class="fas fa-user-times" id="contact_legal_icon_delete"></i>
-            <span id="contact_legal_text_delete">حذف البيانات</span>
-          </button>
-        </div>
-        <div class="contact_legal-iframe-container" id="contact_legal_iframe_container">
-          <iframe 
-            id="contact_legal_iframe_privacy" 
-            class="contact_legal-iframe contact_hidden" 
-            data-src="../privacy.html"
-            title="سياسة الخصوصية"
-            loading="lazy"
-          ></iframe>
-          <iframe 
-            id="contact_legal_iframe_delete" 
-            class="contact_legal-iframe contact_hidden" 
-            data-src="../delete-account.html"
-            title="حذف الحساب"
-            loading="lazy"
-          ></iframe>
-        </div>
-      </div>
-
-      <div class="contact_footer-content" id="contact_footer_content">
-        <div class="contact_footer-column" id="contact_footer_column_1">
-          <h4 id="contact_footer_title_1" style="color: blue;">تابعنا</h4>
-          <p id="contact_footer_p_1" style="color: blue;">
-            نقدم حلول تسويقية مبتكرة ومخصصة لمساعدة أعمالك على النمو والازدهار
-            في السوق التنافسي.
-          </p>
-          <div class="contact_social-links" id="contact_social_links">
-            <a href="#" id="contact_social_twitter"
-              ><i class="fab fa-twitter" id="contact_social_icon_twitter"></i
-            ></a>
-            <a href="#" id="contact_social_facebook"
-              ><i
-                class="fab fa-facebook-f"
-                id="contact_social_icon_facebook"
-              ></i
-            ></a>
-            <a href="#" id="contact_social_linkedin"
-              ><i
-                class="fab fa-linkedin-in"
-                id="contact_social_icon_linkedin"
-              ></i
-            ></a>
-            <a href="#" id="contact_social_instagram"
-              ><i
-                class="fab fa-instagram"
-                id="contact_social_icon_instagram"
-              ></i
-            ></a>
+    <!-- Footer -->
+    <footer class="contact_footer" id="contact_footer">
+      <div class="contact_container" id="contact_footer_container">
+        <!-- Legal Pages Section -->
+        <div class="contact_legal-section" id="contact_legal_section">
+          <div class="contact_legal-tabs" id="contact_legal_tabs">
+            <button class="contact_legal-tab" id="contact_legal_tab_privacy" data-tab="privacy">
+              <i class="fas fa-shield-alt" id="contact_legal_icon_privacy"></i>
+              <span id="contact_legal_text_privacy">سياسة الخصوصية</span>
+            </button>
+            <button class="contact_legal-tab" id="contact_legal_tab_delete" data-tab="delete">
+              <i class="fas fa-user-times" id="contact_legal_icon_delete"></i>
+              <span id="contact_legal_text_delete">حذف البيانات</span>
+            </button>
+          </div>
+          <div class="contact_legal-iframe-container" id="contact_legal_iframe_container">
+            <iframe id="contact_legal_iframe_privacy" class="contact_legal-iframe contact_hidden"
+              data-src="../privacy.html" title="سياسة الخصوصية" loading="lazy"></iframe>
+            <iframe id="contact_legal_iframe_delete" class="contact_legal-iframe contact_hidden"
+              data-src="../delete-account.html" title="حذف الحساب" loading="lazy"></iframe>
           </div>
         </div>
+
+        <div class="contact_footer-content" id="contact_footer_content">
+          <div class="contact_footer-column" id="contact_footer_column_1">
+            <h4 id="contact_footer_title_1" style="color: blue;">تابعنا</h4>
+            <p id="contact_footer_p_1" style="color: blue;">
+              نقدم حلول تسويقية مبتكرة ومخصصة لمساعدة أعمالك على النمو والازدهار
+              في السوق التنافسي.
+            </p>
+            <div class="contact_social-links" id="contact_social_links">
+              <a href="#" id="contact_social_twitter"><i class="fab fa-twitter"
+                  id="contact_social_icon_twitter"></i></a>
+              <a href="#" id="contact_social_facebook"><i class="fab fa-facebook-f"
+                  id="contact_social_icon_facebook"></i></a>
+              <a href="#" id="contact_social_linkedin"><i class="fab fa-linkedin-in"
+                  id="contact_social_icon_linkedin"></i></a>
+              <a href="#" id="contact_social_instagram"><i class="fab fa-instagram"
+                  id="contact_social_icon_instagram"></i></a>
+            </div>
+          </div>
+        </div>
+
+        <div class="contact_copyright" id="contact_copyright_div">
+          <p id="contact_copyright_p">© 2025. جميع الحقوق محفوظة.</p>
+        </div>
       </div>
+    </footer>
 
-      <div class="contact_copyright" id="contact_copyright_div">
-        <p id="contact_copyright_p">© 2025. جميع الحقوق محفوظة.</p>
-      </div>
-    </div>
-  </footer>
+    <script>
+      // FAQ Toggle Functionality
+      /**
+       * @description Initializes FAQ toggle functionality.
+       * Attach click event listeners to each FAQ question to toggle the answer visibility.
+       */
+      try {
+        document
+          .querySelectorAll(".contact_faq-question")
+          .forEach((contact_question) => {
+            contact_question.addEventListener("click", () => {
+              try {
+                const contact_faqItem = contact_question.parentElement;
+                contact_faqItem.classList.toggle("contact_active");
 
-  <script>
-    // FAQ Toggle Functionality
-    try {
-      document
-        .querySelectorAll(".contact_faq-question")
-        .forEach((contact_question) => {
-          contact_question.addEventListener("click", () => {
-            try {
-              const contact_faqItem = contact_question.parentElement;
-              contact_faqItem.classList.toggle("contact_active");
+                // Close other FAQ items
+                document
+                  .querySelectorAll(".contact_faq-item")
+                  .forEach((contact_item) => {
+                    if (contact_item !== contact_faqItem) {
+                      contact_item.classList.remove("contact_active");
+                    }
+                  });
+              } catch (error) {
+                console.error("Error toggling FAQ item:", error);
+              }
+            });
+          });
+      } catch (error) {
+        console.error("Error initializing FAQ section:", error);
+      }
 
-              // Close other FAQ items
-              document
-                .querySelectorAll(".contact_faq-item")
-                .forEach((contact_item) => {
-                  if (contact_item !== contact_faqItem) {
-                    contact_item.classList.remove("contact_active");
+      // Form and Services Tabs Functionality
+      /**
+       * @description Initializes tabbing logic between Contact Form and Services sections.
+       */
+      try {
+        const contact_formServicesSection = document.getElementById("contact_form_services_section");
+        const contact_formTitle = document.getElementById("contact_form_title");
+        const contact_servicesTitle = document.getElementById("contact_services_title");
+        const contact_formDiv = document.getElementById("contact_form_div");
+        const contact_servicesSection = document.getElementById("contact_services_section");
+
+        const contact_tabs = [contact_formTitle, contact_servicesTitle];
+        const contact_contents = {
+          form: contact_formDiv,
+          services: contact_servicesSection
+        };
+
+        contact_tabs.forEach((contact_tab) => {
+          if (contact_tab) {
+            contact_tab.addEventListener("click", () => {
+              try {
+                const contact_tabName = contact_tab.getAttribute("data-tab");
+                const contact_isActive = contact_tab.classList.contains("contact_active");
+
+                // If clicking the same active tab, collapse the section
+                if (contact_isActive && contact_formServicesSection && contact_formServicesSection.classList.contains("contact_expanded")) {
+                  // Remove active class from clicked tab
+                  contact_tab.classList.remove("contact_active");
+
+                  // Hide all contents
+                  Object.values(contact_contents).forEach((contact_content) => {
+                    if (contact_content) {
+                      contact_content.classList.remove("contact_tab_visible");
+                    }
+                  });
+
+                  // Collapse section
+                  contact_formServicesSection.classList.remove("contact_expanded");
+                  return;
+                }
+
+                // Expand section if not already expanded
+                if (contact_formServicesSection && !contact_formServicesSection.classList.contains("contact_expanded")) {
+                  contact_formServicesSection.classList.add("contact_expanded");
+                }
+
+                // Remove active class from all tabs
+                contact_tabs.forEach((contact_t) => {
+                  if (contact_t) {
+                    contact_t.classList.remove("contact_active");
                   }
                 });
-            } catch (error) {
-              console.error("حدث خطأ أثناء تبديل عرض السؤال:", error);
-            }
-          });
-        });
-    } catch (error) {
-      console.error("حدث خطأ في إعداد الأسئلة الشائعة:", error);
-    }
 
-    // Form and Services Tabs Functionality
-    try {
-      const contact_formServicesSection = document.getElementById("contact_form_services_section");
-      const contact_formTitle = document.getElementById("contact_form_title");
-      const contact_servicesTitle = document.getElementById("contact_services_title");
-      const contact_formDiv = document.getElementById("contact_form_div");
-      const contact_servicesSection = document.getElementById("contact_services_section");
+                // Add active class to clicked tab
+                contact_tab.classList.add("contact_active");
 
-      const contact_tabs = [contact_formTitle, contact_servicesTitle];
-      const contact_contents = {
-        form: contact_formDiv,
-        services: contact_servicesSection
-      };
-
-      contact_tabs.forEach((contact_tab) => {
-        if (contact_tab) {
-          contact_tab.addEventListener("click", () => {
-            try {
-              const contact_tabName = contact_tab.getAttribute("data-tab");
-              const contact_isActive = contact_tab.classList.contains("contact_active");
-
-              // If clicking the same active tab, collapse the section
-              if (contact_isActive && contact_formServicesSection && contact_formServicesSection.classList.contains("contact_expanded")) {
-                // Remove active class from clicked tab
-                contact_tab.classList.remove("contact_active");
-                
                 // Hide all contents
                 Object.values(contact_contents).forEach((contact_content) => {
                   if (contact_content) {
                     contact_content.classList.remove("contact_tab_visible");
                   }
                 });
-                
+
+                // Show selected content
+                if (contact_contents[contact_tabName]) {
+                  setTimeout(() => {
+                    contact_contents[contact_tabName].classList.add("contact_tab_visible");
+                  }, 100);
+                }
+              } catch (error) {
+                console.error("Error switching tabs:", error);
+              }
+            });
+          }
+        });
+      } catch (error) {
+        console.error("Error initializing Form/Services tabs:", error);
+      }
+
+      // Form Submission
+      /**
+       * @description Handles the contact form submission.
+       * Validates input and shows a thank you message.
+       */
+      try {
+        document
+          .getElementById("contact_contactForm")
+          .addEventListener("submit", function (e) {
+            try {
+              e.preventDefault();
+
+              // Get form values
+              const contact_name = document.getElementById("contact_name").value;
+              const contact_email =
+                document.getElementById("contact_email").value;
+
+              // Simple validation
+              if (contact_name && contact_email) {
+                // In a real application, you would send data to server here
+                alert(
+                  `Thank you ${contact_name} for contacting us! We will reply to your message at ${contact_email} as soon as possible.`
+                );
+                document.getElementById("contact_contactForm").reset();
+              } else {
+                alert("Please fill in the required fields");
+              }
+            } catch (error) {
+              console.error("Error submitting form:", error);
+            }
+          });
+      } catch (error) {
+        console.error("Error setting up contact form:", error);
+      }
+
+      // Animate service cards on scroll
+      /**
+       * @description Uses IntersectionObserver to animate service cards when they scroll into view.
+       */
+      try {
+        const contact_observerOptions = {
+          threshold: 0.1,
+        };
+
+        const contact_observer = new IntersectionObserver((contact_entries) => {
+          contact_entries.forEach((contact_entry) => {
+            if (contact_entry.isIntersecting) {
+              contact_entry.target.style.opacity = "1";
+              contact_entry.target.style.transform = "translateY(0)";
+            }
+          });
+        }, contact_observerOptions);
+
+        // Observe service cards
+        document
+          .querySelectorAll(".contact_service-card")
+          .forEach((contact_card) => {
+            contact_card.style.opacity = "0";
+            contact_card.style.transform = "translateY(5px)";
+            contact_card.style.transition = "opacity 0.5s, transform 0.5s";
+            contact_observer.observe(contact_card);
+          });
+      } catch (error) {
+        console.error("Error setting up scroll observer:", error);
+      }
+
+      // Legal Pages Tabs Functionality
+      /**
+       * @description Initializes tabbing logic for Legal Pages (Privacy, Delete Account).
+       * Handles iframe visibility and lazy loading.
+       */
+      try {
+        const contact_legalSection = document.getElementById("contact_legal_section");
+        const contact_legalTabs = document.querySelectorAll(".contact_legal-tab");
+        const contact_legalIframes = {
+          privacy: document.getElementById("contact_legal_iframe_privacy"),
+          delete: document.getElementById("contact_legal_iframe_delete")
+        };
+        const contact_legalIframeContainer = document.getElementById("contact_legal_iframe_container");
+
+        contact_legalTabs.forEach((contact_tab) => {
+          contact_tab.addEventListener("click", () => {
+            try {
+              const contact_tabName = contact_tab.getAttribute("data-tab");
+              const contact_isActive = contact_tab.classList.contains("contact_active");
+
+              // If clicking the same active tab, collapse the section
+              if (contact_isActive && contact_legalSection && contact_legalSection.classList.contains("contact_expanded")) {
+                // Remove active class from clicked tab
+                contact_tab.classList.remove("contact_active");
+
+                // Hide all iframes
+                Object.values(contact_legalIframes).forEach((contact_iframe) => {
+                  if (contact_iframe) {
+                    contact_iframe.classList.remove("contact_visible");
+                    contact_iframe.classList.add("contact_hidden");
+                  }
+                });
+
                 // Collapse section
-                contact_formServicesSection.classList.remove("contact_expanded");
+                contact_legalSection.classList.remove("contact_expanded");
                 return;
               }
 
               // Expand section if not already expanded
-              if (contact_formServicesSection && !contact_formServicesSection.classList.contains("contact_expanded")) {
-                contact_formServicesSection.classList.add("contact_expanded");
+              if (contact_legalSection && !contact_legalSection.classList.contains("contact_expanded")) {
+                contact_legalSection.classList.add("contact_expanded");
               }
 
               // Remove active class from all tabs
-              contact_tabs.forEach((contact_t) => {
-                if (contact_t) {
-                  contact_t.classList.remove("contact_active");
-                }
+              contact_legalTabs.forEach((contact_t) => {
+                contact_t.classList.remove("contact_active");
               });
 
               // Add active class to clicked tab
               contact_tab.classList.add("contact_active");
 
-              // Hide all contents
-              Object.values(contact_contents).forEach((contact_content) => {
-                if (contact_content) {
-                  contact_content.classList.remove("contact_tab_visible");
-                }
-              });
-
-              // Show selected content
-              if (contact_contents[contact_tabName]) {
-                setTimeout(() => {
-                  contact_contents[contact_tabName].classList.add("contact_tab_visible");
-                }, 100);
-              }
-            } catch (error) {
-              console.error("حدث خطأ أثناء تبديل التبويب:", error);
-            }
-          });
-        }
-      });
-    } catch (error) {
-      console.error("حدث خطأ في إعداد تبويبات النموذج والخدمات:", error);
-    }
-
-    // Form Submission
-    try {
-      document
-        .getElementById("contact_contactForm")
-        .addEventListener("submit", function (e) {
-          try {
-            e.preventDefault();
-
-            // Get form values
-            const contact_name = document.getElementById("contact_name").value;
-            const contact_email =
-              document.getElementById("contact_email").value;
-
-            // Simple validation
-            if (contact_name && contact_email) {
-              // In a real application, you would send data to server here
-              alert(
-                `شكراً ${contact_name} على تواصلك معنا! سنقوم بالرد على رسالتك على ${contact_email} في أقرب وقت ممكن.`
-              );
-              document.getElementById("contact_contactForm").reset();
-            } else {
-              alert("يرجى ملء الحقول المطلوبة");
-            }
-          } catch (error) {
-            console.error("حدث خطأ أثناء إرسال النموذج:", error);
-          }
-        });
-    } catch (error) {
-      console.error("حدث خطأ في إعداد نموذج الاتصال:", error);
-    }
-
-    // Animate service cards on scroll
-    try {
-      const contact_observerOptions = {
-        threshold: 0.1,
-      };
-
-      const contact_observer = new IntersectionObserver((contact_entries) => {
-        contact_entries.forEach((contact_entry) => {
-          if (contact_entry.isIntersecting) {
-            contact_entry.target.style.opacity = "1";
-            contact_entry.target.style.transform = "translateY(0)";
-          }
-        });
-      }, contact_observerOptions);
-
-      // Observe service cards
-      document
-        .querySelectorAll(".contact_service-card")
-        .forEach((contact_card) => {
-          contact_card.style.opacity = "0";
-          contact_card.style.transform = "translateY(5px)";
-          contact_card.style.transition = "opacity 0.5s, transform 0.5s";
-          contact_observer.observe(contact_card);
-        });
-    } catch (error) {
-      console.error("حدث خطأ في إعداد مراقب الحركة:", error);
-    }
-
-    // Legal Pages Tabs Functionality
-    try {
-      const contact_legalSection = document.getElementById("contact_legal_section");
-      const contact_legalTabs = document.querySelectorAll(".contact_legal-tab");
-      const contact_legalIframes = {
-        privacy: document.getElementById("contact_legal_iframe_privacy"),
-        delete: document.getElementById("contact_legal_iframe_delete")
-      };
-      const contact_legalIframeContainer = document.getElementById("contact_legal_iframe_container");
-
-      contact_legalTabs.forEach((contact_tab) => {
-        contact_tab.addEventListener("click", () => {
-          try {
-            const contact_tabName = contact_tab.getAttribute("data-tab");
-            const contact_isActive = contact_tab.classList.contains("contact_active");
-
-            // If clicking the same active tab, collapse the section
-            if (contact_isActive && contact_legalSection && contact_legalSection.classList.contains("contact_expanded")) {
-              // Remove active class from clicked tab
-              contact_tab.classList.remove("contact_active");
-              
               // Hide all iframes
               Object.values(contact_legalIframes).forEach((contact_iframe) => {
                 if (contact_iframe) {
@@ -1112,58 +1102,32 @@
                   contact_iframe.classList.add("contact_hidden");
                 }
               });
-              
-              // Collapse section
-              contact_legalSection.classList.remove("contact_expanded");
-              return;
-            }
 
-            // Expand section if not already expanded
-            if (contact_legalSection && !contact_legalSection.classList.contains("contact_expanded")) {
-              contact_legalSection.classList.add("contact_expanded");
-            }
+              // Show selected iframe and load src if not already loaded
+              if (contact_legalIframes[contact_tabName]) {
+                const contact_selectedIframe = contact_legalIframes[contact_tabName];
 
-            // Remove active class from all tabs
-            contact_legalTabs.forEach((contact_t) => {
-              contact_t.classList.remove("contact_active");
-            });
+                // Load src from data-src if not already set
+                if (!contact_selectedIframe.src && contact_selectedIframe.hasAttribute("data-src")) {
+                  contact_selectedIframe.src = contact_selectedIframe.getAttribute("data-src");
+                }
 
-            // Add active class to clicked tab
-            contact_tab.classList.add("contact_active");
-
-            // Hide all iframes
-            Object.values(contact_legalIframes).forEach((contact_iframe) => {
-              if (contact_iframe) {
-                contact_iframe.classList.remove("contact_visible");
-                contact_iframe.classList.add("contact_hidden");
+                // Show iframe with slight delay for smooth animation
+                setTimeout(() => {
+                  contact_selectedIframe.classList.remove("contact_hidden");
+                  contact_selectedIframe.classList.add("contact_visible");
+                }, 200);
               }
-            });
-
-            // Show selected iframe and load src if not already loaded
-            if (contact_legalIframes[contact_tabName]) {
-              const contact_selectedIframe = contact_legalIframes[contact_tabName];
-              
-              // Load src from data-src if not already set
-              if (!contact_selectedIframe.src && contact_selectedIframe.hasAttribute("data-src")) {
-                contact_selectedIframe.src = contact_selectedIframe.getAttribute("data-src");
-              }
-              
-              // Show iframe with slight delay for smooth animation
-              setTimeout(() => {
-                contact_selectedIframe.classList.remove("contact_hidden");
-                contact_selectedIframe.classList.add("contact_visible");
-              }, 200);
+            } catch (error) {
+              console.error("Error switching legal tabs:", error);
             }
-          } catch (error) {
-            console.error("حدث خطأ أثناء تبديل التبويب:", error);
-          }
+          });
         });
-      });
-    } catch (error) {
-      console.error("حدث خطأ في إعداد تبويبات الصفحات القانونية:", error);
-    }
+      } catch (error) {
+        console.error("Error setting up legal pages:", error);
+      }
 
-    insertUniqueSnapshot("../pages/header.html", "header-container101", 100);
+      insertUniqueSnapshot("../pages/header.html", "header-container101", 100);
 
-  </script>
+    </script>
 </body>

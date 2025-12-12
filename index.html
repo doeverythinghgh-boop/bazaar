@@ -302,14 +302,28 @@
   <script>
 
 
-    // دالة لإخفاء أيقونة "الرئيسية" عن طريق إضافة فئة CSS.
+    /**
+     * @file index.html
+     * @description Main entry point for the Bazaar application. Handles navigation, initial data loading (user session, notification config), and UI setup for the single-page application structure.
+     */
+
+    /**
+     * @function hiddenHomeIcon
+     * @description Hides the "Home" icon in the navigation bar by adding a CSS class.
+     * @returns {void}
+     */
     function hiddenHomeIcon() {
       const homeButton = document.getElementById("index-home-btn");
       if (homeButton) {
         homeButton.classList.add("index-hidden");
       }
     }
-    // دالة لإظهار أيقونة "الرئيسية" عن طريق إزالة فئة CSS.
+
+    /**
+     * @function showHomeIcon
+     * @description Shows the "Home" icon in the navigation bar by removing the CSS class.
+     * @returns {void}
+     */
     function showHomeIcon() {
       const homeButton = document.getElementById("index-home-btn");
       if (homeButton) {
@@ -317,9 +331,14 @@
       }
     }
 
-    // [نقطة البداية] يتم تنفيذ هذا الكود بعد تحميل محتوى DOM بالكامل.
+    // [EntryPoint] Executed when DOM is fully loaded.
+    /**
+     * @event DOMContentLoaded
+     * @description Initializes the application on page load. Fetches notification config, sets up user session, loads the home page, and binds all navigation event listeners.
+     * @async
+     */
     document.addEventListener("DOMContentLoaded", async () => {
-    
+
       // [خطوة 0] تحميل إعدادات الإشعارات من السيرفر (المصدر الوحيد للحقيقة)
       try {
         const response = await fetch('/notification_config.json');
@@ -359,16 +378,21 @@
         .getElementById("index-home-btn")
         .addEventListener("click", handleHomeButtonClick);
 
-      // [خطوة 5.3] ربط زر "البحث" بالدالة الخاصة به.
+      // [Step 5.3] Bind "Search" button.
       document
         .getElementById("index-search-btn")
         .addEventListener("click", handleSearchButtonClick);
 
-      // [خطوة 5.4] ربط زر "حركة المشتريات".
+      // [Step 5.4] Bind "Sales Movement" button.
+      /**
+       * @event click
+       * @description Handles the "Sales Movement" button click. Checks login status: if logged in, loads the sales movement page; otherwise, prompts for login.
+       * @async
+       */
       document
         .getElementById("index-sales-movement-btn")
         .addEventListener("click", async () => {
-          // التحقق أولاً من وجود مستخدم مسجل.
+          // Check if user is logged in.
           if (userSession) {
             const container = document.getElementById("index-salesMovement-container");
             if (container.innerHTML == "") {
@@ -391,17 +415,17 @@
               );
             }
           } else {
-            // إذا لم يكن المستخدم مسجلاً، يتم عرض نافذة منبثقة تطلب منه تسجيل الدخول.
+            // If not logged in, show a confirmation modal.
             Swal.fire({
               icon: "info",
-              title: "يجب تسجيل الدخول",
-              text: "لمتابعه مشترياتك ومنتجاتك، يرجى تسجيل الدخول أولاً.",
+              title: "Login Required",
+              text: "To view your sales and products, please log in first.",
               showCancelButton: true,
-              confirmButtonText: "تسجيل الدخول",
-              cancelButtonText: "إلغاء",
+              confirmButtonText: "Log In",
+              cancelButtonText: "Cancel",
             }).then((result) => {
               if (result.isConfirmed) {
-                // إذا وافق المستخدم، يتم توجيهه إلى صفحة تسجيل الدخول.
+                // If confirmed, redirect to login page.
                 console.log("[Modal] User chose to log in. Redirecting...");
                 mainLoader(
                   "./pages/login.html",
@@ -416,7 +440,11 @@
           }
         });
 
-      // [خطوة 5.9] ربط زر "الإشعارات".
+      // [Step 5.9] Bind "Notifications" button.
+      /**
+       * @event click
+       * @description Handles the "Notifications" button click. Loads the notifications page.
+       */
       document
         .getElementById("index-notifications-btn")
         .addEventListener("click", () => {
@@ -428,7 +456,11 @@
         .addEventListener("click", handleContactButtonClick);
 
 
-      // [خطوة 5.5] ربط زر "السلة".
+      // [Step 5.5] Bind "Cart" button.
+      /**
+       * @event click
+       * @description Handles the "Cart" button click. Loads the card package page (cart).
+       */
       document
         .getElementById("index-cart-btn")
         .addEventListener("click", () => {
@@ -456,7 +488,11 @@
           }
         });
 
-      // [خطوة 5.6] ربط زر "الهدايا".
+      // [Step 5.6] Bind "Gifts" button.
+      /**
+       * @event click
+       * @description Handles the "Gifts" button click. Navigates to the gifts page via a protected link handler.
+       */
       document
         .getElementById("index-gifts-btn")
         .addEventListener("click", () =>
@@ -465,9 +501,13 @@
 
 
 
-      // دالة معالجة النقر على زر "الرئيسية".
+      /**
+       * @function handleHomeButtonClick
+       * @description Handles the "Home" button click. Checks for Android updates and reloads the home page if necessary.
+       * @returns {void}
+       */
       function handleHomeButtonClick() {
-        // التحقق من وجود واجهة Android ودالة التحديث.
+        // Check for Android interface and update function.
         if (window.Android && typeof window.Android.checkForUpdates === "function") {
           window.Android.checkForUpdates();
         }
@@ -493,12 +533,15 @@
         }
       }
 
-      // دالة معالجة النقر على زر "تسجيل الدخول / لوحة التحكم".
+      /**
+       * @function handleLoginButtonClick
+       * @description Handles the "Login" button click. Redirects to User Dashboard if logged in, otherwise to Login page.
+       * @returns {void}
+       */
       function handleLoginButtonClick() {
         try {
           if (userSession) {
-            // [أ] إذا كان المستخدم مسجلاً، يتم توجيهه إلى لوحة التحكم.
-            // إذا كان المستخدم مسجلاً، اذهب إلى لوحة التحكم
+            // [A] If user is logged in, redirect to dashboard.
             mainLoader(
               "pages/user-dashboard.html",
               "index-user-container",
@@ -508,7 +551,7 @@
               true
             );
           } else {
-            // [ب] إذا لم يكن المستخدم مسجلاً، يتم توجيهه إلى صفحة تسجيل الدخول.
+            // [B] If user is not logged in, redirect to login page.
             mainLoader(
               "pages/login.html",
               "index-user-container",
@@ -519,11 +562,15 @@
             );
           }
         } catch (error) {
-          console.error("خطأ في التعامل مع زر تسجيل الدخول:", error);
+          console.error("Error handling login button:", error);
         }
       }
 
-      // دالة معالجة النقر على زر "البحث".
+      /**
+       * @function handleSearchButtonClick
+       * @description Handles the "Search" button click. Loads the search page.
+       * @returns {void}
+       */
       function handleSearchButtonClick() {
         const container = document.getElementById("index-search-container");
         if (container.innerHTML == "") {
@@ -547,7 +594,11 @@
         }
       }
 
-      // دالة معالجة النقر على زر "اتصال".
+      /**
+       * @function handleContactButtonClick
+       * @description Handles the "Contact Us" button click. Loads the contact page.
+       * @returns {void}
+       */
       function handleContactButtonClick() {
         const container = document.getElementById("index-contact-btn");
         mainLoader(
@@ -561,17 +612,30 @@
 
       }
 
-      // [خطوة 5.7] ربط زر "إضافة منتج".
+      // [Step 5.7] Bind "Add Product" button.
+      /**
+       * @constant {HTMLElement} addProductBtn
+       * @description Button element for adding a new product.
+       */
       const addProductBtn = document.getElementById("dash-add-product-btn");
       if (addProductBtn) {
         addProductBtn.addEventListener("click", showAddProductModal);
       }
 
-      // [خطوة 5.8] ربط زر "منتجاتي".
+      // [Step 5.8] Bind "My Products" button.
+      /**
+       * @constant {HTMLElement} viewMyProductsBtn
+       * @description Button element for viewing the user's products.
+       */
       const viewMyProductsBtn = document.getElementById(
         "dash-view-my-products-btn"
       );
       if (viewMyProductsBtn) {
+        /**
+         * @event click
+         * @description Handles "My Products" button click. Loads the user's products page.
+         * @async
+         */
         viewMyProductsBtn.addEventListener("click", async () => {
           console.log(myProducts);
           const container = document.getElementById(
@@ -603,11 +667,21 @@
       }
       //#endregion
 
-      // [خطوة 6] منطق تحديد الزر النشط في شريط التنقل.
+      // [Step 6] Validation logic for active button in navigation bar.
+      /**
+       * @constant {NodeListOf<HTMLElement>} headerButtons
+       * @description List of all header navigation buttons.
+       */
       const headerButtons = document.querySelectorAll(".index-header-login-btn");
 
+      /**
+       * @function setActiveButton
+       * @description Sets the active class on the clicked button and removes it from others.
+       * @param {HTMLElement} clickedBtn - The button that was clicked.
+       * @returns {void}
+       */
       function setActiveButton(clickedBtn) {
-        // [أ] إزالة فئة 'active' من جميع الأزرار.
+        // [A] Remove 'active' class from all buttons.
         headerButtons.forEach((btn) => btn.classList.remove("active"));
         if (clickedBtn) {
           clickedBtn.classList.add("active");
@@ -615,13 +689,17 @@
       }
 
       headerButtons.forEach((btn) => {
-        // [ب] إضافة مستمع لكل زر لتطبيق الحالة النشطة عند النقر عليه.
+        // [B] Add listener to each button to apply active state on click.
         btn.addEventListener("click", function () {
           setActiveButton(this);
         });
       });
 
-      // [خطوة 7] تعيين زر "الرئيسية" كنشط افتراضيًا عند تحميل الصفحة.
+      // [Step 7] Set "Home" button as active by default on page load.
+      /**
+       * @constant {HTMLElement} homeBtn
+       * @description The Home button element.
+       */
       const homeBtn = document.getElementById("index-home-btn");
       if (homeBtn) {
         setActiveButton(homeBtn);

@@ -1,3 +1,8 @@
+<!-- 
+@file notification/page/notifications.html
+@description Displays the user's notifications list with states for loading, empty, and error.
+-->
+
 <body>
     <!-- ملفات JavaScript -->
     <link rel="stylesheet" href="../notification/page/notifications.css">
@@ -40,19 +45,24 @@
         </div>
     </div>
 
-    <!-- الإعلان عن دوال IndexedDB (لأغراض التطوير) -->
+    <!-- IndexedDB functions declaration (for development purposes) -->
     <script>
-        // تهيئة صفحة الإشعارات
+        /**
+         * @description Initializes the notifications page logic and global notification system.
+         * Requests browser notification permissions if default.
+         */
+
+        // Initialize notification page logic
         if (typeof NotificationPage !== 'undefined') {
             NotificationPage.init();
         }
 
-        // تهيئة العداد العالمي إذا لم يتم تحميله تلقائياً
+        // Initialize global counter if not automatically loaded
         if (window.GLOBAL_NOTIFICATIONS && typeof window.GLOBAL_NOTIFICATIONS.init === 'function') {
             window.GLOBAL_NOTIFICATIONS.init();
         }
 
-        // طلب إذن الإشعارات من المتصفح
+        // Request browser notification permission
         if ('Notification' in window && Notification.permission === 'default') {
             Notification.requestPermission();
         }

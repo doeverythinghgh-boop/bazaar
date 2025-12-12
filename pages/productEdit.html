@@ -1,4 +1,3 @@
-
 <style>
     .edit-product-modal {
         background: white;
@@ -317,6 +316,11 @@
     }
 </style>
 
+<!--
+@file pages/productEdit.html
+@description Product Edit Page. Handles updating existing products, managing images (add/remove existing), and saving changes.
+-->
+
 <body>
     <div class="edit-product-modal" role="dialog" aria-modal="true" aria-labelledby="editProductTitle">
         <h2 class="edit-product-modal__title" id="editProductTitle"><i class="fas fa-edit"></i> تعديل المنتج</h2>
@@ -338,7 +342,7 @@
                                 class="fas fa-folder-open"></i></button>
                         <button type="button" class="btn btn-ghost btn-icon" id="take-photo-btn"
                             title="التقاط من الكاميرا"><i class="fas fa-camera"></i></button>
-                        
+
                     </div>
 
                     <div class="edit-product-modal__hint">المطلوب: صورة واحدة على الأقل. الدعم: jpg, png, webp. </div>
@@ -427,31 +431,33 @@
 
     <script>
         /**
-         * دالة لتهيئة نموذج تعديل المنتج
+         * @function initializeEditProductForm
+         * @description Initializes the product edit form by populating it with data from `productSession`.
+         *   Loads existing images and sets up the form mode.
          */
         async function initializeEditProductForm() {
             console.log('%c[ProductForm] Initializing edit form...', 'color: blue;');
 
             if (!productSession) {
                 console.error('%c[ProductForm] productSession not found!', 'color: red;');
-                Swal.fire('خطأ!', 'لم يتم العثور على بيانات المنتج.', 'error');
+                Swal.fire('Error!', 'Product data not found.', 'error');
                 return;
             } else {
-                console.log('%c[ProductForm] productSession 0000000 found!', 'color: green;');
+                console.log('%c[ProductForm] productSession found!', 'color: green;');
             }
 
             const form = document.getElementById('edit-product-form');
             const images = window.productModule.images;
-            images.length = 0; // إفراغ مصفوفة الصور
+            images.length = 0; // Clear image array
 
-            // تعيين وضع التعديل
+            // Set edit mode
             form.dataset.mode = 'edit';
             form.dataset.productKey = productSession.product_key;
             console.log(`[ProductForm] Editing product: ${productSession.product_key}`);
 
-            window.productModule.originalImageNames = []; // إعادة تعيين
+            window.productModule.originalImageNames = []; // Reset
 
-            // تعبئة الحقول النصية
+            // Populate text fields
             document.getElementById('product-name').value = productSession.productName || '';
             document.getElementById('product-description').value = productSession.product_description || '';
             document.getElementById('seller-message').value = productSession.user_message || '';
@@ -460,28 +466,34 @@
             document.getElementById('product-price').value = productSession.product_price || '';
             document.getElementById('original-price').value = productSession.original_price || '';
 
-            // تحديث عدادات الحروف
+            // Update character counters
             document.getElementById('product-name').dispatchEvent(new Event('input'));
             document.getElementById('product-description').dispatchEvent(new Event('input'));
             document.getElementById('seller-message').dispatchEvent(new Event('input'));
             document.getElementById('product-notes').dispatchEvent(new Event('input'));
 
-            // تحميل الصور القديمة
+            // Load existing images
             await window.productModule.loadExistingImages();
 
             console.log('%c[ProductForm] Edit form initialized successfully.', 'color: green;');
         }
 
-        // جعل الدوال والمتغيرات متاحة عالميًا ضمن نطاق النافذة
+        // Make functions and variables globally available
         window.productModule = (function () {
-            // --- إعدادات ضغط افتراضية ---
+            // --- Default Compression Settings ---
+            /**
+             * @constant {number} IMAGE_MAX_WIDTH - Max width for compressed images.
+             */
             const IMAGE_MAX_WIDTH = 1600;
+            /**
+             * @constant {number} IMAGE_MAX_HEIGHT - Max height for compressed images.
+             */
             const IMAGE_MAX_HEIGHT = 1600;
             const IMAGE_QUALITY = 0.75;
             const MAX_FILES = 6;
             const CLOUDFLARE_BASE_URL = 'https://pub-e828389e2f1e484c89d8fb652c540c12.r2.dev/';
 
-            // عناصر DOM
+            // DOM Elements
             const fileInput = document.getElementById('file-input');
             const pickFilesBtn = document.getElementById('pick-files-btn');
             const takePhotoBtn = document.getElementById('take-photo-btn');
@@ -497,7 +509,13 @@
             const originalPriceInput = document.getElementById('original-price');
             const imagesLoadingEl = document.getElementById('images-loading');
 
-            // --- دوال مساعدة ---
+            // --- Helper Functions ---
+            /**
+             * @function showError
+             * @description Displays an error message below the specified element.
+             * @param {HTMLElement} element - The element where the error occurred.
+             * @param {string} message - The error message to display.
+             */
             function showError(element, message) {
                 clearError(element);
                 const errorDiv = document.createElement('div');
@@ -506,16 +524,28 @@
                 element.parentElement.appendChild(errorDiv);
             }
 
+            /**
+             * @function clearError
+             * @description Removes the error message from below the specified element.
+             * @param {HTMLElement} element - The element to clear errors for.
+             */
             function clearError(element) {
                 const errorDiv = element.parentElement.querySelector('.edit-product-modal__error-message');
                 if (errorDiv) errorDiv.remove();
             }
 
+            /**
+            * @function formatBytes
+            * @description Converts bytes to a human-readable string (KB, MB, etc.).
+            * @param {number} bytes - Size in bytes.
+            * @param {number} decimals - Number of decimal places.
+            * @returns {string} Formatted string.
+            */
             function formatBytes(bytes, decimals = 2) {
                 if (!+bytes) return '0 Bytes';
                 const k = 1024;
                 const dm = decimals < 0 ? 0 : decimals;
-                const sizes = ['بايت', 'كيلوبايت', 'ميجابايت', 'جيجابايت'];
+                const sizes = ['Bytes', 'KB', 'MB', 'GB'];
                 const i = Math.floor(Math.log(bytes) / Math.log(k));
                 return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
             }
@@ -534,7 +564,13 @@
             }
             const WEBP_SUPPORTED_PROMISE = supportsWebP();
 
-            // --- دالة ضغط الصور ---
+            // --- Image Compression Function ---
+            /**
+             * @function compressImage
+             * @description Compresses an image file.
+             * @param {File} file - The image file to compress.
+             * @returns {Promise<Blob>} Compressed image blob.
+             */
             async function compressImage(file) {
                 const imgBitmap = await createImageBitmap(file);
                 let { width, height } = imgBitmap;
@@ -560,7 +596,13 @@
                 return blob;
             }
 
-            // --- دالة إنشاء معاينة مصغرة ---
+            // --- Function to create thumbnail preview and show in UI ---
+            /**
+             * @function createPreviewItem
+             * @description Creates a visual preview element for an image and appends it to the DOM.
+             * @param {Object} state - The image state object.
+             * @param {string} [existingImageUrl=null] - URL for existing image (if applicable).
+             */
             function createPreviewItem(state, existingImageUrl = null) {
                 const wrapper = document.createElement('div');
                 wrapper.className = 'edit-product-modal__preview';
@@ -575,14 +617,14 @@
                 const removeBtn = document.createElement('button');
                 removeBtn.type = "button";
                 removeBtn.className = 'edit-product-modal__preview-remove';
-                removeBtn.setAttribute('title', 'إزالة الصورة');
+                removeBtn.setAttribute('title', 'Remove Image');
                 removeBtn.innerHTML = '<i class="fas fa-trash-alt"></i>';
                 removeBtn.addEventListener('click', () => removeImage(state.id));
 
                 const img = document.createElement('img');
                 const meta = document.createElement('div');
                 meta.className = 'edit-product-modal__preview-meta';
-                meta.textContent = state.status === 'uploaded' ? 'صورة حالية' : 'جاري الحساب...';
+                meta.textContent = state.status === 'uploaded' ? 'Current Image' : 'Calculating...';
 
                 wrapper.appendChild(removeBtn);
                 wrapper.appendChild(img);
@@ -601,7 +643,11 @@
                 state._metaEl = meta;
             }
 
-            // --- دالة تحميل الصور الحالية ---
+            // --- Function to load existing images ---
+            /**
+             * @function loadExistingImages
+             * @description Loads existing product images from the server / cloud storage.
+             */
             async function loadExistingImages() {
                 if (!productSession || !productSession.ImageName) {
                     imagesLoadingEl.style.display = 'none';
@@ -631,7 +677,7 @@
 
                     images.push(state);
 
-                    // تحميل الصورة لعرضها
+                    // Load image for display
                     const img = new Image();
                     img.onload = () => {
                         createPreviewItem(state, imageUrl);
@@ -643,7 +689,7 @@
                         console.error(`Failed to load image: ${name}`);
                         state.status = 'error';
                         createPreviewItem(state, '');
-                        state._metaEl.textContent = 'خطأ في التحميل';
+                        state._metaEl.textContent = 'Load Failed';
                         if (i === imageNames.length - 1) {
                             imagesLoadingEl.style.display = 'none';
                         }
@@ -656,18 +702,23 @@
                 }
             }
 
-            // --- حذف صورة ---
+            // --- Remove Image Function ---
+            /**
+             * @function removeImage
+             * @description Removes an image from the list and DOM.
+             * @param {string} id - The ID of the image to remove.
+             */
             function removeImage(id) {
                 console.log(`[ImageUploader] Attempting to remove image with id: ${id}`);
                 Swal.fire({
-                    title: 'هل أنت متأكد؟',
-                    text: "هل تريد بالتأكيد حذف هذه الصورة؟",
+                    title: 'Are you sure?',
+                    text: "Do you really want to delete this image?",
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#d33',
                     cancelButtonColor: '#3085d6',
-                    confirmButtonText: 'نعم، احذفها!',
-                    cancelButtonText: 'إلغاء'
+                    confirmButtonText: 'Yes, delete it!',
+                    cancelButtonText: 'Cancel'
                 }).then((result) => {
                     if (result.isConfirmed) {
                         const idx = images.findIndex(i => i.id === id);
@@ -681,8 +732,13 @@
                 });
             }
 
-            
-            // --- معالجة ملفات جديدة ---
+
+            // --- Handle New Files ---
+            /**
+             * @function handleNewFiles
+             * @description Processes newly selected files for upload.
+             * @param {FileList|Array<File>} fileList - List of files.
+             */
             async function handleNewFiles(fileList) {
                 console.log(`[ImageUploader] Handling ${fileList.length} new files.`);
                 clearError(uploaderEl);
@@ -709,21 +765,21 @@
                         console.error('%c[ImageUploader] Error compressing image:', 'color: red;', err);
                         state.status = 'error';
                         if (state._metaEl) {
-                            state._metaEl.textContent = 'خطأ';
+                            state._metaEl.textContent = 'Error';
                         }
                     }
                 }
                 fileInput.value = '';
             }
 
-            // --- أحداث واجهة المستخدم ---
+            // --- UI Events ---
             pickFilesBtn.addEventListener('click', () => {
                 fileInput.removeAttribute('capture');
                 fileInput.click();
             });
 
 
-            // عداد الحروف
+            // Character Counters
             productNameInput.addEventListener('input', () => {
                 const currentLength = productNameInput.value.length;
                 const maxLength = productNameInput.maxLength;
@@ -752,7 +808,7 @@
                 if (currentLength > 0) clearError(notesInput);
             });
 
-            // التحقق من الحقول الرقمية
+            // Numeric field validation
             quantityInput.addEventListener('input', () => {
                 let value = normalizeDigits(quantityInput.value);
                 quantityInput.value = value.replace(/[^0-9]/g, '');
@@ -780,7 +836,7 @@
                 originalPriceInput.value = value;
             });
 
-            // الكاميرا
+            // Camera
             takePhotoBtn.addEventListener('click', () => {
                 const isMobile = /Mobi|Android|iPhone/i.test(navigator.userAgent);
                 if (isMobile) {
@@ -793,7 +849,11 @@
                 }
             });
 
-            // دالة كاميرا سطح المكتب
+            // --- Desktop Camera Function ---
+            /**
+             * @function openDesktopCamera
+             * @description Opens a modal to capture a photo using the desktop webcam.
+             */
             async function openDesktopCamera() {
                 const cameraModalContainer = document.getElementById('camera-modal-container');
                 if (!cameraModalContainer) {
@@ -803,11 +863,11 @@
 
                 cameraModalContainer.innerHTML = `
                     <div class="modal-content camera-modal-content">
-                        <button class="close-button" id="camera-modal-close-btn" aria-label="إغلاق"><i class="fas fa-times"></i></button>
+                        <button class="close-button" id="camera-modal-close-btn" aria-label="Close"><i class="fas fa-times"></i></button>
                         <video id="camera-preview" autoplay playsinline></video>
                         <canvas id="camera-canvas" style="display:none;"></canvas>
                         <div class="camera-controls">
-                            <button id="capture-photo-btn" class="btn btn-warning"><i class="fas fa-camera"></i> التقاط الصورة</button>
+                            <button id="capture-photo-btn" class="btn btn-warning"><i class="fas fa-camera"></i> Capture Photo</button>
                         </div>
                     </div>
                 `;
@@ -841,61 +901,61 @@
                     };
                 } catch (err) {
                     console.error("Error accessing camera: ", err);
-                    Swal.fire('خطأ!', 'لم نتمكن من الوصول إلى الكاميرا. يرجى التأكد من منح الإذن اللازم.', 'error');
+                    Swal.fire('Error!', 'Could not access camera. Please ensure permissions are granted.', 'error');
                     cameraModalContainer.style.display = 'none';
                 }
             }
 
             fileInput.addEventListener('change', (e) => handleNewFiles(e.target.files));
 
-            // إرسال النموذج
+            // Form Submission
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 console.log('%c[ProductForm] Submit event triggered for editing.', 'color: blue;');
                 let isValid = true;
 
-                // التحقق من الصحة
+                // --- Validation ---
                 console.log('[ProductForm] Starting validation...');
 
-                // 1. التحقق من وجود صورة واحدة على الأقل
+                // 1. Check for at least one image
                 clearError(uploaderEl);
                 if (images.length === 0) {
-                    showError(uploaderEl, 'يجب إضافة صورة واحدة على الأقل للمنتج.');
+                    showError(uploaderEl, 'At least one product image is required.');
                     isValid = false;
                 }
 
-                // 2. التحقق من وجود اسم للمنتج
+                // 2. Check Product Name
                 clearError(productNameInput);
                 if (!productNameInput.value.trim()) {
-                    showError(productNameInput, 'اسم المنتج مطلوب.');
+                    showError(productNameInput, 'Product name is required.');
                     isValid = false;
                 }
 
-                // 3. التحقق من وجود وصف للمنتج
+                // 3. Check Description
                 clearError(descriptionTextarea);
                 if (!descriptionTextarea.value.trim() || descriptionTextarea.value.trim().length < 10) {
-                    showError(descriptionTextarea, 'وصف المنتج مطلوب (10 أحرف على الأقل).');
+                    showError(descriptionTextarea, 'Product description is required (at least 10 characters).');
                     isValid = false;
                 }
 
-                // 4. التحقق من وجود رسالة من البائع
+                // 4. Check Seller Message
                 clearError(sellerMessageTextarea);
                 if (!sellerMessageTextarea.value.trim() || sellerMessageTextarea.value.trim().length < 10) {
-                    showError(sellerMessageTextarea, 'رسالة البائع مطلوبة (10 أحرف على الأقل).');
+                    showError(sellerMessageTextarea, 'Seller message is required (at least 10 characters).');
                     isValid = false;
                 }
 
-                // 5. التحقق من الكمية
+                // 5. Check Quantity
                 clearError(quantityInput);
                 if (!quantityInput.value || parseFloat(quantityInput.value) < 1) {
-                    showError(quantityInput, 'يجب إدخال كمية متاحة صالحة (1 على الأقل).');
+                    showError(quantityInput, 'Please enter a valid available quantity (at least 1).');
                     isValid = false;
                 }
 
-                // 6. التحقق من السعر
+                // 6. Check Price
                 clearError(priceInput);
                 if (priceInput.value === '' || parseFloat(priceInput.value) < 0) {
-                    showError(priceInput, 'يجب إدخال سعر صالح للمنتج.');
+                    showError(priceInput, 'Please enter a valid product price.');
                     isValid = false;
                 }
 
@@ -906,8 +966,8 @@
 
                 console.log('%c[ProductForm] Validation passed. Starting update process.', 'color: green;');
                 Swal.fire({
-                    title: 'جاري تحديث المنتج...',
-                    text: 'الرجاء الانتظار قليلاً بينما يتم حفظ التغييرات.',
+                    title: 'Updating Product...',
+                    text: 'Please wait while changes are being saved.',
                     allowOutsideClick: false,
                     didOpen: () => {
                         Swal.showLoading();
@@ -918,44 +978,43 @@
                     const productKey = form.dataset.productKey;
                     const originalImageNames = window.productModule.originalImageNames || [];
 
-                    // 1. تحديد الصور المحذوفة - التصحيح هنا
-                    // الصور القديمة هي تلك التي لديها isExisting: true
+                    // 1. Identify Existing vs New Images
+                    // Existing images have isExisting: true
                     const existingImages = images.filter(state => state.isExisting === true);
-                    
-                    // الصور الجديدة هي تلك التي لديها status: 'ready'
+
+                    // New images have status: 'ready' (and isExisting: false)
                     const newImages = images.filter(state => state.status === 'ready' && state.isExisting === false);
-                    
-                    // أسماء الصور القديمة المتبقية
+
+                    // Names of remaining existing images
                     const remainingExistingImageNames = existingImages
                         .map(state => state.fileName)
                         .filter(Boolean);
 
-                    // تحديد الصور المحذوفة
+                    // Identify deleted images (present in original but not in remaining)
                     const imagesToDelete = originalImageNames.filter(name => !remainingExistingImageNames.includes(name));
 
-                    // 2. رفع الصور الجديدة
+                    // 2. Upload New Images
                     const uploadedImageUrls = [];
                     console.log(`[ProductForm] Uploading ${newImages.length} new images...`);
 
-                    // رفع الصور الجديدة
                     for (let i = 0; i < newImages.length; i++) {
                         const state = newImages[i];
                         if (state.status !== 'ready' || !state.compressedBlob) continue;
 
                         const fileName = `${Date.now()}_${i + 1}_${productKey}.webp`;
                         console.log(`[ProductForm] Uploading new image as: ${fileName}`);
-                        
+
                         try {
                             const result = await uploadFile2cf(state.compressedBlob, fileName, (msg) => console.log('[CloudflareUpload]', msg));
                             console.log(`[ProductForm] New image uploaded successfully: ${result.file}`);
                             uploadedImageUrls.push(result.file);
                         } catch (uploadError) {
                             console.error('[ProductForm] Failed to upload new image:', uploadError);
-                            throw new Error(`فشل رفع الصورة الجديدة: ${uploadError.message}`);
+                            throw new Error(`Failed to upload new image: ${uploadError.message}`);
                         }
                     }
 
-                    // 3. دمج الصور القديمة المتبقية والجديدة
+                    // 3. Assemble Final Content
                     const allImageNames = [...remainingExistingImageNames, ...uploadedImageUrls];
 
                     console.log('[ProductForm] Assembling final product data for update.');
@@ -963,10 +1022,12 @@
                     console.log('[ProductForm] New images:', uploadedImageUrls);
                     console.log('[ProductForm] Images to delete:', imagesToDelete);
                     console.log('[ProductForm] All image names:', allImageNames);
-                    mainCategorySelectToAdd=productSession.MainCategory;
-                    subCategorySelectToAdd=productSession.SubCategory;
+
+                    mainCategorySelectToAdd = productSession.MainCategory;
+                    subCategorySelectToAdd = productSession.SubCategory;
                     productAddLayout(true);
-                    // 4. تجميع بيانات المنتج
+
+                    // 4. Assemble Product Data
                     const productData = {
                         productName: normalizeArabicText(document.getElementById('product-name').value.trim()),
                         user_key: productSession.user_key,
@@ -986,37 +1047,37 @@
 
                     console.log('[ProductForm] Sending UPDATE request to backend with data:', productData);
 
-                    // 5. إرسال طلب التحديث
+                    // 5. Send Update Request
                     const dbResult = await updateProduct(productData);
 
                     if (dbResult && dbResult.error) {
-                        throw new Error(`فشل تحديث بيانات المنتج: ${dbResult.error}`);
+                        throw new Error(`Failed to update product data: ${dbResult.error}`);
                     }
 
-                    // 6. حذف الصور المحذوفة بعد النجاح
+                    // 6. Delete Removed Images (After successful update)
                     if (imagesToDelete.length > 0) {
                         console.log("[ProductForm] Deleting removed images from cloud storage:", imagesToDelete);
-                        
-                        // حذف الصور بشكل متوازي مع معالجة الأخطاء
+
+                        // Delete images in parallel with error handling
                         const deletePromises = imagesToDelete.map(name =>
                             deleteFile2cf(name, (msg) => console.log('[CloudflareDelete]', msg))
                                 .catch(err => {
-                                    console.error(`فشل حذف الملف ${name}:`, err);
-                                    // لا نوقف العملية إذا فشل حذف صورة واحدة
+                                    console.error(`Failed to delete file ${name}:`, err);
+                                    // Don't stop process if one deletion fails
                                     return null;
                                 })
                         );
-                        
+
                         await Promise.all(deletePromises);
                         console.log('[ProductForm] Deletion process completed.');
                     }
 
                     console.log('%c[ProductForm] Product updated successfully.', 'color: green; font-weight: bold;');
-                    
-                    // 7. عرض رسالة النجاح
+
+                    // 7. Show Success Message
                     Swal.fire({
-                        title: 'تم بنجاح!',
-                        text: 'تم تحديث المنتج بنجاح.',
+                        title: 'Success!',
+                        text: 'Product updated successfully.',
                         icon: 'success',
                         timer: 2000,
                         showConfirmButton: false
@@ -1025,8 +1086,8 @@
                 } catch (error) {
                     console.error('%c[ProductForm] Update failed with critical error:', 'color: red; font-weight: bold;', error);
                     Swal.fire({
-                        title: 'خطأ!',
-                        text: `فشل في تحديث المنتج: ${error.message}`,
+                        title: 'Error!',
+                        text: `Failed to update product: ${error.message}`,
                         icon: 'error'
                     });
                 }

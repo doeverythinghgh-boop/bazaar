@@ -156,7 +156,8 @@
       inset 0 1px 0 rgba(255, 255, 255, 0.2);
     transition: transform 0.2s, box-shadow 0.2s;
     cursor: pointer;
-    border-radius: 10px; /* ✅ جديد: إضافة حواف دائرية للزر */
+    border-radius: 10px;
+    /* ✅ جديد: إضافة حواف دائرية للزر */
   }
 
   .register_form-footer {
@@ -176,142 +177,101 @@
 </style>
 
 <body>
-    <div id="header-container1Xx" style="height: 70px"></div>
+  <div id="header-container1Xx" style="height: 70px"></div>
   <div class="register_page-wrapper">
 
     <div class="register_container">
-  
+
       <h2>إنشاء حساب جديد</h2>
       <form id="register_form" novalidate>
         <div class="register_form-group">
-          <label for="register_username"
-            ><i class="fas fa-user"></i> الاسم</label
-          >
-          <input
-            type="text"
-            id="register_username"
-            name="username"
-            required
-            autocomplete="off"
-          />
-          <div
-            id="register_username-error"
-            class="register_error-message"
-          ></div>
+          <label for="register_username"><i class="fas fa-user"></i> الاسم</label>
+          <input type="text" id="register_username" name="username" required autocomplete="off" />
+          <div id="register_username-error" class="register_error-message"></div>
         </div>
         <div class="register_form-group">
-          <label for="register_phone"
-            ><i class="fa fa-phone"></i> رقم الهاتف</label
-          >
-          <input
-            type="tel"
-            id="register_phone"
-            name="phone"
-            required
-            autocomplete="tel"
-          />
+          <label for="register_phone"><i class="fa fa-phone"></i> رقم الهاتف</label>
+          <input type="tel" id="register_phone" name="phone" required autocomplete="tel" />
           <div id="register_phone-error" class="register_error-message"></div>
         </div>
         <div class="register_form-group">
-          <label for="register_password"
-            ><i class="fas fa-lock"></i> كلمة المرور</label
-          >
+          <label for="register_password"><i class="fas fa-lock"></i> كلمة المرور</label>
           <div class="register_password-container">
-            <input
-              type="password"
-              id="register_password"
-              name="password"
-              required
-              autocomplete="new-password"
-            />
-            <i
-              class="fa fa-eye register_toggle-password"
-              id="register_toggle-password-icon"
-            ></i>
+            <input type="password" id="register_password" name="password" required autocomplete="new-password" />
+            <i class="fa fa-eye register_toggle-password" id="register_toggle-password-icon"></i>
           </div>
-          <div
-            id="register_password-error"
-            class="register_error-message"
-          ></div>
-          <small class="register_form-hint"
-            >يجب أن تتكون من 4 أحرف على الأقل لحماية حسابك.</small
-          >
+          <div id="register_password-error" class="register_error-message"></div>
+          <small class="register_form-hint">يجب أن تتكون من 4 أحرف على الأقل لحماية حسابك.</small>
         </div>
         <div class="register_form-group">
-          <label for="register_address"
-            ><i class="fas fa-map-marker-alt"></i> العنوان (اختياري)</label
-          >
-          <input
-            type="text"
-            id="register_address"
-            name="address"
-            autocomplete="off"
-          />
+          <label for="register_address"><i class="fas fa-map-marker-alt"></i> العنوان (اختياري)</label>
+          <input type="text" id="register_address" name="address" autocomplete="off" />
           <div id="register_address-error" class="register_error-message"></div>
-          <small class="register_form-hint"
-            >اختياري. يُستخدم لتسهيل عملية توصيل المنتجات إليك.</small
-          >
+          <small class="register_form-hint">اختياري. يُستخدم لتسهيل عملية توصيل المنتجات إليك.</small>
         </div>
 
         <button type="submit" class="button register_btn">إنشاء الحساب</button>
         <div class="register_form-footer">
-          <a href="#" id="register_goToLoginLink"
-            >لديك حساب بالفعل؟ <strong>سجل الدخول</strong></a
-          >
+          <a href="#" id="register_goToLoginLink">لديك حساب بالفعل؟ <strong>سجل الدخول</strong></a>
         </div>
       </form>
     </div>
   </div>
 
   <script>
+    /**
+     * @file pages/register.html
+     * @description Handles new user registration functionality, including form validation, password confirmation, and serial number generation for user keys.
+     */
+
     const register_form = document.getElementById("register_form");
     const register_username = document.getElementById("register_username");
     const register_phone = document.getElementById("register_phone");
     const register_password = document.getElementById("register_password");
     const register_address = document.getElementById("register_address");
 
-    // تفريغ حقول الإدخال عند تحميل الصفحة لضمان أنها فارغة دائمًا
+    // Clear input fields on page load to ensure they are always empty.
     if (register_username) register_username.value = "";
     if (register_phone) register_phone.value = "";
     if (register_password) register_password.value = "";
     if (register_address) register_address.value = "";
 
     /**
-     * يقوم بإنشاء رقم تسلسلي فريد مكون من 4 أحرف صغيرة و 4 أرقام عشوائية.
-     * يتم خلط الأحرف لجعل الرقم التسلسلي أقل قابلية للتنبؤ.
-     * @returns {string} رقم تسلسلي عشوائي مكون من 8 أحرف.
+     * @function register_generateSerialNumber
+     * @description Generates a unique serial number consisting of 4 random lowercase letters and 4 random digits. The characters are key shuffled to increase randomness.
+     * @returns {string} A random 8-character string acting as a user key.
      */
     function register_generateSerialNumber() {
       const letters = "abcdefghijklmnopqrstuvwxyz";
       const digits = "0123456789";
       let chars = [];
 
-      // 1. إضافة 4 أحرف صغيرة عشوائية
+      // 1. Add 4 random lowercase letters.
       for (let i = 0; i < 4; i++) {
         chars.push(letters.charAt(Math.floor(Math.random() * letters.length)));
       }
 
-      // 2. إضافة 4 أرقام عشوائية
+      // 2. Add 4 random digits.
       for (let i = 0; i < 4; i++) {
         chars.push(digits.charAt(Math.floor(Math.random() * digits.length)));
       }
 
-      // 3. خلط المصفوفة لضمان العشوائية
+      // 3. Shuffle the array to ensure randomness.
       for (let i = chars.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
-        [chars[i], chars[j]] = [chars[j], chars[i]]; // تبديل العناصر
+        [chars[i], chars[j]] = [chars[j], chars[i]]; // Swap elements.
       }
 
-      // 4. دمج المصفوفة لتكوين السلسلة النهائية
+      // 4. Join the array to form the final string.
       return chars.join("");
     }
 
-    // إضافة مستمع لحدث الإدخال لتنقية رقم الهاتف في الوقت الفعلي
+    // Add input event listener to sanitize phone number in real-time.
     if (register_phone) {
       register_phone.addEventListener("input", function (e) {
         try {
           let value = e.target.value;
-          // تعريف قاموس لتحويل الأرقام الهندية إلى الإنجليزية
+          // Dictionary to convert Indic digits to Arabic numerals.
           const hindiToArabic = {
             "٠": "0",
             "١": "1",
@@ -325,13 +285,13 @@
             "٩": "9",
           };
 
-          // استبدال الأرقام الهندية بالإنجليزية
+          // Replace Indic digits with Arabic numerals.
           value = value.replace(/[٠-٩]/g, (d) => hindiToArabic[d]);
 
-          // إزالة أي حرف ليس رقمًا (0-9)
+          // Remove any non-numeric characters (0-9).
           value = value.replace(/[^0-9]/g, "");
 
-          // تحديث قيمة الحقل
+          // Update input value.
           e.target.value = value;
         } catch (error) {
           console.error("[Register] Error handling phone input:", error);
@@ -340,6 +300,11 @@
     }
 
     if (register_form) {
+      /**
+       * @description Handles the registration form submission. Validates username, phone, and password, performs password confirmation via popup, and creates a new user via API.
+       * @event submit
+       * @async
+       */
       register_form.addEventListener("submit", async function (e) {
         e.preventDefault(); // Prevent form from submitting
         console.log("%c[Register] Form submitted.", "color: blue;");
@@ -352,13 +317,13 @@
         const register_usernameValue = register_username.value.trim();
         console.log("[Register] Validating username...");
         if (register_usernameValue === "") {
-          showError(register_username, "الاسم مطلوب.");
+          showError(register_username, "Name is required.");
           register_isValid = false;
         } else if (
           register_usernameValue.length < 8 ||
           register_usernameValue.length > 30
         ) {
-          showError(register_username, "الاسم يجب أن يكون بين 8 و 30 حرفًا.");
+          showError(register_username, "Name must be between 8 and 30 characters.");
           register_isValid = false;
         }
 
@@ -367,10 +332,10 @@
         const register_phoneValue = register_phone.value.trim();
         console.log("[Register] Validating phone number...");
         if (register_phoneValue === "") {
-          showError(register_phone, "رقم الهاتف مطلوب.");
+          showError(register_phone, "Phone number is required.");
           register_isValid = false;
         } else if (register_phoneValue.length < 11) {
-          showError(register_phone, "رقم الهاتف يجب ألا يقل عن 11 رقمًا.");
+          showError(register_phone, "Phone number must be at least 11 digits.");
           register_isValid = false;
         }
 
@@ -379,12 +344,12 @@
         const register_passwordValue = register_password.value.trim();
         console.log("[Register] Validating password...");
         if (register_passwordValue === "") {
-          showError(register_password, "كلمة المرور مطلوبة.");
+          showError(register_password, "Password is required.");
           register_isValid = false;
         } else if (register_passwordValue.length < 4) {
           showError(
             register_password,
-            "كلمة المرور يجب أن تكون 4 أحرف على الأقل."
+            "Password must be at least 4 characters."
           );
           register_isValid = false;
         }
@@ -397,17 +362,17 @@
         // Password confirmation is now mandatory
         console.log("[Register] Prompting for password confirmation...");
         const { value: register_confirmedPassword } = await Swal.fire({
-          title: "تأكيد كلمة المرور",
+          title: "Confirm Password",
           html: `
-            <p>الرجاء إعادة إدخال كلمة المرور للتأكيد</p>
+            <p>Please re-enter your password to confirm</p>
             <div class="register_password-container">
-              <input type="password" id="register_swal-confirm-password" class="swal2-input" placeholder="أعد إدخال كلمة المرور">
+              <input type="password" id="register_swal-confirm-password" class="swal2-input" placeholder="Re-enter password">
               <i class="fa fa-eye register_toggle-password" id="register_swal-toggle-confirm-password" style="top: 60%;"></i>
             </div>
           `,
           showCancelButton: true,
-          confirmButtonText: "تأكيد",
-          cancelButtonText: "إلغاء",
+          confirmButtonText: "Confirm",
+          cancelButtonText: "Cancel",
           didOpen: () => {
             const confirmInput = document.getElementById(
               "register_swal-confirm-password"
@@ -428,36 +393,36 @@
               "register_swal-confirm-password"
             ).value;
             if (confirmValue !== register_password.value) {
-              Swal.showValidationMessage("كلمتا المرور غير متطابقتين!");
+              Swal.showValidationMessage("Passwords do not match!");
               return false;
             }
             return confirmValue;
           },
         });
 
-        // إذا ألغى المستخدم، أوقف عملية التسجيل
+        // If user cancelled, stop registration.
         if (!register_confirmedPassword) {
           console.log("[Register] Password confirmation cancelled by user.");
           return;
         }
-        const register_userKey = register_generateSerialNumber(); // 🔑 توليد الرقم التسلسلي
+        const register_userKey = register_generateSerialNumber(); // 🔑 Generate unique serial number (user_key)
         console.log(`[Register] Generated new user_key: ${register_userKey}`);
         const register_newUser = {
           username: register_username.value.trim(),
           phone: register_phone.value.trim(),
-          user_key: register_userKey, // إضافة الرقم التسلسلي للبيانات
-          password: register_password.value, // قد تكون فارغة
-          address: register_address.value.trim(), // قد تكون فارغة
+          user_key: register_userKey, // Add serial number to user data
+          password: register_password.value, // Can be empty if allowed
+          address: register_address.value.trim(), // Can be empty
         };
 
         console.log(
           "[Register] Sending new user data to API...",
           register_newUser
         );
-        // إظهار رسالة انتظار باستخدام SweetAlert2
+        // Show loading message using SweetAlert2
         Swal.fire({
-          title: "جاري إنشاء الحساب...",
-          text: "الرجاء الانتظار قليلاً.",
+          title: "Creating Account...",
+          text: "Please wait a moment.",
           allowOutsideClick: false,
           didOpen: () => {
             Swal.showLoading();
@@ -466,7 +431,7 @@
 
         try {
           const register_result = await addUser(register_newUser);
-          Swal.close(); // إغلاق رسالة الانتظار
+          Swal.close(); // Close waiting message
 
           if (register_result && register_result.message) {
             console.log(
@@ -474,24 +439,24 @@
               "color: green;",
               register_result
             );
-            // حفظ بيانات المستخدم في التخزين المحلي لتسجيل دخوله
-            // ✅ إصلاح: التأكد من حفظ جميع البيانات التي أدخلها المستخدم، بما في ذلك العنوان
+            // Save user data in local storage for login
+            // ✅ Fix: Ensure all user-entered data is saved, including address
             const register_loggedInUserData = {
               username: register_newUser.username,
               phone: register_newUser.phone,
               user_key: register_newUser.user_key,
-              Address: register_newUser.address, // إضافة العنوان إلى الكائن المحفوظ
-              is_seller: 0, // إضافة قيمة افتراضية لحالة البائع
+              Address: register_newUser.address, // Add address to saved object
+              is_seller: 0, // Default seller status
             };
             localStorage.setItem(
               "loggedInUser",
               JSON.stringify(register_loggedInUserData)
             );
 
-            // تحديث الجلسة العالمية
+            // Update global session
             userSession = register_loggedInUserData;
 
-            // ✅ جديد: تهيئة الإشعارات للمستخدم الجديد كما في صفحة تسجيل الدخول
+            // ✅ New: Initialize notifications for new user as in login page
             console.log(
               "[Register] Initializing notifications for new user..."
             );
@@ -514,22 +479,22 @@
               "[Register] User data saved to localStorage. Redirecting to index.html..."
             );
 
-            // إظهار رسالة ترحيب قبل التوجيه إلى الصفحة الرئيسية
+            // Show welcome message before redirecting to home
             Swal.fire({
               icon: "success",
-              title: "تم إنشاء الحساب بنجاح!",
+              title: "Account Created Successfully!",
               html: `
-      <p style="font-size: 1.1rem; color: #333;">أنت الآن جاهز لتجربة تسوق فريدة!</p>
+      <p style="font-size: 1.1rem; color: #333;">You are now ready for a unique shopping experience!</p>
       <div style="text-align: right; margin-top: 20px; padding-right: 15px; font-size: 1rem;">
-        <p style="margin-bottom: 10px;">🛍️ تصفح آلاف المنتجات بسهولة.</p>
-        <p style="margin-bottom: 10px;">💰 تمتع بالخصومات والعروض الحصرية.</p>
-        <p>✨ اكتشف كل ما هو جديد في سويس بازار.</p>
+        <p style="margin-bottom: 10px;">🛍️ Browse thousands of products easily.</p>
+        <p style="margin-bottom: 10px;">💰 Enjoy exclusive discounts and offers.</p>
+        <p>✨ Discover what's new in Suez Bazaar.</p>
       </div>
     `,
-              allowOutsideClick: false, // منع الإغلاق عند النقر خارج الرسالة
-              confirmButtonText: "متابعة إلى الرئيسية",
+              allowOutsideClick: false, // Prevent closing on click outside
+              confirmButtonText: "Continue to Home",
             }).then((result) => {
-              // بعد الضغط على زر المتابعة، يتم توجيه المستخدم
+              // Redirect user after clicking continue
               if (result.isConfirmed) {
                 mainLoader(
                   "./pages/home.html",
@@ -547,27 +512,27 @@
               "[Register] API returned an error:",
               register_result.error
             );
-            // إذا كان هناك خطأ من الخادم (مثل رقم هاتف مكرر)
+            // If server error (e.g., duplicate phone number)
             showError(register_phone, register_result.error);
           } else {
             console.error("[Register] Unknown API failure.");
-            // في حالة فشل غير معروف السبب من الخادم
-            showError(form, "حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى.");
+            // Unknown server failure
+            showError(register_form, "An unexpected error occurred. Please try again.");
           }
         } catch (error) {
-          Swal.close(); // تأكد من إغلاق الرسالة في حالة حدوث خطأ
+          Swal.close(); // Ensure message is closed on error
           console.error(
             "%c[Register] Critical error during registration:",
             "color: red; font-weight: bold;",
             error
           );
-          // هذا الخطأ يحدث إذا كانت هناك مشكلة في الاتصال بالخادم أو الكود
-          showError(register_form, "حدث خطأ في التطبيق. يرجى المحاولة لاحقاً.");
+          // Connection or code error
+          showError(register_form, "Application error. Please try again later.");
         }
       });
     }
 
-    // معالجة الانتقال لصفحة تسجيل الدخول
+    // Handle navigation to the login page.
     try {
       const register_loginLink = document.getElementById(
         "register_goToLoginLink"
@@ -589,25 +554,25 @@
       console.error("[Register] Could not find or bind login link:", error);
     }
 
-    // جديد: إضافة وظيفة تبديل عرض كلمة المرور للنموذج الرئيسي
+    // New: Add password visibility toggle for the main form.
     const register_togglePasswordIcon = document.getElementById(
       "register_toggle-password-icon"
     );
     if (register_togglePasswordIcon && register_password) {
       register_togglePasswordIcon.addEventListener("click", function () {
-        // تبديل نوع حقل الإدخال
+        // Toggle input type.
         const type =
           register_password.getAttribute("type") === "password"
             ? "text"
             : "password";
         register_password.setAttribute("type", type);
 
-        // تبديل أيقونة العين
+        // Toggle eye icon.
         this.classList.toggle("fa-eye");
         this.classList.toggle("fa-eye-slash");
       });
     }
-    // يتم إدراج هذا العنصر بالطريقة المتبعة في المشروع (hgh_sec)
+    // This element is inserted in the way followed in the project (hgh_sec).
     insertUniqueSnapshot("/pages/header.html", "header-container1Xx", 300);
   </script>
 </body>

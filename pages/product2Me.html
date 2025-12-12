@@ -316,58 +316,63 @@
 </style>
 
 <div class="products-container">
-  
-  <!-- شريط البحث والتصفية -->
+
+  <!-- Search and Filter Bar -->
   <div class="search-container">
     <form class="search-form" id="search-form">
       <div class="form-group">
-        <label class="form-label">بحث بالاسم</label>
-        <input type="text" class="form-input" id="search-input" placeholder="ابحث باسم المنتج..." />
+        <label class="form-label">Search by Name</label>
+        <input type="text" class="form-input" id="search-input" placeholder="Search by product name..." />
       </div>
       <div class="form-group">
-        <label class="form-label">الفئة الرئيسية</label>
+        <label class="form-label">Main Category</label>
         <select class="form-select" id="main-category-filter">
-          <option value="">جميع الفئات</option>
-          <option value="1">الفئة 1</option>
-          <option value="2">الفئة 2</option>
+          <option value="">All Categories</option>
+          <option value="1">Category 1</option>
+          <option value="2">Category 2</option>
         </select>
       </div>
       <div class="form-group">
-        <label class="form-label">الفئة الفرعية</label>
+        <label class="form-label">Sub Category</label>
         <select class="form-select" id="sub-category-filter">
-          <option value="">جميع الفئات الفرعية</option>
+          <option value="">All Sub Categories</option>
         </select>
       </div>
       <button type="submit" class="search-btn">
-        <i class="fas fa-search"></i> بحث
+        <i class="fas fa-search"></i> Search
       </button>
     </form>
   </div>
 
-  <!-- حاوية البطاقات -->
+  <!-- Cards Container -->
   <div class="products-grid" id="products-grid">
-    <!-- سيتم تعبئة البطاقات هنا بالجافاسكريبت -->
+    <!-- Cards will be populated here via JS -->
   </div>
 
-  <!-- حالة التحميل -->
+  <!-- Loading State -->
   <div class="loading-state" id="loading-state">
     <i class="fas fa-spinner fa-spin"></i>
-    <p>جاري تحميل المنتجات...</p>
+    <p>Loading products...</p>
   </div>
 
-  <!-- حالة عدم وجود منتجات -->
+  <!-- Empty State -->
   <div class="empty-state" id="empty-state" style="display: none">
     <i class="fas fa-box-open"></i>
-    <p>لا توجد منتجات لعرضها</p>
-    <p>قم بإضافة منتجك الأول للبدء</p>
+    <p>No products to display</p>
+    <p>Add your first product to start</p>
   </div>
 </div>
 
 <script>
-  // بيانات المنتجات (سيتم استبدالها بالبيانات الفعلية)
-  //const myProducts = []; // سيتم تعبئتها من المصدر الفعلي
+  /**
+   * @fileoverview User Products Management Page (product2Me)
+   * @description Handles listing, searching, editing, and deleting user's products.
+   */
 
-  // العناصر الرئيسية في DOM
+  // Product Data
+  // const myProducts = []; // To be populated from actual source
+
+  // Main DOM Elements
   const productsGrid = document.getElementById("products-grid");
   const loadingState = document.getElementById("loading-state");
   const emptyState = document.getElementById("empty-state");
@@ -376,24 +381,24 @@
   const mainCategoryFilter = document.getElementById("main-category-filter");
   const subCategoryFilter = document.getElementById("sub-category-filter");
 
-  // المسار الأساسي للصور
-  const CLOUDFLARE_BASE_URL =
-    "https://pub-e828389e2f1e484c89d8fb652c540c12.r2.dev/";
+  // Base Image URL
+  const CLOUDFLARE_BASE_URL = "https://pub-e828389e2f1e484c89d8fb652c540c12.r2.dev/";
 
   /**
-   * دالة لتحميل وعرض المنتجات
+   * @function loadProducts
+   * @description Fetches and displays the user's products.
    */
   async function loadProducts() {
     console.log("%c[Products] Loading products...", "color: blue;");
-    // إخفاء البطاقات وإظهار حالة التحميل
+    // Hide cards and show loading state
     productsGrid.innerHTML = "";
     loadingState.style.display = "block";
     emptyState.style.display = "none";
     myProducts = await getProductsByUser(userSession.user_key);
 
-    // محاكاة تحميل البيانات (سيتم استبدالها بالبيانات الفعلية)
+    // Simulate data loading (switching to actual data display)
     setTimeout(() => {
-      if (myProducts.length === 0) {
+      if (!myProducts || myProducts.length === 0) {
         showEmptyState();
         return;
       }
@@ -404,7 +409,8 @@
   }
 
   /**
-   * دالة لعرض حالة عدم وجود منتجات
+   * @function showEmptyState
+   * @description Displays the empty state UI when no products are found.
    */
   function showEmptyState() {
     loadingState.style.display = "none";
@@ -413,7 +419,9 @@
   }
 
   /**
-   * دالة لعرض المنتجات في البطاقات
+   * @function renderProducts
+   * @description Renders the list of products into the grid.
+   * @param {Array} products - Array of product objects.
    */
   function renderProducts(products) {
     productsGrid.innerHTML = "";
@@ -425,21 +433,24 @@
   }
 
   /**
-   * دالة لإنشاء بطاقة منتج
+   * @function createProductCard
+   * @description Creates a DOM element for a single product card.
+   * @param {object} product - Product data object.
+   * @returns {HTMLElement} The product card element.
    */
   function createProductCard(product) {
     const card = document.createElement("div");
     card.className = "product-card";
     card.setAttribute("data-product-id", product.id);
 
-    // الحصول على أول صورة للمنتج
+    // Get the first image
     const firstImage = product.ImageName
       ? product.ImageName.split(",")[0].trim()
       : null;
 
     const imageUrl = firstImage ? CLOUDFLARE_BASE_URL + firstImage : null;
 
-    // تقطيع اسم المنتج إذا كان طويلاً
+    // Truncate product name if too long
     const displayName =
       product.productName.length > 15
         ? product.productName.substring(0, 15) + "..."
@@ -457,27 +468,27 @@
                     <div class="product-actions">
                         <button class="btn btn-edit" onclick="editProduct(${product.id
       })">
-                            <i class="fas fa-edit"></i> تعديل
+                            <i class="fas fa-edit"></i> Edit
                         </button>
                         <button class="btn btn-delete" onclick="deleteProduct(${product.id
       })">
-                            <i class="fas fa-trash"></i> حذف
+                            <i class="fas fa-trash"></i> Delete
                         </button>
                     </div>
                 </div>
             `;
 
-    // إضافة حدث النقر لعرض التفاصيل
+    // Add click event to show details
     card.addEventListener("click", (e) => {
-      // التحقق من أن النقر لم يكن على زر التعديل أو الحذف
+      // Check that click was not on edit or delete buttons
       if (!e.target.closest(".btn")) {
-        // تم التعديل: بدلاً من إظهار النافذة، يتم تسجيل بيانات المنتج في لوحة التحكم فقط
+        // Log product data to console instead of showing modal directly (as per logic)
         console.log(
-          "%c[Developer] تم النقر على بطاقة المنتج. البيانات:",
+          "%c[Developer] Product card clicked. Data:",
           "color: #007bff; font-weight: bold;",
           product
         );
-        // ✅ إصلاح: تجهيز بيانات المنتج بشكل صحيح قبل تمريرها
+        // Prepare product data for modal/view
         const productDataForModal = {
           product_key: product.product_key,
           productName: product.productName,
@@ -503,7 +514,9 @@
   }
 
   /**
-   * دالة تعديل المنتج
+   * @function editProduct
+   * @description Handles product editing logic (Category selection -> Edit Page).
+   * @param {number} productId - ID of the product to edit.
    */
   async function editProduct(productId) {
     const product = myProducts.find((p) => p.id === productId);
@@ -517,12 +530,11 @@
     }
 
     console.log("%c[Products] Editing product:", "color: blue;", product);
-    const result = await CategoryModal.show(product.MainCategory, product.SubCategory, "سوق المنتج");
+    const result = await CategoryModal.show(product.MainCategory, product.SubCategory, "Edit Product Market");
     if (result.status === 'success') {
-      console.log('تم الاختيار:', result.mainId, result.subId);
+      console.log('Selected:', result.mainId, result.subId);
 
-      //mainCategorySelectToAdd = result.mainId; //الفئه الرئيسية المختارة عند اضافة منتج
-      //subCategorySelectToAdd = result.subId; //الفئه الفرعية المختارة عند اضافة منتج
+      // result.mainId, result.subId are selected category IDs
 
       product.MainCategory = result.mainId;
       product.SubCategory = result.subId;
@@ -533,20 +545,22 @@
   }
 
   /**
-   * دالة حذف المنتج
+   * @function deleteProduct
+   * @description Handles product deletion logic with confirmation.
+   * @param {number} productId - ID of the product to delete.
    */
   async function deleteProduct(productId) {
     const product = myProducts.find((p) => p.id === productId);
     console.log("%c[Products] Deleting product:", "color: red;", product);
     Swal.fire({
-      title: 'هل أنت متأكد؟',
-      text: `سيتم حذف المنتج "${product.productName}" بشكل نهائي. لا يمكن التراجع عن هذا الإجراء.`,
+      title: 'Are you sure?',
+      text: `Product "${product.productName}" will be permanently deleted. This action cannot be undone.`,
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#d33',
       cancelButtonColor: '#3085d6',
-      confirmButtonText: 'نعم، احذفه!',
-      cancelButtonText: 'إلغاء',
+      confirmButtonText: 'Yes, delete it!',
+      cancelButtonText: 'Cancel',
       showLoaderOnConfirm: true,
       preConfirm: async () => {
         try {
@@ -563,29 +577,30 @@
           if (dbResult && dbResult.error) throw new Error(dbResult.error);
           return true;
         } catch (error) {
-          Swal.showValidationMessage(`فشل الحذف: ${error.message}`);
+          Swal.showValidationMessage(`Deletion failed: ${error.message}`);
           return false;
         }
       },
       allowOutsideClick: () => !Swal.isLoading()
     }).then((result) => {
       if (result.isConfirmed) {
-        // حذف المنتج من البيانات
+        // Remove from local array
         const index = myProducts.findIndex((p) => p.id === productId);
         if (index > -1) {
           myProducts.splice(index, 1);
         }
 
-        // إعادة تحميل العرض
+        // Reload display
         loadProducts();
 
-        Swal.fire("تم الحذف!", "تم حذف المنتج بنجاح", "success");
+        Swal.fire("Deleted!", "Product deleted successfully", "success");
 
       }
     });
   }
   /**
-   * دالة البحث والتصفية
+   * @function filterProducts
+   * @description Filters the product list based on search term and category selection.
    */
   function filterProducts() {
     const searchTerm = searchInput.value.toLowerCase();
@@ -617,23 +632,23 @@
     }
   }
 
-  // أحداث DOM
+  // DOM Events
   document.addEventListener("DOMContentLoaded", function () {
     loadProducts();
 
-    // حدث البحث
+    // Search Event
     searchForm.addEventListener("submit", function (e) {
       e.preventDefault();
       filterProducts();
     });
 
-    // أحداث التصفية الفورية
+    // Instant Filter Events
     searchInput.addEventListener("input", filterProducts);
     mainCategoryFilter.addEventListener("change", filterProducts);
     subCategoryFilter.addEventListener("change", filterProducts);
   });
 
-  // جعل الدوال متاحة عالمياً
+  // Make functions globally available
   window.editProduct = editProduct;
   window.deleteProduct = deleteProduct;
   loadProducts();

@@ -331,44 +331,44 @@
     // ضمان أن السكربت نظيف ومعزول (Isolated Scope) لتجنب تضارب المتغيرات
     (function () {
         /**
- * @description يضيف سجلاً جديدًا إلى جدول `updates` في قاعدة البيانات.
- *   يُستخدم هذا لتسجيل وقت آخر تغيير مهم في البيانات (مثل تحديث الإعلانات) للمساعدة في إدارة التخزين المؤقت (Caching).
- * @function addUpdate
- * @param {string} text - النص المراد تسجيله في التحديث.
- * @returns {Promise<Object>} - وعد (Promise) يحتوي على كائن الاستجابة من الخادم، أو كائن خطأ في حالة الفشل.
- * @see apiFetch
- */
-async function addUpdate(text) {
-  return await apiFetch('/api/updates', {
-    method: 'POST',
-    body: { txt: text },
-  });
-}
+         * @function addUpdate
+         * @description Adds a new record to the `updates` table in the database.
+         * Used to log the time of the last important data change (like ad updates) to help with caching management.
+         * @param {string} text - The text to record in the update.
+         * @returns {Promise<Object>} - A Promise that resolves to the server response object, or an error object on failure.
+         * @see apiFetch
+         */
+        async function addUpdate(text) {
+            return await apiFetch('/api/updates', {
+                method: 'POST',
+                body: { txt: text },
+            });
+        }
         /**
          * ------------------------------------------------------------------
-         * التكوين والإعدادات (Configuration)
+         * Configuration & Settings
          * ------------------------------------------------------------------
          */
-        // أقصى أبعاد للصور (للحفاظ على الأداء وتقليل حجم التخزين)
+        // Max image dimensions (to maintain performance and reduce storage size)
         const IMAGE_MAX_WIDTH = 1600;
         const IMAGE_MAX_HEIGHT = 1600;
-        // جودة ضغط الصورة (0.75 تعني 75% جودة)
+        // Image compression quality (0.75 means 75% quality)
         const IMAGE_QUALITY = 0.75;
-        // الحد الأقصى لعدد الصور المسموح برفعها
+        // Maximum number of allowed files to upload
         const MAX_FILES = 10;
-        // الرابط العام لخدمة Cloudflare R2
+        // Public URL for Cloudflare R2 service
         const R2_PUBLIC_URL = 'https://pub-e828389e2f1e484c89d8fb652c540c12.r2.dev';
 
         /**
          * ------------------------------------------------------------------
-         * حالة التطبيق (Application State)
+         * Application State
          * ------------------------------------------------------------------
          */
-        // مصفوفة لتخزين كائنات الصور الحالية (سواء كانت جديدة أو موجودة مسبقاً)
+        // Array to store current image objects (whether new or existing)
         let images = [];
-        // لتخزين أسماء الصور الأصلية عند التحميل
+        // To store original image names upon loading
         let originalImageNames = [];
-        // عداد لإنشاء معرفات فريدة مؤقتة للعناصر
+        // Counter to generate temporary unique IDs for items
         let idCounter = 1;
 
         /**
@@ -395,15 +395,17 @@ async function addUpdate(text) {
          */
 
         /**
-         * يولد معرف فريد مؤقت للصورة.
-         * @returns {string} المعرف المولد
+         * @function genId
+         * @description Generates a temporary unique ID for an image.
+         * @returns {string} The generated ID.
          */
         function genId() { return 'ad_img_' + (Date.now() + idCounter++); }
 
         /**
-         * يتحقق من دعم المتصفح لتنسيق WebP وإنشاء Bitmap.
-         * هذا يساعد في تحديد آلية الضغط المناسبة.
-         * @returns {Promise<boolean>}
+         * @function checkWebP
+         * @description Checks browser support for WebP format and ImageBitmap creation.
+         * This helps determine the appropriate compression mechanism.
+         * @returns {Promise<boolean>} True if supported, false otherwise.
          */
         async function checkWebP() {
             try {
@@ -415,7 +417,7 @@ async function addUpdate(text) {
                 return true;
             } catch { return false; }
         }
-        // تخزين نتيجة فحص WebP في وعد (Promise) للاستخدام لاحقاً
+        // Store WebP check result in a Promise for later use
         const webP_Promise = checkWebP();
 
         /**
@@ -425,36 +427,37 @@ async function addUpdate(text) {
          */
 
         /**
-         * يقوم بضغط الصورة وتغيير أبعادها لتناسب المعايير المحددة.
-         * يحاول التحويل إلى WebP إذا كان مدعوماً، وإلا يستخدم JPEG.
-         * @param {File} file - ملف الصورة الأصلي
-         * @returns {Promise<Blob|File>} - الصورة المضغوطة كـ Blob أو الملف الأصلي في حال الفشل
+         * @function compressImage
+         * @description Compresses and resizes an image to fit specified standards.
+         * Attempts to convert to WebP if supported, otherwise uses JPEG.
+         * @param {File} file - The original image file.
+         * @returns {Promise<Blob|File>} - The compressed image as a Blob, or the original file on failure.
          */
         async function compressImage(file) {
             try {
                 const bitmap = await createImageBitmap(file);
                 let { width, height } = bitmap;
 
-                // حساب نسبة التصغير للحفاظ على الأبعاد
+                // Calculate scaling ratio to maintain aspect ratio
                 const ratio = Math.min(1, IMAGE_MAX_WIDTH / width, IMAGE_MAX_HEIGHT / height);
                 const w = Math.round(width * ratio);
                 const h = Math.round(height * ratio);
 
-                // إنشاء Canvas للرسم عليها
+                // Create Canvas for drawing
                 const canvas = document.createElement('canvas');
                 canvas.width = w; canvas.height = h;
                 const ctx = canvas.getContext('2d');
 
-                // خلفية بيضاء لصور JPEG (لتجنب الخلفيات السوداء للصور الشفافة)
+                // White background for JPEG images (to avoid black backgrounds for transparent images)
                 ctx.fillStyle = '#FFFFFF';
                 ctx.fillRect(0, 0, w, h);
                 ctx.drawImage(bitmap, 0, 0, w, h);
 
                 const isWebP = await webP_Promise;
-                // التحويل إلى WebP أو JPEG
+                // Convert to WebP or JPEG
                 const blob = await new Promise(r => canvas.toBlob(r, isWebP ? 'image/webp' : 'image/jpeg', IMAGE_QUALITY));
 
-                // تنظيف الذاكرة
+                // Clean up memory
                 try { bitmap.close(); } catch { }
 
                 return blob;
@@ -465,16 +468,17 @@ async function addUpdate(text) {
         }
 
         /**
-         * ينشئ عنصر المعاينة (Preview Card) للصورة في الواجهة.
-         * @param {Object} state - كائن حالة الصورة
-         * @param {string|null} existingUrl - رابط الصورة إذا كانت موجودة مسبقاً (اختياري)
+         * @function createPreview
+         * @description Creates a preview card for an image in the UI.
+         * @param {Object} state - The image state object.
+         * @param {string|null} existingUrl - URL of the image if it already exists (optional).
          */
         function createPreview(state, existingUrl = null) {
             const wrapper = document.createElement('div');
             wrapper.className = 'mainAdver_preview';
             wrapper.dataset.id = state.id;
 
-            // زر الحذف
+            // Remove Button
             const removeBtn = document.createElement('button');
             removeBtn.className = 'mainAdver_remove';
             removeBtn.innerHTML = '<i class="fas fa-trash-alt"></i>';
@@ -484,22 +488,22 @@ async function addUpdate(text) {
                 removeImage(state.id);
             };
 
-            // عنصر الصورة
+            // Image Element
             const img = document.createElement('img');
 
-            // شريط المعلومات (مستطيل الحالة أسفل الصورة)
+            // Info Bar (Status rectangle below image)
             const meta = document.createElement('div');
             meta.className = 'mainAdver_meta';
 
             if (existingUrl) {
                 img.src = existingUrl;
-                meta.textContent = 'منشور'; // الصورة موجودة بالفعل على السيرفر
+                meta.textContent = 'Published'; // Image already exists on server
             } else {
-                // قراءة الملف المحلي وعرضه
+                // Read local file and display it
                 const r = new FileReader();
                 r.onload = e => img.src = e.target.result;
                 r.readAsDataURL(state.file);
-                meta.textContent = 'جديد'; // صورة جديدة قيد الإضافة
+                meta.textContent = 'New'; // New image being added
             }
 
             wrapper.append(removeBtn, img, meta);
@@ -511,17 +515,18 @@ async function addUpdate(text) {
         }
 
         /**
-         * يزيل الصورة من القائمة (محلياً فقط حتى يتم الحفظ).
-         * @param {string} id - معرف الصورة
+         * @function removeImage
+         * @description Removes an image from the list (locally only until saved).
+         * @param {string} id - The image ID.
          */
         function removeImage(id) {
             Swal.fire({
-                title: 'حذف الصورة؟',
-                text: "لن يتم الحذف من الخادم حتى تضغط 'نشر'.",
+                title: 'Delete Image?',
+                text: "It will not be deleted from the server until you click 'Publish'.",
                 icon: 'question',
                 showCancelButton: true,
-                confirmButtonText: 'نعم',
-                cancelButtonText: 'لا'
+                confirmButtonText: 'Yes',
+                cancelButtonText: 'No'
             }).then(res => {
                 if (res.isConfirmed) {
                     const idx = images.findIndex(x => x.id === id);
@@ -534,12 +539,13 @@ async function addUpdate(text) {
         }
 
         /**
-         * يعالج الملفات الجديدة المضافة (عبر السحب أو الاختيار).
-         * @param {FileList} fileList - قائمة الملفات المختارة
+         * @function handleNewFiles
+         * @description Handles newly added files (via drag & drop or selection).
+         * @param {FileList} fileList - List of selected files.
          */
         async function handleNewFiles(fileList) {
             if (images.length + fileList.length > MAX_FILES) {
-                Swal.fire('تنبيه', `الحد الأقصى هو ${MAX_FILES} صور.`, 'warning');
+                Swal.fire('Alert', `Maximum limit is ${MAX_FILES} images.`, 'warning');
                 return;
             }
 
@@ -567,9 +573,10 @@ async function addUpdate(text) {
          */
 
         /**
-         * يقوم بتحميل الصور الحالية من السيرفر وعرضها.
-         * يستخدم ملف `advertisements.json` (المانيفست) كمرجع أساسي.
-         * في حال فشل المانيفست، يستخدم طريقة التخمين القديمة.
+         * @function loadImages
+         * @description Loads current images from the server and displays them.
+         * Uses `advertisements.json` (manifest) as the primary reference.
+         * If the manifest fails, it logs a warning.
          */
         async function loadImages() {
             els.previewsEl.innerHTML = '';
@@ -579,26 +586,26 @@ async function addUpdate(text) {
             images = [];
             originalImageNames = [];
 
-            // 1. محاولة جلب ملف المانيفست (advertisements.json)
+            // 1. Attempt to fetch manifest file (advertisements.json)
             let manifest = [];
             try {
-                // إضافة timestamp لتجنب الكاش
+                // Add timestamp to avoid caching
                 const res = await fetch(`${R2_PUBLIC_URL}/advertisements.json?t=${Date.now()}`);
                 if (res.ok) manifest = await res.json();
             } catch { }
 
-            // 2. تحميل الصور بناءً على المانيفست
+            // 2. Load images based on manifest
             if (manifest && Array.isArray(manifest) && manifest.length > 0) {
                 manifest.forEach(name => {
                     const id = genId();
-                    // الحالة uploaded تعني أن الصورة موجودة في الـ R2
+                    // Status 'uploaded' means image exists on R2
                     images.push({ id, status: 'uploaded', fileName: name });
                     originalImageNames.push(name);
                     createPreview(images[images.length - 1], `${R2_PUBLIC_URL}/${name}`);
                 });
             } else {
-                // إذا لم يتم العثور على مانيفست أو كان فارغاً
-                // لا نقوم بالتخمين بعد الآن، نبدأ بقائمة فارغة.
+                // If no manifest found or empty
+                // Do not guess anymore, start with empty list.
                 console.warn("No manifest found or empty.");
             }
 
@@ -642,7 +649,8 @@ async function addUpdate(text) {
         };
 
         /**
-         * يفتح نافذة الكاميرا للأجهزة المكتبية باستخدام WebRTC.
+         * @function openDesktopCamera
+         * @description Opens the desktop camera window using WebRTC.
          */
         async function openDesktopCamera() {
             const html = `
@@ -650,7 +658,7 @@ async function addUpdate(text) {
                     <button id="camClose" style="position:absolute;top:10px;right:10px;border:none;background:none;font-size:20px;">&times;</button>
                     <video id="camVideo" autoplay playsinline style="width:100%;border-radius:10px;background:#000;"></video>
                     <div style="text-align:center;margin-top:10px;">
-                        <button id="camSnap" class="mainAdver_btn mainAdver_btnPrimary">التقاط</button>
+                        <button id="camSnap" class="mainAdver_btn mainAdver_btnPrimary">Caputre</button>
                     </div>
                 </div>
              `;

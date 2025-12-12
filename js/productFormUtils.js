@@ -7,21 +7,7 @@
  * @constant {string} SERVICE_CATEGORY_BACKGROUND - خلفية النموذج في وضع فئة الخدمات
  */
 const SERVICE_CATEGORY_BACKGROUND = 'radial-gradient(circle, #f6f9fc, #0e4a9aff, #182b48ff, #000101ff)';
-/**
- * @description يحول عدد البايتات إلى صيغة قابلة للقراءة من قبل الإنسان (مثل KB, MB, GB).
- * @function productFormatBytes
- * @param {number} bytes - عدد البايتات المراد تحويله.
- * @param {number} [decimals=2] - عدد الخانات العشرية في الناتج.
- * @returns {string} - سلسلة نصية تمثل الحجم المنسق (مثال: "1.50 MB").
- */
-function productFormatBytes(bytes, decimals = 2) {
-  if (!+bytes) return '0 Bytes';
-  const k = 1024;
-  const dm = decimals < 0 ? 0 : decimals;
-  const sizes = ['بايت', 'كيلوبايت', 'ميجابايت', 'جيجابايت'];
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
-}
+
 
 /**
  * @description تقوم بتحويل الأرقام العربية الشرقية (الهندية) والفارسية في سلسلة نصية إلى أرقام عربية غربية (إنجليزية).
@@ -78,6 +64,7 @@ function productGenerateProductSerial() {
  * @function productSupportsWebP
  * @async
  * @returns {Promise<boolean>} - وعد (Promise) يُرجع `true` إذا كان المتصفح يدعم WebP، و`false` بخلاف ذلك.
+ * @deprecated - This function is currently unused in the codebase.
  * @throws {Error} - If `fetch` or `createImageBitmap` encounters an error.
  */
 async function productSupportsWebP() {
@@ -93,6 +80,7 @@ async function productSupportsWebP() {
  * @description إعادة تعيين قوية للخلفية مع فحص مسبق
  * @function productForceResetBackground
  * @returns {void}
+ * @deprecated - This function is currently unused in the codebase.
  * @see productDebugBackground
  */
 function productForceResetBackground() {

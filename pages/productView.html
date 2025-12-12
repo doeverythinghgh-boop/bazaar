@@ -5,7 +5,7 @@
     * ========================================
     */
 
- 
+
 
     .productView_modal_content {
         padding: 20px;
@@ -304,24 +304,25 @@
 <script>
     /**
      * @fileoverview Product View Details Logic (productView_ module)
-     * @author Hisham (BidStory Project)
+     * @description Handles displaying product details, image gallery, managing quantity selection, and adding to cart.
      */
 
     // ==============================================
-    //  الوصول إلى عناصر DOM (فصل المسؤوليات - SRP)
+    //  DOM Access (Separation of Concerns - SRP)
     // ==============================================
 
     /**
-     * كائن يحتوي على جميع معرفات DOM المستخدمة لتجنب تكرار استدعاء document.getElementById.
+     * @constant {Object} productView_domElements
+     * @description Cache of DOM elements to avoid repeated `document.getElementById` calls.
      */
     const productView_domElements = {
-        // الحاويات الرئيسية
+        // Main Containers
         quantityContainer: document.getElementById("productView_quantity_container"),
         priceContainer: document.getElementById("productView_price_container"),
         cartActionsContainer: document.getElementById("productView_cart_actions"),
         originalPriceContainer: document.getElementById("productView_original_price_container"),
 
-        // بيانات المنتج
+        // Product Data Elements
         name: document.getElementById("productView_name"),
         quantityValue: document.getElementById("productView_quantity_value"),
         price: document.getElementById("productView_price"),
@@ -329,11 +330,11 @@
         description: document.getElementById("productView_description_text"),
         sellerMessage: document.getElementById("productView_seller_message_text"),
 
-        // الصور
+        // Images
         mainImage: document.getElementById("productView_image"),
         thumbnailsContainer: document.getElementById("productView_thumbnails_container"),
 
-        // أدوات التحكم بالكمية والسلة
+        // Controls
         decreaseBtn: document.getElementById("productView_decrease_quantity_btn"),
         increaseBtn: document.getElementById("productView_increase_quantity_btn"),
         selectedQuantityInput: document.getElementById("productView_selected_quantity_input"),
@@ -343,86 +344,89 @@
 
 
     // ==============================================
-    //  الدوال المساعدة (قابلية الصيانة - Modularity)
+    //  Helper Functions (Modularity)
     // ==============================================
 
     /**
-     * تُحدِّث السعر الإجمالي بناءً على الكمية المحددة وسعر القطعة.
-     * @param {number} pricePerItem - سعر القطعة الواحدة.
+     * @function productView_updateTotalPrice
+     * @description Updates the total price display based on selected quantity and price per item.
+     * @param {number} pricePerItem - The price of a single item.
      */
     function productView_updateTotalPrice(pricePerItem) {
         try {
             const price = parseFloat(pricePerItem);
-            // جلب القيمة من حقل الإدخال
+            // Get value from input field
             const quantity = parseInt(productView_domElements.selectedQuantityInput.value, 10) || 1;
             const total = price * quantity;
-            productView_domElements.totalPriceEl.textContent = `${total.toFixed(2)} جنيه`;
+            productView_domElements.totalPriceEl.textContent = `${total.toFixed(2)} EGP`;
         } catch (error) {
-            console.error("productView_updateTotalPrice - خطأ في تحديث السعر الإجمالي:", error);
+            console.error("productView_updateTotalPrice - Error updating total price:", error);
         }
     }
 
     /**
-     * تُنشئ وتعالج صور المصغرات للمنتج.
-     * @param {string[]} imageSrcArray - مصفوفة مسارات الصور.
-     * @param {HTMLElement} mainImageEl - عنصر الصورة الرئيسية (<img>).
-     * @param {HTMLElement} thumbnailsContainerEl - حاوية الصور المصغرة.
+     * @function productView_populateThumbnails
+     * @description Creates and handles product image thumbnails.
+     * @param {string[]} imageSrcArray - Array of image source URLs.
+     * @param {HTMLElement} mainImageEl - The main image element (<img>).
+     * @param {HTMLElement} thumbnailsContainerEl - The container for thumbnails.
      */
     function productView_populateThumbnails(imageSrcArray, mainImageEl, thumbnailsContainerEl) {
         try {
-            thumbnailsContainerEl.innerHTML = ""; // مسح الصور المصغرة القديمة
-            mainImageEl.src = imageSrcArray[0] || ""; // عرض الصورة الأولى
+            thumbnailsContainerEl.innerHTML = ""; // Clear old thumbnails
+            mainImageEl.src = imageSrcArray[0] || ""; // Show first image
 
             imageSrcArray.forEach((src) => {
                 const thumb = document.createElement("img");
-                thumb.alt = "صورة مصغرة للمنتج";
+                thumb.alt = "Product Thumbnail";
                 thumb.src = src;
 
-                thumb.onclick = () => { // عند النقر، تحديث الصورة الرئيسية
+                thumb.onclick = () => { // On click, update main image
                     mainImageEl.src = src;
-                    // إزالة الكلاس 'active' من الجميع وإضافته إلى الصورة المحددة
+                    // Remove 'active' class from all and add to selected
                     document.querySelectorAll('.productView_thumbnails_container img').forEach(t => t.classList.remove('active'));
                     thumb.classList.add('active');
                 };
 
                 thumb.onerror = () => {
-                    console.warn("[productView_] فشل تحميل الصورة المصغرة:", src);
-                    // استبدال الصورة الفاشلة بعنصر نائب (يمكن تحسين هذا في CSS المشروع)
+                    console.warn("[productView_] Thumbnail load failed:", src);
+                    // Replace failed image with placeholder (CSS can improve this)
                     const placeholder = document.createElement("div");
                     placeholder.className = "image-load-error-placeholder";
-                    placeholder.innerHTML = `<i class="fas fa-exclamation-triangle"></i><span>فشل التحميل</span>`;
+                    placeholder.innerHTML = `<i class="fas fa-exclamation-triangle"></i><span>Load Failed</span>`;
                     thumb.replaceWith(placeholder);
                 };
                 thumbnailsContainerEl.appendChild(thumb);
             });
 
-            // تفعيل أول صورة مصغرة بشكل افتراضي (تأخير بسيط لضمان الإلحاق)
+            // Activate first thumbnail by default (small delay to ensure append)
             setTimeout(() => {
                 if (thumbnailsContainerEl.firstChild) thumbnailsContainerEl.firstChild.classList.add('active');
             }, 0);
 
         } catch (error) {
-            console.error("productView_populateThumbnails - خطأ في تعبئة الصور المصغرة:", error);
+            console.error("productView_populateThumbnails - Error populating thumbnails:", error);
         }
     }
 
     /**
-     * تُهيئ منطق زيادة/إنقاص الكمية وإظهار السعر الإجمالي.
-     * @param {object} productData - بيانات المنتج.
+     * @function productView_setupQuantityControls
+     * @description Sets up logic for increasing/decreasing quantity and updating total price.
+     * @param {object} productData - The product data object.
      */
     function productView_setupQuantityControls(productData) {
         try {
             const { decreaseBtn, increaseBtn, selectedQuantityInput } = productView_domElements;
 
-            // تعيين الحد الأقصى للكمية المتاحة
+            // Set max quantity available
             selectedQuantityInput.max = productData.availableQuantity;
 
-            // استخدام productData.pricePerItem لضمان تحديث السعر بشكل صحيح
+            // Use productData.pricePerItem to ensure price is updated correctly
             const pricePerItem = productData.pricePerItem;
 
-            // دالة المعالج المشتركة لتجنب تكرار الكود
+            // Shared handler to avoid code duplication
             const quantityChangeHandler = () => {
-                // التأكد من أن القيمة لا تتجاوز الحد الأقصى أو تقل عن الحد الأدنى (1)
+                // Ensure value does not exceed max or fall below min (1)
                 let quantity = parseInt(selectedQuantityInput.value, 10);
                 const max = parseInt(selectedQuantityInput.max, 10);
 
@@ -434,7 +438,7 @@
                 productView_updateTotalPrice(pricePerItem);
             };
 
-            // إضافة الأحداث لأزرار زيادة وإنقاص الكمية
+            // Add events for increase/decrease buttons
             decreaseBtn.onclick = () => {
                 if (parseInt(selectedQuantityInput.value, 10) > 1) {
                     selectedQuantityInput.value = parseInt(selectedQuantityInput.value, 10) - 1;
@@ -450,27 +454,28 @@
                 }
             };
 
-            // معالجة تغيير القيمة يدوياً في حقل الإدخال
+            // Handle manual input change
             selectedQuantityInput.onchange = quantityChangeHandler;
             selectedQuantityInput.onblur = quantityChangeHandler;
 
-            productView_updateTotalPrice(pricePerItem); // حساب السعر المبدئي
+            productView_updateTotalPrice(pricePerItem); // Initial price calculation
 
         } catch (error) {
-            console.error("productView_setupQuantityControls - خطأ في تهيئة أدوات التحكم بالكمية:", error);
+            console.error("productView_setupQuantityControls - Error initializing quantity controls:", error);
         }
     }
 
     /**
-     * تُهيئ منطق إضافة المنتج إلى السلة.
-     * @param {object} productData - بيانات المنتج.
+     * @function productView_setupAddToCart
+     * @description Initializes logic for adding the product to the shopping cart.
+     * @param {object} productData - The product data object.
      */
     function productView_setupAddToCart(productData) {
         try {
             productView_domElements.addToCartBtn.onclick = async () => {
 
                 if (userSession && Number(userSession.is_seller) > -1) {
-                    console.log("[productView_] المستخدم مسجل، جاري الإضافة للسلة...");
+                    console.log("[productView_] User logged in, adding to cart...");
                     const quantity = parseInt(productView_domElements.selectedQuantityInput.value, 10);
 
                     const productInfoForCart = {
@@ -481,44 +486,45 @@
                         image: productData.imageSrc[0],
                         seller_key: productData.user_key,
                     };
-                    addToCart(productInfoForCart, quantity); // مُعرفة خارجياً
+                    addToCart(productInfoForCart, quantity); // Defined externally
                 } else {
-                    console.warn("[productView_] المستخدم ضيف. توجيه لتسجيل الدخول.");
-                    // استخدام نمط SweetAlert2 المحفوظ في الذاكرة
+                    console.warn("[productView_] Guest user. Redirecting to login.");
+                    // Use preset SweetAlert2 style
                     Swal.fire({
                         icon: "info",
-                        title: "يجب تسجيل الدخول",
-                        text: "لإضافة منتجات إلى السلة، يرجى تسجيل الدخول أولاً.",
+                        title: "Login Required",
+                        text: "To add products to cart, please login first.",
                         showCancelButton: true,
-                        confirmButtonText: "تسجيل الدخول",
-                        cancelButtonText: "إلغاء",
-                        customClass: { popup: 'fullscreen-swal' }, // تطبيق النمط المخصص
+                        confirmButtonText: "Login",
+                        cancelButtonText: "Cancel",
+                        customClass: { popup: 'fullscreen-swal' }, // Apply custom style
                     }).then((result) => {
                         if (result.isConfirmed) {
-                    mainLoader("./pages/login.html","index-user-container",0,undefined,"hiddenLoginIcon",true  );
+                            mainLoader("./pages/login.html", "index-user-container", 0, undefined, "hiddenLoginIcon", true);
                         }
                     });
                 }
             };
         } catch (error) {
-            console.error("productView_setupAddToCart - خطأ في تهيئة زر الإضافة للسلة:", error);
+            console.error("productView_setupAddToCart - Error initializing add to cart button:", error);
         }
     }
 
 
     // ==============================================
-    //  الدالة الرئيسية (مبدأ المسؤولية الواحدة - SRP)
+    //  Main Function (SRP)
     // ==============================================
 
     /**
-     * تعرض تفاصيل المنتج في النافذة المنبثقة وتُهيئ الوظائف التفاعلية.
-     * تُعد هذه الدالة نقطة الدخول الرئيسية لعرض بيانات المنتج.
-     * @param {object} productData - كائن بيانات المنتج المراد عرضه.
-     * @param {object} options - خيارات العرض الإضافية (مثل: { showAddToCart: true }).
+     * @function productView_viewDetails
+     * @description Displays product details in the modal and initializes interactive functions.
+     *   This is the main entry point for displaying product data.
+     * @param {object} productData - Product data object to display.
+     * @param {object} options - Additional display options (e.g., { showAddToCart: true }).
      */
     function productView_viewDetails(productData, options = {}) {
         try {
-            console.log("[productView_] جاري عرض تفاصيل المنتج...", options.showAddToCart);
+            console.log("[productView_] Displaying product details...", options.showAddToCart);
             const {
                 name, quantityValue, price, description, sellerMessage,
                 quantityContainer, priceContainer, cartActionsContainer,
@@ -526,20 +532,20 @@
                 mainImage, thumbnailsContainer,
             } = productView_domElements;
 
-            const showAddToCart = options.showAddToCart !== false; // القيمة الافتراضية هي true
+            const showAddToCart = options.showAddToCart !== false; // Default is true
 
-            // تعبئة البيانات الأساسية
-            name.textContent = productData.productName || "غير متوفر";
-            description.textContent = productData.description || "لا يوجد وصف متاح.";
-            sellerMessage.textContent = productData.sellerMessage || "لا توجد رسالة من البائع.";
+            // Populate basic data
+            name.textContent = productData.productName || "Not Available";
+            description.textContent = productData.description || "No description available.";
+            sellerMessage.textContent = productData.sellerMessage || "No message from seller.";
 
-            // تهيئة العرض بناءً على خيار showAddToCart
+            // Configure display based on showAddToCart option
             if (showAddToCart) {
-                quantityContainer.style.display = "flex"; // كانت "block"
-                priceContainer.style.display = "flex"; // كانت "block"
+                quantityContainer.style.display = "flex";
+                priceContainer.style.display = "flex";
                 cartActionsContainer.style.display = "block";
                 quantityValue.textContent = productData.availableQuantity;
-                price.textContent = `${productData.pricePerItem} جنيه`;
+                price.textContent = `${productData.pricePerItem} EGP`;
                 productView_setupQuantityControls(productData);
                 productView_setupAddToCart(productData);
             } else {
@@ -548,48 +554,48 @@
                 cartActionsContainer.style.display = "none";
             }
 
-            // تعبئة معرض الصور
+            // Populate image gallery
             productView_populateThumbnails(
                 productData.imageSrc || [],
                 mainImage,
                 thumbnailsContainer
             );
 
-            // عرض السعر قبل الخصم إذا كان موجودًا وأكبر من السعر الحالي
+            // Show original price if exists and greater than current price
             const originalPriceVal = productData.original_price ? parseFloat(productData.original_price) : 0;
             const currentPriceVal = productData.pricePerItem ? parseFloat(productData.pricePerItem) : 0;
 
             if (originalPriceVal > 0 && originalPriceVal > currentPriceVal) {
-                console.log("[productView_] عرض السعر قبل الخصم.");
-                originalPrice.textContent = `${originalPriceVal.toFixed(2)} جنيه`;
-                originalPriceContainer.style.display = "flex"; // كانت "block"
+                console.log("[productView_] Showing original price.");
+                originalPrice.textContent = `${originalPriceVal.toFixed(2)} EGP`;
+                originalPriceContainer.style.display = "flex";
             } else {
-                console.log("[productView_] إخفاء السعر قبل الخصم.");
+                console.log("[productView_] Hiding original price.");
                 originalPriceContainer.style.display = "none";
                 originalPrice.textContent = "";
             }
 
         } catch (error) {
-            console.error("productView_viewDetails - خطأ عام أثناء عرض التفاصيل:", error);
-            // رسالة تنبيه للمستخدم النهائي باستخدام SweetAlert2
+            console.error("productView_viewDetails - General error displaying details:", error);
+            // Alert user using SweetAlert2
             Swal.fire({
                 icon: "error",
-                title: "عفواً!",
-                text: "حدث خطأ أثناء تحميل تفاصيل المنتج. يرجى المحاولة لاحقاً.",
+                title: "Opps!",
+                text: "An error occurred while loading product details. Please try again later.",
                 customClass: { popup: 'fullscreen-swal' },
             });
         }
     }
 
     // ==============================================
-    //  نقطة الدخول (Initialization)
+    //  Entry Point (Initialization)
     // ==============================================
 
     try {
         console.log("Initializing product view module with received state:", productSession);
-        // productSession[0] هو بيانات المنتج، productSession[1] هو خيار showAddToCart
+        // productSession[0] is product data, productSession[1] is showAddToCart option
         productView_viewDetails(productSession[0], productSession[1]);
     } catch (error) {
-        console.error("خطأ أثناء تهيئة نافذة عرض المنتج:", error);
+        console.error("Error initializing product view window:", error);
     }
 </script>
