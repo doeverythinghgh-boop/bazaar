@@ -1,7 +1,7 @@
 /**
  * @file pages/ADMIN/adminPanel.js
  * @description This file manages the admin control panel interface, handling user data fetching,
- * displaying it in a table, managing seller and distributor relations, as well as functions for Impersonation login and sending notifications.
+ * displaying it in a table, managing seller and delivery relations, as well as functions for Impersonation login and sending notifications.
  */
 /**
  * @description Asynchronously fetches all basic user data from the server API.
@@ -571,7 +571,7 @@ window.sendAdminNotification = async (userKey) => {
 
     } catch (error) {
         console.error(error);
-    
+
     }
 };
 /**

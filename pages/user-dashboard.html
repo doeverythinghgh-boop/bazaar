@@ -12,7 +12,7 @@
         text-align: center;
         color: var(--dark-blue, #03478f);
         font-size: clamp(24px, 5vw, 32px);
-        /* حجم خط متجاوب */
+        /* Responsive font size */
         font-weight: 700;
         margin-bottom: 40px;
         animation: fadeInDown 0.5s ease-out;
@@ -28,14 +28,14 @@
         align-items: center;
         justify-content: center;
         gap: 12px;
-        /* مسافة بين الأيقونة والنص */
+        /* Gap between icon and text */
         padding: 0px;
         font-size: 0.8rem;
         max-width: fit-content;
         font-weight: 600;
         color: var(--dark-blue, #03478f);
         background-color: transparent;
-        /* حواف أكثر دائرية */
+        /* More rounded corners */
         cursor: pointer;
         text-align: center;
         transition: transform 0.2s ease, box-shadow 0.2s ease,
@@ -44,7 +44,7 @@
 
     .dash-button i {
         font-size: 2rem;
-        /* تكبير حجم الأيقونة */
+        /* Increase icon size */
         color: var(--primary-color, #007bff);
     }
 
@@ -54,14 +54,14 @@
         border-color: var(--primary-color-light);
     }
 
-    /* تمييز زر تسجيل الخروج */
+    /* Highlight logout button */
 
     #dash-logout-btn-alt i {
         color: var(--danger-color, #dc3545);
     }
 </style>
 
-<!-- حاوية لعرض الهيدر بشكل ديناميكي -->
+<!-- Container to dynamically display header -->
 <!-- 
 @file pages/user-dashboard.html
 @description User Dashboard page acting as a central hub for user actions (profile editing, admin panel access, logout).
@@ -69,32 +69,32 @@
 <div id="dash-header-container" style="height: 70px"></div>
 
 <div id="dash-profile-modal-container" class="modal">
-    <!-- سيتم ملء محتوى تعديل الملف الشخصي هنا -->
+    <!-- Profile edit content will be filled here -->
 </div>
 
 
 <h2 id="dash-welcome-message"></h2>
-<!-- حاوية رئيسية للأزرار مقسمة إلى مجموعات -->
-<!-- ✅ تعديل: حاوية شبكية لجميع الأزرار -->
+<!-- Main container for buttons split into groups -->
+<!-- ✅ EDIT: Grid container for all buttons -->
 <div id="dash-action-buttons" class="dash-action-buttons">
-    <!-- أزرار المستخدم العام -->
+    <!-- General User buttons -->
     <button id="dash-edit-profile-btn" class="dash-button">
         <i class="fas fa-user-cog"></i> تعديل البيانات
     </button>
 
 
-    <!-- أزرار المسؤول -->
+    <!-- Admin buttons -->
     <button id="dash-admin-panel-btn" class="dash-button">
         <i class="fas fa-user-shield"></i> لوحة المسؤول
     </button>
 
-    <!-- زر الخروج -->
+    <!-- Logout button -->
     <button id="dash-logout-btn-alt" class="dash-button">
         <i class="fas fa-sign-out-alt"></i> تسجيل الخروج
     </button>
 </div>
 
-<!-- ✅ جديد: ربط ملف الجافاسكريبت الخاص بالصفحة -->
+<!-- ✅ NEW: Link page-specific JavaScript file -->
 <script src="../js/user-dashboard.js"></script>
 
 

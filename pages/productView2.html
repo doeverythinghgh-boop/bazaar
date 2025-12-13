@@ -5,7 +5,7 @@
     * ========================================
     */
 
-    /* تطبيق الحركات على العناصر */
+    /* Apply animations to elements */
     .productView_modal_content {
         padding: 20px;
         max-width: 100%;
@@ -23,11 +23,11 @@
     .productView_slider-container {
         position: relative;
         height: 400px;
-        /* مطابق للارتفاع الأقصى السابق */
+        /* Matches previous max height */
         width: 100%;
         margin-bottom: 20px;
         overflow: hidden;
-        /* لمنع ظهور التمرير الأفقي */
+        /* Prevent horizontal scroll */
         background: linear-gradient(180deg, var(--bg-color-white, #fff) 0%, var(--border-color, #e9ecef) 100%);
         border-radius: 12px;
         box-shadow: var(--shadow-soft, 0 4px 12px rgba(0, 0, 0, 0.05));
@@ -41,7 +41,7 @@
         width: 100%;
         height: 100%;
         display: flex;
-        /* لمركزة العناصر */
+        /* To center elements */
         justify-content: center;
         align-items: center;
     }
@@ -50,12 +50,12 @@
     .productView_slide {
         position: absolute;
         top: 5%;
-        /* هوامش لضبط المحاذاة */
-        /* left: 20%;  لا نعتمد عليها بشكل مطلق مع الحسابات الجديدة */
+        /* Margins for alignment */
+        /* left: 20%; Not relied upon absolutely with new calculations */
         width: 60%;
         height: 90%;
         background-size: contain;
-        /* استخدام contain لضمان ظهور المنتج بالكامل */
+        /* Use contain to ensure full product visibility */
         background-position: center;
         background-repeat: no-repeat;
         border-radius: 12px;
@@ -66,7 +66,7 @@
         filter: blur(3px) brightness(0.9) saturate(0.8);
         cursor: pointer;
         background-color: #fff;
-        /* خلفية بيضاء لصور المنتجات الشفافة */
+        /* White background for transparent product images */
     }
 
     /* Active (visible) slide */
@@ -151,18 +151,18 @@
     #productView_details_container {
         animation: productView_slideInFromTop 0.5s ease-out 0.2s forwards;
         opacity: 0;
-        /* يبدأ مخفياً */
+        /* Starts hidden */
         text-align: right;
     }
 
-    /* حركة متدرجة للتفاصيل */
+    /* Staggered animation for details */
     #productView_details_container>* {
         animation: productView_slideInFromTop 0.5s ease-out forwards;
         opacity: 0;
-        /* يبدأ مخفياً */
+        /* Starts hidden */
     }
 
-    /* حاويات الوصف والرسالة */
+    /* Description and message containers */
     .productView_description_box,
     .productView_seller_message_box {
         background-color: var(--bg-color-white, #fff);
@@ -191,10 +191,10 @@
     .productView_seller_message_box h4 i {
         color: var(--primary-color, #007bff);
         margin-left: 8px;
-        /* تغيير جهة الهامش */
+        /* Change margin direction */
     }
 
-    /* Keyframes للحركات */
+    /* Animation Keyframes */
     @keyframes productView_fadeInScaleUp {
         from {
             opacity: 0;
@@ -372,7 +372,7 @@
 
 <div class="productView_modal_content" id="productView_modal_content">
 
-    <!-- ✅ جديد: حاوية سلايدر الصور -->
+    <!-- ✅ NEW: Image Slider Container -->
     <div id="productView_slider" class="productView_slider-container">
         <div class="productView_slider-track" id="productView_slider_track"></div>
         <div class="productView_slider-dots" id="productView_slider_dots"></div>
@@ -977,7 +977,7 @@
 
         } catch (error) {
             console.error(error);
-    
+
         }
     }
 

@@ -90,7 +90,7 @@
         flex: 1;
     }
 
-    /* أنماط رفع الصور */
+    /* Image Upload Styles */
     .edit-product-modal__image-uploader {
         border: 2px dashed #bdc3c7;
         border-radius: 10px;
@@ -253,7 +253,7 @@
         color: #e67e22;
     }
 
-    /* كاميرا سطح المكتب */
+    /* Desktop Camera */
     .camera-modal-content {
         position: relative;
         background: white;
@@ -289,7 +289,7 @@
         color: #e74c3c;
     }
 
-    /* التجاوب مع الأجهزة المختلفة */
+    /* Responsive Design */
     @media (max-width: 768px) {
         .edit-product-modal__form-row {
             flex-direction: column;
@@ -326,7 +326,7 @@
         <h2 class="edit-product-modal__title" id="editProductTitle"><i class="fas fa-edit"></i> تعديل المنتج</h2>
 
         <form class="edit-product-modal__form" id="edit-product-form" novalidate>
-            <!-- موديول رفع الصور -->
+            <!-- Image Upload Module -->
             <section class="edit-product-modal__form-group" aria-labelledby="imagesHeading">
                 <label id="imagesHeading" class="edit-product-modal__label"><i class="fas fa-images"></i> صور
                     المنتج</label>
@@ -334,7 +334,7 @@
                 <div class="edit-product-modal__image-uploader" id="image-uploader" tabindex="0" role="group"
                     aria-label="منطقة رفع الصور">
                     <div class="edit-product-modal__uploader-actions">
-                        <!-- input مع capture لتفعيل الكاميرا على الأجهزة المحمولة -->
+                        <!-- input with capture to enable mobile camera -->
                         <input class="edit-product-modal__hidden-file" id="file-input" type="file" accept="image/*"
                             multiple aria-hidden="true">
 
@@ -356,7 +356,7 @@
                 </div>
             </section>
 
-            <!-- حقل اسم المنتج -->
+            <!-- Product Name Field -->
             <div class="edit-product-modal__form-group">
                 <label for="product-name" class="edit-product-modal__label"><i class="fas fa-signature"></i> اسم
                     المنتج</label>
@@ -365,7 +365,7 @@
                 <div id="product-name-char-counter" class="edit-product-modal__char-counter">0 / 100</div>
             </div>
 
-            <!-- حقل وصف المنتج -->
+            <!-- Product Description Field -->
             <div class="edit-product-modal__form-group">
                 <label for="product-description" class="edit-product-modal__label"><i class="fas fa-file-alt"></i>
                     الوصف</label>
@@ -374,7 +374,7 @@
                 <div id="description-char-counter" class="edit-product-modal__char-counter">0 / 400</div>
             </div>
 
-            <!-- حقل رسالة من البائع -->
+            <!-- Seller Message Field -->
             <div class="edit-product-modal__form-group">
                 <label for="seller-message" class="edit-product-modal__label"><i class="fas fa-comment-dots"></i> رسالة
                     من البائع</label>
@@ -383,7 +383,7 @@
                 <div id="seller-message-char-counter" class="edit-product-modal__char-counter">0 / 100</div>
             </div>
 
-            <!-- حقل ملاحظات -->
+            <!-- Notes Field -->
             <div class="edit-product-modal__form-group">
                 <label for="product-notes" class="edit-product-modal__label"><i class="fas fa-sticky-note"></i>
                     ملاحظات</label>
@@ -392,23 +392,23 @@
                 <div id="notes-char-counter" class="edit-product-modal__char-counter">0 / 100</div>
             </div>
 
-            <!-- صف جديد للسعر والكمية -->
+            <!-- New row for Price and Quantity -->
             <div class="edit-product-modal__form-row" id="price-quantity-row">
-                <!-- حقل الكمية -->
+                <!-- Quantity Field -->
                 <div class="edit-product-modal__form-group">
                     <label for="product-quantity" class="edit-product-modal__label"><i class="fas fa-boxes-stacked"></i>
                         الكمية المتاحة</label>
                     <input type="number" id="product-quantity" name="product-quantity" class="edit-product-modal__input"
                         placeholder="مثال: 50" required min="1">
                 </div>
-                <!-- حقل السعر -->
+                <!-- Price Field -->
                 <div class="edit-product-modal__form-group">
                     <label for="product-price" class="edit-product-modal__label"><i class="fas fa-dollar-sign"></i>سعر
                         القطعة</label>
                     <input type="text" inputmode="decimal" id="product-price" name="product-price"
                         class="edit-product-modal__input" placeholder="بالجنيه" required>
                 </div>
-                <!-- حقل السعر قبل الخصم -->
+                <!-- Original Price Field -->
                 <div class="edit-product-modal__form-group">
                     <label for="original-price" class="edit-product-modal__label"><i class="fas fa-tag"></i>السعر قبل
                         الخصم</label>
@@ -417,14 +417,14 @@
                 </div>
             </div>
 
-            <!-- زر إرسال النموذج -->
+            <!-- Submit Button -->
             <div class="edit-product-modal__submit-container">
                 <button type="submit" class="btn btn-warning">حفظ التعديلات</button>
             </div>
         </form>
     </div>
 
-    <!-- حاوية للكاميرا -->
+    <!-- Camera Container -->
     <div id="camera-modal-container"
         style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center;">
     </div>
@@ -440,7 +440,7 @@
 
             if (!productSession) {
                 console.error('%c[ProductForm] productSession not found!', 'color: red;');
-            
+
                 return;
             } else {
                 console.log('%c[ProductForm] productSession found!', 'color: green;');
@@ -709,7 +709,7 @@
              * @param {string} id - The ID of the image to remove.
              */
             function removeImage(id) {
-                console.log(`[ImageUploader] محاولة حذف الصورة بالمعرف: ${id}`);
+                console.log(`[ImageUploader] Attempting to delete image with ID: ${id}`);
                 Swal.fire({
                     title: 'هل أنت متأكد؟',
                     text: "هل تريد حقاً حذف هذه الصورة؟",
@@ -901,7 +901,7 @@
                     };
                 } catch (err) {
                     console.error("Error accessing camera: ", err);
-        
+
                     cameraModalContainer.style.display = 'none';
                 }
             }

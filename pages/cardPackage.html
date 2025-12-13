@@ -911,7 +911,7 @@
                                 if (cartPage_product && confirm(`هل أنت متأكد من حذف "${cartPage_product.productName}" من السلة؟`)) {
                                     removeFromCart(cartPage_productKey);
                                 } else {
-                                    // إعادة تعيين القيمة إلى 1
+                                    // Reset value to 1
                                     e.target.value = 1;
                                     updateCartQuantity(cartPage_productKey, 1);
                                 }

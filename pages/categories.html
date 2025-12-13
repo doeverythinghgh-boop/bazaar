@@ -5,8 +5,8 @@
     * ========================================
     */
 
-  /* الأنماط العامة (من ملف utilities.css) */
-  /* يجب عدم تغيير المسميات المشتركة مثل error-message و loader و spin إلا إذا كانت خاصة بالـ categories */
+  /* General styles (from utilities.css) */
+  /* Shared selectors like error-message, loader and spin should NOT be renamed unless they are specific to categories */
   /* .error-message */
   .error-message {
     color: var(--danger-color);
@@ -14,7 +14,8 @@
     margin-top: 5px;
     min-height: 15px;
   }
-  /* .loader & @keyframes spin (من ملف loader.css) */
+
+  /* .loader & @keyframes spin (from loader.css) */
   .loader {
     border: 5px solid var(--primary-color-light);
     border-top: 5px solid var(--primary-color);
@@ -22,23 +23,27 @@
     width: 50px;
     height: 50px;
     animation: spin 1s linear infinite;
-    margin: 50px auto; /* Center the loader */
+    margin: 50px auto;
+    /* Center the loader */
   }
+
   @keyframes spin {
     0% {
       transform: rotate(0deg);
     }
+
     100% {
       transform: rotate(360deg);
     }
   }
 
-  /* الأنماط الخاصة بقسم الفئات (من index-categories.css) */
+  /* Category section styles (from index-categories.css) */
   .categories_section_container {
     padding: 0px 0 40px 0;
     background-color: var(--bg-color-light);
     text-align: center;
   }
+
   .categories_table {
     width: 100%;
     border-collapse: separate;
@@ -46,20 +51,24 @@
     margin-top: 0px;
     table-layout: fixed;
   }
+
   @keyframes categories_fadeInRow {
     from {
       opacity: 0;
       transform: translateY(20px);
     }
+
     to {
       opacity: 1;
       transform: translateY(0);
     }
   }
+
   .categories_main_row {
     animation: categories_fadeInRow 0.5s ease-out forwards;
     opacity: 0;
   }
+
   .categories_main_cell {
     border: 1px solid var(--border-color);
     padding: 20px;
@@ -71,58 +80,63 @@
     transition: transform 0.3s ease, box-shadow 0.5s ease, opacity 0.3s ease,
       border-color 0.5s ease;
   }
+
   .categories_main_row .categories_main_cell--has-subcategories {
     cursor: pointer;
   }
+
   .categories_main_row .categories_main_cell--active {
     border: 1px solid var(--border-color-active);
     box-shadow: var(--shadow-focus);
     opacity: 1;
   }
-  .categories_main_row
-    .categories_main_cell--active
-    .categories_cell_content
-    i {
+
+  .categories_main_row .categories_main_cell--active .categories_cell_content i {
     color: var(--primary-color);
   }
-  .categories_main_row
-    .categories_main_cell--active
-    .categories_cell_content
-    span {
+
+  .categories_main_row .categories_main_cell--active .categories_cell_content span {
     color: var(--text-color-medium);
   }
+
   .categories_cell_content {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 10px;
   }
+
   .categories_cell_content__icon {
     font-size: 2rem;
     color: var(--primary-color);
     transition: color 0.3s ease;
   }
+
   .categories_cell_content__text {
     font-size: 0.6rem;
     color: var(--text-color-medium);
     font-weight: 600;
   }
+
   .categories_sub_row td {
     padding: 0;
     background-color: transparent;
     border: none;
     box-shadow: none;
   }
+
   @keyframes categories_slide_fade_in {
     from {
       opacity: 0;
       transform: translateY(-10px);
     }
+
     to {
       opacity: 1;
       transform: translateY(0);
     }
   }
+
   .categories_subcategories_container {
     display: flex;
     flex-wrap: nowrap;
@@ -132,16 +146,20 @@
     padding: 20px;
     -webkit-overflow-scrolling: touch;
   }
+
   .categories_subcategories_container::-webkit-scrollbar {
     height: 6px;
   }
+
   .categories_subcategories_container::-webkit-scrollbar-track {
     background: var(--bg-color-light);
   }
+
   .categories_subcategories_container::-webkit-scrollbar-thumb {
     background-color: var(--border-color-input);
     border-radius: 10px;
   }
+
   .categories_subcategory_item {
     background-color: var(--bg-color-light);
     border: 1px solid var(--border-color);
@@ -156,21 +174,25 @@
     font-size: 0.8em;
     cursor: pointer;
   }
+
   .categories_subcategory_item:active {
     background-color: var(--primary-color-light);
   }
+
   .categories_subcategory_item__icon {
     font-size: 1.2em;
   }
+
   .categories_subcategory_item--active {
     border: 1px solid var(--border-color-active);
     box-shadow: var(--shadow-focus);
   }
+
   .categories_subcategory_item--active .categories_subcategory_item__icon {
     color: var(--primary-color);
   }
 
-  /* الأنماط الخاصة بمعرض المنتجات (من index-products-gallery.css) */
+  /* Product gallery styles (from index-products-gallery.css) */
   .categories_products_gallery_row td {
     height: 15vh;
     padding: 0px;
@@ -180,6 +202,7 @@
     border: 1px solid var(--border-color);
     vertical-align: top;
   }
+
   .categories_products_gallery_container {
     display: flex;
     overflow-x: auto;
@@ -189,16 +212,20 @@
     padding: 15px;
     -webkit-overflow-scrolling: touch;
   }
+
   .categories_products_gallery_container::-webkit-scrollbar {
     height: 6px;
   }
+
   .categories_products_gallery_container::-webkit-scrollbar-track {
     background: var(--bg-color-light);
   }
+
   .categories_products_gallery_container::-webkit-scrollbar-thumb {
     background-color: var(--border-color-input);
     border-radius: 10px;
   }
+
   .categories_product_item {
     cursor: pointer;
     text-align: center;
@@ -214,12 +241,14 @@
     width: 12vh;
     flex-shrink: 0;
   }
+
   .categories_product_item__image {
     width: 100%;
     height: 12vh;
     object-fit: cover;
     display: block;
   }
+
   .categories_product_item__name {
     font-family: var(--font-primary);
     font-size: 0.75rem;
@@ -241,35 +270,35 @@
 
 <script>
   /**
-   * @fileoverview إدارة عرض الفئات (الرئيسية والفرعية) ومعرض المنتجات، مع تطبيق حفظ واستعادة حالة الصفحة.
-   * @author Hisham (هشام)
+   * @fileoverview Manage category display (main and sub) and product gallery, with page state saving/restoring.
+   * @author Hisham
    * @project BidStory
    * @version 1.0
    */
 
   // **********************************************
-  // ** الدوال الرئيسية (Core Functions) **
+  // ** Core Functions **
   // **********************************************
 
   /**
-   * @description يجلب الفئات من ملف list.json وينشئ جدول الفئات ديناميكياً.
+   * @description Fetches categories from list.json and dynamically builds the categories table.
    * @async
    * @function categories_loadCategoriesAsTable
-   * @returns {Promise<void>} وعد يكتمل عند تحميل وعرض الفئات بنجاح.
-   * @throws {Error} في حال فشل جلب أو تحليل ملف الفئات.
+   * @returns {Promise<void>} Promise that resolves when categories are successfully loaded and displayed.
+   * @throws {Error} If fetching or parsing the category file fails.
    */
   async function categories_loadCategoriesAsTable() {
     try {
       const tbody = document.getElementById("categories_tbody");
       if (!tbody) return;
 
-      // 1. جلب البيانات
+      // 1. Fetch data
       const categories = await categories_fetchCategories(
         "../shared/list.json"
       );
 
-      // 2. بناء الجدول
-      tbody.innerHTML = ""; // مسح المحتوى القديم
+      // 2. Build table
+      tbody.innerHTML = ""; // Clear old content
       categories_buildCategoryTable(tbody, categories);
     } catch (error) {
       console.error(
@@ -279,19 +308,19 @@
       );
       const tbody = document.getElementById("categories_tbody");
       if (tbody) {
-        // إظهار رسالة خطأ للمستخدم
+        // Show error message to user
         tbody.innerHTML = `<tr><td colspan="4">حدث خطأ أثناء تحميل الفئات.</td></tr>`;
       }
     }
   }
 
   /**
-   * @description وظيفة مساعدة لجلب وتحليل ملف الفئات (SRP).
+   * @description Helper function to fetch and parse category file (SRP).
    * @async
    * @function categories_fetchCategories
-   * @param {string} url - مسار ملف JSON.
-   * @returns {Promise<Array<Object>>} مصفوفة الفئات.
-   * @throws {Error} في حال فشل الجلب أو حالة استجابة HTTP غير ناجحة.
+   * @param {string} url - JSON file path.
+   * @returns {Promise<Array<Object>>} Array of categories.
+   * @throws {Error} If fetch fails or HTTP response status is not successful.
    */
   async function categories_fetchCategories(url) {
     try {
@@ -300,7 +329,7 @@
         throw new Error(`فشل تحميل الفئات. الحالة: ${response.status}`);
       }
       const data = await response.json();
-      // التحقق من وجود مفتاح categories
+      // Check for 'categories' key
       if (!data || !data.categories || !Array.isArray(data.categories)) {
         throw new Error("تنسيق ملف الفئات غير صحيح.");
       }
@@ -308,20 +337,20 @@
       return data.categories;
     } catch (error) {
       console.error("%c[Categories] خطأ في جلب الفئات:", "color: red;", error);
-      throw error; // إعادة طرح الخطأ لمعالجته في categories_loadCategoriesAsTable
+      throw error; // Rethrow error to be handled in categories_loadCategoriesAsTable
     }
   }
 
   /**
-   * @description تبني صفوف جدول الفئات وتضيف مستمعات الأحداث (SRP).
+   * @description Builds category table rows and adds event listeners (SRP).
    * @function categories_buildCategoryTable
-   * @param {HTMLElement} tbody - عنصر <tbody> لإدراج الصفوف فيه.
-   * @param {Array<Object>} categories - مصفوفة الفئات الرئيسية.
+   * @param {HTMLElement} tbody - <tbody> element to insert rows into.
+   * @param {Array<Object>} categories - Array of main categories.
    * @returns {void}
    */
   function categories_buildCategoryTable(tbody, categories) {
     try {
-      // تجميع الفئات في مجموعات من 4 لعرض أربعة أعمدة
+      // Group categories in batches of 4 to display four columns
       for (let i = 0; i < categories.length; i += 4) {
         const chunk = categories.slice(i, i + 4);
         const mainRow = document.createElement("tr");
@@ -336,7 +365,7 @@
           mainRow.appendChild(cell);
         });
 
-        // ملء الصف بخلايا فارغة إذا كان عدد الفئات أقل من 4
+        // Fill the row with empty cells if number of categories is less than 4
         while (mainRow.cells.length < 4) {
           mainRow.appendChild(document.createElement("td"));
         }
@@ -353,12 +382,12 @@
   }
 
   /**
-   * @description تنشئ خلية الفئة الرئيسية وتضيف معالج النقر (SRP).
+   * @description Creates main category cell and adds click handler (SRP).
    * @function categories_createCategoryCell
-   * @param {Object} category - كائن الفئة.
-   * @param {HTMLTableRowElement} mainRow - صف الجدول الأب.
-   * @param {Array<Object>} allCategories - جميع الفئات لتمريرها إلى categories_toggleSubcategories.
-   * @returns {HTMLTableCellElement} الخلية المُنْشأة.
+   * @param {Object} category - Category object.
+   * @param {HTMLTableRowElement} mainRow - Parent table row.
+   * @param {Array<Object>} allCategories - All categories to pass to categories_toggleSubcategories.
+   * @returns {HTMLTableCellElement} The created cell.
    */
   function categories_createCategoryCell(category, mainRow, allCategories) {
     try {
@@ -377,9 +406,9 @@
 
       if (category.subcategories && category.subcategories.length > 0) {
         cell.classList.add("categories_main_cell--has-subcategories");
-        // تمرير جميع الفئات لتمكين categories_toggleSubcategories من الوصول للفئة التي تم النقر عليها
+        // Pass all categories to enable categories_toggleSubcategories to access the clicked category
         cell.addEventListener("click", () => {
-          // نمرر الفئة نفسها بدلاً من البحث عنها لاحقاً، لزيادة الكفاءة
+          // Pass the category itself instead of searching for it later, for efficiency
           categories_toggleSubcategories(mainRow, category, cell);
         });
       }
@@ -390,7 +419,7 @@
         "color: red;",
         error
       );
-      // إرجاع خلية فارغة في حالة الخطأ لضمان استمرار بناء الجدول
+      // Return empty cell in case of error to ensure table building continues
       const cell = document.createElement("td");
       cell.className = "categories_main_cell";
       cell.innerHTML = `<div><span class="error-message">خطأ في عرض الفئة</span></div>`;
@@ -399,11 +428,11 @@
   }
 
   /**
-   * @description تبديل عرض صف الفئات الفرعية ومعرض المنتجات.
+   * @description Toggles display of subcategories row and product gallery.
    * @function categories_toggleSubcategories
-   * @param {HTMLTableRowElement} mainRow - صف الفئة الرئيسية الذي تم النقر عليه.
-   * @param {Object} mainCategory - كائن الفئة الرئيسية الذي تم النقر عليه (يحتوي على subcategories).
-   * @param {HTMLTableCellElement} clickedCell - خلية الفئة الرئيسية التي تم النقر عليها.
+   * @param {HTMLTableRowElement} mainRow - The clicked main category row.
+   * @param {Object} mainCategory - The clicked main category object (contains subcategories).
+   * @param {HTMLTableCellElement} clickedCell - The clicked main category cell.
    * @returns {void}
    */
   function categories_toggleSubcategories(mainRow, mainCategory, clickedCell) {
@@ -413,7 +442,7 @@
         "color: purple;"
       );
       const tbody = mainRow.parentNode;
-      // البحث عن العناصر باستخدام المسميات الجديدة
+      // Find elements using new selectors
       const currentlyActiveCell = tbody.querySelector(
         "td.categories_main_cell--active"
       );
@@ -423,21 +452,21 @@
       const existingSubRow = tbody.querySelector(".categories_sub_row");
       const isClickingSameCell = currentlyActiveCell === clickedCell;
 
-      // 1. إزالة أي صفوف مفتوحة حاليًا (فرعية أو منتجات)
+      // 1. Remove any currently open rows (sub or products)
       if (existingSubRow) existingSubRow.remove();
       if (existingProductsRow) existingProductsRow.remove();
 
-      // 2. تحديث التمييز وفتح/إغلاق
+      // 2. Update highlighting and toggle open/close
       if (!isClickingSameCell) {
         console.log("%c[DevLog] الحالة: فتح قسم جديد.", "color: green;");
 
-        // إزالة التمييز القديم وتطبيق الجديد
+        // Remove old highlighting and apply new
         if (currentlyActiveCell) {
           currentlyActiveCell.classList.remove("categories_main_cell--active");
         }
         clickedCell.classList.add("categories_main_cell--active");
 
-        // بناء وإدراج صف الفئات الفرعية
+        // Build and insert subcategory row
         const subRow = categories_createSubcategoryRow(
           mainRow,
           mainCategory.subcategories,
@@ -455,17 +484,17 @@
         "color: red;",
         error
       );
-      // لا يوجد تفاعل حرج للمستخدم هنا، فقط تسجيل الخطأ
+      // No critical user interaction here, just log error
     }
   }
 
   /**
-   * @description تنشئ صف الفئات الفرعية وتضيف معالجات النقر (SRP).
+   * @description Creates subcategory row and adds click handlers (SRP).
    * @function categories_createSubcategoryRow
-   * @param {HTMLTableRowElement} mainRow - الصف الذي يتبع صف الفئات الفرعية.
-   * @param {Array<Object>} subcategories - مصفوفة الفئات الفرعية.
-   * @param {string} mainCatId - معرف الفئة الرئيسية.
-   * @returns {HTMLTableRowElement} صف الفئات الفرعية المُنْشأ.
+   * @param {HTMLTableRowElement} mainRow - The row following the subcategory row.
+   * @param {Array<Object>} subcategories - Array of subcategories.
+   * @param {string} mainCatId - Main category ID.
+   * @returns {HTMLTableRowElement} The created subcategory row.
    */
   function categories_createSubcategoryRow(mainRow, subcategories, mainCatId) {
     try {
@@ -506,12 +535,12 @@
   }
 
   /**
-   * @description تنشئ عنصر فئة فرعية وتضيف معالج النقر (SRP).
+   * @description Creates subcategory item and adds click handler (SRP).
    * @function categories_createSubcategoryItem
-   * @param {Object} sub - كائن الفئة الفرعية.
-   * @param {HTMLTableRowElement} subRow - صف الفئات الفرعية.
-   * @param {string} mainCatId - معرف الفئة الرئيسية.
-   * @returns {HTMLAnchorElement} عنصر الفئة الفرعية المُنْشأ.
+   * @param {Object} sub - Subcategory object.
+   * @param {HTMLTableRowElement} subRow - Subcategory row.
+   * @param {string} mainCatId - Main category ID.
+   * @returns {HTMLAnchorElement} The created subcategory element.
    */
   function categories_createSubcategoryItem(sub, subRow, mainCatId) {
     try {
@@ -529,7 +558,7 @@
         try {
           e.preventDefault();
 
-          // إزالة التمييز القديم وتطبيق الجديد
+          // Remove old highlighting and apply new
           document
             .querySelectorAll(".categories_subcategory_item--active")
             .forEach((item) =>
@@ -541,7 +570,7 @@
           );
           subItem.classList.add("categories_subcategory_item--active");
 
-          // عرض معرض المنتجات
+          // Show product gallery
           categories_showProductGallery(subRow, mainCatId, sub.id);
         } catch (error) {
           console.error(
@@ -567,17 +596,17 @@
   }
 
   // **********************************************
-  // ** دوال عرض المنتجات (Product Gallery) **
+  // ** Product Gallery Functions **
   // **********************************************
 
   /**
-   * @description يعرض معرض المنتجات تحت صف الفئات الفرعية.
+   * @description Displays product gallery below subcategory row.
    * @async
    * @function categories_showProductGallery
-   * @param {HTMLTableRowElement} subRow - صف الفئات الفرعية.
-   * @param {string} mainCatId - معرف الفئة الرئيسية.
-   * @param {string} subCatId - معرف الفئة الفرعية.
-   * @returns {Promise<void>} وعد يكتمل عند عرض المعرض.
+   * @param {HTMLTableRowElement} subRow - Subcategory row.
+   * @param {string} mainCatId - Main category ID.
+   * @param {string} subCatId - Subcategory ID.
+   * @returns {Promise<void>} Promise that resolves when gallery is displayed.
    */
   async function categories_showProductGallery(subRow, mainCatId, subCatId) {
     try {
@@ -586,21 +615,21 @@
         "color: #fd7e14;"
       );
 
-      // إزالة أي معرض منتجات مفتوح مسبقاً
+      // Remove any previously open product gallery
       const existingGallery = document.querySelector(
         ".categories_products_gallery_row"
       );
       if (existingGallery) existingGallery.remove();
 
-      // 1. إنشاء الصف الخالي وإضافة مؤشر التحميل
+      // 1. Create empty row and add loading indicator
       const galleryRow = categories_createGalleryRow(subRow);
       const galleryCell = galleryRow.querySelector("td");
       galleryCell.innerHTML = `<div class="loader" style="margin: 20px auto;"></div>`;
 
-      // 2. جلب المنتجات (الدالة الخارجية getProductsByCategory لم يتم تغيير اسمها)
+      // 2. Fetch products (External function getProductsByCategory name remains unchanged)
       const products = await getProductsByCategory(mainCatId, subCatId);
 
-      // 3. التحقق من بقاء الصف (لم يتم إغلاق الفئة)
+      // 3. Check if row persists (category was not closed)
       const currentRow = subRow.nextElementSibling;
       const isGalleryStillNeeded =
         currentRow &&
@@ -613,7 +642,7 @@
         return;
       }
 
-      // 4. عرض النتائج
+      // 4. Display results
       if (products && products.length > 0) {
         await categories_renderProductGallery(galleryCell, products);
       } else {
@@ -636,10 +665,10 @@
   }
 
   /**
-   * @description تنشئ صف معرض المنتجات وتدرجه في DOM (SRP).
+   * @description Creates product gallery row and inserts to DOM (SRP).
    * @function categories_createGalleryRow
-   * @param {HTMLTableRowElement} subRow - الصف الذي يتبع صف المعرض.
-   * @returns {HTMLTableRowElement} صف المعرض المُنْشأ.
+   * @param {HTMLTableRowElement} subRow - The row following the gallery row.
+   * @returns {HTMLTableRowElement} The created gallery row.
    */
   function categories_createGalleryRow(subRow) {
     try {
@@ -663,11 +692,11 @@
   }
 
   /**
-   * @description تقوم بعرض المنتجات في المعرض بشكل متتالٍ مع تحميل مؤجل للصور (SRP).
+   * @description Renders products in the gallery sequentially with lazy loading for images (SRP).
    * @async
    * @function categories_renderProductGallery
-   * @param {HTMLTableCellElement} galleryCell - الخلية التي سيتم وضع المعرض داخلها.
-   * @param {Array<Object>} products - مصفوفة المنتجات.
+   * @param {HTMLTableCellElement} galleryCell - The cell to populate with gallery.
+   * @param {Array<Object>} products - Array of products.
    * @returns {Promise<void>}
    */
   async function categories_renderProductGallery(galleryCell, products) {
@@ -682,7 +711,7 @@
       galleryCell.appendChild(galleryContainer);
 
       for (const product of products) {
-        // يتم الانتظار حتى يتم تحميل وعرض كل عنصر قبل الانتقال للعنصر التالي لضمان التسلسل
+        // Wait until each item is loaded and displayed before moving to the next to ensure sequence
         await categories_loadProductItem(product, galleryContainer);
       }
     } catch (error) {
@@ -695,30 +724,30 @@
   }
 
   /**
-   * @description تنشئ عنصر منتج واحد وتضيف معالج النقر (SRP).
+   * @description Creates a single product item and adds click handler (SRP).
    * @async
    * @function categories_loadProductItem
-   * @param {Object} product - كائن المنتج.
-   * @param {HTMLElement} galleryContainer - الحاوية لإضافة المنتج إليها.
-   * @returns {Promise<void>} وعد يكتمل بعد عرض المنتج.
+   * @param {Object} product - Product object.
+   * @param {HTMLElement} galleryContainer - Container to add product to.
+   * @returns {Promise<void>} Promise that resolves after product is displayed.
    */
   function categories_loadProductItem(product, galleryContainer) {
     return new Promise((resolve) => {
       try {
-        // التحقق من وجود صورة
+        // Check if image exists
         const firstImage = product.ImageName
           ? product.ImageName.split(",")[0]
           : null;
 
         if (!firstImage) {
-          // حالة عدم وجود صورة
+          // Case: No image
           const productItem = categories_createProductElement(product, null);
           galleryContainer.appendChild(productItem);
           categories_animateProductIn(productItem, resolve);
           return;
         }
 
-        // حالة وجود صورة
+        // Case: Image exists
         const imageUrl = `https://pub-e828389e2f1e484c89d8fb652c540c12.r2.dev/${firstImage}`;
         const img = document.createElement("img");
         img.className = "categories_product_item__image";
@@ -727,22 +756,22 @@
 
         const productItem = categories_createProductElement(product, img);
 
-        // معالج تحميل الصورة
+        // Image load handler
         img.onload = () => {
           galleryContainer.appendChild(productItem);
           categories_animateProductIn(productItem, resolve);
-          // إضافة معالج النقر بعد إضافة العنصر في DOM
+          // Add click handler after adding element to DOM
           productItem.addEventListener("click", () =>
             categories_handleProductClick(product, firstImage)
           );
         };
 
-        // معالج فشل تحميل الصورة
+        // Image load error handler
         img.onerror = () => {
           console.warn(`[Products] فشل تحميل الصورة: ${imageUrl}`);
           productItem.classList.add("no-image");
           if (productItem.querySelector("img"))
-            productItem.querySelector("img").remove(); // إزالة العنصر الصورة الفاشل
+            productItem.querySelector("img").remove(); // Remove failed image element
           galleryContainer.appendChild(productItem);
           categories_animateProductIn(productItem, resolve);
           productItem.addEventListener("click", () =>
@@ -757,17 +786,17 @@
           "color: red;",
           error
         );
-        resolve(); // يجب الإكمال حتى في حالة الخطأ لعدم إيقاف الحلقة
+        resolve(); // Must complete even in case of error to not stop the loop
       }
     });
   }
 
   /**
-   * @description تنشئ عنصر المنتج الأساسي (SRP).
+   * @description Creates basic product element (SRP).
    * @function categories_createProductElement
-   * @param {Object} product - كائن المنتج.
-   * @param {HTMLImageElement|null} imgElement - عنصر الصورة إذا كان موجوداً.
-   * @returns {HTMLDivElement} عنصر المنتج المُنْشأ.
+   * @param {Object} product - Product object.
+   * @param {HTMLImageElement|null} imgElement - Image element if exists.
+   * @returns {HTMLDivElement} The created product element.
    */
   function categories_createProductElement(product, imgElement) {
     try {
@@ -779,7 +808,7 @@
 
       const productName = document.createElement("p");
       productName.className = "categories_product_item__name";
-      // لم يتم تغيير الـ ID الخاص بالمنتج لأنه قد يستخدم في مكان آخر خارج سياق الفئات
+      // Product ID is not changed because it might be used elsewhere outside the category context
       productName.id = `product-name-${product.product_key}`;
       productName.textContent = product.productName || "منتج غير مسمى";
 
@@ -805,10 +834,10 @@
   }
 
   /**
-   * @description تطبيق الحركة التمهيدية على عنصر المنتج (SRP).
+   * @description Applies introductory animation to product item (SRP).
    * @function categories_animateProductIn
-   * @param {HTMLElement} productItem - عنصر المنتج.
-   * @param {Function} resolve - دالة Resolve للـ Promise.
+   * @param {HTMLElement} productItem - Product item element.
+   * @param {Function} resolve - Promise resolve function.
    * @returns {void}
    */
   function categories_animateProductIn(productItem, resolve) {
@@ -824,15 +853,15 @@
         "color: red;",
         error
       );
-      resolve(); // يجب الإكمال حتى في حالة الخطأ
+      resolve(); // Must continue even in case of error
     }
   }
 
   /**
-   * @description معالج النقر على عنصر المنتج (SRP).
+   * @description Product click handler (SRP).
    * @function categories_handleProductClick
-   * @param {Object} product - كائن بيانات المنتج.
-   * @param {string} firstImageName - اسم أول صورة.
+   * @param {Object} product - Product data object.
+   * @param {string} firstImageName - Name of first image.
    * @returns {void}
    * @see mainLoader
    */
@@ -865,7 +894,7 @@
         SubCategory: product.SubCategory,
         type: product.serviceType,
       };
-      //لا يتم اضافة showAddToCart يجب ان تحدد من الداله productViewLayout
+      // showAddToCart is not added, it must be determined by the function productViewLayout
       productSession = [productDataForModal];
       productViewLayout(productDataForModal.type);
     } catch (error) {
@@ -878,14 +907,14 @@
   }
 
   /**
-   * @description يجلب قائمة المنتجات بناءً على الفئة الرئيسية والفرعية المحددة من واجهة برمجة التطبيقات (API).
+   * @description Fetches product list based on main and sub category from API.
    * @async
    * @function getProductsByCategory
-   * @param {string} mainCatId - معرف الفئة الرئيسية.
-   * @param {string} subCatId - معرف الفئة الفرعية.
-   * @returns {Promise<Array<Object>|null>} - وعد يحتوي على مصفوفة من كائنات المنتجات، أو `null` في حالة الفشل.
-   * @throws {Error} - إذا كان `baseURL` غير معرف، أو فشل جلب البيانات من API.
-   * @remarks تم ترك اسم الدالة كما هو لأنها دالة مساعدة (مفترضة) يتم استدعاؤها من الخارج، وليست داخلية خاصة بالصفحة.
+   * @param {string} mainCatId - Main category ID.
+   * @param {string} subCatId - Subcategory ID.
+   * @returns {Promise<Array<Object>|null>} - Promise containing array of product objects, or `null` on failure.
+   * @throws {Error} - If `baseURL` is undefined, or API fetch fails.
+   * @remarks Function name left as is because it's a helper function (assumed) called from outside, not internal to the page.
    */
   async function getProductsByCategory(mainCatId, subCatId) {
     try {
@@ -908,25 +937,25 @@
       const data = await apiFetch(`/api/products?${params.toString()}`);
       if (data && data.error) throw new Error(data.error);
 
-      // التحقق من أن النتيجة هي مصفوفة منتجات
+      // Check if result is an array of products
       return Array.isArray(data)
         ? data
         : data && Array.isArray(data.products)
-        ? data.products
-        : [];
+          ? data.products
+          : [];
     } catch (error) {
       console.error(
         "%c[getProductsByCategory] فشل جلب المنتجات:",
         "color: red;",
         error
       );
-      // عند الفشل، يجب إرجاع مصفوفة فارغة بدلاً من null لتسهيل معالجة المنتجات في الدالة المستدعية
+      // On failure, return empty array instead of null to facilitate product processing in calling function
       return [];
     }
   }
 
   // **********************************************
-  // ** معالجات أحداث الصفحة (Event Listeners) **
+  // ** Page Event Listeners **
   // **********************************************
-  // (لم يطلب المستخدم إضافة كود هنا، تُرك للتنفيذ الخارجي)
+  // (User did not request adding code here, left for external implementation)
 </script>

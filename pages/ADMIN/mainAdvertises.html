@@ -328,7 +328,7 @@
 <div id="mainAdver_cameraModalContainer"></div>
 
 <script>
-    // ضمان أن السكربت نظيف ومعزول (Isolated Scope) لتجنب تضارب المتغيرات
+    // Ensure the script is clean and isolated (Isolated Scope) to avoid variable conflicts
     (function () {
         /**
          * @function addUpdate
@@ -373,7 +373,7 @@
 
         /**
          * ------------------------------------------------------------------
-         * عناصر واجهة المستخدم (UI Elements)
+         * UI Elements
          * ------------------------------------------------------------------
          */
         const els = {
@@ -390,7 +390,7 @@
 
         /**
          * ------------------------------------------------------------------
-         * دوال مساعدة (Helper Functions)
+         * Helper Functions
          * ------------------------------------------------------------------
          */
 
@@ -422,7 +422,7 @@
 
         /**
          * ------------------------------------------------------------------
-         * الوظائف الأساسية (Core Functions)
+         * Core Functions
          * ------------------------------------------------------------------
          */
 
@@ -509,7 +509,7 @@
             wrapper.append(removeBtn, img, meta);
             els.previewsEl.appendChild(wrapper);
 
-            // ربط العنصر بالحالة لتسهيل التحديث
+            // Bind element to state to facilitate updates
             state._el = wrapper;
             state._metaEl = meta;
         }
@@ -550,25 +550,25 @@
             }
 
             for (const file of fileList) {
-                if (!file.type.startsWith('image/')) continue; // تجاهل الملفات غير الصور
+                if (!file.type.startsWith('image/')) continue; // Ignore non-image files
 
                 const id = genId();
                 const state = { id, file, compressedBlob: null, status: 'pending' };
                 images.push(state);
                 createPreview(state);
 
-                // البدء في الضغط
+                // Start compression
                 state.status = 'compressing';
                 state.compressedBlob = await compressImage(file);
                 state.status = 'ready';
-                if (state._metaEl) state._metaEl.textContent = 'جاهز'; // جاهز للرفع
+                if (state._metaEl) state._metaEl.textContent = 'جاهز'; // Ready for upload
             }
-            els.fileInput.value = ''; // تصفير الإدخال للسماح باختيار نفس الملف مجدداً
+            els.fileInput.value = ''; // Clear input to allow picking the same file again
         }
 
         /**
          * ------------------------------------------------------------------
-         * التحميل الأولي (Initialization)
+         * Initialization
          * ------------------------------------------------------------------
          */
 
@@ -614,7 +614,7 @@
 
         /**
          * ------------------------------------------------------------------
-         * معالجة الأحداث (Event Handlers)
+         * Event Handlers
          * ------------------------------------------------------------------
          */
         els.pickFilesBtn.onclick = () => els.fileInput.click();
@@ -636,15 +636,15 @@
 
         // (Drag & Drop functionality removed as requested)
 
-        // الكاميرا (Unified Logic)
+        // Camera (Unified Logic)
         els.takePhotoBtn.onclick = () => {
-            // للهواتف: استخدام واجهة الكاميرا الأصلية
+            // For phones: Use native camera interface
             if (/Mobi|Android/i.test(navigator.userAgent)) {
                 els.fileInput.setAttribute('capture', 'environment');
                 els.fileInput.click();
                 return;
             }
-            // للأجهزة المكتبية: فتح نافذة الكاميرا المخصصة
+            // For desktops: Open custom camera window
             openDesktopCamera();
         };
 
@@ -693,13 +693,13 @@
 
         /**
          * ------------------------------------------------------------------
-         * إرسال النموذج (Submission Logic)
+         * Submission Logic
          * ------------------------------------------------------------------
          */
         els.form.onsubmit = async (e) => {
             e.preventDefault();
 
-            // ترتيب الصور بناءً على ترتيبها في DOM
+            // Sort images based on their order in DOM
             const domIds = Array.from(els.previewsEl.querySelectorAll('.mainAdver_preview')).map(x => x.dataset.id);
             images.sort((a, b) => domIds.indexOf(a.id) - domIds.indexOf(b.id));
 
@@ -710,50 +710,50 @@
             });
 
             try {
-                // --- استراتيجية المزامنة الحديثة (Smart Sync) ---
-                // بدلاً من حذف كل شيء وإعادة الرفع، سنقوم بما يلي:
-                // 1. رفع الصور الجديدة فقط بأسماء فريدة.
-                // 2. تحديث ملف المانيفست بالترتيب الجديد.
-                // 3. حذف الصور التي لم تعد موجودة في القائمة فقط.
+                // --- Smart Sync Strategy ---
+                // Instead of deleting everything and re-uploading, we will do the following:
+                // 1. Upload only new images with unique names.
+                // 2. Update the manifest file with the new order.
+                // 3. Delete only images that are no longer in the list.
 
-                const newManifest = []; // لتخزين قائمة الأسماء النهائية
-                const uploads = []; // لتخزين عمليات الرفع الجديدة
+                const newManifest = []; // To store the final list of names
+                const uploads = []; // To store new upload operations
 
-                // الخطوة 1: معالجة الصور (رفع الجديد + حفظ القديم)
+                // Step 1: Process images (Upload new + Keep old)
                 for (const imgState of images) {
                     if (imgState.status === 'uploaded') {
-                        // صورة موجودة مسبقاً: نحتفظ باسمها كما هو
+                        // Image already exists: keep its name as is
                         newManifest.push(imgState.fileName);
                     } else if (imgState.status === 'ready' && imgState.compressedBlob) {
-                        // صورة جديدة: نولد لها اسماً فريداً
-                        // نستخدم Timestamp + Random لضمان عدم التكرار وتفادي مشاكل الكاش
+                        // New image: generate a unique name for it
+                        // We use Timestamp + Random to ensure uniqueness and avoid cache issues
                         const ext = imgState.compressedBlob.type === 'image/webp' ? 'webp' : 'jpg';
                         const uniqueName = `ad_${Date.now()}_${Math.floor(Math.random() * 1000)}.${ext}`;
 
-                        // إضافتها لقائمة الرفع
+                        // Add to upload list
                         uploads.push({ blob: imgState.compressedBlob, name: uniqueName });
-                        // إضافتها للمانيفست
+                        // Add to manifest
                         newManifest.push(uniqueName);
 
-                        // تحديث حالة العنصر محلياً (رغم أننا سنعيد التحميل)
+                        // Update item status locally (although we will reload)
                         imgState.fileName = uniqueName;
                         imgState.status = 'uploaded';
                     }
                 }
 
-                // تنفيذ عمليات الرفع للصور الجديدة
+                // Execute upload operations for new images
                 if (uploads.length > 0) {
                     for (const up of uploads) {
                         await uploadFile2cf(up.blob, up.name);
                     }
                 }
 
-                // الخطوة 2: تحديث المانيفست (advertisements.json)
+                // Step 2: Update manifest (advertisements.json)
                 const mBlob = new Blob([JSON.stringify(newManifest)], { type: 'application/json' });
                 await uploadFile2cf(mBlob, 'advertisements.json');
 
-                // الخطوة 3: تنظيف الملفات غير المستخدمة (Smart Delete)
-                // نحذف فقط الملفات التي كانت موجودة (originalImageNames) ولم تعد موجودة في القائمة الجديدة (newManifest)
+                // Step 3: Cleanup unused files (Smart Delete)
+                // We only delete files that were present (originalImageNames) and are no longer in the new list (newManifest)
                 const filesToDelete = originalImageNames.filter(oldName => !newManifest.includes(oldName));
 
                 if (filesToDelete.length > 0) {
@@ -762,19 +762,19 @@
                     await Promise.all(deletePromises);
                 }
 
-                // الخطوة 4: الإشعارات والتحديث
+                // Step 4: Notifications and Update
                 if (window.addUpdate) await window.addUpdate("تحديث الإعلانات");
 
                 Swal.fire('تم!', 'تم تحديث الإعلانات بنجاح.', 'success');
-                loadImages(); // إعادة التحميل لتحديث الواجهة بالبيانات الجديدة
+                loadImages(); // Reload to update UI with new data
 
             } catch (err) {
                 console.error(err);
-            
+
             }
         };
 
-        // --- بدء التشغيل ---
+        // --- Startup ---
         loadImages();
 
     })();

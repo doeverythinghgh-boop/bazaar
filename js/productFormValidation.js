@@ -1,14 +1,14 @@
 /**
  * @file js/productFormValidation.js
- * @description يحتوي هذا الملف على دوال التحقق من صحة نموذج إضافة المنتج وعرض رسائل الخطأ المتعلقة به.
+ * @description Contains validation functions for the product add form and displays related error messages.
  */
 
 /**
- * @description يظهر رسالة خطأ أسفل العنصر المحدد في نموذج إضافة المنتج.
- *   يقوم بإنشاء عنصر `div` جديد يحتوي على رسالة الخطأ ويدرجه في DOM بعد العنصر المستهدف.
+ * @description Displays an error message below the specified element in the product add form.
+ *   Creates a new `div` element containing the error message and inserts it into the DOM after the target element.
  * @function productShowError
- * @param {HTMLElement} element - عنصر DOM الذي ستظهر رسالة الخطأ أسفله.
- * @param {string} message - رسالة الخطأ المراد عرضها.
+ * @param {HTMLElement} element - DOM element below which the error message will be shown.
+ * @param {string} message - Error message to display.
  * @returns {void}
  * @throws {Error} - If `element` is null.
  * @see productClearError
@@ -18,7 +18,7 @@ function productShowError(element, message) {
     console.error('Cannot show error: element is null');
     return;
   }
-  
+
   productClearError(element);
   const errorDiv = document.createElement('div');
   errorDiv.className = 'add-product-modal__error-message';
@@ -27,24 +27,24 @@ function productShowError(element, message) {
   errorDiv.style.fontSize = '14px';
   errorDiv.style.marginTop = '5px';
   errorDiv.style.textAlign = 'right';
-  
-  // إدراج رسالة الخطأ بعد العنصر مباشرة
+
+  // Insert error message directly after user element
   element.parentNode.insertBefore(errorDiv, element.nextSibling);
 }
 
 /**
- * @description يمسح أي رسالة خطأ موجودة أسفل العنصر المحدد.
- *   يبحث عن عنصر رسالة الخطأ المرتبط بالعنصر المستهدف ويزيله من DOM.
+ * @description Clears any existing error message below the specified element.
+ *   Searches for the error message element associated with the target element and removes it from the DOM.
  * @function productClearError
- * @param {HTMLElement} element - عنصر DOM الذي سيتم مسح رسالة الخطأ من أسفله.
+ * @param {HTMLElement} element - DOM element to clear the error message from.
  * @returns {void}
  */
 function productClearError(element) {
   if (!element) return;
-  
+
   const parent = element.parentNode;
   if (!parent) return;
-  
+
   const errorDiv = parent.querySelector('.add-product-modal__error-message');
   if (errorDiv && errorDiv.parentNode === parent) {
     parent.removeChild(errorDiv);
@@ -52,11 +52,11 @@ function productClearError(element) {
 }
 
 /**
- * @description يقوم بالتحقق الشامل من صحة جميع حقول نموذج إضافة/تعديل المنتج قبل إرساله.
- *   يتحقق من الحقول المطلوبة مثل الصور، الفئات، اسم المنتج، الوصف، السعر، والكمية.
- *   يعرض رسائل خطأ للمستخدم في حالة عدم الصحة ويقوم بالتمرير إلى أول خطأ.
+ * @description Performs comprehensive validation of all product add/edit form fields before submission.
+ *   Checks required fields like images, categories, product name, description, price, and quantity.
+ *   Displays error messages to the user in case of invalidity and scrolls to the first error.
  * @function productValidateForm
- * @returns {boolean} - `true` إذا كان النموذج صالحًا وجاهزًا للإرسال، وإلا `false`.
+ * @returns {boolean} - `true` if form is valid and ready for submission, otherwise `false`.
  * @throws {Error} - If critical DOM elements are missing.
  * @see productShowError
  * @see productClearError
@@ -64,22 +64,22 @@ function productClearError(element) {
 function productValidateForm() {
   const form = document.getElementById('add-product-form');
   const extendedMode = form ? form.dataset.extendedMode : 'unknown';
-  
-  console.log(`%c[Validation] 🔍 Starting validation in mode: ${extendedMode}`, 
+
+  console.log(`%c[Validation] 🔍 Starting validation in mode: ${extendedMode}`,
     'color: teal; font-weight: bold;');
-  
+
   let isValid = true;
   const images = window.productModule ? window.productModule.images : [];
   const uploaderEl = document.getElementById('image-uploader');
-  
+
   console.log('[ProductForm] Images count:', images.length);
   console.log('[ProductForm] Uploader element:', uploaderEl);
 
-  // 1. التحقق من وجود صورة واحدة على الأقل
+  // 1. Check for at least one image
   if (uploaderEl) {
     productClearError(uploaderEl);
   }
-  
+
   if (images.length === 0) {
     console.log('[ProductForm] No images found - showing error');
     if (uploaderEl) {
@@ -92,7 +92,7 @@ function productValidateForm() {
     console.log('[ProductForm] Images validation passed');
   }
 
-  // 2. التحقق من اختيار فئة رئيسية
+  // 2. Check for main category selection
   const mainCategorySelect = document.getElementById('main-category');
   if (mainCategorySelect) {
     productClearError(mainCategorySelect);
@@ -102,7 +102,7 @@ function productValidateForm() {
     }
   }
 
-  // 3. التحقق من اختيار فئة فرعية (إذا كانت ظاهرة ومطلوبة)
+  // 3. Check for sub-category selection (if visible and required)
   const subCategoryGroup = document.getElementById('sub-category-group');
   const subCategorySelect = document.getElementById('sub-category');
   if (subCategorySelect) {
@@ -113,7 +113,7 @@ function productValidateForm() {
     }
   }
 
-  // 4. التحقق من وجود اسم للمنتج
+  // 4. Check for product name
   const productNameInput = document.getElementById('product-name');
   if (productNameInput) {
     productClearError(productNameInput);
@@ -126,7 +126,7 @@ function productValidateForm() {
     }
   }
 
-  // 5. التحقق من وجود وصف للمنتج
+  // 5. Check for product description
   const descriptionTextarea = document.getElementById('product-description');
   if (descriptionTextarea) {
     productClearError(descriptionTextarea);
@@ -139,7 +139,7 @@ function productValidateForm() {
     }
   }
 
-  // 6. التحقق من وجود رسالة من البائع
+  // 6. Check for seller message
   const sellerMessageTextarea = document.getElementById('seller-message');
   if (sellerMessageTextarea) {
     productClearError(sellerMessageTextarea);
@@ -154,7 +154,7 @@ function productValidateForm() {
 
   const mainCategoryId = mainCategorySelect ? mainCategorySelect.value : null;
 
-  // 7. التحقق من الكمية (للفئات غير الخدمات)
+  // 7. Check quantity (for non-service categories)
   const quantityInput = document.getElementById('product-quantity');
   if (quantityInput) {
     productClearError(quantityInput);
@@ -164,7 +164,7 @@ function productValidateForm() {
     }
   }
 
-  // 8. التحقق من السعر (للفئات غير الخدمات)
+  // 8. Check price (for non-service categories)
   const priceInput = document.getElementById('product-price');
   if (priceInput) {
     productClearError(priceInput);
@@ -174,7 +174,7 @@ function productValidateForm() {
     }
   }
 
-  // 9. التحقق من نوع الخدمة (للفئة 6 فقط)
+  // 9. Check service type (only for category 6)
   if (mainCategoryId === SERVICE_CATEGORY_NoPrice_ID) {
     const selectedServiceType = document.querySelector('input[name="serviceType"]:checked');
     const serviceTypeOptions = document.getElementById('service-type-options');
@@ -187,7 +187,7 @@ function productValidateForm() {
     }
   }
 
-  // 10. التحقق من أن السعر الأصلي أكبر من السعر الحالي (إذا تم إدخاله)
+  // 10. Check that original price is greater than current price (if entered)
   const originalPriceInput = document.getElementById('original-price');
   if (originalPriceInput && originalPriceInput.value && priceInput && priceInput.value) {
     const originalPrice = parseFloat(originalPriceInput.value);
@@ -200,14 +200,14 @@ function productValidateForm() {
 
   if (!isValid) {
     console.warn('[ProductForm] Validation failed with errors');
-    
-    // التمرير إلى أول حقل به خطأ
+
+    // Scroll to the first field with error
     setTimeout(() => {
       const firstErrorElement = document.querySelector('.add-product-modal__error-message');
       if (firstErrorElement) {
-        firstErrorElement.scrollIntoView({ 
-          behavior: 'smooth', 
-          block: 'center' 
+        firstErrorElement.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center'
         });
       }
     }, 100);
@@ -219,18 +219,18 @@ function productValidateForm() {
 }
 
 /**
- * @description يقوم بالتحقق السريع من صحة حقل واحد في النموذج، ويُستخدم عادةً في الوقت الفعلي (أثناء الإدخال أو عند فقدان التركيز).
- *   يوفر تغذية راجعة فورية للمستخدم حول صحة البيانات التي يدخلها.
+ * @description Quickly validates a single form field, typically used in real-time (during input or on blur).
+ *   Provides immediate feedback to the user about data validity.
  * @function productQuickValidateField
- * @param {HTMLInputElement|HTMLTextAreaElement} field - عنصر حقل النموذج المراد التحقق منه.
- * @returns {boolean} - `true` إذا كان الحقل صالحًا، وإلا `false`.
+ * @param {HTMLInputElement|HTMLTextAreaElement} field - Form field element to validate.
+ * @returns {boolean} - `true` if field is valid, otherwise `false`.
  * @throws {Error} - If critical DOM elements are missing.
  * @see productShowError
  * @see productClearError
  */
 function productQuickValidateField(field) {
   if (!field) return true;
-  
+
   const fieldId = field.id;
   let isValid = true;
   let errorMessage = '';
@@ -295,20 +295,20 @@ function productQuickValidateField(field) {
 }
 
 /**
- * @description تنظيف النموذج وإعادة الخلفية عند الإغلاق
+ * @description Clean up form and reset background on close
  * @function productCleanupForm
  * @returns {void}
  * @see productResetModalBackground
  */
 function productCleanupForm() {
   console.log('%c[ProductForm] 🧹 Cleaning up form and resetting background', 'color: gray;');
-  
+
   // إعادة تعيين لون الخلفية
   if (typeof productResetModalBackground === 'function') {
     productResetModalBackground();
   }
-  
-  // تنظيف أي حالات أخرى إذا لزم الأمر
+
+  // Cleanup other states if needed
   const form = document.getElementById('add-product-form');
   if (form) {
     delete form.dataset.extendedMode;
@@ -316,7 +316,7 @@ function productCleanupForm() {
     delete form.dataset.productKey;
   }
 }
-// جعل الدوال متاحة عالميًا
+// Make functions globally available
 window.productValidateForm = productValidateForm;
 window.productQuickValidateField = productQuickValidateField;
 window.productCleanupForm = productCleanupForm;

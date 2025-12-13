@@ -6,13 +6,13 @@
 
   .register_password-container input {
     padding-left: 40px;
-    /* مساحة للأيقونة على اليسار (لـ RTL) */
+    /* Space for icon on the left (for RTL) */
   }
 
   .register_toggle-password {
     position: absolute;
     left: 15px;
-    /* لليمين في RTL */
+    /* To the right in RTL */
     top: 50%;
     transform: translateY(-50%);
     cursor: pointer;
@@ -35,17 +35,17 @@
 
   .register_page-wrapper {
     font-family: "Tajawal", sans-serif;
-    /* جديد: خلفية متحركة جذابة */
+    /* NEW: Attractive animated background */
     background-size: 400% 400%;
     animation: gradient-animation 15s ease infinite;
     min-height: 100vh;
     display: flex;
-    /* ✅ تعديل: تغيير طريقة المحاذاة العمودية */
+    /* ✅ Fix: Change vertical alignment method */
     align-items: flex-start;
-    /* محاذاة المحتوى إلى الأعلى */
+    /* Align content to the top */
     justify-content: center;
     padding: 20px;
-    /* ✅ تعديل: إضافة حشو علوي لدفع النموذج للأسفل قليلًا */
+    /* ✅ Fix: Add top padding to push the form down slightly */
 
     box-sizing: border-box;
   }
@@ -53,26 +53,26 @@
   .register_container {
     background-color: var(--bg-color-white);
     width: 100%;
-    /* تعديل: إزالة الارتفاع الأدنى الثابت ليتناسب مع المحتوى */
+    /* Fix: Remove fixed min-height to fit content */
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     padding: 0;
-    /* إزالة الحشو من هذه الحاوية */
+    /* Remove padding from this container */
     background: none;
-    /* جعل هذه الحاوية شفافة */
+    /* Make this container transparent */
   }
 
   .register_container h2 {
     margin-top: 0;
     margin-bottom: 40px;
-    /* زيادة المسافة السفلية */
+    /* Increase bottom margin */
     color: var(--dark-blue);
-    /* لون أغمق وأكثر وضوحًا */
+    /* Darker and clearer color */
     font-size: clamp(28px, 6vw, 36px);
-    /* تكبير حجم الخط */
+    /* Increase font size */
     font-weight: 700;
     text-align: center;
   }
@@ -80,15 +80,15 @@
   .register_container form {
     width: 100%;
     max-width: 420px;
-    /* تعديل العرض الأقصى */
-    /* جديد: تأثير زجاجي شفاف مع استخدام متغيرات */
+    /* Modify max-width */
+    /* NEW: Transparent glass effect using variables */
     background-color: var(--bg-color-glass);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     padding: 40px;
     border-radius: 20px;
-    /* حواف أكثر دائرية */
-    /* جديد: ظل أكثر نعومة وعمقًا */
+    /* More rounded corners */
+    /* NEW: Softer and deeper shadow */
     box-shadow: var(--shadow-interactive);
     border: 1px solid var(--border-color-soft);
   }
@@ -103,25 +103,25 @@
     margin-bottom: 8px;
     font-weight: bold;
     color: var(--dark-blue);
-    /* لون رمادي داكن */
+    /* Dark gray color */
     font-size: 0.9rem;
   }
 
   .register_form-group input {
     width: 100%;
-    /* تعديل: العرض الكامل للحاوية */
+    /* Fix: Full width of the container */
     padding: 14px 45px 14px 15px;
-    /* مساحة للأيقونة على اليمين */
+    /* Space for icon on the right */
     border: 1px solid var(--border-color-input);
-    /* لون إطار أفتح */
+    /* Lighter border color */
     border-radius: 10px;
-    /* زيادة دائرية الحواف */
+    /* Increase border radius */
     box-sizing: border-box;
     font-family: "Tajawal", sans-serif;
     font-size: 16px;
     transition: border-color 0.3s, box-shadow 0.3s;
     background-color: var(--bg-color-white);
-    /* تعديل: خلفية بيضاء نقية */
+    /* Fix: Pure white background */
   }
 
   .register_form-group {
@@ -130,13 +130,13 @@
 
   .register_form-group .fa-phone,
   .register_form-group .fa-user {
-    /* تعديل: تحسين محاذاة الأيقونة */
+    /* Fix: Improve icon alignment */
     position: absolute;
     top: 50%;
     right: 15px;
-    /* لليمين في RTL */
+    /* To the right in RTL */
     transform: translateY(calc(-50% + 14px));
-    /* ضبط المحاذاة العمودية بدقة */
+    /* Precise vertical alignment adjustment */
     color: var(--icon-color);
     cursor: pointer;
   }
@@ -149,22 +149,22 @@
     margin-top: 10px;
     border: none;
     color: var(--bg-color-white);
-    /* تعديل: استخدام متغير اللون الأساسي للخلفية */
+    /* Fix: Use primary color variable for background */
     background-color: var(--primary-color);
-    /* تم استبدال التدرج اللوني بمتغير موحد */
+    /* Gradient replaced with unified variable */
     box-shadow: var(--shadow-interactive),
       inset 0 1px 0 rgba(255, 255, 255, 0.2);
     transition: transform 0.2s, box-shadow 0.2s;
     cursor: pointer;
     border-radius: 10px;
-    /* ✅ جديد: إضافة حواف دائرية للزر */
+    /* ✅ NEW: Add rounded corners to button */
   }
 
   .register_form-footer {
     margin-top: 25px;
     font-size: 14px;
     text-align: center;
-    /* توسيط النص والروابط بالداخل */
+    /* Center text and links inside */
   }
 
   .register_error-message {
@@ -172,7 +172,7 @@
     font-size: 12px;
     margin-top: 5px;
     min-height: 15px;
-    /* حجز مساحة لمنع اهتزاز التصميم */
+    /* Reserve space to prevent layout shifts */
   }
 </style>
 

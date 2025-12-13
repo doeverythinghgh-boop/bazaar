@@ -76,7 +76,7 @@ async function performActualConnectionCheck() {
 
     // 🔹 Connection restored
     if (!isConnectedCache) {
-      console.log("%c[الشبكة] عاد الاتصال بالإنترنت.", "color: green;");
+      console.log("%c[Network] تم استعادة الاتصال بالإنترنت.", "color: green;");
     }
 
     isConnectedCache = true;
@@ -92,7 +92,7 @@ async function performActualConnectionCheck() {
   } catch (error) {
     // 🔻 Connection lost
     if (isConnectedCache) {
-      console.warn("%c[الشبكة] تم فقد الاتصال بالإنترنت.", "color: red;");
+      console.warn("%c[Network] انقطع الاتصال بالإنترنت.", "color: red;");
     }
 
     isConnectedCache = false;
@@ -105,7 +105,7 @@ async function performActualConnectionCheck() {
         html: `
     <div style="display: grid; align-items:center;justify-items: center;margin:0;padding:0;">
       <i class="fas fa-wifi-slash" style=""></i>
-      <span style="font-size:14px;">الاتصال بالانترنت ضعيف او منقطع</span>
+      <span style="font-size:14px;">اتصال الإنترنت ضعيف أو مقطوع</span>
     </div>
   `,
         showConfirmButton: false,
@@ -210,7 +210,7 @@ async function apiFetch(endpoint, options = {}) {
     }
     return data;
   } catch (error) {
-    return { error: `فشل الاتصال بالخادم: ${error.message}` };
+    return { error: `فشل الاتصال: ${error.message}` };
   }
 }
 

@@ -1,20 +1,20 @@
 /**
  * @file js/tools.js
- * @description يوفر دوال مساعدة عامة لتنسيق النصوص والأرقام، إدارة الجلسات، التفاعل مع التخزين المحلي، وتشغيل التنبيهات.
+ * @description Provides general helper functions for text and number formatting, session management, local storage interaction, and triggering alerts.
  */
 
 
 
 /**
- * @description تتحقق من وجود جلسة مسؤول أصلية (originalAdminSession) في التخزين المحلي.
- *   إذا وجدت، تعرض علامة مائية (Watermark) تشير إلى أن المسؤول يتصفح بصفة مستخدم آخر.
+ * @description Checks for an original admin session (originalAdminSession) in local storage.
+ *   If found, displays a watermark indicating that the admin is browsing as another user.
  * @function checkImpersonationMode
  * @returns {void}
  */
 function checkImpersonationMode() {
   const originalAdminSession = localStorage.getItem("originalAdminSession");
   if (originalAdminSession) {
-    // إذا وجدت، يتم إنشاء عنصر HTML للعلامة المائية وإضافته إلى الصفحة.
+    // If found, create HTML element for watermark and add to page.
     const watermark = document.createElement("div");
     watermark.className = "admin-watermark";
     watermark.innerHTML = `
@@ -31,56 +31,56 @@ function checkImpersonationMode() {
 }
 
 /**
- * @description يحول الأرقام الهندية (٠-٩) إلى أرقام إنجليزية (0-9) في سلسلة نصية.
- *   هذه الدالة مفيدة لمعالجة مدخلات المستخدم التي قد تحتوي على أرقام بأي من الصيغتين.
+ * @description Converts Hindi digits (0-9) to English digits (0-9) in a string.
+ *   Useful for processing user inputs that may contain digits in either format.
  * @function normalizeDigits
- * @param {string} str - السلسلة النصية التي قد تحتوي على أرقام.
- * @returns {string} - السلسلة النصية بعد تحويل الأرقام إلى الصيغة الإنجليزية.
+ * @param {string} str - String that may contain digits.
+ * @returns {string} - String after converting digits to English format.
  */
 function normalizeDigits(str) {
   if (!str) return "";
-  const easternArabicNumerals = /[\u0660-\u0669]/g; // نطاق الأرقام العربية الشرقية (الهندية)
+  const easternArabicNumerals = /[\u0660-\u0669]/g; // Eastern Arabic (Hindi) numerals range
   return str.replace(easternArabicNumerals, (d) => d.charCodeAt(0) - 0x0660);
 }
 
 /**
- * @description يقوم بتنقيح وتوحيد النص العربي عن طريق إزالة علامات التشكيل وتوحيد أشكال الحروف (الهمزات والتاء المربوطة).
- *   مفيد جدًا لعمليات البحث والمقارنة لضمان تطابق النصوص بغض النظر عن التشكيل.
+ * @description Sanitizes and normalizes Arabic text by removing diacritics and unifying character forms (Hamzas and Taa Marbuta).
+ *   Very useful for search and comparison operations to ensure text matching regardless of diacritics.
  * @function normalizeArabicText
- * @param {string} text - النص العربي المراد تنقيحه.
- * @returns {string} - النص بعد إزالة التشكيل وتوحيد الحروف.
+ * @param {string} text - Arabic text to sanitize.
+ * @returns {string} - Text after removing diacritics and unifying characters.
  */
 function normalizeArabicText(text) {
   if (!text) return "";
 
-  // إزالة التشكيل
+  // Remove diacritics
   text = text.replace(/[\u064B-\u0652]/g, "");
 
-  // توحيد الهمزات (أ، إ، آ) إلى ا
+  // Unify Hamzas (أ، إ، آ) to ا
   text = text.replace(/[آأإ]/g, "ا");
 
-  // تحويل التاء المربوطة (ة) إلى ه
+  // Convert Taa Marbuta (ة) to Ha (ه)
   text = text.replace(/ة/g, "ه");
 
-  // توحيد حرف الياء (ي / ى) إلى ي
+  // Unify Ya (ي / ى) to ي
   text = text.replace(/[ى]/g, "ي");
 
-  // إزالة المد (ـــ)
+  // Remove Tatweel (ـــ)
   text = text.replace(/ـ+/g, "");
 
-  // إزالة المسافات المكررة
+  // Remove duplicate spaces
   text = text.replace(/\s+/g, " ").trim();
 
   return text;
 }
 
 /**
- * @description يدمج معرف الحالة (status ID) مع التاريخ والوقت الحاليين في سلسلة نصية واحدة.
- *   التنسيق الناتج: "ID#TIMESTAMP" (مثال: "1#2023-10-27T10:00:00.000Z").
- *   هذه الدالة تُستخدم قبل إرسال تحديثات الحالة إلى الخادم.
+ * @description Combines status ID with current date and time into a single string.
+ *   Result format: "ID#TIMESTAMP" (e.g., "1#2023-10-27T10:00:00.000Z").
+ *   This function is used before sending status updates to the server.
  * @function composeOrderStatus
- * @param {number} statusId - المعرف الرقمي للحالة الجديدة.
- * @returns {string} - السلسلة النصية المدمجة.
+ * @param {number} statusId - Numeric ID of the new status.
+ * @returns {string} - Combined string.
  */
 function composeOrderStatus(statusId) {
   const timestamp = new Date().toISOString();
@@ -88,15 +88,15 @@ function composeOrderStatus(statusId) {
 }
 
 /**
- * @description يفكك السلسلة النصية لحالة الطلب (القادمة من قاعدة البيانات) إلى كائن منظم.
- *   يتعامل مع الحالات التي تكون فيها القيمة غير صالحة أو قديمة (لا تحتوي على #).
+ * @description Parses the order status string (from database) into a structured object.
+ *   Handles cases where the value is invalid or legacy (does not contain #).
  * @function parseOrderStatus
- * @param {string | null | undefined} statusValue - القيمة المخزنة في عمود `order_status`.
- * @returns {{statusId: number, timestamp: string | null}} - كائن يحتوي على معرف الحالة والتاريخ.
+ * @param {string | null | undefined} statusValue - Value stored in `order_status` column.
+ * @returns {{statusId: number, timestamp: string | null}} - Object containing status ID and timestamp.
  */
 function parseOrderStatus(statusValue) {
   if (!statusValue || typeof statusValue !== "string") {
-    return { statusId: -1, timestamp: null }; // حالة غير معروفة أو قيمة فارغة
+    return { statusId: -1, timestamp: null }; // Unknown status or empty value
   }
 
   if (statusValue.includes("#")) {
@@ -104,17 +104,17 @@ function parseOrderStatus(statusValue) {
     return { statusId: parseInt(idStr, 10), timestamp: timestamp };
   }
 
-  // للتعامل مع البيانات القديمة التي قد تكون مجرد رقم أو نص
-  return { statusId: -1, timestamp: null }; // افترض أنها حالة غير معروفة إذا لم تكن بالتنسيق الجديد
+  // Handle legacy data that might be just a number or text
+  return { statusId: -1, timestamp: null }; // Assume unknown status if not in new format
 }
 
 /**
- * @description يعالج كائن طلب فردي لإضافة تفاصيل الحالة المنسقة إليه.
- *   هذه دالة مساعدة مركزية تُستخدم في طبقة الاتصال (connect1.js) لضمان
- *   أن جميع الطلبات القادمة من API تحتوي على `status_details` و `status_timestamp`.
+ * @description Processes a single order object to add formatted status details to it.
+ *   This is a central helper function used in the connection layer (connect1.js) to ensure
+ *   that all orders coming from API contain `status_details` and `status_timestamp`.
  * @function processOrderStatus
- * @param {object} order - كائن الطلب الأصلي الذي يحتوي على `order_status`.
- * @returns {object} - كائن الطلب بعد إضافة الحقول المنسقة.
+ * @param {object} order - Original order object containing `order_status`.
+ * @returns {object} - Order object after adding formatted fields.
  * @see parseOrderStatus
  * @see ORDER_STATUSES
  */
@@ -134,38 +134,38 @@ function processOrderStatus(order) {
 
 /**
  * @function showError
- * @description تعرض رسالة خطأ تحت حقل الإدخال المحدد وتضيف فئة خطأ إليه.
- * @param {HTMLInputElement} input - عنصر الإدخال الذي حدث فيه الخطأ.
- * @param {string} message - رسالة الخطأ المراد عرضها.
+ * @description Displays an error message below the specified input field and adds an error class to it.
+ * @param {HTMLInputElement} input - Input element where the error occurred.
+ * @param {string} message - Error message to display.
  * @returns {void}
  */
 const showError = (input, message) => {
-  // العثور على العنصر المخصص لعرض رسالة الخطأ.
+  // Find the element dedicated to displaying the error message.
   const errorDiv = document.getElementById(`${input.id}-error`);
-  // إضافة فئة CSS لتغيير نمط حقل الإدخال (مثل تغيير لون الحدود إلى الأحمر).
+  // Add CSS class to change input style (e.g., change border color to red).
   input.classList.add("input-error");
-  // تعيين نص رسالة الخطأ.
+  // Set error message text.
   errorDiv.textContent = message;
 };
 
 /**
  * @function clearError
- * @description تزيل رسالة الخطأ من تحت حقل الإدخال المحدد وتزيل فئة الخطأ منه.
- * @param {HTMLInputElement} input - عنصر الإدخال لتنظيف الخطأ منه.
+ * @description Removes the error message from below the specified input field and removes the error class from it.
+ * @param {HTMLInputElement} input - Input element to clear error from.
  * @returns {void}
  */
 const clearError = (input) => {
-  // العثور على عنصر رسالة الخطأ.
+  // Find error message element.
   const errorDiv = document.getElementById(`${input.id}-error`);
-  // إزالة فئة الخطأ من حقل الإدخال.
+  // Remove error class from input field.
   input.classList.remove("input-error");
-  // تفريغ نص رسالة الخطأ.
+  // Clear error message text.
   errorDiv.textContent = "";
 };
 /**
- * @description تقوم بتحديث نص تسجيل الدخول في الشريط العلوي للصفحة.
- *   إذا كان هناك مستخدم مسجل، تعرض اسمه (مقتطعاً إذا كان طويلاً).
- *   إذا لم يكن، تعرض "تسجيل الدخول".
+ * @description Updates login text in the top bar of the page.
+ *   If a user is logged in, displays their name (truncated if long).
+ *   If not, displays "Login".
  * @function setUserNameInIndexBar
  * @returns {void}
  */
@@ -186,17 +186,17 @@ function setUserNameInIndexBar() {
   }
 }
 /**
- * @description تمسح جميع البيانات المخزنة محلياً في المتصفح والمتعلقة بالتطبيق،
- *   بما في ذلك `localStorage`، `sessionStorage`، وإهمال قواعد بيانات `IndexedDB`.
- *   تستخدم عادة عند تسجيل الخروج الكامل أو لتنظيف التطبيق.
+ * @description Clears all locally stored browser data related to the application,
+ *   including `localStorage`, `sessionStorage`, and wiping `IndexedDB` databases.
+ *   Typically used for full logout or app cleanup.
  * @function clearAllBrowserData
  * @async
- * @returns {Promise<boolean>} - وعد (Promise) يعود بـ `true` عند الانتهاء.
+ * @returns {Promise<boolean>} - Promise returning `true` on completion.
  * @throws {Error} - If there's an error clearing localStorage, sessionStorage, or IndexedDB.
  */
 async function clearAllBrowserData() {
   // -----------------------------
-  // 1) مسح localStorage
+  // 1) Clear localStorage
   // -----------------------------
   try {
     localStorage.clear();
@@ -205,7 +205,7 @@ async function clearAllBrowserData() {
   }
 
   // -----------------------------
-  // 2) مسح sessionStorage
+  // 2) Clear sessionStorage
   // -----------------------------
   try {
     sessionStorage.clear();
@@ -216,7 +216,7 @@ async function clearAllBrowserData() {
 
 
   // -----------------------------
-  // 3) مسح IndexedDB
+  // 3) Clear IndexedDB
   // -----------------------------
   try {
     if ("indexedDB" in window) {
@@ -240,7 +240,7 @@ async function clearAllBrowserData() {
 }
 
 /**
- * @description تعرض نافذة الإشعارات المنبثقة باستخدام `mainLoader`.
+ * @description Displays notifications modal using `mainLoader`.
  * @function showNotificationsModal
  * @returns {void}
  * @deprecated - This function is commented out in the code and appears unused.
@@ -250,7 +250,7 @@ function showNotificationsModal() {
 }
 
 
-// متغير عام لإعادة استخدام AudioContext
+// Global variable to reuse AudioContext
 /**
  * @type {AudioContext|null}
  * @description Global variable to store and reuse the AudioContext instance for notification sounds.
@@ -258,18 +258,18 @@ function showNotificationsModal() {
 let suzeAudioContext = null;
 
 /**
- * @description تشغيل صوت تنبيه باستخدام Web Audio API
+ * @description Play notification sound using Web Audio API
  * @returns {void}
  * @throws {Error} - If the Web Audio API encounters an error during sound playback.
  */
 function playNotificationSound() {
   try {
-    // إنشاء AudioContext عند الحاجة فقط
+    // Create AudioContext only when needed
     if (!suzeAudioContext) {
       suzeAudioContext = new (window.AudioContext || window.webkitAudioContext)();
     }
 
-    // إصلاح حالة إذا كان المتصفح أوقف الـ AudioContext
+    // Fix if browser suspended AudioContext
     if (suzeAudioContext.state === "suspended") {
       suzeAudioContext.resume();
     }
@@ -304,31 +304,31 @@ const pageSnapshots = {};
  */
 
 /**
- * @description يقوم بجلب محتوى صفحة HTML وتخزينه مؤقتًا، ثم إدراجه في حاوية محددة.
- *   يضمن عدم تحميل نفس الصفحة مرارًا وتكرارًا من الشبكة إذا كانت مخزنة بالفعل.
- *   كما يعيد تشغيل السكربتات الموجودة في الصفحة المحملة.
+ * @description Fetches HTML page content and caches it, then inserts it into a specified container.
+ *   Ensures the same page is not loaded repeatedly from network if already cached.
+ *   Also re-executes scripts found in the loaded page.
  * @function insertUniqueSnapshot
  * @async
- * @param {string} pageUrl - رابط الصفحة المراد جلبها.
- * @param {string} containerId - معرف الحاوية التي سيتم إدراج المحتوى فيها.
+ * @param {string} pageUrl - URL of the page to fetch.
+ * @param {string} containerId - ID of the container to insert content into.
  * @returns {Promise<void>}
  * @throws {Error} - If the page fails to load or the container element is not found.
  */
 async function insertUniqueSnapshot(pageUrl, containerId) {
   try {
-    // حفظ النسخة إذا لم تكن موجودة
+    // Save snapshot if not exists
     if (!pageSnapshots[pageUrl]) {
       const response = await fetch(pageUrl, { cache: "no-store" });
       if (!response.ok) throw new Error("فشل تحميل: " + pageUrl);
       pageSnapshots[pageUrl] = await response.text();
     }
 
-    // إزالة النسخ السابقة من DOM
+    // Remove previous copies from DOM
     document
       .querySelectorAll(`[data-page-url="${pageUrl}"]`)
       .forEach((el) => el.remove());
 
-    // إدراج النسخة
+    // Insert snapshot
     const container = document.getElementById(containerId);
     if (!container) throw new Error("لا يوجد عنصر: " + containerId);
 
@@ -336,27 +336,27 @@ async function insertUniqueSnapshot(pageUrl, containerId) {
     container.innerHTML = pageSnapshots[pageUrl];
     container.setAttribute("data-page-url", pageUrl);
 
-    // تشغيل جميع السكربتات
+    // Run all scripts
     const scripts = container.querySelectorAll("script");
 
     scripts.forEach((oldScript) => {
       const newScript = document.createElement("script");
 
-      // نسخ attributes
+      // Copy attributes
       for (const attr of oldScript.attributes) {
         newScript.setAttribute(attr.name, attr.value);
       }
 
-      // لو السكربت داخلي
+      // If inline script
       if (!oldScript.src) {
         let code = oldScript.textContent.trim();
 
-        // تغليف تلقائي داخل IIFE لمنع إعادة تعريف المتغيرات
+        // Auto-wrap in IIFE to prevent variable re-definition
         code = `(function(){\n${code}\n})();`;
 
         newScript.textContent = code;
       } else {
-        // سكربت خارجي → نضيف وسوم تمنع التكرار
+        // External script -> add tags to prevent duplication
         const uniqueSrc = oldScript.src + "?v=" + Date.now();
         newScript.src = uniqueSrc;
 
@@ -372,13 +372,13 @@ async function insertUniqueSnapshot(pageUrl, containerId) {
 }
 
 /**
- * دالة تقوم بتحميل جزء HTML من ملف خارجي ودمجه داخل صفحة أخرى،
- * مع إعادة تشغيل السكربتات بداخله بشكل كامل،
- * وتنتظر فترة زمنية بعد اكتمال كل شيء.
+ * Function that loads an HTML fragment from an external file and merges it into another page,
+ * fully re-executing scripts within it,
+ * and waits for a period after everything completes.
  *
- * @param {string} pageUrl - رابط الملف الخارجي المراد تحميله
- * @param {string} containerId - معرف العنصر الذي سيحتوي على المحتوى
- * @param {number} waitMs - فترة الانتظار بعد اكتمال تحميل وتشغيل كل شيء
+ * @param {string} pageUrl - URL of the external file to load
+ * @param {string} containerId - ID of the element to contain the content
+ * @param {number} waitMs - Wait period after loading and executing everything
  * @returns {Promise<void>}
  * @async
  * @throws {Error} - If fetching HTML fails, the container element is not found, or script execution encounters an error.
@@ -386,7 +386,7 @@ async function insertUniqueSnapshot(pageUrl, containerId) {
 async function loader(pageUrl, containerId, waitMs = 300) {
   try {
     // ================================
-    // 1) جلب الملف عبر fetch
+    // 1) Fetch file via fetch
     // ================================
     let response, html;
     try {
@@ -399,7 +399,7 @@ async function loader(pageUrl, containerId, waitMs = 300) {
     }
 
     // ================================
-    // 2) إدراج المحتوى داخل العنصر الهدف
+    // 2) Insert content into target element
     // ================================
     let container;
     try {
@@ -407,7 +407,7 @@ async function loader(pageUrl, containerId, waitMs = 300) {
       if (!container)
         throw new Error("لم يتم العثور على العنصر: " + containerId);
 
-      // تفريغ المحتوى لضمان عدم بقاء سكربتات قديمة
+      // Clear content to ensure no old scripts remain
       container.replaceChildren();
 
       container.innerHTML = html;
@@ -417,7 +417,7 @@ async function loader(pageUrl, containerId, waitMs = 300) {
     }
 
     // ================================
-    // 3) استخراج جميع السكربتات وتشغيلها من جديد
+    // 3) Extract and re-run all scripts
     // ================================
     try {
       const scripts = [...container.querySelectorAll("script")];
@@ -425,21 +425,21 @@ async function loader(pageUrl, containerId, waitMs = 300) {
       for (const oldScript of scripts) {
         const newScript = document.createElement("script");
 
-        // نقل النوع (مهم للـ ES Modules)
+        // Transfer type (important for ES Modules)
         if (oldScript.type) newScript.type = oldScript.type;
 
-        // لو السكربت خارجي
+        // If external script
         if (oldScript.src) {
           newScript.src = oldScript.src;
-          newScript.async = oldScript.async || false; // الحفاظ على async
+          newScript.async = oldScript.async || false; // Maintain async
         }
 
-        // لو السكربت داخلي
+        // If inline script
         if (oldScript.innerHTML.trim() !== "") {
           newScript.textContent = oldScript.innerHTML;
         }
 
-        // نقل خصائص السكربت (dataset, attributes)
+        // Transfer script attributes (dataset, attributes)
         for (const attr of oldScript.attributes) {
           if (attr.name !== "src" && attr.name !== "type")
             newScript.setAttribute(attr.name, attr.value);
@@ -453,7 +453,7 @@ async function loader(pageUrl, containerId, waitMs = 300) {
     }
 
     // ================================
-    // 4) الانتظار بعد اكتمال كل شيء
+    // 4) Wait after everything completes
     // ================================
     try {
       await new Promise((resolve) => setTimeout(resolve, waitMs));

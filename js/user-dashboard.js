@@ -1,7 +1,7 @@
 
 /**
- * @description يعالج حدث النقر على زر لوحة تحكم المسؤول.
- *   يقوم بتحميل صفحة لوحة التحكم في الحاوية الرئيسية.
+ * @description Handles the click event on the Admin Panel button.
+ *   Loads the admin panel page into the main container.
  * @function handleAdminPanelClick
  * @returns {void}
  * @throws {Error} - If an error occurs during `mainLoader` execution or DOM manipulation.
@@ -10,11 +10,11 @@
  */
 function handleAdminPanelClick() {
   try {
-    // [خطوة 1] تسجيل رسالة في الكونسول لتتبع الحدث.
+    // [Step 1] Log message to console to track event.
     console.log(
       "[Dashboard] تم النقر على زر لوحة تحكم المسؤول. جاري تحميل الصفحة..."
     );
-    // [خطوة 2] استخدام `mainLoader` لتحميل صفحة لوحة تحكم المسؤول في الحاوية المخصصة.
+    // [Step 2] Use `mainLoader` to load admin panel page into designated container.
 
     Swal.fire({
       title: "اختر وجهتك",
@@ -52,7 +52,7 @@ function handleAdminPanelClick() {
       }
     });
 
-    // ربط الأحداث للأزرار المخصصة
+    // Bind events for custom buttons
     document.getElementById("swal-users-btn").addEventListener("click", () => {
       mainLoader(
         "pages/ADMIN/adminPanel.html",
@@ -79,8 +79,8 @@ function handleAdminPanelClick() {
 
     document
       .getElementById("swal-notifications-btn")
-      .addEventListener("click",async () => {
-    await    mainLoader(
+      .addEventListener("click", async () => {
+        await mainLoader(
           "notification/page/settings.html",
           "index-user-container",
           0,
@@ -98,9 +98,8 @@ function handleAdminPanelClick() {
 
 
 /**
- * @description تحديث واجهة المستخدم لتعكس حالة تسجيل الدخول،
- *   وتخصيص الأزرار والإجراءات المتاحة بناءً على دور المستخدم (ضيف، عميل، بائع، مسؤول).
- *   مع تخصيص الأزرار والإجراءات بناءً على دور المستخدم (ضيف، عميل، بائع، مسؤول).
+ * @description Updates the user interface to reflect login status,
+ *   and customizes available buttons and actions based on user role (guest, customer, seller, admin).
  * @function updateViewForLoggedInUser
  * @param {object|null} user - كائن المستخدم المسجل دخوله. يمكن أن يكون `null` إذا لم يتم العثور على مستخدم.
  * @param {string} userSession.username - اسم المستخدم.
@@ -115,20 +114,20 @@ function handleAdminPanelClick() {
  * @see userSession
  */
 function updateViewForLoggedInUser() {
-  // [خطوة 1] التحقق من وجود جلسة مستخدم. إذا لم يكن هناك مستخدم مسجل، تتوقف الدالة.
+  // [Step 1] Check for user session. If no user logged in, function stops.
   if (!userSession) {
-    // لا يتم اتخاذ أي إجراء، حيث من المفترض أن يتم التعامل مع هذا السيناريو في مكان آخر (مثل إعادة التوجيه).
+    // No action taken, as this scenario should be handled elsewhere (e.g., redirection).
     return;
   }
 
-  // [خطوة 2] تحديث رسالة الترحيب لعرض اسم المستخدم المسجل دخوله.
+  // [Step 2] Update welcome message to display logged-in username.
   document.getElementById(
     "dash-welcome-message"
   ).textContent = `أهلاً بك، ${userSession.username}`;
 
-  // [خطوة 3] التحقق مما إذا كان المستخدم هو "ضيف".
+  // [Step 3] Check if user is a "guest".
   if (userSession.is_guest) {
-    // [خطوة 3.1] إذا كان ضيفًا، يتم إخفاء الأزرار التي لا يملك صلاحية الوصول إليها.
+    // [Step 3.1] If guest, hide buttons they don't have access to.
     [
       "dash-edit-profile-btn",
       "dash-admin-panel-btn",
@@ -136,9 +135,9 @@ function updateViewForLoggedInUser() {
       "dash-view-sales-movement-btn",
     ].forEach((id) => {
       const btn = document.getElementById(id);
-      if (btn) btn.style.display = "none"; // إخفاء الزر إذا كان موجودًا
+      if (btn) btn.style.display = "none"; // Hide button if exists
     });
-    // [خطوة 3.2] ربط حدث النقر على زر "تسجيل الخروج" بدالة `logout`.
+    // [Step 3.2] Bind "Logout" button click event to `logout` function.
     document
       .getElementById("dash-logout-btn-alt")
       .addEventListener("click", () => {
@@ -146,51 +145,51 @@ function updateViewForLoggedInUser() {
         if (typeof logout === "function") logout();
       });
   } else {
-    // [خطوة 4] منطق العرض للمستخدم المسجل (غير الضيف).
+    // [Step 4] Display logic for logged-in user (non-guest).
 
-    // [خطوة 4.1] التحقق من صلاحيات البائع:
-    // إذا كان المستخدم بائعًا (is_seller === 1) أو مسؤولاً، فإنه يرى أزرار إدارة المنتجات (التي تكون ظاهرة افتراضيًا).
+    // [Step 4.1] Check seller permissions:
+    // If user is seller (is_seller === 1) or admin, they see product management buttons (visible by default).
     if (
       userSession.is_seller === 1 ||
       (typeof adminPhoneNumbers !== "undefined" &&
         adminPhoneNumbers.includes(userSession.phone))
     ) {
-      // لا يوجد إجراء مطلوب هنا لأن الأزرار تكون ظاهرة بشكل افتراضي في HTML.
+      // No action required here as buttons are visible by default in HTML.
     }
 
-    // [خطوة 4.2] التحقق من صلاحيات المسؤول:
-    // يتم إظهار زر لوحة تحكم المسؤول إذا كان رقم هاتف المستخدم مدرجًا في قائمة المسؤولين،
-    // أو إذا كان هناك جلسة مسؤول أصلية مخزنة (وضع انتحال الشخصية).
+    // [Step 4.2] Check admin permissions:
+    // Admin Panel button is shown if user phone is in admin list,
+    // or if an original admin session exists (impersonation mode).
     if (
       (typeof adminPhoneNumbers !== "undefined" &&
         adminPhoneNumbers.includes(userSession.phone)) ||
       localStorage.getItem("originalAdminSession")
     ) {
-      // ربط حدث النقر على زر لوحة التحكم بالدالة الخاصة به.
+      // Bind click event to admin panel button.
       const adminBtn = document.getElementById("dash-admin-panel-btn");
       if (adminBtn) adminBtn.addEventListener("click", handleAdminPanelClick);
     } else {
-      // إذا لم يكن المستخدم مسؤولاً، يتم إخفاء زر لوحة التحكم.
+      // If user is not admin, hide admin panel button.
       const adminBtn = document.getElementById("dash-admin-panel-btn");
       if (adminBtn) adminBtn.style.display = "none";
     }
 
-    // [خطوة 4.3] التحقق من صلاحيات عرض التقارير:
-    // إذا كان المستخدم بائعًا (1)، أو موظف توصيل (2)، أو مسؤولاً، فإنه يرى زر التقارير.
+    // [Step 4.3] Check reports viewing permissions:
+    // If user is seller (1), delivery (2), or admin, they see reports button.
     if (
       userSession.is_seller === 1 ||
       userSession.is_seller === 2 ||
       (typeof adminPhoneNumbers !== "undefined" &&
         adminPhoneNumbers.includes(userSession.phone))
     ) {
-      // لا يوجد إجراء مطلوب هنا لأن الزر ظاهر بشكل افتراضي.
+      // No action required here as button is visible by default.
     } else {
-      // إذا لم يكن مؤهلاً، يتم إخفاء الزر (الكود معطل حاليًا).
+      // If not eligible, hide button (code currently disabled).
       ///    document.getElementById("dash-view-sales-movement-btn").style.display =
       ///    "none";
     }
-    // [خطوة 5] ربط الأحداث العامة للأزرار لجميع المستخدمين المسجلين.
-    // [5.1] ربط زر تسجيل الخروج.
+    // [Step 5] Bind general button events for all registered users.
+    // [5.1] Bind logout button.
     document
       .getElementById("dash-logout-btn-alt")
       .addEventListener("click", () => {
@@ -199,7 +198,7 @@ function updateViewForLoggedInUser() {
         logout();
       });
 
-    // [5.2] ربط زر "تعديل الملف الشخصي" لتحميل صفحة التعديل.
+    // [5.2] Bind "Edit Profile" button to load edit page.
     document
       .getElementById("dash-edit-profile-btn")
 
@@ -216,7 +215,7 @@ function updateViewForLoggedInUser() {
   }
 }
 
-// [خطوة أخيرة] استدعاء الدالة فور تحميل الملف لتحديث الواجهة بناءً على حالة المستخدم الحالية.
+// [Final Step] Call function immediately upon file load to update view based on current user state.
 /**
  * @description Automatically initializes the user dashboard view when the script loads.
  * @function initializeDashboardView

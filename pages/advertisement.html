@@ -124,7 +124,7 @@
     transform: translateY(-50%) scale(0.95);
   }
 </style>
-<!-- ✅ جديد: حاوية شريط الإعلانات -->
+<!-- ✅ NEW: Advertisement Banner Container -->
 <div id="advertisement-section" class="ad-slider-container">
   <p class="no-ads-message" style="display: none">لا توجد إعلانات حالياً تاكد من الاتصال بالانترنت</p>
   <div class="ad-slider-track"></div>
@@ -140,9 +140,9 @@
 
 
   /**
-   * @description يجلب آخر تاريخ تحديث مسجل في جدول `updates` من واجهة برمجة التطبيقات (API).
-   * @returns {Promise<Object|null>} - وعد (Promise) يحتوي على كائن يتضمن تاريخ التحديث (`{ datetime: '...' }`)، أو `null` في حالة الفشل أو عدم وجود تحديثات.
-   * @throws {Error} - إذا فشل جلب البيانات من API.
+   * @description Fetches the latest update date recorded in the `updates` table from the API.
+   * @returns {Promise<Object|null>} - Promise containing an object with date (`{ datetime: '...' }`), or `null` on failure.
+   * @throws {Error} - If fetching data from API fails.
    */
   async function getLatestUpdate() {
     try {
@@ -159,12 +159,12 @@
   }
 
   /**
-   * @description تهيئة وعرض موديول الإعلانات.
-   *   يقوم بجلب الصور الإعلانية من الذاكرة المؤقتة المحلية أو من الخادم، ثم يقوم ببناء وعرض شريط تمرير (Slider) للإعلانات.
-   *   يدعم آلية التخزين المؤقت لتجنب جلب البيانات بشكل متكرر.
-   * @param {HTMLElement} container - عنصر DOM الذي سيحتوي على شريط الإعلانات.
-   * @param {boolean} [forceRefresh=false] - إذا كان `true`، سيتم تجاوز الذاكرة المؤقتة وجلب الإعلانات من الخادم مباشرة.
-   * @returns {Promise<void>} - وعد (Promise) لا يُرجع قيمة عند الاكتمال.
+   * @description Initializes and displays the advertisement module.
+   *   Fetches ad images from local cache or server, then builds and displays an ad slider.
+   *   Supports caching mechanism to avoid frequent fetching.
+   * @param {HTMLElement} container - DOM element to contain the ad slider.
+   * @param {boolean} [forceRefresh=false] - If `true`, bypasses cache and fetches ads directly from server.
+   * @returns {Promise<void>} - Promise returning no value on completion.
    * @see getLatestUpdate
    * @see buildSlider
    */
@@ -176,28 +176,28 @@
 
     console.log('%c[AdverModule] Initializing...', 'color: #20c997');
 
-    // --- ✅ جديد: منطق التخزين المؤقت (Caching) ---
+    // --- ✅ NEW: Caching Logic ---
     const CACHE_KEY_IMAGES = 'adver_images_cache';
     const CACHE_KEY_TIMESTAMP = 'adver_timestamp_cache';
-    const CACHE_KEY_LAST_CHECK = 'adver_last_check_timestamp'; // ✅ جديد: لتخزين وقت آخر فحص
-    // 🔴 ضبط مدة الكاش: هنا نحدد المدة التي يثق فيها المتصفح بالبيانات المخزنة دون سؤال السيرفر.
-    // تم التعديل إلى 1 ساعة (1 * 60 * 60 * 1000) بدلاً من 24 ساعة، لزيادة دقة التحديثات.
-    const CHECK_INTERVAL = 1 * 60 * 60 * 1000; // 1 ساعة بالمللي ثانية
+    const CACHE_KEY_LAST_CHECK = 'adver_last_check_timestamp'; // ✅ NEW: Store last check time
+    // 🔴 Set cache duration: Here we define how long the browser trusts cached data without asking server.
+    // Changed to 1 hour (1 * 60 * 60 * 1000) instead of 24 hours, to increase update accuracy.
+    const CHECK_INTERVAL = 1 * 60 * 60 * 1000; // 1 hour in milliseconds
 
     const cachedTimestamp = localStorage.getItem(CACHE_KEY_TIMESTAMP);
     const cachedImages = JSON.parse(localStorage.getItem(CACHE_KEY_IMAGES));
     const lastCheckTimestamp = localStorage.getItem(CACHE_KEY_LAST_CHECK);
 
-    // ✅ التحقق: هل مرت ساعة منذ آخر فحص؟ وهل لدينا صور مخزنة؟
-    // إذا كانت الإجابة نعم (لم تمر ساعة ولدينا صور)، نعرض الصور المخزنة فوراً ونوقف الاتصال.
+    // ✅ Check: Has 1 hour passed since last check? And do we have cached images?
+    // If yes (less than 1 hour and have images), show cached images immediately and stop connection.
     if (!forceRefresh && lastCheckTimestamp && (Date.now() - lastCheckTimestamp < CHECK_INTERVAL) && cachedImages && cachedImages.length > 0) {
       console.log('%c[AdverModule] Loading ads from cache (within 1h interval).', 'color: green; font-weight: bold;');
       buildSlider(container, cachedImages);
-      return; // توقف هنا، لا داعي لإزعاج السيرفر
+      return; // Stop here, no need to bother the server
     }
 
-    // إذا وصلنا هنا، فهذا يعني أن الكاش قديم (> 1 ساعة) أو غير موجود، أو تم طلب تحديث إجباري.
-    // سنقوم الآن بسؤال السيرفر: "هل لديك تحديثات؟"
+    // If we reached here, cache is old (> 1 hour) or missing, or forced refresh requested.
+    // We will now ask the server: "Do you have updates?"
     console.log('%c[AdverModule] Checking for updates from server (interval elapsed or no cache).', 'color: #17a2b8;');
     const latestUpdate = await getLatestUpdate();
     const serverTimestamp = latestUpdate ? latestUpdate.datetime : null;
@@ -205,22 +205,22 @@
     console.log(`[AdverModule] Server Timestamp: ${serverTimestamp}`);
     console.log(`[AdverModule] Cached Timestamp: ${cachedTimestamp}`);
 
-    // إذا كانت التواريخ متطابقة وهناك صور محفوظة، استخدم النسخة المحفوظة (بعد التحقق من الخادم)
+    // If dates match and images are saved, use saved copy (after server check)
     if (!forceRefresh && serverTimestamp && serverTimestamp === cachedTimestamp && cachedImages && cachedImages.length > 0) {
       console.log('%c[AdverModule] Loading ads from cache.', 'color: green; font-weight: bold;');
-      localStorage.setItem(CACHE_KEY_LAST_CHECK, Date.now()); // ✅ جديد: تحديث وقت آخر فحص
+      localStorage.setItem(CACHE_KEY_LAST_CHECK, Date.now()); // ✅ NEW: Update last check time
       buildSlider(container, cachedImages);
-      return; // توقف هنا، لا حاجة لجلب الصور من الشبكة
+      return; // Stop here, no need to fetch images from network
     }
 
-    // --- إذا لم تتطابق التواريخ أو لا توجد نسخة محفوظة، قم بالجلب من الشبكة ---
+    // --- If dates don't match or no saved copy, fetch from network ---
     console.log('%c[AdverModule] Cache is outdated or empty. Fetching from network...', 'color: orange; font-weight: bold;');
 
     const R2_PUBLIC_URL = 'https://pub-e828389e2f1e484c89d8fb652c540c12.r2.dev';
     const fetchedImages = [];
 
-    // ✅ جديد: محاولة جلب المانيفست (advertisements.json)
-    // نعتمد الآن كلياً على هذا الملف. لا يوجد تخمين.
+    // ✅ NEW: Attempt to fetch manifest (advertisements.json)
+    // We now rely entirely on this file. No guessing.
     try {
       const manifestRes = await fetch(`${R2_PUBLIC_URL}/advertisements.json?t=${Date.now()}`);
       if (manifestRes.ok) {
@@ -238,7 +238,7 @@
       console.error("[AdverModule] Manifest check failed:", e);
     }
 
-    // ✅ جديد: حفظ الصور الجديدة وتاريخ التحديث في localStorage
+    // ✅ NEW: Save new images and update date to localStorage
     if (fetchedImages.length > 0) {
       console.log(`[AdverModule] Fetched ${fetchedImages.length} images. Caching results.`);
       localStorage.setItem(CACHE_KEY_IMAGES, JSON.stringify(fetchedImages));
@@ -249,21 +249,21 @@
 
       buildSlider(container, fetchedImages);
     } else {
-      // إذا لم نجد صوراً في المانيفست
+      // If no images found in manifest
       console.warn('[AdverModule] No ads found in manifest.');
       const noAdsMsg = container.querySelector('.no-ads-message');
       if (noAdsMsg) noAdsMsg.style.display = 'block';
 
-      // تنظيف الكاش القديم لتجنب عرض صور غير معتمدة
+      // Clean old cache to avoid displaying invalid images
       localStorage.removeItem(CACHE_KEY_IMAGES);
     }
   }
 
   /**
-   * @description يبني ويعرض شريط تمرير (Slider) للصور الإعلانية داخل حاوية محددة.
-   *   ينشئ الشرائح والنقاط وأزرار التنقل، ويدير الحركة التلقائية والتفاعلات اليدوية.
+   * @description Builds and displays ad image slider inside specified container.
+   *   Creates slides, dots, and navigation buttons, handles auto-play and manual interactions.
    * @function buildSlider
-   * @param {string[]} adImages - مصفوفة من عناوين URL لصور الإعلانات.
+   * @param {string[]} adImages - Array of ad image URLs.
    * @returns {void}
    * @see goToSlide
    * @see startAutoPlay
@@ -271,19 +271,19 @@
    * @see resetAutoPlay
    */
   function buildSlider(container, adImages) {
-    /** @param {HTMLElement} container - عنصر DOM الذي سيحتوي على شريط التمرير. */
-    // إذا لم توجد صور، اعرض رسالة
+    /** @param {HTMLElement} container - DOM element to contain the slider. */
+    // If no images, show message
     if (adImages.length === 0) {
       container.innerHTML = '<p class="no-ads-message">لا توجد إعلانات حالياً تاكد من الاتصال بالانترنت</p>';
-      container.style.height = 'auto'; // ضبط الارتفاع
+      container.style.height = 'auto'; // Adjust height
       return;
     }
 
-    // بناء هيكل الشريط الإعلاني
+    // Build slider structure
     container.innerHTML = `
     <div class="ad-slider-track"></div>
     <div class="ad-slider-dots"></div>
-    <!-- ✅ جديد: أزرار التنقل -->
+    <!-- ✅ NEW: Navigation Buttons -->
     <button class="ad-slider-nav prev" aria-label="Previous Slide"><i class="fas fa-chevron-left"></i></button>
     <button class="ad-slider-nav next" aria-label="Next Slide"><i class="fas fa-chevron-right"></i></button>
   `;
@@ -293,19 +293,19 @@
     const slides = [];
     const dots = [];
     let currentIndex = 0;
-    let autoPlayInterval = null; // ✅ جديد: متغير لتخزين مؤقت الحركة التلقائية
+    let autoPlayInterval = null; // ✅ NEW: Variable to store auto-play timer
 
     const prevButton = container.querySelector('.ad-slider-nav.prev');
     const nextButton = container.querySelector('.ad-slider-nav.next');
 
-    // إنشاء الشرائح والنقاط
+    // Create slides and dots
     adImages.forEach((imageUrl, index) => {
       const slide = document.createElement('div');
       slide.className = 'ad-slide';
       slide.style.backgroundImage = `url(${imageUrl})`;
       track.appendChild(slide);
 
-      // ✅ جديد: إضافة أحداث لإيقاف الحركة مؤقتًا عند الضغط المستمر
+      // ✅ NEW: Add events to pause auto-play on hold
       slide.addEventListener('mousedown', pauseAutoPlay);
       slide.addEventListener('mouseup', startAutoPlay);
       slide.addEventListener('touchstart', pauseAutoPlay, { passive: true });
@@ -320,9 +320,9 @@
     });
 
     /**
-     * @description تنتقل إلى شريحة محددة وتطبق تأثير الكاروسيل الدائري.
-     *   تقوم بحساب وتطبيق التحويلات (transform) لكل شريحة بناءً على موقعها الحالي.
-     * @param {number} index - فهرس الشريحة المستهدفة.
+     * @description Navigates to a specific slide and applies circular carousel effect.
+     *   Calculates and applies transforms for each slide based on its current position.
+     * @param {number} index - Index of target slide.
      * @inner
      * @returns {void}
      */
@@ -331,8 +331,8 @@
       currentIndex = newIndex;
 
       slides.forEach((slide, i) => {
-        // ✅ تعديل: حساب الإزاحة بطريقة تأخذ "المسار الأقصر" في الاعتبار
-        // هذا يضمن أن الحركة دائرية ومتناظرة دائمًا.
+        // ✅ Fix: Calculate offset considering "shortest path"
+        // This ensures movement is always circular and symmetrical.
         const totalSlides = slides.length;
         const directOffset = i - currentIndex;
         const wrapOffset = directOffset > 0 ? directOffset - totalSlides : directOffset + totalSlides;
@@ -340,17 +340,17 @@
 
         const isActive = offset === 0;
 
-        // حساب التحريك الأفقي والتكبير
-        // الشرائح الجانبية تكون أصغر ومزاحة
-        const translateX = offset * 40; // 40% من عرض الشريحة
+        // Calculate horizontal transform and scale
+        // Side slides are smaller and offset
+        const translateX = offset * 40; // 40% of slide width
         const scale = isActive ? 1 : 0.7;
-        // ✅ جديد: إضافة إزاحة بسيطة على المحور Z لإعطاء عمق ومنع التداخل
+        // ✅ NEW: Add slight Z-axis offset to give depth and prevent overlap
         const translateZ = -Math.abs(offset) * 50;
 
         slide.style.transform = `translateX(${translateX}%) translateZ(${translateZ}px) scale(${scale})`;
         slide.classList.toggle('active', isActive);
 
-        // عند النقر على شريحة جانبية، تنتقل لتصبح هي النشطة
+        // When clicking a side slide, it moves to become active
         slide.onclick = () => goToSlide(i);
       });
 
@@ -361,18 +361,18 @@
     }
 
     /**
-     * @description تبدأ الحركة التلقائية لشريط التمرير، حيث تنتقل الشرائح كل 4 ثوانٍ.
+     * @description Starts auto-play for slider, changing slides every 4 seconds.
      * @returns {void}
      * @inner
      */
     function startAutoPlay() {
-      if (autoPlayInterval) clearInterval(autoPlayInterval); // مسح المؤقت القديم
-      // تغيير الشريحة كل 4 ثوانٍ
+      if (autoPlayInterval) clearInterval(autoPlayInterval); // Clear old timer
+      // Change slide every 4 seconds
       autoPlayInterval = setInterval(() => goToSlide(currentIndex + 1), 4000);
     }
 
     /**
-     * @description توقف الحركة التلقائية لشريط التمرير عن طريق مسح المؤقت.
+     * @description Stops auto-play by clearing the timer.
      * @returns {void}
      * @inner
      */
@@ -381,7 +381,7 @@
     }
 
     /**
-     * @description تعيد ضبط الحركة التلقائية لشريط التمرير عن طريق إيقافها ثم إعادة تشغيلها.
+     * @description Resets auto-play by stopping then restarting it.
      * @returns {void}
      * @see pauseAutoPlay
      * @see startAutoPlay
@@ -392,11 +392,11 @@
       startAutoPlay();
     }
 
-    // بدء الحركة
+    // Start animation
     if (slides.length > 0) {
-      goToSlide(0); // عرض الشريحة الأولى
+      goToSlide(0); // Show first slide
 
-      // ✅ جديد: إظهار/إخفاء أزرار التنقل والتحكم في الحركة
+      // ✅ NEW: Show/Hide navigation buttons and control animation
       if (slides.length > 1) {
         startAutoPlay();
         prevButton.style.display = 'flex';
@@ -412,7 +412,7 @@
       } else {
         prevButton.style.display = 'none';
         nextButton.style.display = 'none';
-        // ✅ جديد: إخفاء حاوية النقاط إذا كانت هناك صورة واحدة فقط
+        // ✅ NEW: Hide dots container if only one image
         dotsContainer.style.display = 'none';
       }
     }

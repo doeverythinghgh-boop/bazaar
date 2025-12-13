@@ -1,5 +1,5 @@
 <style>
-    /* أنماط CSS من الكود الأصلي */
+    /* Original CSS Styles */
 
 
 
@@ -94,7 +94,7 @@
         flex: 1;
     }
 
-    /* أنماط رفع الصور */
+    /* Image Upload Styles */
     .add-product-modal__image-uploader {
         border: 2px dashed #bdc3c7;
         border-radius: 10px;
@@ -245,7 +245,7 @@
         display: none;
     }
 
-    /* كاميرا سطح المكتب */
+    /* Desktop Camera */
     .camera-modal-content {
         position: relative;
         background: white;
@@ -281,7 +281,7 @@
         color: #e74c3c;
     }
 
-    /* التجاوب مع الأجهزة المختلفة */
+    /* Responsive Design */
     @media (max-width: 768px) {
         .add-product-modal__form-row {
             flex-direction: column;
@@ -318,7 +318,7 @@
         <h2 class="add-product-modal__title" id="addProductTitle"><i class="fas fa-cart-plus"></i> إضافة منتج جديد</h2>
 
         <form class="add-product-modal__form" id="add-product-form" novalidate>
-            <!-- موديول رفع الصور -->
+            <!-- Image Upload Module -->
             <section class="add-product-modal__form-group" aria-labelledby="imagesHeading">
                 <label id="imagesHeading" class="add-product-modal__label"><i class="fas fa-images"></i> صور
                     المنتج</label>
@@ -326,11 +326,11 @@
                 <div class="add-product-modal__image-uploader" id="image-uploader" tabindex="0" role="group"
                     aria-label="منطقة رفع الصور">
                     <div class="add-product-modal__uploader-actions">
-                        <!-- input مع capture لتفعيل الكاميرا على الأجهزة المحمولة -->
+                        <!-- input with capture to enable camera on mobile devices -->
                         <input class="add-product-modal__hidden-file" id="fileInput00" type="file" accept="image/*"
                             multiple aria-hidden="true">
 
-                        <!-- تم تغيير btn-primary إلى btn-ghost لتوحيد التصميم -->
+                        <!-- Changed btn-primary to btn-ghost for design consistency -->
                         <button type="button" class="btn btn-ghost btn-icon" id="pick-files-btn" title="اختر صورًا"><i
                                 class="fas fa-folder-open"></i></button>
                         <button type="button" class="btn btn-ghost btn-icon" id="take-photo-btn"
@@ -344,7 +344,7 @@
                 </div>
             </section>
 
-            <!-- جديد: حقل اسم المنتج -->
+            <!-- NEW: Product Name Field -->
             <div class="add-product-modal__form-group">
                 <label for="product-name" class="add-product-modal__label"><i class="fas fa-signature"></i> اسم
                     المنتج</label>
@@ -353,7 +353,7 @@
                 <div id="product-name-char-counter" class="add-product-modal__char-counter">0 / 100</div>
             </div>
 
-            <!-- حقل وصف المنتج -->
+            <!-- Product Description Field -->
             <div class="add-product-modal__form-group">
                 <label for="product-description" class="add-product-modal__label"><i class="fas fa-file-alt"></i>
                     الوصف</label>
@@ -362,7 +362,7 @@
                 <div id="description-char-counter" class="add-product-modal__char-counter">0 / 400</div>
             </div>
 
-            <!-- حقل رسالة من البائع -->
+            <!-- Seller Message Field -->
             <div class="add-product-modal__form-group">
                 <label for="seller-message" class="add-product-modal__label"><i class="fas fa-comment-dots"></i> رسالة
                     من البائع</label>
@@ -371,7 +371,7 @@
                 <div id="seller-message-char-counter" class="add-product-modal__char-counter">0 / 100</div>
             </div>
 
-            <!-- حقل ملاحظات -->
+            <!-- Notes Field -->
             <div class="add-product-modal__form-group">
                 <label for="product-notes" class="add-product-modal__label"><i class="fas fa-sticky-note"></i>
                     ملاحظات</label>
@@ -380,23 +380,23 @@
                 <div id="notes-char-counter" class="add-product-modal__char-counter">0 / 100</div>
             </div>
 
-            <!-- صف جديد للسعر والكمية -->
+            <!-- New row for Price and Quantity -->
             <div class="add-product-modal__form-row" id="price-quantity-row">
-                <!-- حقل الكمية -->
+                <!-- Quantity Field -->
                 <div class="add-product-modal__form-group">
                     <label for="product-quantity" class="add-product-modal__label"><i class="fas fa-boxes-stacked"></i>
                         الكمية المتاحة</label>
                     <input type="number" id="product-quantity" name="product-quantity" class="add-product-modal__input"
                         placeholder="مثال: 50" required min="1">
                 </div>
-                <!-- حقل السعر -->
+                <!-- Price Field -->
                 <div class="add-product-modal__form-group">
                     <label for="product-price" class="add-product-modal__label"><i class="fas fa-dollar-sign"></i>سعر
                         القطعة</label>
                     <input type="text" inputmode="decimal" id="product-price" name="product-price"
                         class="add-product-modal__input" placeholder="بالجنيه" required>
                 </div>
-                <!-- جديد: حقل السعر قبل الخصم -->
+                <!-- NEW: Original Price Field -->
                 <div class="add-product-modal__form-group">
                     <label for="original-price" class="add-product-modal__label"><i class="fas fa-tag"></i>السعر قبل
                         الخصم</label>
@@ -405,29 +405,29 @@
                 </div>
             </div>
 
-            <!-- زر إرسال النموذج -->
+            <!-- Submit Button -->
             <div class="add-product-modal__submit-container">
                 <button type="submit" class="btn btn-primary">اضف المنتج الآن</button>
             </div>
         </form>
     </div>
 
-    <!-- حاوية للكاميرا -->
+    <!-- Camera Container -->
     <div id="camera-modal-container"
         style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center;">
     </div>
 
     <script>
-        // ✅ استخدام IIFE بسيط بدون تعيينه لـ window
+        // ✅ Simple IIFE usage without assigning to window
 
         console.log('%c[ProductForm] Initializing product add form...', 'color: blue;');
-        // --- إعدادات ضغط افتراضية ---
-        const IMAGE_MAX_WIDTH = 1600; // أقصى عرض بعد الضغط
-        const IMAGE_MAX_HEIGHT = 1600; // أقصى ارتفاع بعد الضغط
-        const IMAGE_QUALITY = 0.75; // جودة ضغط 0..1
-        const MAX_FILES = 6; // حد معقول من الصور
+        // --- Default Compression Settings ---
+        const IMAGE_MAX_WIDTH = 1600; // Max width after compression
+        const IMAGE_MAX_HEIGHT = 1600; // Max height after compression
+        const IMAGE_QUALITY = 0.75; // Compression quality 0..1
+        const MAX_FILES = 6; // Reasonable limit of images
 
-        // عناصر DOM
+        // DOM Elements
         const fileInput0 = document.getElementById('fileInput00');
         const pickFilesBtn = document.getElementById('pick-files-btn');
         const takePhotoBtn = document.getElementById('take-photo-btn');
@@ -487,10 +487,10 @@
         const images = [];
         let idCounter = 1;
 
-        // مساعدة: توليد معرف فريد خفيف
+        // Helper: Generate lightweight unique ID
         function genId() { return 'img_' + (Date.now() + idCounter++); }
 
-        // فحص دعم webp
+        // Check WebP support
         async function supportsWebP() {
             if (!self.createImageBitmap) return false;
             const blob = await fetch('data:image/webp;base64,UklGRiIAAABXRUJQVlA4TAYAAAAvAAAAAAfQ//73v/+BiOh/AAA=')
@@ -500,7 +500,7 @@
         }
         const WEBP_SUPPORTED_PROMISE = supportsWebP();
 
-        // --- دالة ضغط: تأخذ File أو Blob وتعيد Blob مضغوط ---
+        // --- Compression function: Takes File or Blob and returns compressed Blob ---
         // --- Compression Function: Takes File or Blob, returns compressed Blob ---
         /**
          * @function compressImage
@@ -976,14 +976,14 @@
                 };
             } catch (err) {
                 console.error("Error accessing camera: ", err);
-            
+
                 cameraModalContainer.style.display = 'none';
             }
         }
 
         fileInput0.addEventListener('change', async (e) => await handleNewFiles(e.target.files));
 
-        // سحب وإفلات
+        // Drag and Drop
         //    uploaderEl.addEventListener('dragover', (e) => { e.preventDefault(); uploaderEl.style.borderColor = '#007bff'; });
         //    uploaderEl.addEventListener('dragleave', (e) => { uploaderEl.style.borderColor = ''; });
         //    uploaderEl.addEventListener('drop', (e) => { e.preventDefault(); uploaderEl.style.borderColor = ''; handleNewFiles(e.dataTransfer.files); });
@@ -1119,7 +1119,7 @@
 
             } catch (error) {
                 console.error('%c[ProductForm] Submission failed with critical error:', 'color: red; font-weight: bold;', error);
-                
+
             }
         });
 

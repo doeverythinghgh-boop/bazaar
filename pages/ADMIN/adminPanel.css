@@ -1,4 +1,4 @@
-/* المتغيرات الأساسية المستوحاة من المشروع */
+/* Core variables inspired by the project */
 :root {
     --primary-color: #007bff;
     --bg-color-light: #f8f9fa;
@@ -11,7 +11,7 @@
     --font-family-main: "Tajawal", sans-serif;
 }
 
-/* تنسيق الحاوية الرئيسية */
+/* Main container styling */
 .admin-panel-container {
     font-family: var(--font-family-main);
     padding: 20px;
@@ -29,7 +29,7 @@
     padding-bottom: 10px;
 }
 
-/* تنسيق مؤشر التحميل */
+/* Loader styling */
 .admin-panel-loader-container {
     display: flex;
     flex-direction: column;
@@ -59,13 +59,13 @@
     }
 }
 
-/* تنسيق حاوية الجدول */
+/* Table container styling */
 .admin-panel-table-container {
     overflow-x: auto;
-    /* لإضافة شريط تمرير أفقي عند الحاجة على الشاشات الصغيرة */
+    /* To add horizontal scrollbar when needed on small screens */
 }
 
-/* تنسيق الجدول */
+/* Table styling */
 .admin-panel-users-table {
     width: 100%;
     border-collapse: collapse;
@@ -80,7 +80,7 @@
     border-bottom: 1px solid var(--border-color);
 }
 
-/* رأس الجدول */
+/* Table header */
 .admin-panel-table-header th {
     background-color: var(--bg-color-light);
     color: var(--text-color-dark);
@@ -88,7 +88,7 @@
     font-size: 14px;
 }
 
-/* صفوف الجدول */
+/* Table rows */
 #admin-panel-users-tbody tr:hover {
     background-color: #f1f3f5;
 }
@@ -98,10 +98,10 @@
     color: #495057;
 }
 
-/* تنسيق الصف المختار */
+/* Selected row styling */
 #admin-panel-users-tbody tr.selected-row {
     background-color: #ffe8cc !important;
-    /* لون برتقالي فاتح مميز */
+    /* Distinct light orange color */
     border: 2px solid #fd7e14;
     transition: background-color 0.2s;
 }
@@ -111,7 +111,7 @@
     color: #000;
 }
 
-/* تنسيق خاص بعمود "لديه توكن" */
+/* Special styling for "Has Token" column */
 #admin-panel-users-tbody .has-token-true {
     color: var(--success-color);
     font-weight: bold;
@@ -121,18 +121,18 @@
     color: var(--danger-color);
 }
 
-/* أيقونات لتوضيح حالة التوكن */
+/* Icons to indicate token status */
 #admin-panel-users-tbody .has-token-true::before {
     content: '✓ ';
-    /* علامة صح */
+    /* Check mark */
 }
 
 #admin-panel-users-tbody .has-token-false::before {
     content: '✗ ';
-    /* علامة خطأ */
+    /* Cross mark */
 }
 
-/* تنسيق أزرار حالة التوصيل */
+/* Delivery status buttons styling */
 .btn-delivery-status {
     padding: 6px 12px;
     border: none;
@@ -148,22 +148,22 @@
     opacity: 0.9;
 }
 
-/* تاجر - أزرق */
+/* Seller - Blue */
 .btn-role-seller {
     background-color: var(--primary-color);
 }
 
-/* خدمة توصيل - أخضر */
+/* Delivery Service - Green */
 .btn-role-delivery {
     background-color: var(--success-color);
 }
 
-/* كلاهما - برتقالي/ذهبي للمرونة */
+/* Both - Orange/Gold for flexibility */
 .btn-role-both {
     background-color: #fd7e14;
 }
 
-/* محتوى الأزرار */
+/* Buttons content */
 .btn-role-seller::before {
     content: '📦 ';
 }

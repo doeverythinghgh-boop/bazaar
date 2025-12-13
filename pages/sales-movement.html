@@ -185,7 +185,7 @@
         color: #333;
     }
 
-    /* حالة التحميل */
+    /* Loading state */
     .salesMovement_loading {
         text-align: center;
         padding: 40px;
@@ -206,7 +206,7 @@
         }
     }
 
-    /* حالة فارغة */
+    /* Empty state */
     .salesMovement_emptyState {
         text-align: center;
         padding: 60px 20px;
@@ -407,7 +407,7 @@
        Responsive Design - Media Queries
        ======================================== */
 
-    /* شاشات صغيرة جداً (هواتف صغيرة) - أقل من 360px */
+    /* Very small screens (small phones) - less than 360px */
     @media screen and (max-width: 359px) {
         .salesMovement_container {
             padding: 15px;
@@ -453,7 +453,7 @@
         }
     }
 
-    /* هواتف محمولة صغيرة - من 360px إلى 479px */
+    /* Small mobile phones - 360px to 479px */
     @media screen and (min-width: 360px) and (max-width: 479px) {
         .salesMovement_container {
             padding: 18px;
@@ -485,7 +485,7 @@
         }
     }
 
-    /* هواتف محمولة متوسطة - من 480px إلى 767px */
+    /* Medium mobile phones - 480px to 767px */
     @media screen and (min-width: 480px) and (max-width: 767px) {
         .salesMovement_container {
             padding: 22px;
@@ -517,7 +517,7 @@
         }
     }
 
-    /* أجهزة لوحية صغيرة (Portrait) - من 768px إلى 991px */
+    /* Small tablets (Portrait) - 768px to 991px */
     @media screen and (min-width: 768px) and (max-width: 991px) {
         .salesMovement_container {
             padding: 25px;
@@ -544,7 +544,7 @@
         }
     }
 
-    /* أجهزة لوحية كبيرة وشاشات صغيرة - من 992px إلى 1199px */
+    /* Large tablets and small screens - 992px to 1199px */
     @media screen and (min-width: 992px) and (max-width: 1199px) {
         .salesMovement_container {
             padding: 28px;
@@ -556,7 +556,7 @@
         }
     }
 
-    /* شاشات كبيرة - من 1200px إلى 1599px */
+    /* Large screens - 1200px to 1599px */
     @media screen and (min-width: 1200px) and (max-width: 1599px) {
         .salesMovement_container {
             padding: 30px;
@@ -568,7 +568,7 @@
         }
     }
 
-    /* شاشات كبيرة جداً - أكبر من 1600px */
+    /* Very large screens - larger than 1600px */
     @media screen and (min-width: 1600px) {
         .salesMovement_container {
             padding: 35px;
@@ -587,7 +587,7 @@
         }
     }
 
-    /* تحسينات للأجهزة اللمسية */
+    /* Improvements for touch devices */
     @media (hover: none) and (pointer: coarse) {
         .salesMovement_radioLabel {
             min-height: 50px;
@@ -599,7 +599,7 @@
         }
     }
 
-    /* وضع الشاشة الأفقي للهواتف */
+    /* Landscape mode for phones */
     @media screen and (max-width: 767px) and (orientation: landscape) {
         .salesMovement_container {
             padding: 15px 25px;
@@ -650,20 +650,20 @@
             </table>
         </div>
 
-        <!-- حاوية عرض الطلبات -->
+        <!-- Orders display container -->
         <div id="salesMovement_ordersContainer" class="salesMovement_ordersContainer">
-            <!-- سيتم إضافة بطاقات الطلبات هنا ديناميكياً -->
+            <!-- Order cards will be added here dynamically -->
         </div>
     </div>
 
-    <!-- نافذة منبثقة لعرض تفاصيل الطلب -->
+    <!-- Modal for displaying order details -->
     <div id="salesMovement_orderModal" class="salesMovement_modal">
         <div class="salesMovement_modalContent">
             <button class="salesMovement_closeBtn" id="salesMovement_closeModal">
                 <span>×</span>
             </button>
             <div id="salesMovement_modalBody" class="salesMovement_modalBody">
-                <!-- سيتم إضافة تفاصيل الطلب هنا ديناميكياً -->
+                <!-- Order details will be added here dynamically -->
             </div>
         </div>
     </div>
@@ -672,17 +672,17 @@
         const salesMovement_STORAGE_KEY = 'sales_movement_user_type';
         const salesMovement_radioButtons = document.querySelectorAll('input[name="salesMovement_userType"]');
 
-        // دالة لجلب الطلبات بناءً على نوع المستخدم
+        // Function to fetch orders based on user type
         async function salesMovement_fetchOrders(salesMovement_userType) {
             try {
-                // عرض حالة التحميل
+                // Show loading state
                 salesMovement_showLoading();
 
                 let salesMovement_url = '';
                 let salesMovement_userKey = userSession.user_key;
                 let salesMovement_role = '';
 
-                // تحديد المعاملات بناءً على نوع المستخدم
+                // Determine parameters based on user type
                 switch (salesMovement_userType) {
                     case 'buyer':
                         salesMovement_role = 'purchaser';
@@ -718,7 +718,7 @@
                         console.log('First order items sample:', salesMovement_data[0].order_items);
                     }
 
-                    // يمكنك هنا معالجة البيانات وعرضها
+                    // You can process and display data here
                     salesMovement_displayOrders(salesMovement_data);
 
                 } catch (salesMovement_error) {
@@ -729,15 +729,15 @@
             }
         }
 
-        // دالة لعرض الطلبات
+        // Function to display orders
         function salesMovement_displayOrders(salesMovement_data) {
             try {
                 const salesMovement_container = document.getElementById('salesMovement_ordersContainer');
 
-                // إخفاء حالة التحميل
+                // Hide loading state
                 salesMovement_hideLoading();
 
-                // التحقق من وجود بيانات
+                // Check for data existence
                 if (!salesMovement_data || salesMovement_data.length === 0) {
                     salesMovement_container.innerHTML = `
                         <div class="salesMovement_emptyState">
@@ -748,14 +748,14 @@
                     return;
                 }
 
-                // ترتيب الطلبات حسب التاريخ (الأحدث أولاً)
+                // Sort orders by date (newest first)
                 const salesMovement_sortedOrders = [...salesMovement_data].sort((a, b) => {
                     return new Date(b.created_at) - new Date(a.created_at);
                 });
 
                 console.log('عرض الطلبات:', salesMovement_sortedOrders);
 
-                // إنشاء HTML للطلبات
+                // Create HTML for orders
                 let salesMovement_cardsHTML = '';
 
                 salesMovement_sortedOrders.forEach((salesMovement_order, salesMovement_index) => {
@@ -784,12 +784,12 @@
 
                 salesMovement_container.innerHTML = salesMovement_cardsHTML;
 
-                // إضافة مستمعي الأحداث للبطاقات
+                // Add event listeners to cards
                 const salesMovement_cards = document.querySelectorAll('.salesMovement_orderCard');
                 salesMovement_cards.forEach((salesMovement_card) => {
                     salesMovement_card.addEventListener('click', async function () {
                         try {
-                            // 1. إعادة تعيين القيم الافتراضية
+                            // 1. Reset default values
                             localStorage.setItem('productKeyFromStepReview', '');
                             if (window.globalStepperAppData) window.globalStepperAppData = null;
 

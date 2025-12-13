@@ -18,29 +18,29 @@
         width: 100%;
         animation: productView_zoomInEffect 0.5s ease-out 0.1s forwards;
         opacity: 0;
-        /* يبدأ مخفياً */
+        /* Starts hidden */
         max-height: 400px;
-        /* تحديد ارتفاع أقصى */
+        /* Set max height */
         border-radius: 8px;
         background-color: var(--bg-color-light, #f9f9f9);
-        /* خلفية للصورة */
+        /* Image background */
     }
 
     #productView_details_container {
         animation: productView_slideInFromTop 0.5s ease-out 0.2s forwards;
         opacity: 0;
-        /* يبدأ مخفياً */
+        /* Starts hidden */
         text-align: right;
     }
 
-    /* حركة متدرجة للتفاصيل */
+    /* Staggered animation for details */
     #productView_details_container>* {
         animation: productView_slideInFromTop 0.5s ease-out forwards;
         opacity: 0;
-        /* يبدأ مخفياً */
+        /* Starts hidden */
     }
 
-    /* حاويات الوصف والرسالة */
+    /* Description and message containers */
     .productView_description_box,
     .productView_seller_message_box {
         background-color: var(--bg-color-white, #fff);
@@ -69,7 +69,7 @@
     .productView_seller_message_box h4 i {
         color: var(--primary-color, #007bff);
         margin-left: 8px;
-        /* تغيير جهة الهامش */
+        /* Change margin direction */
     }
 
     .productView_image_container {
@@ -103,7 +103,7 @@
         transform: scale(1.1);
     }
 
-    /* الطباعة والمسافات الحديثة */
+    /* Modern typography and spacing */
     #productView_name {
         font-size: 1.8rem;
         font-weight: 700;
@@ -137,7 +137,7 @@
         color: var(--primary-color, #007bff);
     }
 
-    /* إجراءات السلة الحديثة */
+    /* Modern cart actions */
     .productView_quantity_selector {
         display: flex;
         justify-content: center;
@@ -202,7 +202,7 @@
         transition: background-color 0.3s, transform 0.2s;
     }
 
-    /* Keyframes للحركات */
+    /* Animation Keyframes */
     @keyframes productView_fadeInScaleUp {
         from {
             opacity: 0;
@@ -577,7 +577,7 @@
 
         } catch (error) {
             console.error("productView_viewDetails - خطأ عام في عرض التفاصيل:", error);
-        
+
         }
     }
 

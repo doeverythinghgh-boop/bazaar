@@ -1,20 +1,20 @@
 /**
  * @file js/productFormUtils.js
- * @description يحتوي هذا الملف على مجموعة من الدوال المساعدة المستخدمة في نماذج المنتجات،
- *   مثل تنسيق البيانات، توليد الأرقام التسلسلية، والتحقق من دعم المتصفح لميزات معينة.
+ * @description This file contains a set of helper functions used in product forms,
+ *   such as data formatting, serial number generation, and checking browser support for specific features.
  */
 /**
- * @constant {string} SERVICE_CATEGORY_BACKGROUND - خلفية النموذج في وضع فئة الخدمات
+ * @constant {string} SERVICE_CATEGORY_BACKGROUND - Form background in service category mode
  */
 const SERVICE_CATEGORY_BACKGROUND = 'radial-gradient(circle, #f6f9fc, #0e4a9aff, #182b48ff, #000101ff)';
 
 
 /**
- * @description تقوم بتحويل الأرقام العربية الشرقية (الهندية) والفارسية في سلسلة نصية إلى أرقام عربية غربية (إنجليزية).
- *   تُستخدم لتوحيد الأرقام المدخلة من قبل المستخدم قبل معالجتها.
+ * @description Converts Eastern Arabic (Hindi) and Persian digits in a string to Western Arabic (English) digits.
+ *   Used to normalize user-input numbers before processing.
  * @function productNormalizeDigits
- * @param {string} str - السلسلة النصية التي قد تحتوي على أرقام هندية أو فارسية.
- * @returns {string} - السلسلة النصية بعد تحويل جميع الأرقام إلى الصيغة الإنجليزية.
+ * @param {string} str - String that may contain Hindi or Persian digits.
+ * @returns {string} - String after converting all digits to English format.
  */
 function productNormalizeDigits(str) {
   const arabicDigits = '٠١٢٣٤٥٦٧٨٩';
@@ -33,11 +33,11 @@ function productNormalizeDigits(str) {
 }
 
 /**
- * @description تقوم بتنقيح النص العربي عن طريق إزالة المسافات الزائدة من البداية والنهاية،
- *   واستبدال أي تكرار للمسافات بمسافة واحدة فقط.
+ * @description Sanitizes Arabic text by removing excess whitespace from the beginning and end,
+ *   and replacing multiple spaces with a single space.
  * @function productNormalizeArabicText
- * @param {string} text - النص المراد تنقيحه.
- * @returns {string} - النص المنقح.
+ * @param {string} text - Text to be sanitized.
+ * @returns {string} - Sanitized text.
  */
 function productNormalizeArabicText(text) {
   text = text.replace(/\s+/g, ' ').trim();
@@ -59,25 +59,25 @@ function productGenerateProductSerial() {
 }
 
 /**
- * @description تتحقق بشكل غير متزامن مما إذا كان المتصفح الحالي يدعم تنسيق الصور WebP.
- *   تقوم بذلك عن طريق محاولة فك تشفير صورة WebP صغيرة جدًا.
+ * @description Asynchronously checks if the current browser supports the WebP image format.
+ *   Attempts to decode a very small WebP image.
  * @function productSupportsWebP
  * @async
- * @returns {Promise<boolean>} - وعد (Promise) يُرجع `true` إذا كان المتصفح يدعم WebP، و`false` بخلاف ذلك.
+ * @returns {Promise<boolean>} - Promise returning `true` if browser supports WebP, `false` otherwise.
  * @deprecated - This function is currently unused in the codebase.
  * @throws {Error} - If `fetch` or `createImageBitmap` encounters an error.
  */
 async function productSupportsWebP() {
   if (!self.createImageBitmap) return false;
   const blob = await fetch('data:image/webp;base64,UklGRiIAAABXRUJQVlA4TAYAAAAvAAAAAAfQ//73v/+BiOh/AAA=')
-    .then(r => r.blob()).catch(()=>null);
+    .then(r => r.blob()).catch(() => null);
   if (!blob) return false;
-  try { await createImageBitmap(blob); return true; } catch(e) { return false; }
+  try { await createImageBitmap(blob); return true; } catch (e) { return false; }
 }
 
 
 /**
- * @description إعادة تعيين قوية للخلفية مع فحص مسبق
+ * @description Strong background reset with pre-check
  * @function productForceResetBackground
  * @returns {void}
  * @deprecated - This function is currently unused in the codebase.
@@ -85,64 +85,64 @@ async function productSupportsWebP() {
  */
 function productForceResetBackground() {
   console.log('%c[ProductForm] 🎨 FORCED Background Reset Started', 'color: red; font-weight: bold;');
-  
+
   // فحص الحالة الحالية أولاً
   if (typeof productDebugBackground === 'function') {
     productDebugBackground();
   }
-  
+
   const elements = [
     document.querySelector('.add-product-modal'),
     document.getElementById('modal-main-content'),
     document.querySelector('.add-product-modal__form'),
     document.querySelector('.add-product-modal__form-group')
   ];
-  
+
   elements.forEach((element, index) => {
     if (element) {
       console.log(`%c[ProductForm] 🎨 Resetting element ${index}`, 'color: orange;');
-      
-      // إزالة كافة التخصيصات
+
+      // Remove all customizations
       element.style.removeProperty('background-color');
       element.style.removeProperty('background');
       element.style.backgroundColor = '';
       element.style.background = '';
       element.classList.remove('service-category-mode');
-      
-      // إزالة dataset
+
+      // Remove dataset
       delete element.dataset.originalBackground;
     }
   });
-  
+
   console.log('%c[ProductForm] 🎨 FORCED Background Reset Completed', 'color: green; font-weight: bold;');
 }
 
 /**
- * @description تغيير خلفية الخدمات ديناميكياً مع دعم التدرج
+ * @description Dynamically change service background with gradient support
  * @function productSetServiceCategoryBackground
- * @param {string} newBackground - الخلفية الجديدة (لون أو تدرج)
+ * @param {string} newBackground - New background (color or gradient)
  * @returns {void}
  * @see productUpdateExtendedMode
  */
 function productSetServiceCategoryBackground(newBackground) {
   window.SERVICE_CATEGORY_BACKGROUND = newBackground;
   const isGradient = newBackground.includes('gradient');
-  
+
   if (isGradient) {
     document.documentElement.style.setProperty('--service-category-bg-image', newBackground);
   } else {
     document.documentElement.style.setProperty('--service-category-bg-color', newBackground);
   }
-  
+
   console.log(`%c[ProductForm] 🎨 Service category background changed to: ${newBackground}`, 'color: green; font-weight: bold;');
-  
-  // تحديث النموذج إذا كان مفتوحاً
+
+  // Update form if open
   if (typeof productUpdateExtendedMode === 'function') {
     productUpdateExtendedMode();
   }
 }
 /**
- * @description فحص حالة الخلفية الحالية
+ * @description Check current background status
  * @function productCheckBackgroundStatus
  * @returns {void}
  */
@@ -151,7 +151,7 @@ function productCheckBackgroundStatus() {
   console.group('%c[ProductForm] 🎨 Background Status Check', 'color: blue; font-weight: bold;');
   console.log('SERVICE_CATEGORY_BACKGROUND:', window.SERVICE_CATEGORY_BACKGROUND);
   console.log('Modal element:', modal);
-  
+
   if (modal) {
     const computed = getComputedStyle(modal);
     console.log('Computed background:', computed.background);
@@ -165,7 +165,7 @@ function productCheckBackgroundStatus() {
 }
 
 /**
- * @description تطبيق الخلفية يدوياً للتجربة
+ * @description Manually apply background for testing
  * @function productTestGradient
  * @returns {void}
  */
@@ -177,10 +177,10 @@ function productTestGradient() {
   }
 }
 
-// جعل الدوال متاحة عالمياً
+// Make functions globally available
 window.productCheckBackgroundStatus = productCheckBackgroundStatus;
 window.productTestGradient = productTestGradient;
-// جعل الدالة متاحة عالمياً
+// Make function globally available
 window.productSetServiceCategoryBackground = productSetServiceCategoryBackground;
-// جعل الدالة متاحة عالميًا
+// Make function globally available
 window.productForceResetBackground = productForceResetBackground;

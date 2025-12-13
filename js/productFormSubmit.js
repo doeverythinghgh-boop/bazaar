@@ -1,11 +1,11 @@
 /**
  * @file js/productFormSubmit.js
- * @description يحتوي على منطق معالجة تقديم نموذج المنتج، بما في ذلك التحقق من الصحة، رفع الصور، وحفظ البيانات.
+ * @description Contains logic for handling product form submission, including validation, image upload, and data saving.
  */
 
 /**
- * @description يربط معالج حدث الإرسال بنموذج إضافة المنتج.
- *   يقوم بإزالة أي معالجات سابقة لتجنب التكرار.
+ * @description Binds the submit event handler to the add product form.
+ *   Removes any previous handlers to prevent duplication.
  * @function productSetupFormSubmit
  * @returns {void}
  * @throws {Error} - If the form element (`add-product-form`) is not found in the DOM.
@@ -19,15 +19,15 @@ function productSetupFormSubmit() {
     return;
   }
 
-  // إزالة أي مستمعين سابقين لمنع التكرار
+  // Remove any previous listeners to prevent duplication
   form.removeEventListener('submit', productHandleFormSubmit);
 
   form.addEventListener('submit', productHandleFormSubmit);
 }
 
 /**
- * @description المعالج الرئيسي لحدث إرسال النموذج. يمنع السلوك الافتراضي للنموذج،
- *   ويقوم بالتحقق من صحة الحقول عبر `productValidateForm`، ثم يبدأ عملية الإرسال الفعلية.
+ * @description Main handler for form submission event. Prevents default behavior,
+ *   validates fields via `productValidateForm`, then starts the actual submission process.
  * @function productHandleFormSubmit
  * @async
  * @param {Event} e - كائن حدث إرسال النموذج.
@@ -40,23 +40,23 @@ async function productHandleFormSubmit(e) {
   const form = document.getElementById('add-product-form');
   const extendedMode = form ? form.dataset.extendedMode : 'unknown';
 
-  console.log(`%c[Submit] 🚀 Form submission in mode: ${extendedMode}`,
+  console.log(`%c[Submit] 🚀 تقديم النموذج في الوضع: ${extendedMode}`,
     'color: blue; font-weight: bold;');
 
-  // التحقق من الصحة
+  // Validation
   if (!productValidateForm()) {
-    console.warn('[ProductForm] Validation failed. Submission aborted.');
+    console.warn('[ProductForm] فشل التحقق من الصحة. تم إلغاء الإرسال.');
     return;
   }
 
-  // معالجة الإرسال
+  // Process submission
   await productProcessFormSubmission();
 }
 
 /**
- * @description ينسق عملية إرسال النموذج الكاملة بعد اجتياز التحقق من الصحة.
- *   يتضمن ذلك عرض رسالة تحميل، وحذف الصور القديمة (في وضع التعديل)، ورفع الصور الجديدة،
- *   وتجهيز بيانات المنتج، وحفظها في قاعدة البيانات، وأخيرًا عرض رسالة نجاح.
+ * @description Coordinates the full form submission process after validation passes.
+ *   Includes showing loading message, deleting old images (in edit mode), uploading new images,
+ *   preparing product data, saving to database, and finally showing success message.
  * @function productProcessFormSubmission
  * @async
  * @returns {Promise<void>} - وعد (Promise) لا يُرجع قيمة عند الاكتمال.
@@ -72,9 +72,9 @@ async function productProcessFormSubmission() {
   const form = document.getElementById('add-product-form');
   const extendedMode = form ? form.dataset.extendedMode : 'unknown';
 
-  console.log(`%c[ProductForm] Validation passed. Starting submission process in mode: ${extendedMode}.`, 'color: green;');
+  console.log(`%c[ProductForm] اجتياز التحقق من الصحة. البدء في عملية الإرسال في الوضع: ${extendedMode}.`, 'color: green;');
 
-  // استخدام SweetAlert2 إذا متاح، وإلا استخدام confirm عادي
+  // Use SweetAlert2 if available, otherwise use standard log/alert
   if (typeof Swal !== 'undefined') {
     Swal.fire({
       title: form.dataset.mode === 'edit' ? 'جاري تحديث المنتج...' : 'جاري إضافة المنتج...',
@@ -92,25 +92,25 @@ async function productProcessFormSubmission() {
     const productSerial = form.dataset.mode === 'edit' ?
       form.dataset.productKey : productGenerateProductSerial();
 
-    // حذف الصور القديمة في وضع التعديل
+    // Delete old images in edit mode
     if (form.dataset.mode === 'edit') {
       await productHandleImageDeletion();
     }
 
-    // رفع الصور الجديدة والحصول على أسماء الملفات
+    // Upload new images and get file names
     const uploadedImageFiles = await productUploadImages(productSerial);
 
-    // تجميع بيانات المنتج مع الصور المحدثة
+    // Aggregate product data with updated images
     const productData = productPrepareProductData(productSerial, uploadedImageFiles);
 
-    // حفظ في قاعدة البيانات
+    // Save to database
     await productSaveToDatabase(productData, form.dataset.mode);
 
-    // عرض رسالة النجاح
+    // Show success message
     await productShowSuccessMessage(form.dataset.mode);
 
   } catch (error) {
-    console.error('%c[ProductForm] Submission failed with critical error:', 'color: red; font-weight: bold;', error);
+    console.error('%c[ProductForm] فشل الإرسال بسبب خطأ جسيم:', 'color: red; font-weight: bold;', error);
 
     if (typeof Swal !== 'undefined') {
       console.error('خطأ!', `فشل في حفظ المنتج: ${error.message}`, 'error');
@@ -121,8 +121,8 @@ async function productProcessFormSubmission() {
 }
 
 /**
- * @description في وضع تعديل المنتج، تحدد هذه الدالة الصور التي تمت إزالتها من قبل المستخدم
- *   وتقوم بحذفها من التخزين السحابي (Cloudflare R2) قبل رفع الصور الجديدة.
+ * @description In product edit mode, this function identifies images removed by the user
+ *   and deletes them from cloud storage (Cloudflare R2) before uploading new images.
  * @function productHandleImageDeletion
  * @async
  * @returns {Promise<void>} - وعد (Promise) لا يُرجع قيمة عند الاكتمال.
@@ -133,36 +133,36 @@ async function productHandleImageDeletion() {
   const originalImageNames = window.productModule.originalImageNames || [];
   const currentImages = window.productModule.images || [];
 
-  // الحصول على أسماء الصور الحالية (القديمة والجديدة)
+  // Get current image names (old and new)
   const currentImageNames = currentImages.map(state => {
-    // إذا كانت الصورة مرفوعة مسبقًا، استخدم fileName، وإلا فهي جديدة وسيتم رفعها
+    // If image is already uploaded, use fileName, otherwise it's new and will be uploaded
     return state.status === 'uploaded' ? state.fileName : null;
   }).filter(Boolean);
 
-  console.log('[ProductForm] Original images:', originalImageNames);
-  console.log('[ProductForm] Current images:', currentImageNames);
+  console.log('[ProductForm] الصور الأصلية:', originalImageNames);
+  console.log('[ProductForm] الصور الحالية:', currentImageNames);
 
-  // تحديد الصور المحذوفة: الموجودة في الأصلية وغير موجودة في الحالية
+  // Identify deleted images: present in original but not in current
   const imagesToDelete = originalImageNames.filter(name => !currentImageNames.includes(name));
 
   if (imagesToDelete.length > 0) {
-    console.log("[ProductForm] Deleting old images:", imagesToDelete);
+    console.log("[ProductForm] حذف الصور القديمة:", imagesToDelete);
     await Promise.all(imagesToDelete.map(name =>
       deleteFile2cf(name, (msg) => console.log('[CloudflareDelete]', msg))
         .catch(err => console.error(`فشل حذف الملف ${name}:`, err))
     ));
   } else {
-    console.log("[ProductForm] No old images to delete");
+    console.log("[ProductForm] لا توجد صور قديمة للحذف");
   }
 }
 
 /**
- * @description تقوم برفع الصور الجديدة (التي حالتها 'ready') إلى التخزين السحابي.
- *   تنشئ أسماء ملفات فريدة لكل صورة بناءً على الرقم التسلسلي للمنتج وتستخدم دالة `uploadFile2cf` للرفع الفعلي.
+ * @description Uploads new images (status 'ready') to cloud storage.
+ *   Generates unique file names for each image based on product serial and uses `uploadFile2cf` for actual upload.
  * @function productUploadImages
  * @async
- * @param {string} productSerial - الرقم التسلسلي الفريد للمنتج، يُستخدم في تسمية الملفات.
- * @returns {Promise<string[]>} - وعد (Promise) يحتوي على مصفوفة من أسماء الملفات التي تم رفعها بنجاح.
+ * @param {string} productSerial - Unique product serial used for naming files.
+ * @returns {Promise<string[]>} - Promise containing array of uploaded file names.
  * @throws {Error} - إذا كانت دالة `uploadFile2cf` غير متاحة.
  * @see uploadFile2cf
  */
@@ -170,30 +170,30 @@ async function productUploadImages(productSerial) {
   const uploadedImageFiles = [];
   const imagesToUpload = window.productModule.images.filter(s => s.status === 'ready');
 
-  console.log(`[ProductForm] Uploading ${imagesToUpload.length} new images...`);
+  console.log(`[ProductForm] جاري رفع ${imagesToUpload.length} صور جديدة...`);
 
   for (let i = 0; i < window.productModule.images.length; i++) {
     const state = window.productModule.images[i];
 
-    // رفع الصور الجديدة فقط (status === 'ready')
+    // Upload only new images (status === 'ready')
     if (state.status !== 'ready' || !state.compressedBlob) continue;
 
-    // إنشاء اسم ملف فريد
+    // Generate unique file name
     const timestamp = Date.now();
     const fileName = `${i + 1}_${productSerial}_${timestamp}.webp`;
 
-    // التحقق من وجود دالة الرفع
+    // Check if upload function exists
     if (typeof uploadFile2cf !== 'function') {
       throw new Error('دالة رفع الملفات غير متاحة (uploadFile2cf)');
     }
 
-    console.log(`[ProductForm] Uploading new image: ${fileName}`);
+    console.log(`[ProductForm] جاري رفع صورة جديدة: ${fileName}`);
     const result = await uploadFile2cf(state.compressedBlob, fileName,
       (msg) => console.log('[CloudflareUpload]', msg));
 
-    console.log(`[ProductForm] New image uploaded: ${result.file}`);
+    console.log(`[ProductForm] تم رفع صورة جديدة: ${result.file}`);
 
-    // تحديث حالة الصورة لتعكس أنها مرفوعة الآن
+    // Update image status to reflect it's now uploaded
     state.status = 'uploaded';
     state.fileName = result.file;
 
@@ -204,14 +204,14 @@ async function productUploadImages(productSerial) {
 }
 
 /**
- * @description تجمع كل البيانات من حقول النموذج، بما في ذلك أسماء الصور المرفوعة،
- *   وتجهزها في كائن منظم لإرساله إلى الواجهة البرمجية (API).
- *   تتعامل مع الحالات الخاصة مثل فئة الخدمات (حيث يتم تعيين السعر والكمية إلى 0).
+ * @description Collects all data from form fields, including uploaded image names,
+ *   and prepares it in a structured object for API submission.
+ *   Handles special cases like Services category (where price and quantity are set to 0).
  * @function productPrepareProductData
- * @param {string} productSerial - الرقم التسلسلي الفريد للمنتج.
- * @param {string[]} uploadedImageFiles - مصفوفة بأسماء الصور التي تم رفعها حديثًا.
- * @returns {object} - كائن يحتوي على جميع بيانات المنتج الجاهزة للحفظ.
- * @throws {Error} - إذا لم يتم العثور على مفتاح المستخدم (user_key) في `localStorage`.
+ * @param {string} productSerial - Unique product serial.
+ * @param {string[]} uploadedImageFiles - Array of newly uploaded image names.
+ * @returns {object} - Object containing all product data ready to save.
+ * @throws {Error} - If `user_key` not found in `localStorage`.
  * @see productNormalizeArabicText
  */
 function productPrepareProductData(productSerial, uploadedImageFiles) {
@@ -223,9 +223,9 @@ function productPrepareProductData(productSerial, uploadedImageFiles) {
   const mainCatForSubmit = document.getElementById('main-category').value;
   let finalServiceType = 0;
 
-  // معالجة الفئة الخدمات
+  // Handle Services category
   if (mainCatForSubmit === SERVICE_CATEGORY_NoPrice_ID) {
-    console.log('[ProductForm] Service category detected. Forcing price and quantity to 0 before submission.');
+    console.log('[ProductForm] تم اكتشاف فئة خدمات. فرض السعر والكمية إلى 0 قبل الإرسال.');
     document.getElementById('product-price').value = 0;
     document.getElementById('product-quantity').value = 0;
 
@@ -235,24 +235,24 @@ function productPrepareProductData(productSerial, uploadedImageFiles) {
     }
   }
 
-  // تجميع جميع أسماء الصور النهائية
+  // Aggregate all final image names
   const finalImageNames = [];
 
-  // إضافة الصور الحالية (القديمة والجديدة)
+  // Add current images (old and new)
   window.productModule.images.forEach(state => {
     if (state.fileName) {
       finalImageNames.push(state.fileName);
     }
   });
 
-  // إضافة الصور التي تم رفعها حديثًا (في حالة عدم وجود fileName في state)
+  // Add newly uploaded images (if fileName missing in state)
   uploadedImageFiles.forEach(fileName => {
     if (!finalImageNames.includes(fileName)) {
       finalImageNames.push(fileName);
     }
   });
 
-  console.log('[ProductForm] Final image names:', finalImageNames);
+  console.log('[ProductForm] أسماء الصور النهائية:', finalImageNames);
 
   return {
     productName: productNormalizeArabicText(document.getElementById('product-name').value.trim()),
@@ -273,14 +273,14 @@ function productPrepareProductData(productSerial, uploadedImageFiles) {
 }
 
 /**
- * @description تقوم بحفظ بيانات المنتج في قاعدة البيانات عن طريق استدعاء `addProduct` (للإضافة)
- *   أو `updateProduct` (للتعديل) بناءً على وضع النموذج الحالي.
+ * @description Saves product data to database by calling `addProduct` (for add)
+ *   or `updateProduct` (for edit) based on current form mode.
  * @function productSaveToDatabase
  * @async
- * @param {object} productData - كائن بيانات المنتج المراد حفظه.
- * @param {'add' | 'edit'} mode - وضع النموذج الحالي ('add' أو 'edit').
- * @returns {Promise<void>} - وعد (Promise) لا يُرجع قيمة عند الاكتمال.
- * @throws {Error} - إذا فشلت عملية الحفظ في قاعدة البيانات أو إذا كانت دوال `addProduct`/`updateProduct` غير متاحة.
+ * @param {object} productData - Product data object to save.
+ * @param {'add' | 'edit'} mode - Current form mode ('add' or 'edit').
+ * @returns {Promise<void>} - Promise that resolves when complete.
+ * @throws {Error} - If save operation fails or `addProduct`/`updateProduct` functions are unavailable.
  * @see addProduct
  * @see updateProduct
  */
@@ -288,13 +288,13 @@ async function productSaveToDatabase(productData, mode) {
   let dbResult;
 
   if (mode === 'edit') {
-    console.log('[ProductForm] Sending UPDATE request to backend...');
+    console.log('[ProductForm] إرسال طلب تحديث إلى الواجهة الخلفية...');
     if (typeof updateProduct !== 'function') {
       throw new Error('دالة تحديث المنتج غير متاحة (updateProduct)');
     }
     dbResult = await updateProduct(productData);
   } else {
-    console.log('[ProductForm] Sending ADD request to backend...');
+    console.log('[ProductForm] إرسال طلب إضافة إلى الواجهة الخلفية...');
     if (typeof addProduct !== 'function') {
       throw new Error('دالة إضافة المنتج غير متاحة (addProduct)');
     }
@@ -305,16 +305,16 @@ async function productSaveToDatabase(productData, mode) {
     throw new Error(`فشل حفظ بيانات المنتج: ${dbResult.error}`);
   }
 
-  console.log('%c[ProductForm] Product saved to DB successfully.', 'color: green; font-weight: bold;');
+  console.log('%c[ProductForm] تم حفظ المنتج في قاعدة البيانات بنجاح.', 'color: green; font-weight: bold;');
 }
 
 /**
- * @description تعرض رسالة نجاح للمستخدم باستخدام SweetAlert2 بعد إتمام عملية إضافة أو تحديث المنتج بنجاح.
- *   بعد عرض الرسالة، تقوم بإغلاق النافذة المنبثقة وتحديث قائمة "منتجاتي" لتعكس التغييرات.
+ * @description Shows success message to user using SweetAlert2 after successful add or update.
+ *   After message, closes the modal and updates "My Products" list.
  * @function productShowSuccessMessage
  * @async
- * @param {'add' | 'edit'} mode - وضع النموذج لتحديد رسالة النجاح المناسبة.
- * @returns {Promise<void>} - وعد (Promise) لا يُرجع قيمة عند الاكتمال.
+ * @param {'add' | 'edit'} mode - Mode to determine partial success message.
+ * @returns {Promise<void>} - Promise that resolves when complete.
  * @see Swal.fire
  */
 async function productShowSuccessMessage(mode) {
@@ -327,17 +327,17 @@ async function productShowSuccessMessage(mode) {
     alert(successMessage);
   }
 
-  // إغلاق النافذة المنبثقة
+  // Close the modal
   const closeBtn = document.getElementById("add-product-modal-close-btn");
   if (closeBtn) closeBtn.click();
 
-  // تحديث عرض "منتجاتي"
+  // Update "My Products" view
   const loggedInUser = JSON.parse(localStorage.getItem("loggedInUser"));
   if (loggedInUser && typeof showMyProducts === 'function') {
     showMyProducts(loggedInUser.user_key);
   }
 }
 
-// جعل الدوال متاحة عالميًا
+// Make functions globally available
 window.productSetupFormSubmit = productSetupFormSubmit;
 window.productHandleFormSubmit = productHandleFormSubmit;

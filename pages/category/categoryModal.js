@@ -10,7 +10,7 @@ window.CategoryModal = (function () {
     'use strict';
 
     // ============================================
-    // 1. المتغيرات العامة
+    // 1. Global Variables
     // ============================================
     const MODAL_ID = 'category-modal';
     /**
@@ -52,15 +52,15 @@ window.CategoryModal = (function () {
     let styleElement = null;
 
     // ============================================
-    // 2. دالة تحميل الملفات الخارجية
+    // 2. Function to load external files
     // ============================================
     /**
      * @function loadExternalFile
-     * @description تحميل محتوى ملف خارجي (HTML/CSS) عبر fetch.
-     * @param {string} url - رابط الملف.
-     * @param {string} [type='text'] - نوع الاستجابة المتوقع (حالياً يتم التعامل معه كنص دائماً).
-     * @returns {Promise<string>} محتوى الملف كنص.
-     * @throws {Error} إذا فشل التحميل.
+     * @description Load external file content (HTML/CSS) via fetch.
+     * @param {string} url - File URL.
+     * @param {string} [type='text'] - Expected response type (currently always treated as text).
+     * @returns {Promise<string>} File content as text.
+     * @throws {Error} If loading fails.
      * @async
      */
     async function loadExternalFile(url, type = 'text') {
@@ -80,12 +80,12 @@ window.CategoryModal = (function () {
     }
 
     // ============================================
-    // 3. إنشاء Shadow DOM وعزل الأنماط
+    // 3. Create Shadow DOM and Isolate Styles
     // ============================================
     /**
      * @function createModalDOM
-     * @description إنشاء هيكل النافذة وعزل الأنماط باستخدام Shadow DOM.
-     * @returns {Promise<boolean>} returns true إذا تم الإنشاء بنجاح أو كانت موجودة.
+     * @description Create modal structure and isolate styles using Shadow DOM.
+     * @returns {Promise<boolean>} returns true if successfully created or already exists.
      * @throws {Error} - If HTML content fails to load.
      * @async
      * @see loadExternalFile
@@ -94,26 +94,26 @@ window.CategoryModal = (function () {
     async function createModalDOM() {
         console.log('[CategoryModal] إنشاء عناصر النافذة مع Shadow DOM...');
 
-        // إذا كانت النافذة موجودة بالفعل
+        // If modal already exists
         if (document.getElementById(MODAL_ID)) {
             console.log('[CategoryModal] النافذة موجودة بالفعل');
             return true;
         }
 
         try {
-            // تحميل HTML وCSS بشكل متوازي
+            // Load HTML and CSS in parallel
             const [htmlContent, cssContent] = await Promise.allSettled([
                 loadExternalFile(HTML_URL),
                 loadExternalFile(CSS_URL)
             ]);
 
-            // التحقق من نجاح تحميل HTML
+            // Check for successful HTML loading
             if (htmlContent.status === 'rejected') {
                 console.error('[CategoryModal] فشل تحميل HTML، استخدام بديل');
                 throw new Error('تعذر تحميل هيكل النافذة');
             }
 
-            // إنشاء عنصر حاوية للنافذة
+            // Create container element for modal
             const container = document.createElement('div');
             container.id = 'category-modal-container';
             container.style.cssText = `
@@ -126,10 +126,10 @@ window.CategoryModal = (function () {
                 z-index: 10000;
             `;
 
-            // إنشاء Shadow DOM
+            // Create Shadow DOM
             shadowRoot = container.attachShadow({ mode: 'open' });
 
-            // إضافة الأنماط (CSS) إلى Shadow DOM
+            // Add styles (CSS) to Shadow DOM
             styleElement = document.createElement('style');
             styleElement.id = 'category-modal-styles';
 
@@ -138,7 +138,7 @@ window.CategoryModal = (function () {
             } else {
                 console.warn('[CategoryModal] استخدام أنماط افتراضية بسبب فشل تحميل CSS');
                 styleElement.textContent = `
-                    /* أنماط افتراضية */
+                    /* Default styles */
                     .category-modal-backdrop {
                         display: none;
                         position: fixed;
@@ -158,22 +158,22 @@ window.CategoryModal = (function () {
                         max-width: 500px;
                         width: 90%;
                     }
-                    /* ... يمكن إضافة المزيد من الأنماط الافتراضية */
+                    /* ... more default styles can be added */
                 `;
             }
 
-            // إضافة HTML إلى Shadow DOM
+            // Add HTML to Shadow DOM
             const template = document.createElement('template');
             template.innerHTML = htmlContent.value;
 
-            // إضافة العناصر إلى Shadow DOM
+            // Append elements to Shadow DOM
             shadowRoot.appendChild(styleElement);
             shadowRoot.appendChild(template.content.cloneNode(true));
 
-            // إضافة الحاوية إلى body
+            // Append container to body
             document.body.appendChild(container);
 
-            // جعل العناصر قابلة للنقر
+            // Make elements clickable
             const modalElement = shadowRoot.getElementById(MODAL_ID);
             if (modalElement) {
                 modalElement.style.pointerEvents = 'auto';
@@ -186,19 +186,19 @@ window.CategoryModal = (function () {
         } catch (error) {
             console.error('[CategoryModal] خطأ في إنشاء النافذة:', error);
 
-            // محاولة استخدام طريقة احتياطية بدون Shadow DOM
+            // Attempt to use fallback method without Shadow DOM
             return createFallbackModal();
         }
     }
 
     // ============================================
-    // 4. طريقة احتياطية بدون Shadow DOM
+    // 4. Fallback Method without Shadow DOM
     // ============================================
     /**
      * @function createFallbackModal
-     * @description طريقة احتياطية لإنشاء النافذة إذا فشل Shadow DOM.
-     * تقوم بإضافة HTML و CSS مباشرة إلى المستند الرئيسي.
-     * @returns {Promise<boolean>} returns true إذا نجحت العملية.
+     * @description Fallback method to create modal if Shadow DOM fails.
+     * Adds HTML and CSS directly to the main document.
+     * @returns {Promise<boolean>} returns true if successful.
      * @throws {Error} - If fetching HTML or CSS fails.
      * @async
      * @see loadExternalFile
@@ -207,7 +207,7 @@ window.CategoryModal = (function () {
         console.log('[CategoryModal] استخدام الطريقة الاحتياطية...');
 
         try {
-            // تحميل الأنماط بشكل تقليدي
+            // Load styles traditionally
             const cssResponse = await fetch(CSS_URL);
             if (cssResponse.ok) {
                 const cssText = await cssResponse.text();
@@ -217,7 +217,7 @@ window.CategoryModal = (function () {
                 document.head.appendChild(style);
             }
 
-            // تحميل HTML
+            // Load HTML
             const htmlResponse = await fetch(HTML_URL);
             if (htmlResponse.ok) {
                 const htmlText = await htmlResponse.text();
@@ -238,13 +238,13 @@ window.CategoryModal = (function () {
     }
 
     // ============================================
-    // 5. جلب بيانات الفئات من JSON
+    // 5. Fetch Categories Data from JSON
     // ============================================
     /**
      * @function fetchCategoriesData
-     * @description جلب بيانات الفئات من ملف JSON الخارجي.
-     * @returns {Promise<Array>} مصفوفة الفئات.
-     * @throws {Error} إذا فشل جلب البيانات.
+     * @description Fetch categories data from external JSON file.
+     * @returns {Promise<Array>} Categories array.
+     * @throws {Error} If data fetching fails.
      * @async
      */
     async function fetchCategoriesData() {
@@ -273,12 +273,12 @@ window.CategoryModal = (function () {
     }
 
     // ============================================
-    // 6. الحصول على عناصر من Shadow DOM أو DOM العادي
+    // 6. Get Elements from Shadow DOM or Normal DOM
     // ============================================
     /**
      * @function getModalElement
-     * @description الحصول على العنصر الجذر للنافذة (من Shadow DOM أو document).
-     * @returns {HTMLElement|null} عنصر النافذة.
+     * @description Get modal root element (from Shadow DOM or document).
+     * @returns {HTMLElement|null} Modal element.
      */
     function getModalElement() {
         if (shadowRoot) {
@@ -289,9 +289,9 @@ window.CategoryModal = (function () {
 
     /**
      * @function querySelector
-     * @description بحث عن عنصر داخل نطاق النافذة (Shadow DOM أو document).
-     * @param {string} selector - استعلام CSS.
-     * @returns {HTMLElement|null} العنصر المطابق.
+     * @description Query for an element within modal scope (Shadow DOM or document).
+     * @param {string} selector - CSS selector.
+     * @returns {HTMLElement|null} Matching element.
      */
     function querySelector(selector) {
         if (shadowRoot) {
@@ -301,12 +301,12 @@ window.CategoryModal = (function () {
     }
 
     // ============================================
-    // 7. تحديث عنوان النافذة
+    // 7. Update Modal Title
     // ============================================
     /**
      * @function updateModalTitle
-     * @description تحديث النص الظاهر في عنوان النافذة.
-     * @param {string} title - العنوان الجديد.
+     * @description Update text displayed in modal title.
+     * @param {string} title - New title.
      * @returns {void}
      */
     function updateModalTitle(title) {
@@ -317,15 +317,15 @@ window.CategoryModal = (function () {
     }
 
     // ============================================
-    // 8. إعداد وعرض النافذة (الوظيفة الرئيسية)
+    // 8. Setup and Show Modal (Main Function)
     // ============================================
     /**
      * @function showCategoryModal
-     * @description الوظيفة الداخلية الرئيسية لفتح النافذة وإدارة دورة حياتها.
-     * @param {string|null} [initialMainId=null] - معرف الفئة الرئيسية الأولية.
-     * @param {string|null} [initialSubId=null] - معرف الفئة الفرعية الأولية.
-     * @param {string|null} [customTitle=null] - عنوان مخصص.
-     * @returns {Promise<object>} وعد يتم حله عند إغلاق النافذة بنجاح أو إلغاء.
+     * @description Main internal function to open modal and manage its lifecycle.
+     * @param {string|null} [initialMainId=null] - Initial main category ID.
+     * @param {string|null} [initialSubId=null] - Initial sub-category ID.
+     * @param {string|null} [customTitle=null] - Custom title.
+     * @returns {Promise<object>} Promise resolved when modal is successfully closed or cancelled.
      * @async
      * @throws {Error} - If an unexpected error occurs during modal display.
      * @see createModalDOM
@@ -339,34 +339,34 @@ window.CategoryModal = (function () {
             initialMainId,
             initialSubId,
             customTitle,
-            // تسجيل جميع المعلمات التي تم تمريرها
+            // Log all passed arguments
             argumentsLength: arguments.length,
             allArguments: Array.from(arguments)
         });
 
         return new Promise(async (resolve) => {
             try {
-                // معالجة المعلمات المرنة
-                // يمكن للمستخدم تمرير معلمات مختلفة مثل:
-                // show() - بدون معلمات
-                // show('1') - مع الفئة الرئيسية فقط
-                // show('1', '33') - مع فئتين
-                // show('1', '33', 'عنوان مخصص') - مع فئتين وعنوان
-                // show(null, null, 'عنوان فقط') - مع عنوان فقط
+                // Handle flexible arguments
+                // User can pass different arguments like:
+                // show() - No arguments
+                // show('1') - With main category only
+                // show('1', '33') - With two categories
+                // show('1', '33', 'Custom Title') - With two categories and title
+                // show(null, null, 'Title Only') - With title only
 
                 let titleToUse = DEFAULT_TITLE;
 
-                // تحديد إذا كان المعامل الثالث هو العنوان
+                // Determine if third argument is title
                 if (arguments.length === 3 && customTitle !== null) {
                     titleToUse = customTitle;
                 }
-                // إذا مرر معلمتين فقط وكانت الثانية نصاً (ليست رقم/معرف)
+                // If two arguments passed and second is string (not number/ID)
                 else if (arguments.length === 2 && typeof initialSubId === 'string' &&
                     isNaN(initialSubId) && initialSubId.trim() !== '') {
                     titleToUse = initialSubId;
-                    initialSubId = null; // إعادة ضبط لأنها كانت العنوان
+                    initialSubId = null; // Reset because it was title
                 }
-                // إذا مرر معلمة واحدة وكانت نصاً (ليست رقم/معرف)
+                // If one argument passed and is string (not number/ID)
                 else if (arguments.length === 1 && typeof initialMainId === 'string' &&
                     isNaN(initialMainId) && initialMainId.trim() !== '') {
                     titleToUse = initialMainId;
@@ -375,7 +375,7 @@ window.CategoryModal = (function () {
 
                 console.log('[CategoryModal] العنوان النهائي:', titleToUse);
 
-                // 1. التحقق من التهيئة
+                // 1. Check Initialization
                 if (!isInitialized) {
                     console.log('[CategoryModal] تهيئة النافذة لأول مرة');
                     const created = await createModalDOM();
@@ -393,7 +393,7 @@ window.CategoryModal = (function () {
                     isInitialized = true;
                 }
 
-                // 2. التحقق من وجود العنصر
+                // 2. Check for Element Existence
                 const modalElement = getModalElement();
                 if (!modalElement) {
                     console.error('[CategoryModal] العنصر غير موجود في DOM');
@@ -408,10 +408,10 @@ window.CategoryModal = (function () {
                     return;
                 }
 
-                // 3. تحديث العنوان
+                // 3. Update Title
                 updateModalTitle(titleToUse);
 
-                // 4. جلب البيانات
+                // 4. Fetch Data
                 let categories;
                 try {
                     categories = await fetchCategoriesData();
@@ -427,14 +427,14 @@ window.CategoryModal = (function () {
                     return;
                 }
 
-                // 5. الحصول على عناصر DOM
+                // 5. Get DOM Elements
                 const mainSelect = querySelector('#main-category');
                 const subSelect = querySelector('#sub-category');
                 const confirmBtn = querySelector('#confirm-modal-btn');
                 const cancelBtn = querySelector('#cancel-modal-btn');
                 const validationMsg = querySelector('#validation-message');
 
-                // التحقق من وجود جميع العناصر
+                // Check for existence of all elements
                 if (!mainSelect || !subSelect || !confirmBtn || !cancelBtn) {
                     resolve({
                         status: 'error',
@@ -447,7 +447,7 @@ window.CategoryModal = (function () {
                     return;
                 }
 
-                // 6. تعبئة القائمة الرئيسية
+                // 6. Populate Main List
                 mainSelect.innerHTML = '<option value="" disabled selected>اختر السوق الرئيسي...</option>';
                 categories.forEach(category => {
                     const option = document.createElement('option');
@@ -456,7 +456,7 @@ window.CategoryModal = (function () {
                     mainSelect.appendChild(option);
                 });
 
-                // 7. دالة تحديث القائمة الفرعية
+                // 7. Sub-category Update Function
                 /**
                  * @description Updates the sub-category dropdown based on the selected main category.
                  * If the selected main category has subcategories, it populates the sub-category dropdown
@@ -487,7 +487,7 @@ window.CategoryModal = (function () {
                     }
                 }
 
-                // 8. تعيين القيم الأولية
+                // 8. Set Initial Values
                 if (initialMainId) {
                     mainSelect.value = initialMainId;
                     updateSubCategories();
@@ -506,7 +506,7 @@ window.CategoryModal = (function () {
                     }
                 }
 
-                // 9. معالجات الأحداث
+                // 9. Event Handlers
                 let isModalActive = true;
 
                 /**
@@ -638,7 +638,7 @@ window.CategoryModal = (function () {
                     }
                 }
 
-                // 10. دالة تنظيف المستمعات
+                // 10. Cleanup Listeners Function
                 /**
                  * @description Removes all event listeners to prevent memory leaks and duplicate triggers.
                  * Also resets the modal title to its default value.
@@ -652,22 +652,22 @@ window.CategoryModal = (function () {
                     modalElement.removeEventListener('click', handleBackdropClick);
                     document.removeEventListener('keydown', handleEscKey);
 
-                    // إعادة العنوان إلى القيمة الافتراضية
+                    // Reset title to default
                     updateModalTitle(DEFAULT_TITLE);
                 }
 
-                // 11. إضافة مستمعات الأحداث
+                // 11. Add Event Listeners
                 mainSelect.addEventListener('change', handleMainChange);
                 confirmBtn.addEventListener('click', handleConfirm);
                 cancelBtn.addEventListener('click', handleCancel);
                 modalElement.addEventListener('click', handleBackdropClick);
                 document.addEventListener('keydown', handleEscKey);
 
-                // 12. عرض النافذة
+                // 12. Show Modal
                 modalElement.classList.add('show');
                 document.body.style.overflow = 'hidden';
 
-                // التركيز على العنصر المناسب
+                // Focus on appropriate element
                 setTimeout(() => {
                     if (initialMainId) {
                         subSelect.focus();
@@ -691,11 +691,11 @@ window.CategoryModal = (function () {
     }
 
     // ============================================
-    // 9. دالة إغلاق النافذة يدوياً
+    // 9. Manual Modal Close Function
     // ============================================
     /**
      * @function closeCategoryModal
-     * @description إغلاق النافذة يدوياً وإخفائها من الواجهة.
+     * @description Manually close modal and hide from UI.
      * @returns {void}
      * @see getModalElement
      * @see updateModalTitle
@@ -707,18 +707,18 @@ window.CategoryModal = (function () {
             document.body.style.overflow = '';
             console.log('[CategoryModal] تم إغلاق النافذة يدوياً');
 
-            // إعادة العنوان إلى القيمة الافتراضية
+            // Reset title to default
             updateModalTitle(DEFAULT_TITLE);
         }
     }
 
     // ============================================
-    // 10. دالة التحقق من حالة النافذة
+    // 10. Modal State Check Function
     // ============================================
     /**
      * @function isModalOpen
-     * @description التحقق مما إذا كانت النافذة مفتوحة حالياً (تحتوي على فئة 'show').
-     * @returns {boolean} true إذا كانت مفتوحة.
+     * @description Check if modal is currently open (has 'show' class).
+     * @returns {boolean} true if open.
      * @see getModalElement
      */
     function isModalOpen() {
@@ -727,11 +727,11 @@ window.CategoryModal = (function () {
     }
 
     // ============================================
-    // 11. دالة إعادة تعيين النافذة
+    // 11. Reset Modal Function
     // ============================================
     /**
      * @function resetModal
-     * @description إعادة تعيين حقول النافذة (القوائم المنسدلة، العنوان) إلى الحالة الافتراضية.
+     * @description Reset modal fields (dropdowns, title) to default state.
      * @returns {void}
      * @see getModalElement
      * @see querySelector
@@ -752,16 +752,16 @@ window.CategoryModal = (function () {
         }
         if (validationMsg) validationMsg.textContent = '';
 
-        // إعادة العنوان إلى القيمة الافتراضية
+        // Reset title to default
         updateModalTitle(DEFAULT_TITLE);
     }
 
     // ============================================
-    // 12. دالة تنظيف الذاكرة
+    // 12. Memory Cleanup Function
     // ============================================
     /**
      * @function destroy
-     * @description إزالة النافذة وعناصرها تماماً من DOM وتنظيف المتغيرات.
+     * @description Remove modal and its elements completely from DOM and clear variables.
      * @returns {void}
      */
     function destroy() {
@@ -784,33 +784,33 @@ window.CategoryModal = (function () {
     }
 
     // ============================================
-    // 13. تصدير الواجهة العامة
+    // 13. Export Public Interface
     // ============================================
     return {
         /**
-         * فتح نافذة اختيار الفئات
-         * @param {string|null} initialMainId - الفئة الرئيسية الأولية (اختياري)
-         * @param {string|null} initialSubId - الفئة الفرعية الأولية أو العنوان المخصص (اختياري)
-         * @param {string|null} customTitle - العنوان المخصص للنافذة (اختياري)
-         * @returns {Promise<Object>} - يعيد وعداً بكائن النتيجة
+         * Open category selection modal
+         * @param {string|null} initialMainId - Initial Main Category ID (optional)
+         * @param {string|null} initialSubId - Initial Sub-Category ID or Custom Title (optional)
+         * @param {string|null} customTitle - Custom Modal Title (optional)
+         * @returns {Promise<Object>} - Returns a promise with result object
          * 
-         * أمثلة استخدام:
-         * show() - بدون معلمات
-         * show('1') - مع الفئة الرئيسية فقط
-         * show('1', '33') - مع فئتين
-         * show('1', '33', 'اختر التصنيف') - مع فئتين وعنوان
-         * show(null, null, 'اختر التصنيف') - مع عنوان فقط
-         * show('اختر التصنيف') - مع عنوان فقط (مرونة)
+         * Usage examples:
+         * show() - No arguments
+         * show('1') - With main category only
+         * show('1', '33') - With two categories
+         * show('1', '33', 'Select Category') - With two categories and title
+         * show(null, null, 'Select Category') - With title only
+         * show('Select Category') - With title only (flexible)
          */
         show: showCategoryModal,
 
         /**
-         * إغلاق النافذة يدوياً
+         * Manually close modal
          */
         close: closeCategoryModal,
 
         /**
-         * التحقق مما إذا كانت النافذة مفتوحة
+         * Check if modal is open
          * @returns {boolean}
          */
         isOpen: isModalOpen,
@@ -825,20 +825,20 @@ window.CategoryModal = (function () {
         },
 
         /**
-         * إعادة تعيين النافذة إلى حالتها الأولية
+         * Reset modal to initial state
          */
         reset: resetModal,
 
         /**
-         * تغيير عنوان النافذة يدوياً
-         * @param {string} title - العنوان الجديد
+         * Manually change modal title
+         * @param {string} title - New Title
          */
         setTitle: function (title) {
             updateModalTitle(title);
         },
 
         /**
-         * الحصول على العنوان الحالي
+         * Get current title
          * @returns {string}
          */
         getTitle: function () {
@@ -847,7 +847,7 @@ window.CategoryModal = (function () {
         },
 
         /**
-         * تنظيف جميع الموارد وإزالة النافذة من الذاكرة
+         * Clean all resources and remove modal from memory
          */
         destroy: destroy,
 
@@ -870,7 +870,7 @@ window.CategoryModal = (function () {
          */
         preload: async function () {
             try {
-                // تحميل البيانات والملفات مسبقاً
+                // Preload data and files
                 await Promise.all([
                     fetchCategoriesData(),
                     loadExternalFile(HTML_URL).catch(() => { }),
@@ -907,7 +907,7 @@ window.CategoryModal = (function () {
 })();
 
 // ============================================
-// 14. تهيئة تلقائية عند تحميل الصفحة
+// 14. Automatic Initialization on Page Load
 // ============================================
 if (typeof window !== 'undefined') {
     window.addEventListener('DOMContentLoaded', function () {

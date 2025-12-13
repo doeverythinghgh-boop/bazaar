@@ -30,10 +30,10 @@
   .search-modal-content {
     margin: 40px;
     background-color: transparent;
-    /* لون الخلفية */
+    /* Background color */
     animation: slide-down 0.5s ease-out forwards;
     text-align: right;
-    /* ✅ تعديل: محاذاة المحتوى لليمين ليتناسب مع اللغة */
+    /* ✅ EDIT: Align content to right to match language */
   }
 
   @keyframes slide-down {
@@ -48,7 +48,7 @@
     }
   }
 
-  /* ✅ جديد: تأثير الظهور التدريجي للنافذة */
+  /* ✅ NEW: Modal fade-in effect */
   @keyframes fade-in {
     from {
       opacity: 0;
@@ -59,25 +59,25 @@
     }
   }
 
-  /* ✅ جديد: حاوية لتجميع حقل البحث وزر البحث */
+  /* ✅ NEW: Container to group search field and button */
   .search-wrapper {
     display: flex;
     align-items: center;
     gap: 10px;
-    /* مسافة بين حقل البحث والزر */
+    /* Gap between search field and button */
   }
 
-  /* ✅ جديد: أنماط زر البحث الجديد */
+  /* ✅ NEW: New search button styles */
   .search-button {
     flex-shrink: 0;
-    /* منع الزر من التقلص */
+    /* Prevent button shrinking */
     width: 50px;
     height: 50px;
     border-radius: 50%;
     background-color: transparent;
     color: var(--primary-color);
     border: 1px solid var(--border-color-input);
-    /* ✅ تعديل: حدود أرفع بلون أزرق خفيف */
+    /* ✅ EDIT: Thinner border with light blue color */
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -85,10 +85,10 @@
     font-size: 1.2rem;
     transition: background-color 0.3s ease, box-shadow 0.3s ease;
     box-shadow: var(--shadow-interactive);
-    /* ✅ تعديل: ظل أكثر وضوحًا */
+    /* ✅ EDIT: More visible shadow */
   }
 
-  /* ✅ جديد: تعريف حركة النبض لزر البحث */
+  /* ✅ NEW: Define pulse animation for search button */
   @keyframes pulse-animation {
     0% {
       transform: scale(1);
@@ -118,68 +118,68 @@
     border-radius: 50px;
     overflow: hidden;
     transition: border-color 0.3s ease, box-shadow 0.3s ease;
-    /* ✅ تعديل: إزالة الحشو من هنا */
+    /* ✅ EDIT: Remove padding from here */
     background-color: var(--bg-color-light);
     flex-grow: 1;
-    /* جعل حقل البحث يملأ المساحة المتاحة */
+    /* Make search field fill available space */
   }
 
   .search-modal-input-container:focus-within {
     border-color: var(--primary-color);
     box-shadow: 0 0 0 3px var(--primary-color-light);
-    /* ✅ تحسين: استخدام متغير لون للتوهج */
+    /* ✅ IMPROVE: Use color variable for glow */
   }
 
-  /* ✅ جديد: أنماط أيقونة البحث داخل حقل الإدخال */
+  /* ✅ NEW: Search icon styles inside input field */
   .search-modal-input-icon {
     font-style: normal;
-    /* إزالة النمط المائل من وسم <i> */
+    /* Remove italic style from <i> tag */
     font-weight: bold;
     color: var(--primary-color);
     font-size: 1rem;
     transition: color 0.3s ease;
-    /* ✅ تعديل: إضافة حشو على اليمين لإنشاء مسافة من حافة الحاوية */
+    /* ✅ EDIT: Add right padding to create space from container edge */
     padding-right: 20px;
   }
 
-  /* ✅ جديد: استخدام ::before لإظهار نص "txt" بدلاً من أيقونة font-awesome */
+  /* ✅ NEW: Use ::before to show "txt" text instead of font-awesome icon */
   .search-modal-input-icon.fa-search::before {
     content: "txt";
     font-family: "Tajawal", sans-serif;
-    /* استخدام خط متناسق */
+    /* Use consistent font */
   }
 
   .search-modal-input-icon.fa-search {
     font-family: "Font Awesome 5 Free";
-    /* تعريف احتياطي لتجنب مشاكل العرض */
+    /* Fallback definition to avoid display issues */
   }
 
-  /* ✅ جديد: تغيير لون أيقونة البحث عند التركيز */
+  /* ✅ NEW: Change search icon color on focus */
   #search-modal-input {
     flex-grow: 1;
     border: none;
     padding: 15px 20px;
-    /* ✅ تعديل: توحيد الحشو بعد الاعتماد على flexbox */
+    /* ✅ EDIT: Unify padding after relying on flexbox */
     font-size: 1.1rem;
     outline: none;
     background-color: transparent;
     width: 100%;
-    /* ✅ جديد: لضمان ملء المساحة */
+    /* ✅ NEW: To ensure filling space */
     box-sizing: border-box;
-    /* ✅ جديد: لضمان حساب الحشو بشكل صحيح */
+    /* ✅ NEW: To ensure padding is calculated correctly */
   }
 
-  /* ✅ جديد: تغيير لون الأيقونة عند التركيز على حقل الإدخال */
+  /* ✅ NEW: Change icon color when focusing on input field */
   .search-modal-input-container:focus-within .search-modal-input-icon {
     color: var(--primary-color);
   }
 
-  /* ✅ جديد: أنماط رابط إظهار/إخفاء الفلاتر */
+  /* ✅ NEW: Styles for show/hide filters link */
   .search-toggle-filters-link {
     display: block;
-    /* ✅ تعديل: تغيير العرض ليأخذ كامل المساحة المتاحة */
+    /* ✅ EDIT: Change width to take full available space */
     text-align: center;
-    /* ✅ جديد: توسيط النص داخل الرابط */
+    /* ✅ NEW: Center text inside link */
     margin-top: 15px;
     color: var(--primary-color);
     text-decoration: none;
@@ -187,7 +187,7 @@
     cursor: pointer;
     /* Use pointer cursor for links */
     font-size: 1rem;
-    /* ✅ تعديل: توحيد حجم الخط مع النص التعريفي */
+    /* ✅ EDIT: Unify font size with label text */
     transition: color 0.3s ease;
   }
 
@@ -195,9 +195,9 @@
     transition: transform 0.3s ease;
   }
 
-  /* ✅ جديد: أنماط أيقونة البحث داخل الحقل */
+  /* ✅ NEW: Search icon styles inside field */
 
-  /* ✅ جديد: أنماط حاوية فلاتر الفئات */
+  /* ✅ NEW: Category filters container styles */
   .search-filters-container {
     display: flex;
     gap: 15px;
@@ -215,15 +215,15 @@
   .search-filter-icon {
     position: absolute;
     right: 18px;
-    /* ✅ تعديل: تحسين الموضع */
+    /* ✅ EDIT: Improve positioning */
     color: var(--primary-color);
     pointer-events: none;
-    /* لمنع الأيقونة من التداخل مع النقر */
+    /* To prevent icon from interfering with click */
     transition: color 0.3s ease;
-    /* ✅ جديد: إضافة حركة لتغيير اللون */
+    /* ✅ NEW: Add animation for color change */
   }
 
-  /* ✅ جديد: تغيير لون أيقونة الفلتر عند التركيز */
+  /* ✅ NEW: Change filter icon color on focus */
   .search-filter-group:focus-within .search-filter-icon {
     color: var(--primary-color);
   }
@@ -231,7 +231,7 @@
   .search-category-filter {
     width: 100%;
     padding: 12px 45px 12px 20px;
-    /* حشو لإفساح المجال للأيقونة */
+    /* Padding to make room for icon */
     border: 1px solid var(--border-color-input);
     border-radius: 50px;
     background-color: var(--bg-color-light);
@@ -240,7 +240,7 @@
     color: var(--text-color-medium);
     cursor: pointer;
     -webkit-appearance: none;
-    /* إزالة المظهر الافتراضي للمتصفح */
+    /* Remove browser default appearance */
     -moz-appearance: none;
     appearance: none;
     background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='var(--text-color-dark)' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
@@ -248,14 +248,14 @@
     background-position: left 0.75rem center;
     background-size: 16px 12px;
     transition: border-color 0.3s ease, box-shadow 0.3s ease;
-    /* ✅ تحسين: إضافة تأثير للظل */
+    /* ✅ IMPROVE: Add shadow effect */
   }
 
   .search-category-filter:focus {
     outline: none;
     border-color: var(--primary-color);
     box-shadow: 0 0 0 3px var(--primary-color-light);
-    /* ✅ جديد: إضافة توهج عند التركيز */
+    /* ✅ NEW: Add glow on focus */
   }
 
   .search-category-filter:disabled {
@@ -267,49 +267,49 @@
   #search-results-container {
     margin-top: 20px;
     text-align: right;
-    /* محاذاة نتائج البحث لليمين */
+    /* Align search results to right */
   }
 
-  /* ✅ جديد: أنماط الشبكة لعرض نتائج البحث */
+  /* ✅ NEW: Grid styles for displaying search results */
   .search-results-grid {
     display: grid;
-    /* إنشاء أعمدة متجاوبة، كل عمود عرضه الأدنى 180 بكسل والأقصى 1fr (جزء من المساحة المتاحة) */
+    /* Create responsive columns, min width 180px, max 1fr (part of available space) */
     grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
     gap: 20px;
-    /* مسافة بين العناصر */
+    /* Gap between items */
     padding-top: 10px;
   }
 
-  /* ✅ جديد: أنماط كل عنصر في شبكة البحث */
+  /* ✅ NEW: Styles for each item in search grid */
   .search-result-item {
     background-color: var(--bg-color-white);
     border: 1px solid var(--border-color);
     border-radius: 12px;
     overflow: hidden;
-    /* لإخفاء أي أجزاء من الصورة تتجاوز الحدود الدائرية */
+    /* To hide any parts of image exceeding rounded borders */
     box-shadow: var(--shadow-soft);
     cursor: pointer;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     display: flex;
     flex-direction: column;
     text-align: right;
-    /* محاذاة النص لليمين */
+    /* Align text to right */
   }
 
-  /* ✅ جديد: أنماط صورة المنتج في نتيجة البحث */
+  /* ✅ NEW: Product image styles in search result */
   .search-result-image {
     width: 100%;
     height: 160px;
-    /* ارتفاع ثابت للصور للحفاظ على التناسق */
+    /* Fixed height for images to maintain consistency */
     object-fit: cover;
-    /* لضمان ملء الصورة للمساحة دون تشويه */
+    /* To ensure image fills space without distortion */
   }
 
-  /* ✅ جديد: أنماط تفاصيل المنتج في نتيجة البحث */
+  /* ✅ NEW: Product details styles in search result */
   .search-result-details {
     padding: 15px;
     flex-grow: 1;
-    /* لجعل هذا الجزء يملأ المساحة المتبقية */
+    /* To make this part fill remaining space */
     display: flex;
     flex-direction: column;
   }
@@ -326,14 +326,14 @@
     color: var(--primary-color);
     font-weight: bold;
     margin: auto 0 0 0;
-    /* دفع السعر إلى الأسفل */
+    /* Push price to bottom */
   }
 
-  /* ✅ جديد: أنماط للشاشات الصغيرة (Responsive) */
+  /* ✅ NEW: Styles for small screens (Responsive) */
   @media (max-width: 768px) {
     .search-modal-content {
       width: 95%;
-      /* زيادة العرض قليلاً ليملأ الشاشة بشكل أفضل */
+      /* Increase width slightly to better fill screen */
       margin: 20px auto;
       padding: 15px;
       max-width: none;
@@ -341,12 +341,12 @@
 
     #search-modal-input {
       padding: 12px 15px 12px 10px;
-      /* ✅ تعديل: تعديل الحشو ليتناسب مع flexbox */
+      /* ✅ EDIT: Adjust padding to fit flexbox */
       font-size: 1rem;
-      /* تصغير حجم خط الإدخال */
+      /* Reduce input font size */
     }
 
-    /* ✅ جديد: جعل الفلاتر تحت بعضها في الشاشات الصغيرة */
+    /* ✅ NEW: Stack filters on small screens */
     .search-filters-container {
       flex-direction: column;
       gap: 10px;
@@ -357,7 +357,7 @@
       font-size: 0.9rem;
     }
 
-    /* ✅ جديد: تعديل حجم الأعمدة في الشاشات الصغيرة جدًا */
+    /* ✅ NEW: Adjust column size on very small screens */
     .search-results-grid {
       grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
       gap: 15px;
@@ -369,7 +369,7 @@
 <div id="search-modal-content" class="search-modal-content">
   <table id="search-layout-table" style="width: 100%; border-spacing: 10px; table-layout: fixed">
     <tbody id="search-layout-tbody">
-      <!-- الصف الأول: الفئات الرئيسية والفرعية -->
+      <!-- First Row: Main and Sub Categories -->
       <tr id="search-filters-row">
         <td id="search-main-category-cell">
           <div id="search-main-category-filter-group" class="search-filter-group">
@@ -392,7 +392,7 @@
           </div>
         </td>
       </tr>
-      <!-- الصف الثاني: حقل البحث -->
+      <!-- Second Row: Search Field -->
       <tr id="search-input-row">
         <td id="search-input-cell" colspan="2">
           <div id="search-modal-input-container" class="search-modal-input-container" style="padding-right: 0px">
@@ -402,7 +402,7 @@
           </div>
         </td>
       </tr>
-      <!-- الصف الثالث: فلتر الترتيب وزر البحث -->
+      <!-- Third Row: Sort Filter and Search Button -->
       <tr id="search-action-row">
         <td id="search-sort-cell">
           <div id="search-sort-filter-group" class="search-filter-group">
