@@ -1,4 +1,15 @@
+<!--
+    @file pages/ADMIN/pendingProducts.html
+    @description Admin page for managing product approvals.
+    Contains two main sections:
+    1. Pending Products: A list of products waiting for approval (Card layout).
+    2. Published Products: A table of currently active products (Table layout).
+    Includes responsive CSS and inline JavaScript logic for fetching and updating data.
+-->
 <style>
+    /* 
+     * Container styles for the pending products page
+     */
     .pending-products-container {
         padding: 20px;
         background: #fff;
@@ -9,6 +20,9 @@
         margin-bottom: 30px;
     }
 
+    /* 
+     * Header section containing title and refresh button
+     */
     .pending-products-header {
         display: flex;
         justify-content: space-between;
@@ -18,10 +32,12 @@
         padding-bottom: 10px;
     }
 
-    /* Pending Cards Style */
+    /* 
+     * Pending Cards (Top Section) Styles 
+     */
     .pending-product-card {
         border: 1px solid #ffc107;
-        /* Yellow border for warning/pending */
+        /* Yellow border indicates pending/warning state */
         border-radius: 8px;
         padding: 15px;
         margin-bottom: 15px;
@@ -29,7 +45,7 @@
         gap: 15px;
         align-items: flex-start;
         background: #fffbf0;
-        /* Light yellow bg */
+        /* Light yellow background */
         transition: transform 0.2s;
     }
 
@@ -70,7 +86,9 @@
         min-width: 120px;
     }
 
-    /* Table Styles */
+    /* 
+     * Published Table (Bottom Section) Styles 
+     */
     .pending-products-table {
         width: 100%;
         border-collapse: collapse;
@@ -94,7 +112,9 @@
         background-color: #f1f1f1;
     }
 
-    /* Buttons */
+    /* 
+     * Action Buttons Styles 
+     */
     .btn-approve {
         background-color: #28a745;
         color: white;
@@ -166,6 +186,120 @@
         background: #fafafa;
         border-radius: 6px;
     }
+
+    /* 
+     * Responsive Styles for Mobile Devices 
+     */
+    @media (max-width: 768px) {
+
+        /* Stack card elements vertically on small screens */
+        .pending-product-card {
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .pending-product-image {
+            width: 100%;
+            height: 200px;
+            max-width: 300px;
+            margin-bottom: 10px;
+        }
+
+        .pending-product-details {
+            width: 100%;
+            margin-bottom: 15px;
+        }
+
+        .pending-product-actions {
+            flex-direction: row;
+            width: 100%;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .pending-product-actions button {
+            flex: 1;
+            min-width: 100px;
+        }
+
+        /* Convert Table to Card Layout on Mobile */
+        .pending-products-table,
+        .pending-products-table thead,
+        .pending-products-table tbody,
+        .pending-products-table th,
+        .pending-products-table td,
+        .pending-products-table tr {
+            display: block;
+        }
+
+        /* Hide table headers on mobile */
+        .pending-products-table thead tr {
+            position: absolute;
+            top: -9999px;
+            left: -9999px;
+        }
+
+        .pending-products-table tr {
+            border: 1px solid #ccc;
+            margin-bottom: 15px;
+            background: #fff;
+            border-radius: 8px;
+            padding: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .pending-products-table td {
+            border: none;
+            border-bottom: 1px solid #eee;
+            position: relative;
+            padding-right: 50%;
+            text-align: left;
+            padding-top: 10px;
+            padding-bottom: 10px;
+        }
+
+        /* Add labels before cell content */
+        .pending-products-table td:before {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 45%;
+            padding-right: 10px;
+            white-space: nowrap;
+            font-weight: bold;
+            text-align: right;
+            color: #333;
+        }
+
+        /* Specific Labels for mobile table view */
+        .pending-products-table td:nth-of-type(1):before {
+            content: "اسم المنتج";
+        }
+
+        .pending-products-table td:nth-of-type(2):before {
+            content: "اسم البائع";
+        }
+
+        .pending-products-table td:nth-of-type(3):before {
+            content: "الإجراءات";
+        }
+
+        .pending-products-table td:last-child {
+            border-bottom: none;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+            padding-right: 10px;
+            /* Reset padding for actions */
+        }
+
+        .pending-products-table td:last-child:before {
+            display: none;
+            /* Hide label for actions */
+        }
+    }
 </style>
 
 <div class="pending-products-container">
@@ -178,7 +312,7 @@
         </button>
     </div>
 
-    <!-- PENDING LIST (Cards) -->
+    <!-- PENDING PRODUCTS LIST (Cards) -->
     <div style="margin-bottom: 40px;">
         <div class="section-title" style="color: #d39e00;">
             <i class="fas fa-clock"></i> المنتجات المعلقة (بانتظار الموافقة)
@@ -188,7 +322,7 @@
         </div>
     </div>
 
-    <!-- PUBLISHED LIST (Table) -->
+    <!-- PUBLISHED PRODUCTS LIST (Table) -->
     <div>
         <div class="section-title" style="color: #28a745;">
             <i class="fas fa-check-circle"></i> المنتجات المنشورة
@@ -200,6 +334,17 @@
 </div>
 
 <script>
+    /**
+     * Logic for fetching, displaying, and managing products.
+     * Functions are attached to window object for accessibility from HTML attributes.
+     */
+
+    /**
+     * Fetches all product data (both pending and published) and updates the UI.
+     * @async
+     * @function fetchAllData
+     * @returns {Promise<void>}
+     */
     async function fetchAllData() {
         console.log("Fetching all data...");
         fetchPendingItems();
@@ -209,7 +354,12 @@
     // Attach to window to ensure global access for onclick handlers
     window.fetchAllData = fetchAllData;
 
-    // 1. Fetch Pending (Status = 0)
+    /**
+     * Fetches pending products (status = 0) from the API and renders them as cards.
+     * @async
+     * @function fetchPendingItems
+     * @returns {Promise<void>}
+     */
     async function fetchPendingItems() {
         const container = document.getElementById('pending-list-container');
         container.innerHTML = '<div class="loader"></div>';
@@ -230,7 +380,7 @@
 
                 html += `
                     <div class="pending-product-card" id="card-${p.product_key}">
-                        <img src="${imgUrl}" class="pending-product-image">
+                        <img src="${imgUrl}" class="pending-product-image" alt="${p.productName}">
                         <div class="pending-product-details">
                             <div class="pending-product-title">${p.productName}</div>
                             <div class="pending-product-info"><strong>البائع:</strong> ${p.seller_username || 'غير معروف'} (${p.seller_phone || '-'})</div>
@@ -259,7 +409,12 @@
         }
     }
 
-    // 2. Fetch Published (Status = 1)
+    /**
+     * Fetches published products (status = 1) from the API and renders them as a table.
+     * @async
+     * @function fetchPublishedItems
+     * @returns {Promise<void>}
+     */
     async function fetchPublishedItems() {
         const container = document.getElementById('published-list-container');
         container.innerHTML = '<div class="loader"></div>';
@@ -318,7 +473,16 @@
         }
     }
 
-    // Unified Update Status Function (1 = Approve, 0 = Unpublish)
+    /**
+     * Updates the approval status of a product.
+     * Used for both Approving (0 -> 1) and Unpublishing (1 -> 0).
+     * @async
+     * @function updateStatus
+     * @param {string} key - The product key.
+     * @param {string} name - The product name.
+     * @param {number} newStatus - The new status (1 for approved, 0 for pending).
+     * @returns {Promise<void>}
+     */
     async function updateStatus(key, name, newStatus) {
         const actionName = newStatus === 1 ? 'موافقة ونشر' : 'إلغاء نشر';
         const color = newStatus === 1 ? '#28a745' : '#ffc107';
@@ -364,6 +528,15 @@
     // Attach to window
     window.updateStatus = updateStatus;
 
+    /**
+     * Permanently deletes a product from the database.
+     * Used for Rejecting pending products or Deleting published ones.
+     * @async
+     * @function deleteProduct
+     * @param {string} key - The product key.
+     * @param {string} name - The product name.
+     * @returns {Promise<void>}
+     */
     async function deleteProduct(key, name) {
         const confirm = await Swal.fire({
             title: 'حذف المنتج',
@@ -399,6 +572,14 @@
     // Attach to window
     window.deleteProduct = deleteProduct;
 
+    /**
+     * Opens a full product preview modal using the same layout as the main product view.
+     * Fetches product details and sets the global session variable before calling productViewLayout.
+     * @async
+     * @function previewProduct
+     * @param {string} key - The product key.
+     * @returns {Promise<void>}
+     */
     async function previewProduct(key) {
         try {
             const response = await fetch(`${baseURL}/api/products?product_key=${key}&status=0`);
