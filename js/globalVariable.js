@@ -1,8 +1,8 @@
-                         /**
- * @file js/globalVariable.js
- * @description Definition of global variables and functions responsible for page routing and layout
- *   specific to products (add, view, edit).
- */
+/**
+* @file js/globalVariable.js
+* @description Definition of global variables and functions responsible for page routing and layout
+*   specific to products (add, view, edit).
+*/
 
 /**
  * @description Currently logged-in user data.
@@ -85,26 +85,38 @@ function productViewLayout(View) {
 
 /**
  * @description Directs the user to the add new product page, setting the product type based on the selected category.
- * @function productAddLayout
+ * @function productAddSetType
  * @param {boolean} [editMode=false] - Is it edit existing product mode? (Currently not fully used in this logic).
  * @returns {void}
  * @see mainLoader
  */
-function productAddLayout(editMode = false) {
+function productAddSetType(editMode = false) {
   if (mainCategorySelectToAdd == 6) {
     productTypeToAdd = 2; // Product type: Service
   } else {
     productTypeToAdd = 0; // Product type: Default
   }
   if (editMode == false) {
-    mainLoader(
-      "./pages/productAdd.html",
-      "index-product-container",
-      0,
-      undefined,
-      "showHomeIcon",
-      true
-    );
+    if (productTypeToAdd == 2) {
+      mainLoader(
+        "./pages/productAdd2.html",
+        "index-product-container",
+        0,
+        undefined,
+        "showHomeIcon",
+        true
+      );
+    } else if (productTypeToAdd == 0) {
+      mainLoader(
+        "./pages/productAdd.html",
+        "index-product-container",
+        0,
+        undefined,
+        "showHomeIcon",
+        true
+      );
+    }
+
   }
 
 }
@@ -138,7 +150,7 @@ function productEditLayout() {
  * @returns {Promise<void>}
  * @throws {Error} - If there's an error displaying the category modal or setting product layout.
  * @see CategoryModal.show
- * @see productAddLayout
+ * @see productAddSetType
  */
 async function showAddProductModal() {
   try {
@@ -148,12 +160,12 @@ async function showAddProductModal() {
       console.log('تم الاختيار:', result.mainId, result.subId);
       mainCategorySelectToAdd = result.mainId; // Main category selected when adding product
       subCategorySelectToAdd = result.subId; // Sub category selected when adding product
-      productAddLayout();
+      productAddSetType();
     }
 
 
   } catch (error) {
     console.error("خطأ في عرض نافذة إضافة المنتج:", error);
-  
+
   }
 }

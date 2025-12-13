@@ -965,13 +965,11 @@
             Swal.fire({
                 icon: 'success',
                 title: 'تم الإرسال بنجاح',
-                html: `تم رفع الصور وإنشاء الطلب.<br><small style="color:#777">الملفات المرفوعة:<br>${uploadedFileNames.join('<br>')}</small>`,
+                
                 confirmButtonText: 'حسناً'
             }).then(() => {
-                const modal = document.getElementById('productView_modal_content');
-                if (modal && modal.parentElement) {
-                    productView_initOrderLogic();
-                }
+                          mainLoader("./pages/home.html","index-home-container",0,undefined,"hiddenHomeIcon",false);
+
             });
 
         } catch (error) {

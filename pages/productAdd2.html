@@ -317,7 +317,7 @@
     <div class="add-product-modal" role="dialog" aria-modal="true" aria-labelledby="addProductTitle"
         id="add-product-modal-container">
         <h2 class="add-product-modal__title" id="addProductTitle"><i class="fas fa-cart-plus"
-                id="productAdd_icon_title"></i> إضافة منتج جديد</h2>
+                id="productAdd_icon_title"></i> إضافة خدمة جديدة</h2>
 
         <form class="add-product-modal__form" id="add-product-form" novalidate>
             <!-- Image Upload Module -->
@@ -325,7 +325,7 @@
                 id="productAdd_section_images">
                 <label id="imagesHeading" class="add-product-modal__label"><i class="fas fa-images"
                         id="productAdd_icon_images"></i> صور
-                    المنتج</label>
+                    الخدمة</label>
 
                 <div class="add-product-modal__image-uploader" id="image-uploader" tabindex="0" role="group"
                     aria-label="منطقة رفع الصور">
@@ -343,7 +343,8 @@
 
                     </div>
 
-                    <div class="add-product-modal__hint" id="productAdd_hint_text">المطلوب: صورة واحدة على الأقل. الدعم:
+                    <div class="add-product-modal__hint" id="productAdd_hint_text">المطلوب: صورة واحدة للخدمة على الأقل.
+                        الدعم:
                         jpg, png, webp. </div>
 
                     <div class="add-product-modal__previews" id="previews" aria-live="polite" aria-atomic="false"></div>
@@ -354,9 +355,9 @@
             <div class="add-product-modal__form-group" id="productAdd_group_productName">
                 <label for="product-name" class="add-product-modal__label" id="productAdd_label_productName"><i
                         class="fas fa-signature" id="productAdd_icon_productName"></i> اسم
-                    المنتج</label>
+                    الخدمة</label>
                 <input type="text" id="product-name" name="product-name" class="add-product-modal__input"
-                    maxlength="100" placeholder="اكتب اسمًا واضحًا للمنتج..." required>
+                    maxlength="100" placeholder="اكتب اسمًا واضحًا للخدمة..." required>
                 <div id="product-name-char-counter" class="add-product-modal__char-counter">0 / 100</div>
             </div>
 
@@ -364,9 +365,9 @@
             <div class="add-product-modal__form-group" id="productAdd_group_description">
                 <label for="product-description" class="add-product-modal__label" id="productAdd_label_description"><i
                         class="fas fa-file-alt" id="productAdd_icon_description"></i>
-                    الوصف</label>
+                    وصف الخدمة</label>
                 <textarea id="product-description" name="product-description" class="add-product-modal__textarea"
-                    rows="4" maxlength="400" placeholder="اكتب وصفًا جذابًا ..."></textarea>
+                    rows="4" maxlength="400" placeholder="اكتب وصفًا جذابًا للخدمة..."></textarea>
                 <div id="description-char-counter" class="add-product-modal__char-counter">0 / 400</div>
             </div>
 
@@ -374,9 +375,9 @@
             <div class="add-product-modal__form-group" id="productAdd_group_sellerMessage">
                 <label for="seller-message" class="add-product-modal__label" id="productAdd_label_sellerMessage"><i
                         class="fas fa-comment-dots" id="productAdd_icon_sellerMessage"></i> رسالة
-                    من البائع</label>
+                    من مقدم الخدمة</label>
                 <input type="text" id="seller-message" name="seller-message" class="add-product-modal__input"
-                    maxlength="100" placeholder="اكتب رسالة قصيرة ومميزة تظهر للمشتري...">
+                    maxlength="100" placeholder="اكتب رسالة قصيرة ومميزة تظهر للعميل...">
                 <div id="seller-message-char-counter" class="add-product-modal__char-counter">0 / 100</div>
             </div>
 
@@ -390,37 +391,11 @@
                 <div id="notes-char-counter" class="add-product-modal__char-counter">0 / 100</div>
             </div>
 
-            <!-- New row for Price and Quantity -->
-            <div class="add-product-modal__form-row" id="price-quantity-row">
-                <!-- Quantity Field -->
-                <div class="add-product-modal__form-group" id="productAdd_group_quantity">
-                    <label for="product-quantity" class="add-product-modal__label" id="productAdd_label_quantity"><i
-                            class="fas fa-boxes-stacked" id="productAdd_icon_quantity"></i>
-                        الكمية المتاحة</label>
-                    <input type="number" id="product-quantity" name="product-quantity" class="add-product-modal__input"
-                        placeholder="مثال: 50" required min="1">
-                </div>
-                <!-- Price Field -->
-                <div class="add-product-modal__form-group" id="productAdd_group_price">
-                    <label for="product-price" class="add-product-modal__label" id="productAdd_label_price"><i
-                            class="fas fa-dollar-sign" id="productAdd_icon_price"></i>سعر
-                        القطعة</label>
-                    <input type="text" inputmode="decimal" id="product-price" name="product-price"
-                        class="add-product-modal__input" placeholder="بالجنيه" required>
-                </div>
-                <!-- NEW: Original Price Field -->
-                <div class="add-product-modal__form-group" id="productAdd_group_originalPrice">
-                    <label for="original-price" class="add-product-modal__label" id="productAdd_label_originalPrice"><i
-                            class="fas fa-tag" id="productAdd_icon_originalPrice"></i>السعر قبل
-                        الخصم</label>
-                    <input type="text" inputmode="decimal" id="original-price" name="original-price"
-                        class="add-product-modal__input" placeholder="اختياري">
-                </div>
-            </div>
+
 
             <!-- Submit Button -->
             <div class="add-product-modal__submit-container" id="productAdd_submit_container">
-                <button type="submit" class="btn btn-primary" id="productAdd_btn_submit">اضف المنتج الآن</button>
+                <button type="submit" class="btn btn-primary" id="productAdd_btn_submit">اضف الخدمة الآن</button>
             </div>
         </form>
     </div>
@@ -432,7 +407,7 @@
 
     <script>
         // ✅ Simple IIFE usage without assigning to window
-        console.log('%c[ProductForm] بدء تهيئة نموذج إضافة المنتج...', 'color: blue;');
+        console.log('%c[ProductForm] بدء تهيئة نموذج إضافة الخدمة...', 'color: blue;');
         // --- Default Compression Settings ---
         const IMAGE_MAX_WIDTH = 1600; // Max width after compression
         const IMAGE_MAX_HEIGHT = 1600; // Max height after compression
@@ -450,9 +425,6 @@
         const productNameInput = document.getElementById('product-name');
         const sellerMessageTextarea = document.getElementById('seller-message');
         const notesInput = document.getElementById('product-notes');
-        const quantityInput = document.getElementById('product-quantity');
-        const priceInput = document.getElementById('product-price');
-        const originalPriceInput = document.getElementById('original-price');
 
         // --- Helper functions for error handling ---
         /**
@@ -847,41 +819,6 @@
             if (currentLength > 0) clearError(notesInput);
         });
 
-        // Hide error messages when interacting with quantity and price fields
-        quantityInput.addEventListener('input', () => {
-            // Improvement: Normalize Hindi digits and allow only English digits
-            let value = normalizeDigits(quantityInput.value);
-            quantityInput.value = value.replace(/[^0-9]/g, '');
-            if (quantityInput.value) clearError(quantityInput);
-        });
-
-        priceInput.addEventListener('input', () => {
-            // Improvement: Normalize Hindi digits and allow only digits and dots
-            let value = normalizeDigits(priceInput.value);
-            value = value.replace(/[^0-9.]/g, '');
-            // Ensure only one decimal point
-            const parts = value.split('.');
-            if (parts.length > 2) {
-                value = parts[0] + '.' + parts.slice(1).join('');
-            }
-            priceInput.value = value;
-            if (priceInput.value) clearError(priceInput);
-        });
-
-        // New: Validate Original Price field (before discount)
-        originalPriceInput.addEventListener('input', () => {
-            // Improvement: Normalize Hindi digits
-            let value = normalizeDigits(originalPriceInput.value);
-            value = value.replace(/[^0-9.]/g, '');
-            const parts = value.split('.');
-            if (parts.length > 2) {
-                value = parts[0] + '.' + parts.slice(1).join('');
-            }
-            originalPriceInput.value = value;
-            // No error handling here as it is optional
-            // if (originalPriceInput.value) clearError(originalPriceInput);
-        });
-
         // Capture photo via camera: Open file input with capture attribute
         takePhotoBtn.addEventListener('click', () => {
             console.log('[Camera] Take photo button clicked on mobile');
@@ -1017,44 +954,33 @@
             // 1. Check for at least one image
             clearError(uploaderEl);
             if (images.length === 0) {
-                showError(uploaderEl, 'مطلوب صورة واحدة للمنتج على الأقل.');
+                showError(uploaderEl, 'مطلوب صورة واحدة للخدمة على الأقل.');
                 isValid = false;
             }
 
             // 2. Check Product Name
             clearError(productNameInput);
             if (!productNameInput.value.trim()) {
-                showError(productNameInput, 'اسم المنتج مطلوب.');
+                showError(productNameInput, 'اسم الخدمة مطلوب.');
                 isValid = false;
             }
 
             // 3. Check Description
             clearError(descriptionTextarea);
             if (!descriptionTextarea.value.trim() || descriptionTextarea.value.trim().length < 10) {
-                showError(descriptionTextarea, 'وصف المنتج مطلوب (على الأقل 10 أحرف).');
+                showError(descriptionTextarea, 'وصف الخدمة مطلوب (على الأقل 10 أحرف).');
                 isValid = false;
             }
 
             // 4. Check Seller Message
             clearError(sellerMessageTextarea);
             if (!sellerMessageTextarea.value.trim() || sellerMessageTextarea.value.trim().length < 10) {
-                showError(sellerMessageTextarea, 'رسالة البائع مطلوبة (على الأقل 10 أحرف).');
+                showError(sellerMessageTextarea, 'رسالة مقدم الخدمة مطلوبة (على الأقل 10 أحرف).');
                 isValid = false;
             }
 
-            // 5. Check Quantity
-            clearError(quantityInput);
-            if (!quantityInput.value || parseFloat(quantityInput.value) < 1) {
-                showError(quantityInput, 'يرجى إدخال كمية متاحة صالحة (على الأقل 1).');
-                isValid = false;
-            }
-
-            // 6. Check Price
-            clearError(priceInput);
-            if (priceInput.value === '' || parseFloat(priceInput.value) < 0) {
-                showError(priceInput, 'يرجى إدخال سعر منتج صالح.');
-                isValid = false;
-            }
+            // 5. Quantity Check - REMOVED for Services
+            // 6. Price Check - REMOVED for Services
 
             if (!isValid) {
                 console.warn('[ProductForm] Validation failed. Submission aborted.');
@@ -1064,7 +990,7 @@
             // If all data is valid, proceed with upload
             console.log('%c[ProductForm] التحقق نجح. بدء عملية الإرسال.', 'color: green;');
             Swal.fire({
-                title: 'جاري إضافة المنتج...',
+                title: 'جاري إضافة الخدمة...',
                 text: 'يرجى الانتظار بينما يتم رفع الصور.',
                 allowOutsideClick: false,
                 didOpen: () => {
@@ -1099,9 +1025,9 @@
                     user_key: userSession.user_key, // Fixed value as requested
                     product_key: productSerial,
                     product_description: normalizeArabicText(document.getElementById('product-description').value.trim()),
-                    product_price: parseFloat(document.getElementById('product-price').value) || 0,
-                    product_quantity: parseInt(document.getElementById('product-quantity').value, 10) || 0,
-                    original_price: parseFloat(document.getElementById('original-price').value) || null,
+                    product_price: 0, // Default for service
+                    product_quantity: 0, // Default for service
+                    original_price: null, // Default for service
                     user_message: normalizeArabicText(document.getElementById('seller-message').value.trim()),
                     user_note: normalizeArabicText(document.getElementById('product-notes').value.trim()),
                     ImageName: uploadedImageUrls.join(','),
@@ -1119,9 +1045,9 @@
                     throw new Error(`Failed to save product data: ${dbResult.error}`);
                 }
 
-                console.log('%c[ProductForm] تم حفظ المنتج بنجاح.', 'color: green; font-weight: bold;');
+                console.log('%c[ProductForm] تم حفظ الخدمة بنجاح.', 'color: green; font-weight: bold;');
                 // 4. Show success message
-                Swal.fire('تم بنجاح!', 'تم إضافة المنتج بنجاح.', 'success').then(() => {
+                Swal.fire('تم بنجاح!', 'تم إضافة الخدمة بنجاح.', 'success').then(() => {
                     // Reset form
                     form.reset();
                     previewsEl.innerHTML = '';
@@ -1139,9 +1065,6 @@
 
             }
         });
-
-    
-
 
 
 
