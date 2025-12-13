@@ -58,11 +58,11 @@
         const versionData = await versionResponse.json();
         const footer = document.createElement('div');
         footer.id = 'app-footer';
-        footer.style.cssText = 'text-align: center; padding: 20px; font-size: 0.85rem; color: #888; width: 100%; border-top: 1px solid #eee; margin-top: 40px; background-color: #fafafa; font-family: sans-serif;';
+        footer.style.cssText = 'text-align: center; padding: 10px; font-size: 0.7rem; color: #888; width: 100%; border-top: 1px solid #eee; margin-top: 10px; background-color: #fafafa; font-family: sans-serif;';
 
         // Creating a clean, professional display
         const versionText = document.createElement('span');
-        versionText.innerHTML = `&copy; 2024 Bazaar App <span style="margin: 0 8px;">•</span> v${versionData.version_code}`;
+        versionText.innerHTML = `&copy; 2025 Suez Bazaar <span style="margin: 0 8px;">•</span> v${versionData.version_code}`;
         versionText.style.fontWeight = '400';
 
         footer.appendChild(versionText);
