@@ -58,14 +58,14 @@ export default async function handler(request) {
       const MainCategory = searchParams.get('MainCategory');
       const SubCategory = searchParams.get('SubCategory');
       const product_key = searchParams.get('product_key'); // ✅ إصلاح: استقبال معامل مفتاح المنتج
+      const status = searchParams.get('status'); // ✅ جديد: استقبال معامل الحالة
 
       // ✅ جديد: تسجيل معايير البحث المستلمة لتسهيل التصحيح
-      console.log(`[API: /api/products GET] Received search request with params: searchTerm='${searchTerm}', MainCategory='${MainCategory}', SubCategory='${SubCategory}', user_key='${user_key}'`);
+      console.log(`[API: /api/products GET] Received request with params: searchTerm='${searchTerm}', MainCategory='${MainCategory}', SubCategory='${SubCategory}', user_key='${user_key}', status='${status}', product_key='${product_key}'`);
 
       let sql, args;
 
-      // ✅ جديد: منطق بحث ديناميكي
-      // ✅ إصلاح: إضافة حالة للبحث عن منتج واحد باستخدام product_key
+      // 1. Fetch Single Product
       if (product_key) {
         sql = `
           SELECT p.*, u.username as seller_username, u.phone as seller_phone 
@@ -73,10 +73,15 @@ export default async function handler(request) {
           JOIN users u ON p.user_key = u.user_key
           WHERE p.product_key = ?
         `;
-        sql += " ORDER BY p.id DESC LIMIT 1"; // ✅ إصلاح: إضافة الترتيب والحد معًا
+        // If not explicitly asking for pending (status=0), enforce approval check for public safety
+        if (status === null) {
+          sql += " AND p.is_approved = 1";
+        }
+        sql += " ORDER BY p.id DESC LIMIT 1";
         args = [product_key];
       }
-      // ✅ إصلاح: التحقق من أن المعاملات ليست السلسلة 'null'
+
+      // 2. Search / Filter Public Market
       else if ((searchTerm && searchTerm !== 'null') || (MainCategory && MainCategory !== 'null')) {
         sql = `
           SELECT p.*, u.username as seller_username, u.phone as seller_phone 
@@ -85,6 +90,15 @@ export default async function handler(request) {
         `;
         const whereClauses = [];
         args = [];
+
+        // Public Search: Show APPROVED only by default
+        if (status === null) {
+          whereClauses.push("p.is_approved = 1");
+        } else {
+          // Admin Search: Filter by status if provided
+          whereClauses.push("p.is_approved = ?");
+          args.push(parseInt(status));
+        }
 
         if (searchTerm) {
           whereClauses.push("p.productName LIKE ?");
@@ -99,19 +113,41 @@ export default async function handler(request) {
           args.push(SubCategory);
         }
         sql += " WHERE " + whereClauses.join(" AND ");
-        sql += " ORDER BY p.id DESC"; // ✅ إصلاح: إضافة الترتيب هنا
+        sql += " ORDER BY p.id DESC";
 
-      } else if (user_key) {
-        // جلب منتجات بائع معين
-        // ✅ إصلاح: إضافة JOIN والاسم المستعار 'p' لتوحيد الاستعلامات وضمان عمل الترتيب
+      }
+      // 3. Vendor/User Products
+      else if (user_key) {
+        // Fetch products for specific vendor
         sql = `
           SELECT p.* FROM marketplace_products p 
           WHERE p.user_key = ?
         `;
-        sql += " ORDER BY p.id DESC"; // ✅ إصلاح: إضافة الترتيب هنا
         args = [user_key];
-      } else {
-        // في حالة عدم وجود معاملات، أرجع مصفوفة فارغة بدلاً من كل المنتجات
+
+        // Ensure status filter is applied if provided
+        if (status !== null) {
+          sql += " AND p.is_approved = ?";
+          args.push(parseInt(status));
+        }
+
+        sql += " ORDER BY p.id DESC";
+      }
+
+      // 4. Admin View (Fetch by Status Only)
+      else if (status !== null) {
+        sql = `
+          SELECT p.*, u.username as seller_username, u.phone as seller_phone 
+          FROM marketplace_products p
+          JOIN users u ON p.user_key = u.user_key
+          WHERE p.is_approved = ?
+        `;
+        sql += " ORDER BY p.id DESC";
+        args = [parseInt(status)];
+      }
+
+      else {
+        // Default: Return empty if no valid params
         return new Response(JSON.stringify([]), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
       }
 
@@ -163,7 +199,7 @@ export default async function handler(request) {
       } = await request.json();
 
       // تحقق بسيط من وجود البيانات الأساسية
-   if (!user_key || !product_key  || !MainCategory || !productName) {
+      if (!user_key || !product_key || !MainCategory || !productName) {
         return new Response(JSON.stringify({ error: "البيانات الأساسية للمنتج مطلوبة." }), {
           status: 400,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -171,8 +207,8 @@ export default async function handler(request) {
       }
 
       await db.execute({
-        sql: "INSERT INTO marketplace_products (productName, user_key, product_key, product_description, product_price, original_price, product_quantity, user_message, user_note, ImageName, MainCategory, SubCategory, ImageIndex, serviceType) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-        args: [productName, user_key, product_key, product_description, parseFloat(product_price), original_price ? parseFloat(original_price) : null, parseInt(product_quantity), user_message, user_note, ImageName, parseInt(MainCategory), SubCategory ? parseInt(SubCategory) : null, parseInt(ImageIndex), serviceType || 0]
+        sql: "INSERT INTO marketplace_products (productName, user_key, product_key, product_description, product_price, original_price, product_quantity, user_message, user_note, ImageName, MainCategory, SubCategory, ImageIndex, serviceType, is_approved) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        args: [productName, user_key, product_key, product_description, parseFloat(product_price), original_price ? parseFloat(original_price) : null, parseInt(product_quantity), user_message, user_note, ImageName, parseInt(MainCategory), SubCategory ? parseInt(SubCategory) : null, parseInt(ImageIndex), serviceType || 0, 0]
       });
 
       return new Response(JSON.stringify({ message: "تم إضافة المنتج إلى قاعدة البيانات بنجاح." }), {
@@ -228,7 +264,8 @@ export default async function handler(request) {
         MainCategory: MainCategory !== undefined ? parseInt(MainCategory) : undefined,
         SubCategory: SubCategory !== undefined ? parseInt(SubCategory) || null : undefined,
         ImageIndex: ImageIndex !== undefined ? parseInt(ImageIndex) : undefined,
-        serviceType: serviceType !== undefined ? parseInt(serviceType) : undefined // جديد: استقبال نوع الخدمة
+        serviceType: serviceType !== undefined ? parseInt(serviceType) : undefined, // جديد: استقبال نوع الخدمة
+        is_approved: await request.json().then(body => body.is_approved !== undefined ? parseInt(body.is_approved) : undefined).catch(() => undefined) // ✅ إضافة: السماح بتحديث حالة الموافقة
       };
 
       const updateEntries = Object.entries(fieldsToUpdate).filter(([key, value]) => value !== undefined);

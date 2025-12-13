@@ -321,7 +321,16 @@ async function productShowSuccessMessage(mode) {
     'تم تحديث المنتج بنجاح.' : 'تم إضافة المنتج بنجاح.';
 
   if (typeof Swal !== 'undefined') {
-    await Swal.fire('تم بنجاح!', successMessage, 'success');
+    const result = await Swal.fire({
+      icon: 'success',
+      title: 'تم الحفظ بنجاح!',
+      text: mode === 'edit'
+        ? 'تم تحديث المنتج بنجاح.'
+        : 'تم إضافة المنتج بنجاح وهو الآن بانتظار موافقة الإدارة قبل أن يظهر للعملاء.', // ✅ تحديث الرسالة
+      confirmButtonText: 'حسناً',
+      timer: 3500,
+      timerProgressBar: true
+    });
   } else {
     alert(successMessage);
   }

@@ -182,7 +182,7 @@ export function showSellerConfirmationProductsAlert(data, ordersData) {
             }).join("");
 
             contentHtml = `
-                <div style="width: 100%; overflow-x: auto;">
+                <div style="min-width: 100%; width: max-content;">
                     <table style="width: 100%; border-collapse: collapse; text-align: right; font-size: 0.9em;">
                         <thead>
                             <tr style="background-color: #f2f2f2;">
@@ -204,7 +204,7 @@ export function showSellerConfirmationProductsAlert(data, ordersData) {
 
         Swal.fire({
             title: "تأكيد المنتجات",
-            html: `<div id="seller-confirmation-container" style="display: flex; flex-direction: column; align-items: start; width: 100%;">
+            html: `<div id="seller-confirmation-container" style="display: flex; flex-direction: column; align-items: start; width: 100%; max-height: 300px; overflow: auto;">
                     ${contentHtml}
                    </div>`,
             footer: isConfirmedActivated

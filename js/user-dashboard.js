@@ -23,6 +23,7 @@ function handleAdminPanelClick() {
                     <button id="swal-users-btn" class="swal2-confirm swal2-styled" style="font-size: 0.85em; padding: 0.5em 1.2em;">مستخدمين</button>
                     <button id="swal-advert-btn" class="swal2-deny swal2-styled" style="font-size: 0.85em; padding: 0.5em 1.2em;">الاعلان</button>
                     <button id="swal-notifications-btn" class="swal2-styled" style="background-color: #808080; font-size: 0.85em; padding: 0.5em 1.2em;">اشعارات</button>
+                    <button id="swal-pending-products-btn" class="swal2-styled" style="background-color: #fd7e14; font-size: 0.85em; padding: 0.5em 1.2em; color: white;">المنتجات المعلقة</button>
                 </div>
             `,
       showConfirmButton: false,
@@ -91,6 +92,19 @@ function handleAdminPanelClick() {
 
         Swal.close();
       });
+
+    // ✅ ربط زر المنتجات المعلقة
+    document.getElementById("swal-pending-products-btn").addEventListener("click", () => {
+      mainLoader(
+        "pages/ADMIN/pendingProducts.html",
+        "index-user-container",
+        0,
+        undefined,
+        "showHomeIcon",
+        true
+      );
+      Swal.close();
+    });
   } catch (error) {
     console.error("حدث خطأ أثناء محاولة تحميل لوحة تحكم المسؤول:", error);
   }

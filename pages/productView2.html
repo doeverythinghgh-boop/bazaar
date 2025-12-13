@@ -707,9 +707,13 @@
      * @description Displays product details and initializes the slider.
      * @param {object} productData - The product data object.
      */
-    function productView_viewDetails(productData) {
+    function productView_viewDetails(productData,options = {}) {
         try {
             console.log("[productView_] عرض تفاصيل الخدمة مع السلايدر...");
+            const showAddToCart = options.showAddToCart !== false;
+            if (!showAddToCart) {
+                document.getElementById("productView_order_box").style.display = "none";
+            }
             const { name, description, sellerMessage } = productView_domElements;
 
             name.textContent = productData.productName || "غير متوفر";
@@ -993,7 +997,7 @@
             clearInterval(productView_sliderState.autoPlayInterval);
         }
 
-        productView_viewDetails(productSession[0]);
+        productView_viewDetails(productSession[0],productSession[1]);
 
         // Initialize Order Logic
         productView_initOrderLogic();

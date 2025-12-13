@@ -54,7 +54,7 @@ window.myProducts = null;
  * @see mainLoader
  */
 function productViewLayout(View) {
-  console.log('------------------------نوع الخدمه-------------------', View);
+  console.log('-----------نوع الخدمه-----------', View);
   //In sending
   //productSession = [productDataForModal,{showAddToCart:true}];
   //In receiving
