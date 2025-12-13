@@ -396,7 +396,6 @@
             Swal.fire('خطأ', e.message, 'error');
         }
     }
-
     // Attach to window
     window.deleteProduct = deleteProduct;
 
@@ -404,17 +403,51 @@
         try {
             const response = await fetch(`${baseURL}/api/products?product_key=${key}&status=0`);
             const p = await response.json();
-            const firstImage = p.ImageName ? p.ImageName.split(',')[0] : null;
-            const imgUrl = firstImage ? `https://pub-e828389e2f1e484c89d8fb652c540c12.r2.dev/${firstImage}` : '';
 
-            Swal.fire({
-                title: p.productName,
-                text: p.product_description,
-                footer: `السعر: ${p.product_price} ج.م`,
-                imageUrl: imgUrl,
-                imageAlt: 'Product Image',
-                confirmButtonText: 'إغلاق'
-            });
+            if (!p) {
+                console.error("Product not found");
+                return;
+            }
+
+            // Map keys exactly as search.html does
+            const productDataForModal = {
+                product_key: p.product_key,
+                productName: p.productName,
+                user_key: p.user_key,
+                pricePerItem: p.product_price,
+                original_price: p.original_price,
+                imageSrc: p.ImageName
+                    ? p.ImageName.split(",").map(
+                        (name) =>
+                            `https://pub-e828389e2f1e484c89d8fb652c540c12.r2.dev/${name}`
+                    )
+                    : [],
+                availableQuantity: p.product_quantity,
+                sellerMessage: p.user_message,
+                description: p.product_description,
+                sellerName: p.seller_username,
+                sellerPhone: p.seller_phone,
+                MainCategory: p.MainCategory,
+                SubCategory: p.SubCategory,
+                type: p.serviceType,
+            };
+
+            // Set Global Session
+            window.productSession = [productDataForModal, true];
+
+            // Call Layout View
+            if (typeof productViewLayout === 'function') {
+                productViewLayout(productDataForModal.type);
+            } else {
+                console.error("productViewLayout function is missing!");
+                // Fallback
+                Swal.fire({
+                    title: p.productName,
+                    text: p.product_description,
+                    imageUrl: productDataForModal.imageSrc[0]
+                });
+            }
+
         } catch (e) { console.error(e); }
     }
 
