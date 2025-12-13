@@ -240,7 +240,8 @@ export default async function handler(request) {
         MainCategory,
         SubCategory,
         ImageIndex,
-        serviceType // جديد: استقبال نوع الخدمة
+        serviceType, // جديد: استقبال نوع الخدمة
+        is_approved // ✅ إضافة: استقبال حالة الموافقة
       } = await request.json();
 
       // التحقق من وجود مفتاح المنتج
@@ -265,7 +266,7 @@ export default async function handler(request) {
         SubCategory: SubCategory !== undefined ? parseInt(SubCategory) || null : undefined,
         ImageIndex: ImageIndex !== undefined ? parseInt(ImageIndex) : undefined,
         serviceType: serviceType !== undefined ? parseInt(serviceType) : undefined, // جديد: استقبال نوع الخدمة
-        is_approved: await request.json().then(body => body.is_approved !== undefined ? parseInt(body.is_approved) : undefined).catch(() => undefined) // ✅ إضافة: السماح بتحديث حالة الموافقة
+        is_approved: is_approved !== undefined ? parseInt(is_approved) : undefined // ✅ إضافة: السماح بتحديث حالة الموافقة
       };
 
       const updateEntries = Object.entries(fieldsToUpdate).filter(([key, value]) => value !== undefined);
