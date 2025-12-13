@@ -34,44 +34,49 @@ async function fetchPendingProducts() {
 
 function renderPendingProducts(products) {
     const listContainer = document.getElementById('pending-products-list');
-    listContainer.innerHTML = '';
+
+    // Create Table Structure
+    let tableHtml = `
+        <table class="pending-products-table">
+            <thead>
+                <tr>
+                    <th>اسم المنتج</th>
+                    <th>اسم البائع</th>
+                    <th>إجراءات</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
 
     products.forEach(product => {
-        const firstImage = product.ImageName ? product.ImageName.split(',')[0] : null;
-        const imageUrl = firstImage
-            ? `https://pub-e828389e2f1e484c89d8fb652c540c12.r2.dev/${firstImage}`
-            : 'images/placeholder.png';
-
-        const card = document.createElement('div');
-        card.className = 'pending-product-card';
-        card.id = `card-${product.product_key}`;
-
-        card.innerHTML = `
-            <img src="${imageUrl}" alt="Product Image" class="pending-product-image">
-            
-            <div class="pending-product-details">
-                <div class="pending-product-title">${product.productName}</div>
-                <div class="pending-product-info"><strong>البائع:</strong> ${product.seller_username || 'غير معروف'} (${product.seller_phone || '-'})</div>
-                <div class="pending-product-info"><strong>السعر:</strong> ${product.product_price} ج.م</div>
-                <div class="pending-product-info"><strong>التصنيف:</strong> ${getCategoryName(product.MainCategory)}</div>
-                <div class="pending-product-info" style="font-size: 0.85em; color: #888; margin-top: 5px;">${product.product_description.substring(0, 100)}...</div>
-            </div>
-
-            <div class="pending-product-actions">
-                <button class="btn-approve" onclick="approveProduct('${product.product_key}', '${product.productName}')">
-                    <i class="fas fa-check"></i> موافقة
-                </button>
-                <button class="btn-reject" onclick="rejectProduct('${product.product_key}', '${product.productName}')">
-                    <i class="fas fa-times"></i> رفض
-                </button>
-                 <button class="btn-view" onclick="viewPendingProduct('${product.product_key}')">
-                    <i class="fas fa-eye"></i> معاينة
-                </button>
-            </div>
+        tableHtml += `
+            <tr id="row-${product.product_key}">
+                <td>
+                    <div style="font-weight: bold;">${product.productName}</div>
+                    <div style="font-size: 0.85em; color: #777;">${product.product_price} ج.م</div>
+                </td>
+                <td>
+                    <div>${product.seller_username || 'غير معروف'}</div>
+                    <div style="font-size: 0.85em; color: #777;">${product.seller_phone || '-'}</div>
+                </td>
+                <td>
+                    <button class="btn-approve" onclick="approveProduct('${product.product_key}', '${product.productName}')" title="نشر المنتج">
+                        <i class="fas fa-check"></i> نشر
+                    </button>
+                    <button class="btn-delete" onclick="rejectProduct('${product.product_key}', '${product.productName}')" title="حذف المنتج">
+                        <i class="fas fa-trash"></i> حذف
+                    </button>
+                </td>
+            </tr>
         `;
-
-        listContainer.appendChild(card);
     });
+
+    tableHtml += `
+            </tbody>
+        </table>
+    `;
+
+    listContainer.innerHTML = tableHtml;
 }
 
 // Helper to get category name (Simplified map, ideally fetching from list.json)
@@ -83,11 +88,11 @@ function getCategoryName(id) {
 
 async function approveProduct(productKey, productName) {
     const confirmResult = await Swal.fire({
-        title: 'تأكيد الموافقة',
-        text: `هل أنت متأكد من الموافقة على نشر "${productName}"؟`,
+        title: 'تأكيد النشر',
+        text: `هل أنت متأكد من نشر "${productName}"؟`,
         icon: 'question',
         showCancelButton: true,
-        confirmButtonText: 'نعم، وافق ونشر',
+        confirmButtonText: 'نعم، نشر',
         cancelButtonText: 'إلغاء',
         confirmButtonColor: '#28a745'
     });
@@ -111,24 +116,25 @@ async function approveProduct(productKey, productName) {
 
         Swal.fire({
             icon: 'success',
-            title: 'تم النشر بنجاح',
+            title: 'تم النشر',
             toast: true,
             position: 'top-end',
             showConfirmButton: false,
             timer: 2000
         });
 
-        // Remove card from UI
-        const card = document.getElementById(`card-${productKey}`);
-        if (card) {
-            card.style.transition = 'all 0.5s';
-            card.style.opacity = '0';
-            setTimeout(() => card.remove(), 500);
-        }
-
-        // Check if empty
-        if (document.querySelectorAll('.pending-product-card').length <= 1) {
-            fetchPendingProducts(); // Reload to show empty state
+        // Remove row from table
+        const row = document.getElementById(`row-${productKey}`);
+        if (row) {
+            row.style.transition = 'all 0.5s';
+            row.style.opacity = '0';
+            setTimeout(() => {
+                row.remove();
+                // Check if empty
+                if (document.querySelectorAll('.pending-products-table tbody tr').length === 0) {
+                    fetchPendingProducts();
+                }
+            }, 500);
         }
 
     } catch (error) {
@@ -139,7 +145,7 @@ async function approveProduct(productKey, productName) {
 
 async function rejectProduct(productKey, productName) {
     const confirmResult = await Swal.fire({
-        title: 'رفض المنتج',
+        title: 'حذف المنتج',
         text: `هل تريد حذف "${productName}" نهائياً؟`,
         icon: 'warning',
         showCancelButton: true,
@@ -162,22 +168,23 @@ async function rejectProduct(productKey, productName) {
 
         Swal.fire({
             icon: 'success',
-            title: 'تم الرفض والحذف',
+            title: 'تم الحذف',
             toast: true,
             position: 'top-end',
             showConfirmButton: false,
             timer: 2000
         });
 
-        const card = document.getElementById(`card-${productKey}`);
-        if (card) {
-            card.style.transition = 'all 0.5s';
-            card.style.opacity = '0';
-            setTimeout(() => card.remove(), 500);
-        }
-
-        if (document.querySelectorAll('.pending-product-card').length <= 1) {
-            fetchPendingProducts();
+        const row = document.getElementById(`row-${productKey}`);
+        if (row) {
+            row.style.transition = 'all 0.5s';
+            row.style.opacity = '0';
+            setTimeout(() => {
+                row.remove();
+                if (document.querySelectorAll('.pending-products-table tbody tr').length === 0) {
+                    fetchPendingProducts();
+                }
+            }, 500);
         }
 
     } catch (error) {
