@@ -922,25 +922,30 @@
         // دالة لتنسيق التاريخ بالعربية
         function salesMovement_formatDate(salesMovement_dateString) {
             try {
-                const salesMovement_date = new Date(salesMovement_dateString);
+                // Ensure the date string is treated as UTC if it comes from SQLite (standard 'YYYY-MM-DD HH:MM:SS')
+                let dateStr = salesMovement_dateString;
+                if (dateStr && !dateStr.includes('Z') && !dateStr.includes('+')) {
+                    // Replace space with T and add Z to force UTC parsing
+                    dateStr = dateStr.replace(' ', 'T') + 'Z';
+                }
 
-                const salesMovement_months = [
-                    'يناير', 'فبراير', 'مارس', 'إبريل', 'مايو', 'يونيو',
-                    'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'
-                ];
+                const salesMovement_date = new Date(dateStr);
 
-                const salesMovement_day = salesMovement_date.getDate();
-                const salesMovement_month = salesMovement_months[salesMovement_date.getMonth()];
-                const salesMovement_year = salesMovement_date.getFullYear();
+                // Check validity
+                if (isNaN(salesMovement_date.getTime())) {
+                    // Fallback to original string parsing if modification failed
+                    return new Date(salesMovement_dateString).toLocaleString('ar-EG');
+                }
 
-                let salesMovement_hours = salesMovement_date.getHours();
-                const salesMovement_minutes = salesMovement_date.getMinutes().toString().padStart(2, '0');
-                const salesMovement_ampm = salesMovement_hours >= 12 ? 'م' : 'ص';
-
-                salesMovement_hours = salesMovement_hours % 12;
-                salesMovement_hours = salesMovement_hours ? salesMovement_hours : 12;
-
-                return `${salesMovement_day} ${salesMovement_month} ${salesMovement_year} - ${salesMovement_hours}:${salesMovement_minutes} ${salesMovement_ampm} `;
+                return salesMovement_date.toLocaleString('ar-EG', {
+                    timeZone: 'Africa/Cairo', // Explicitly target Egypt time
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    hour: 'numeric',
+                    minute: 'numeric',
+                    hour12: true
+                });
             } catch (salesMovement_error) {
                 console.error('خطأ في تنسيق التاريخ:', salesMovement_error);
                 return salesMovement_dateString;
