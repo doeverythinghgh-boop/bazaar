@@ -15,9 +15,9 @@ import {
     loadStepState,
     saveStepDate,
     loadStepDate,
-    getAllItemsStatus,
-    ITEM_STATUS
+    getAllItemsStatus
 } from "./stateManagement.js";
+import { ITEM_STATUS } from "./config.js";
 
 // Variable to store message timeout (to manage redundancy and prevent timeout accumulation)
 let messageTimeout;

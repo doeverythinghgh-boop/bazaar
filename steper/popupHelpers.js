@@ -8,9 +8,9 @@
 import {
     saveStepState,
     loadStepState,
-    getAllItemsStatus,
-    ITEM_STATUS
+    getAllItemsStatus
 } from "./stateManagement.js";
+import { ITEM_STATUS } from "./config.js";
 import {
     updateCurrentStepFromState,
 } from "./uiUpdates.js";

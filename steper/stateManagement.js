@@ -5,7 +5,7 @@
  * This file provides helper functions to save and retrieve data from browser local storage.
  */
 
-import { updateGlobalStepperAppData, globalStepperAppData, ordersData } from "./config.js";
+import { updateGlobalStepperAppData, globalStepperAppData, ordersData, ITEM_STATUS } from "./config.js";
 
 /**
  * @function getAppKey
@@ -231,15 +231,8 @@ export function loadStepDate(stepId) {
 }
 
 // Added constants for item status to avoid magic strings
-export const ITEM_STATUS = {
-    PENDING: "pending",
-    CONFIRMED: "confirmed",
-    SHIPPED: "shipped",
-    DELIVERED: "delivered",
-    RETURNED: "returned",
-    CANCELLED: "cancelled",
-    REJECTED: "rejected"
-};
+// Item status is now imported from config.js
+
 
 /**
  * @function saveItemStatus
