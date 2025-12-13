@@ -46,7 +46,7 @@ export var appDataControl = {
     users: [
         {
             type: "buyer",
-            allowedSteps: ["step-review", "step-delivered", "step-cancelled", "step-rejected", "step-returned"]
+            allowedSteps: ["step-review", "step-confirmed", "step-delivered", "step-cancelled", "step-rejected", "step-returned"]
         },
         {
             type: "seller",

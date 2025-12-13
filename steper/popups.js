@@ -15,6 +15,7 @@ export {
     showUnselectedProductsAlert,
     showDeliveryConfirmationAlert,
     showReturnedProductsAlert,
+    showBuyerConfirmedProductsAlert,
 } from "./buyerPopups.js";
 
 // Re-export seller popups
