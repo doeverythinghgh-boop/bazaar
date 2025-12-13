@@ -14,31 +14,31 @@
  * @see api/suppliers-deliveries
  */
 async function getAllUsers_() {
-    console.log('[getAllUsers_] Starting fetching all users data...');
+    console.log('[getAllUsers_] بدء لجلب بيانات جميع المستخدمين...');
 
     try {
-        console.log('[getAllUsers_] Sending GET request to /api/users...');
+        console.log('[getAllUsers_] إرسال طلب GET إلى /api/users...');
 
         // Send GET request to the specified endpoint
         const response = await fetch(`${baseURL}/api/users`);
 
-        console.log(`[getAllUsers_] Response received from server, status code: ${response.status}`);
+        console.log(`[getAllUsers_] تم استلام الرد من الخادم، رمز الحالة: ${response.status}`);
 
         // Check if request was successful (Status between 200 and 299)
         if (!response.ok) {
-            console.error(`[getAllUsers_] Failed to receive data from server, error code: ${response.status}`);
+            console.error(`[getAllUsers_] فشل استلام البيانات من الخادم، رمز الخطأ: ${response.status}`);
             throw new Error(`Server response failed: ${response.status}`);
         }
 
-        console.log('[getAllUsers_] Converting response to JSON...');
+        console.log('[getAllUsers_] تحويل الرد إلى JSON...');
 
         // Convert received data from server to JavaScript objects
         const rawUsersData = await response.json();
 
-        console.log(`[getAllUsers_] Data converted successfully, raw user count: ${rawUsersData.length}`);
+        console.log(`[getAllUsers_] تم تحويل البيانات بنجاح، عدد المستخدمين الخام: ${rawUsersData.length}`);
 
         // Process data: Convert each user to the required format
-        console.log('[getAllUsers_] Starting data processing and cleaning...');
+        console.log('[getAllUsers_] بدء معالجة وتنظيف البيانات...');
 
         // Extract all user_keys to check status in bulk
         const userKeys = rawUsersData.map(user => user.user_key);
@@ -47,7 +47,7 @@ async function getAllUsers_() {
         const deliveryStatusMap = {};
 
         try {
-            console.log('[getAllUsers_] Checking delivery status for users...');
+            console.log('[getAllUsers_] التحقق من حالة التوصيل للمستخدمين...');
             const statusResponse = await fetch(`${baseURL}/api/suppliers-deliveries`, {
                 method: 'POST',
                 headers: {
@@ -67,7 +67,7 @@ async function getAllUsers_() {
                     };
                 });
 
-                console.log('[getAllUsers_] Delivery statuses received successfully');
+                console.log('[getAllUsers_] تم استلام حالات التوصيل بنجاح');
             } else {
                 console.warn(`[getAllUsers_] Failed to check delivery status: ${statusResponse.status}`);
             }
@@ -92,11 +92,11 @@ async function getAllUsers_() {
             return processedUser;
         });
 
-        console.log(`[getAllUsers_] Processing complete, processed users:`, processedUsers);
+        console.log(`[getAllUsers_] اكتملت المعالجة، المستخدمين المعالجين:`, processedUsers);
         return processedUsers;
 
     } catch (error) {
-        console.error('[getAllUsers_] Unexpected error occurred during function execution:', error);
+        console.error('[getAllUsers_] حدث خطأ غير متوقع أثناء تنفيذ الدالة:', error);
         throw new Error(`Failed to fetch user data: ${error.message}`);
     }
 }
@@ -114,7 +114,7 @@ async function getAllUsers_() {
 function populateUsersTable(users) {
     const tbody = document.getElementById('admin-panel-users-tbody');
     if (!tbody) {
-        console.error('[populateUsersTable] Table tbody element not found.');
+        console.error('[populateUsersTable] لم يتم العثور على عنصر tbody للجدول.');
         return;
     }
 
@@ -252,7 +252,7 @@ async function initializeAdminPanel() {
         }
 
     } catch (error) {
-        console.error('[initializeAdminPanel] Failed to initialize admin panel:', error);
+        console.error('[initializeAdminPanel] فشل تهيئة لوحة التحكم:', error);
         loader.style.display = 'none';
         errorContainer.innerHTML = `<p>حدث خطأ أثناء تحميل بيانات المستخدمين.</p><p><small>${error.message}</small></p>`;
         const mainContainer = document.querySelector('.admin-panel-container');
@@ -313,7 +313,7 @@ async function showRelationsModal(userKey, username) {
         });
 
     } catch (error) {
-        console.error('Error fetching relations data:', error);
+        console.error('خطأ في جلب بيانات العلاقات:', error);
     }
 }
 
@@ -399,7 +399,7 @@ window.handleAddRelation = async (currentUserKey) => {
         });
 
     } catch (error) {
-        console.error('Error adding relation:', error);
+        console.error('خطأ في إضافة العلاقة:', error);
     }
 };
 /**
@@ -440,7 +440,7 @@ window.handleToggleRelation = async (sellerKey, deliveryKey, newStatus, modalOwn
         showRelationsModal(modalOwnerKey, title);
 
     } catch (error) {
-        console.error('Error updating relation:', error);
+        console.error('خطأ في تحديث العلاقة:', error);
     }
 };
 /**
@@ -484,7 +484,7 @@ window.loginAsUser = async (targetUserKey) => {
 
         // 3. Perform full logout (browser cleanup)
         // Use the function from tools.js or auth.js to clear everything
-        console.log('[Impersonation] Cleaning browser data...');
+        console.log('[انتحال الشخصية] تنظيف بيانات المتصفح...');
         if (typeof clearAllBrowserData === 'function') {
             await clearAllBrowserData();
         } else {
@@ -507,7 +507,7 @@ window.loginAsUser = async (targetUserKey) => {
         localStorage.setItem('loggedInUser', JSON.stringify(newUserSession));
 
         // 6. Full redirect to ensure system loads with new data
-        console.log('[Impersonation] Redirecting to home as new user...');
+        console.log('[انتحال الشخصية] إعادة التوجيه إلى الصفحة الرئيسية كمستخدم جديد...');
         window.location.href = 'index.html';
 
     } catch (error) {

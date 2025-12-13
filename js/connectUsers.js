@@ -21,7 +21,7 @@ async function fetchUsers() {
     const data = await apiFetch('/api/users');
     return data.error ? null : data;
   } catch (error) {
-    console.error("%c[fetchUsers] failed:", "color: red;", error);
+    console.error("%c[fetchUsers] فشل:", "color: red;", error);
     return null;
   }
 }

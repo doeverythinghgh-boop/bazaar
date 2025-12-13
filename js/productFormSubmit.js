@@ -40,7 +40,7 @@ async function productHandleFormSubmit(e) {
   const form = document.getElementById('add-product-form');
   const extendedMode = form ? form.dataset.extendedMode : 'unknown';
 
-  console.log(`%c[Submit] 🚀 تقديم النموذج في الوضع: ${extendedMode}`,
+  console.log(`%c[إرسال] 🚀 تقديم النموذج في الوضع: ${extendedMode}`,
     'color: blue; font-weight: bold;');
 
   // Validation
@@ -148,7 +148,7 @@ async function productHandleImageDeletion() {
   if (imagesToDelete.length > 0) {
     console.log("[ProductForm] حذف الصور القديمة:", imagesToDelete);
     await Promise.all(imagesToDelete.map(name =>
-      deleteFile2cf(name, (msg) => console.log('[CloudflareDelete]', msg))
+      deleteFile2cf(name, (msg) => console.log('[حذف من Cloudflare]', msg))
         .catch(err => console.error(`فشل حذف الملف ${name}:`, err))
     ));
   } else {
@@ -189,7 +189,7 @@ async function productUploadImages(productSerial) {
 
     console.log(`[ProductForm] جاري رفع صورة جديدة: ${fileName}`);
     const result = await uploadFile2cf(state.compressedBlob, fileName,
-      (msg) => console.log('[CloudflareUpload]', msg));
+      (msg) => console.log('[رفع إلى Cloudflare]', msg));
 
     console.log(`[ProductForm] تم رفع صورة جديدة: ${result.file}`);
 

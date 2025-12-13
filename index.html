@@ -427,7 +427,7 @@
             }).then((result) => {
               if (result.isConfirmed) {
                 // If confirmed, redirect to login page.
-                console.log("[Modal] User chose to log in. Redirecting...");
+                console.log("[Modal] اختار المستخدم تسجيل الدخول. جاري التوجيه...");
                 mainLoader(
                   "./pages/login.html",
                   "index-user-container",
@@ -563,7 +563,7 @@
             );
           }
         } catch (error) {
-          console.error("Error handling login button:", error);
+          console.error("خطأ في معالجة زر تسجيل الدخول:", error);
         }
       }
 

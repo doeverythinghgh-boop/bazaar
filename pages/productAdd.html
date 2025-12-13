@@ -419,8 +419,7 @@
 
     <script>
         // ✅ Simple IIFE usage without assigning to window
-
-        console.log('%c[ProductForm] Initializing product add form...', 'color: blue;');
+        console.log('%c[ProductForm] بدء تهيئة نموذج إضافة المنتج...', 'color: blue;');
         // --- Default Compression Settings ---
         const IMAGE_MAX_WIDTH = 1600; // Max width after compression
         const IMAGE_MAX_HEIGHT = 1600; // Max height after compression
@@ -531,7 +530,7 @@
                         resizeQuality: 'high'
                     });
                 } catch (e) {
-                    console.warn('createImageBitmap with options failed, falling back to default:', e);
+                    console.warn('فشل createImageBitmap مع الخيارات، العودة إلى الافتراضي:', e);
                     imgBitmap = await createImageBitmap(file);
                 }
 
@@ -564,7 +563,7 @@
                 return blob;
 
             } catch (err) {
-                console.error('Memory optimized compression failed:', err);
+                console.error('فشل الضغط المحسن للذاكرة:', err);
                 throw err;
             } finally {
                 // Explicit and aggressive memory cleanup
@@ -659,7 +658,7 @@
                         const state = images[idx];
                         // 2. Remove the image element from the UI (DOM)
                         if (state._el) state._el.remove();
-                        console.log(`[ImageUploader] Image ${id} (${state.fileName || 'new file'}) removed from view.`);
+                        console.log(`[ImageUploader] تمت إزالة الصورة ${id} (${state.fileName || 'ملف جديد'}) من العرض.`);
                         // 3. Remove the image from the state array
                         images.splice(idx, 1);
                         // Note: No cloud deletion function is called here.
@@ -677,7 +676,7 @@
          * @param {FileList|Array<File>} fileList - The list of files to process.
          */
         async function handleNewFiles(fileList) {
-            console.log(`[ImageUploader] Handling ${fileList.length} file(s)`);
+            console.log(`[ImageUploader] معالجة ${fileList.length} ملف (ملفات)`);
 
             // Prevent recursion/duplication
             if (window.isProcessingFiles) return;
@@ -702,7 +701,7 @@
                 for (const file of filesToProcess) {
                     // Check file type
                     if (!file.type.startsWith('image/')) {
-                        console.warn(`[ImageUploader] Skipping non-image file: ${file.name}`);
+                        console.warn(`[ImageUploader] تخطي ملف غير صورة: ${file.name}`);
                         continue;
                     }
 
@@ -731,7 +730,7 @@
                         }
 
                     } catch (err) {
-                        console.error('[ImageUploader] Compression error:', err);
+                        console.error('[ImageUploader] خطأ في الضغط:', err);
                         state.status = 'error';
                         if (state._metaEl) {
                             state._metaEl.textContent = 'خطأ في الضغط';
@@ -777,7 +776,7 @@
                     state.status = 'uploaded';
                     uploaded.push(await res.json());
                 } catch (err) {
-                    console.error('Upload error', err);
+                    console.error('خطأ في الرفع', err);
                     state.status = 'error';
                 }
             }

@@ -45,7 +45,7 @@ function attachLogButtonListeners() {
         button.addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation(); // Prevent toggling the checkbox/row
-            console.log('button.dataset.key',button.dataset.key);
+            console.log('مفتاح المنتج (زر):', button.dataset.key);
             localStorage.setItem('productKeyFromStepReview', button.dataset.key);
         });
     });
@@ -215,7 +215,7 @@ export function showProductKeysAlert(data, ordersData, isModificationLocked) {
                                             selectedKeys: selectedKeys,
                                             unselectedKeys: unselectedKeys,
                                         });
-                                        console.log("Auto-saved review state:", {
+                                        console.log("الحفظ التلقائي لحالة المراجعة:", {
                                             selectedKeys,
                                             unselectedKeys,
                                         });
@@ -239,7 +239,7 @@ export function showProductKeysAlert(data, ordersData, isModificationLocked) {
                                     selectedKeys: selectedKeys,
                                     unselectedKeys: unselectedKeys,
                                 });
-                                console.log("Auto-saved review state:", {
+                                console.log("الحفظ التلقائي لحالة المراجعة:", {
                                     selectedKeys,
                                     unselectedKeys,
                                 });
@@ -251,7 +251,7 @@ export function showProductKeysAlert(data, ordersData, isModificationLocked) {
             },
         });
     } catch (reviewAlertError) {
-        console.error("Error in showProductKeysAlert:", reviewAlertError);
+        console.error("خطأ في showProductKeysAlert:", reviewAlertError);
     }
 }
 
@@ -301,7 +301,7 @@ export function showUnselectedProductsAlert(data, ordersData) {
         });
     } catch (unselectedAlertError) {
         console.error(
-            "Error in showUnselectedProductsAlert:",
+            "خطأ في showUnselectedProductsAlert:",
             unselectedAlertError
         );
     }
@@ -485,7 +485,7 @@ export function showDeliveryConfirmationAlert(data, ordersData) {
                                 deliveredKeys: deliveredKeys,
                                 returnedKeys: returnedKeys,
                             });
-                            console.log("Auto-saved delivery state:", {
+                            console.log("الحفظ التلقائي لحالة التسليم:", {
                                 deliveredKeys,
                                 returnedKeys,
                             });
@@ -497,7 +497,7 @@ export function showDeliveryConfirmationAlert(data, ordersData) {
         });
     } catch (deliveryAlertError) {
         console.error(
-            "Error in showDeliveryConfirmationAlert:",
+            "خطأ في showDeliveryConfirmationAlert:",
             deliveryAlertError
         );
     }
@@ -554,7 +554,7 @@ export function showReturnedProductsAlert(data, ordersData) {
             }
         });
     } catch (returnedAlertError) {
-        console.error("Error in showReturnedProductsAlert:", returnedAlertError);
+        console.error("خطأ في showReturnedProductsAlert:", returnedAlertError);
     }
 }
 

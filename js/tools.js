@@ -201,7 +201,7 @@ async function clearAllBrowserData() {
   try {
     localStorage.clear();
   } catch (e) {
-    console.warn("localStorage clear failed:", e);
+    console.warn("فشل مسح localStorage:", e);
   }
 
   // -----------------------------
@@ -210,7 +210,7 @@ async function clearAllBrowserData() {
   try {
     sessionStorage.clear();
   } catch (e) {
-    console.warn("sessionStorage clear failed:", e);
+    console.warn("فشل مسح sessionStorage:", e);
   }
 
 
@@ -227,13 +227,13 @@ async function clearAllBrowserData() {
           try {
             indexedDB.deleteDatabase(db.name);
           } catch (dbErr) {
-            console.warn(`Delete IndexedDB "${db.name}" failed:`, dbErr);
+            console.warn(`فشل حذف قاعدة البيانات IndexedDB "${db.name}":`, dbErr);
           }
         }
       }
     }
   } catch (e) {
-    console.warn("IndexedDB wipe failed:", e);
+    console.warn("فشل مسح IndexedDB:", e);
   }
 
   return true;

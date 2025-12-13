@@ -388,7 +388,7 @@
    * @param {object} [filters={}] - Optional filters object containing searchName, MainCategory, SubCategory
    */
   async function loadProducts(filters = {}) {
-    console.log("%c[Products] Loading products with filters:", "color: blue;", filters);
+    console.log("%c[Products] جارٍ تحميل المنتجات بالفلاتر:", "color: blue;", filters);
     // Show loading state
     productsGrid.innerHTML = "";
     loadingState.style.display = "block";
@@ -397,7 +397,7 @@
     // Fetch products from database with filters (server-side filtering)
     myProducts = await getProductsByUser(userSession.user_key, filters);
 
-    console.log(`%c[Products] Loaded ${myProducts ? myProducts.length : 0} products`, "color: green;");
+    console.log(`%c[Products] تم تحميل ${myProducts ? myProducts.length : 0} منتجات`, "color: green;");
 
     // Check if no products found
     if (!myProducts || myProducts.length === 0) {
@@ -486,7 +486,7 @@
       if (!e.target.closest(".btn")) {
         // Log product data to console instead of showing modal directly (as per logic)
         console.log(
-          "%c[Developer] Product card clicked. Data:",
+          "%c[Developer] تم النقر على بطاقة المنتج. البيانات:",
           "color: #007bff; font-weight: bold;",
           product
         );
@@ -524,17 +524,17 @@
     const product = myProducts.find((p) => p.id === productId);
     if (!product) {
       console.error(
-        "%c[Products] Product not found:",
+        "%c[Products] المنتج غير موجود:",
         "color: red;",
         productId
       );
       return;
     }
 
-    console.log("%c[Products] Editing product:", "color: blue;", product);
+    console.log("%c[Products] تعديل المنتج:", "color: blue;", product);
     const result = await CategoryModal.show(product.MainCategory, product.SubCategory, "Edit Product Market");
     if (result.status === 'success') {
-      console.log('Selected:', result.mainId, result.subId);
+      console.log('تم الاختيار:', result.mainId, result.subId);
 
       // result.mainId, result.subId are selected category IDs
 
@@ -553,7 +553,7 @@
    */
   async function deleteProduct(productId) {
     const product = myProducts.find((p) => p.id === productId);
-    console.log("%c[Products] Deleting product:", "color: red;", product);
+    console.log("%c[Products] حذف المنتج:", "color: red;", product);
     Swal.fire({
       title: 'هل أنت متأكد؟',
       text: `سيتم حذف المنتج "${product.productName}" بشكل نهائي. لا يمكن التراجع عن هذا الإجراء.`,
@@ -570,12 +570,12 @@
             const imageNames = product.ImageName.split(',').filter(name => name);
             if (imageNames.length > 0) {
               await Promise.all(imageNames.map(name =>
-                deleteFile2cf(name).catch(err => console.error(`[Delete] Failed to delete image ${name}:`, err))
+                deleteFile2cf(name).catch(err => console.error(`[Delete] فشل حذف الصورة ${name}:`, err))
               ));
             }
           }
           const dbResult = await deleteProduct_(product.product_key);
-          console.log("%c[Products] Deleting product:", "color: red;", dbResult);
+          console.log("%c[Products] حذف المنتج:", "color: red;", dbResult);
           if (dbResult && dbResult.error) throw new Error(dbResult.error);
           return true;
         } catch (error) {
@@ -608,14 +608,14 @@
    * @throws {Error} - If loading categories fails.
    */
   async function loadCategoryFilters() {
-    console.log("[Products] Starting to load category filters from 'list.json'.");
+    console.log("[Products] بدء تحميل فلاتر الفئات من 'list.json'.");
     try {
       const response = await fetch("../shared/list.json");
       if (!response.ok) throw new Error("Failed to load category filters");
       const data = await response.json();
       const categories = data.categories;
 
-      console.log("[Products] 'list.json' loaded and parsed successfully.", categories);
+      console.log("[Products] تم تحميل وتحليل 'list.json' بنجاح.", categories);
 
       // Clear existing options except the first one
       mainCategoryFilter.innerHTML = '<option value="">جميع الفئات</option>';
@@ -631,7 +631,7 @@
       });
 
       // Add event on Main Category change
-      console.log("[Products] Attaching 'change' event listener to the main category filter.");
+      console.log("[Products] ربط حدث 'change' بفلتر الفئة الرئيسية.");
       mainCategoryFilter.addEventListener("change", () => {
         // Reset Sub Categories
         subCategoryFilter.innerHTML = '<option value="">جميع الفئات الفرعية</option>';
@@ -654,12 +654,12 @@
           subCategoryFilter.innerHTML = '<option value="">جميع الفئات الفرعية</option>';
           subCategoryFilter.disabled = true; // Disable
         }
-        console.log("[Products] Sub-category filter updated based on main category selection.");
+        console.log("[Products] تم تحديث فلتر الفئة الفرعية بناءً على اختيار الفئة الرئيسية.");
       });
     } catch (error) {
-      console.error("%c[Products] Error loading category filters:", "color: red;", error);
+      console.error("%c[Products] خطأ في تحميل فلاتر الفئات:", "color: red;", error);
     }
-    console.log("[Products] Category filters have been fully loaded and configured.");
+    console.log("[Products] تم تحميل وتكوين فلاتر الفئات بالكامل.");
   }
   /**
    * @function filterProducts
@@ -671,7 +671,7 @@
     const mainCategory = mainCategoryFilter.value;
     const subCategory = subCategoryFilter.value;
 
-    console.log("%c[Products] Searching with criteria:", "color: blue;", {
+    console.log("%c[Products] بحث بالمعايير:", "color: blue;", {
       searchName,
       mainCategory,
       subCategory

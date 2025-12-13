@@ -153,7 +153,7 @@
       });
       return data;
     } catch (error) {
-      console.error("%c[getLatestUpdate] failed:", "color: red;", error);
+      console.error("%c[getLatestUpdate] فشل:", "color: red;", error);
       return null;
     }
   }
@@ -174,7 +174,7 @@
       return;
     }
 
-    console.log('%c[AdverModule] Initializing...', 'color: #20c997');
+    console.log('%c[AdverModule] جاري التهيئة...', 'color: #20c997');
 
     // --- ✅ NEW: Caching Logic ---
     const CACHE_KEY_IMAGES = 'adver_images_cache';
@@ -191,30 +191,30 @@
     // ✅ Check: Has 1 hour passed since last check? And do we have cached images?
     // If yes (less than 1 hour and have images), show cached images immediately and stop connection.
     if (!forceRefresh && lastCheckTimestamp && (Date.now() - lastCheckTimestamp < CHECK_INTERVAL) && cachedImages && cachedImages.length > 0) {
-      console.log('%c[AdverModule] Loading ads from cache (within 1h interval).', 'color: green; font-weight: bold;');
+      console.log('%c[AdverModule] تحميل الإعلانات من الذاكرة المؤقتة (فترة 1 ساعة).', 'color: green; font-weight: bold;');
       buildSlider(container, cachedImages);
       return; // Stop here, no need to bother the server
     }
 
     // If we reached here, cache is old (> 1 hour) or missing, or forced refresh requested.
     // We will now ask the server: "Do you have updates?"
-    console.log('%c[AdverModule] Checking for updates from server (interval elapsed or no cache).', 'color: #17a2b8;');
+    console.log('%c[AdverModule] التحقق من التحديثات من الخادم (انقضت الفترة أو لا توجد ذاكرة مؤقتة).', 'color: #17a2b8;');
     const latestUpdate = await getLatestUpdate();
     const serverTimestamp = latestUpdate ? latestUpdate.datetime : null;
 
-    console.log(`[AdverModule] Server Timestamp: ${serverTimestamp}`);
-    console.log(`[AdverModule] Cached Timestamp: ${cachedTimestamp}`);
+    console.log(`[AdverModule] طابع زمن الخادم: ${serverTimestamp}`);
+    console.log(`[AdverModule] طابع زمن الذاكرة المؤقتة: ${cachedTimestamp}`);
 
     // If dates match and images are saved, use saved copy (after server check)
     if (!forceRefresh && serverTimestamp && serverTimestamp === cachedTimestamp && cachedImages && cachedImages.length > 0) {
-      console.log('%c[AdverModule] Loading ads from cache.', 'color: green; font-weight: bold;');
+      console.log('%c[AdverModule] تحميل الإعلانات من الذاكرة المؤقتة.', 'color: green; font-weight: bold;');
       localStorage.setItem(CACHE_KEY_LAST_CHECK, Date.now()); // ✅ NEW: Update last check time
       buildSlider(container, cachedImages);
       return; // Stop here, no need to fetch images from network
     }
 
     // --- If dates don't match or no saved copy, fetch from network ---
-    console.log('%c[AdverModule] Cache is outdated or empty. Fetching from network...', 'color: orange; font-weight: bold;');
+    console.log('%c[AdverModule] الذاكرة المؤقتة قديمة أو فارغة. جاري الجلب من الشبكة...', 'color: orange; font-weight: bold;');
 
     const R2_PUBLIC_URL = 'https://pub-e828389e2f1e484c89d8fb652c540c12.r2.dev';
     const fetchedImages = [];
@@ -226,21 +226,21 @@
       if (manifestRes.ok) {
         const manifestData = await manifestRes.json();
         if (Array.isArray(manifestData) && manifestData.length > 0) {
-          console.log('%c[AdverModule] Manifest loaded.', 'color: green;', manifestData);
+          console.log('%c[AdverModule] تم تحميل البيان.', 'color: green;', manifestData);
           manifestData.forEach(img => fetchedImages.push(`${R2_PUBLIC_URL}/${img}`));
         } else {
-          console.warn("[AdverModule] Manifest is empty.");
+          console.warn("[AdverModule] البيان فارغ.");
         }
       } else {
-        console.error(`[AdverModule] Failed to load manifest: ${manifestRes.status}`);
+        console.error(`[AdverModule] فشل تحميل البيان: ${manifestRes.status}`);
       }
     } catch (e) {
-      console.error("[AdverModule] Manifest check failed:", e);
+      console.error("[AdverModule] فشل فحص البيان:", e);
     }
 
     // ✅ NEW: Save new images and update date to localStorage
     if (fetchedImages.length > 0) {
-      console.log(`[AdverModule] Fetched ${fetchedImages.length} images. Caching results.`);
+      console.log(`[AdverModule] تم جلب ${fetchedImages.length} صور. جاري تخزين النتائج.`);
       localStorage.setItem(CACHE_KEY_IMAGES, JSON.stringify(fetchedImages));
       if (serverTimestamp) {
         localStorage.setItem(CACHE_KEY_TIMESTAMP, serverTimestamp);
@@ -250,7 +250,7 @@
       buildSlider(container, fetchedImages);
     } else {
       // If no images found in manifest
-      console.warn('[AdverModule] No ads found in manifest.');
+      console.warn('[AdverModule] لم يتم العثور على إعلانات في البيان.');
       const noAdsMsg = container.querySelector('.no-ads-message');
       if (noAdsMsg) noAdsMsg.style.display = 'block';
 

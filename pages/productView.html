@@ -506,7 +506,7 @@
                 }
             };
         } catch (error) {
-            console.error("productView_setupAddToCart - Error initializing add to cart button:", error);
+            console.error("productView_setupAddToCart - خطأ في تهيئة زر الإضافة إلى السلة:", error);
         }
     }
 
@@ -586,10 +586,10 @@
     // ==============================================
 
     try {
-        console.log("Initializing product view module with received state:", productSession);
+        console.log("تهيئة وحدة عرض المنتج بالحالة المستلمة:", productSession);
         // productSession[0] is product data, productSession[1] is showAddToCart option
         productView_viewDetails(productSession[0], productSession[1]);
     } catch (error) {
-        console.error("Error initializing product view window:", error);
+        console.error("خطأ في تهيئة نافذة عرض المنتج:", error);
     }
 </script>

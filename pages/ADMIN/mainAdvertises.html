@@ -462,7 +462,7 @@
 
                 return blob;
             } catch (err) {
-                console.warn("Compression failed, using original.", err);
+                console.warn("فشل الضغط، جاري استخدام الصورة الأصلية.", err);
                 return file;
             }
         }
@@ -606,7 +606,7 @@
             } else {
                 // If no manifest found or empty
                 // Do not guess anymore, start with empty list.
-                console.warn("No manifest found or empty.");
+                console.warn("لم يتم العثور على ملف manifest أو أنه فارغ.");
             }
 
             els.loader.style.display = 'none';
@@ -757,7 +757,7 @@
                 const filesToDelete = originalImageNames.filter(oldName => !newManifest.includes(oldName));
 
                 if (filesToDelete.length > 0) {
-                    console.log("Deleting orphaned files:", filesToDelete);
+                    console.log("حذف الملفات اليتيمة (غير المستخدمة):", filesToDelete);
                     const deletePromises = filesToDelete.map(name => deleteFile2cf(name).catch(e => console.warn(e)));
                     await Promise.all(deletePromises);
                 }
@@ -769,8 +769,8 @@
                 loadImages(); // Reload to update UI with new data
 
             } catch (err) {
-                console.error(err);
-
+                console.error('خطأ في الرفع', err);
+                state.status = 'error';
             }
         };
 

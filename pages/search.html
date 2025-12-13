@@ -440,9 +440,9 @@
    * @returns {Promise<void>}
    */
   async function initSearchModal(containerId) {
-    // Developer message: Start initializing search modal
+    // Developer message: بدء تهيئة نافذة البحث
     console.log(
-      "%c[SearchModal] Starting initialization of the search modal.",
+      "%c[SearchModal] بدء تهيئة نافذة البحث.",
       "color: #007bff; font-weight: bold;"
     );
     const searchModalInput = document.getElementById("search-modal-input");
@@ -465,7 +465,7 @@
     let currentResults = [];
     // Developer message: DOM elements retrieved successfully
     console.log(
-      "[SearchModal] All required DOM elements have been successfully retrieved."
+      "[SearchModal] تم استرداد جميع عناصر DOM المطلوبة بنجاح."
     );
 
     /**
@@ -502,7 +502,7 @@
 
       // Log search criteria
       console.info(
-        `[SearchModal] Starting search with: searchTerm='${searchTerm}', mainCategory='${mainCategory}', subCategory='${subCategory}'`
+        `[SearchModal] بدء البحث بـ: searchTerm='${searchTerm}', mainCategory='${mainCategory}', subCategory='${subCategory}'`
       );
 
       // Do not search if empty
@@ -525,26 +525,26 @@
 
       const searchURL = `${baseURL}/api/products?${params.toString()}`;
       // Log full request URL
-      console.info(`[SearchModal] Fetching from URL: ${searchURL}`);
+      console.info(`[SearchModal] جلب من الرابط: ${searchURL}`);
 
       try {
         const response = await fetch(searchURL);
-        if (!response.ok) throw new Error("Failed to fetch search results");
+        if (!response.ok) throw new Error("فشل جلب نتائج البحث");
         const results = await response.json();
         currentResults = results; // Store original results
         console.log(
-          "[SearchModal] Successfully received results from server:",
+          "[SearchModal] تم استلام النتائج بنجاح من الخادم:",
           currentResults
         ); // Log received results
         displaySearchResults(results);
       } catch (error) {
-        console.error("%c[SearchModal] Search Error:", "color: red;", error);
+        console.error("%c[SearchModal] خطأ في البحث:", "color: red;", error);
         searchResultsContainer.innerHTML = // NOSONAR
-          '<p class="search-error-message">Error occurred during search. Please try again.</p>'; // NOSONAR
+          '<p class="search-error-message">حدث خطأ أثناء البحث. يرجى المحاولة مرة أخرى.</p>'; // NOSONAR
       }
       // Notify developer search is complete
       console.log(
-        "%c[SearchModal] Search operation completed.",
+        "%c[SearchModal] اكتملت عملية البحث.",
         "color: blue; font-style: italic;"
       );
     }
@@ -559,18 +559,18 @@
      */
     function displaySearchResults(results) {
       // Developer message: Start displaying results
-      console.log("[SearchModal] Starting to display search results.");
+      console.log("[SearchModal] بدء عرض نتائج البحث.");
       let sortedResults = [...results]; // Copy results for sorting
       const sortValue = sortFilter.value;
 
       // Apply sorting logic
       if (sortValue === "price-asc") {
-        console.info("[SearchModal] Sorting results by price: Low to High.");
+        console.info("[SearchModal] ترتيب النتائج حسب السعر: من الأقل إلى الأعلى.");
         sortedResults.sort(
           (a, b) => parseFloat(a.product_price) - parseFloat(b.product_price)
         );
       } else if (sortValue === "price-desc") {
-        console.info("[SearchModal] Sorting results by price: High to Low.");
+        console.info("[SearchModal] ترتيب النتائج حسب السعر: من الأعلى إلى الأقل.");
         sortedResults.sort(
           (a, b) => parseFloat(b.product_price) - parseFloat(a.product_price)
         );
@@ -578,7 +578,7 @@
 
       // Log number of results
       console.log(
-        `[SearchModal] Preparing to display ${sortedResults.length} search results.`
+        `[SearchModal] التحضير لعرض ${sortedResults.length} نتائج بحث.`
       );
 
       if (sortedResults.length === 0) {
@@ -607,7 +607,7 @@
           // Hide search modal and pass a callback to reopen it? (Not implemented here, but implied)
           // Developer message: Product clicked
           console.log(
-            "%c[Search Result Click] Product Clicked:",
+            "%c[Search Result Click] تم النقر على المنتج:",
             "color: #20c997; font-weight: bold;",
             productData
           );
@@ -644,7 +644,7 @@
     sortFilter.addEventListener("change", () => {
       // Developer message: Sort changed
       console.log(
-        `[SearchModal] Sort option changed to: ${sortFilter.value}. Re-displaying results.`
+        `[SearchModal] تم تغيير خيار الترتيب إلى: ${sortFilter.value}. إعادة عرض النتائج.`
       );
       // Redisplay results with new sort
       displaySearchResults(currentResults);
@@ -659,17 +659,17 @@
     async function loadCategoryFilters() {
       // Developer message: Start loading category filters
       console.log(
-        "[SearchModal] Starting to load category filters from 'list.json'."
+        "[SearchModal] بدء تحميل فلاتر التصنيفات من 'list.json'."
       );
       try {
         const response = await fetch("../shared/list.json");
-        if (!response.ok) throw new Error("Failed to load category filters");
+        if (!response.ok) throw new Error("فشل تحميل فلاتر التصنيفات");
         const data = await response.json();
         const categories = data.categories;
 
         // Developer message: list.json loaded successfully
         console.log(
-          "[SearchModal] 'list.json' loaded and parsed successfully.",
+          "[SearchModal] تم تحميل وتحليل 'list.json' بنجاح.",
           categories
         );
         // 1. Populate Main Category Filter
@@ -687,7 +687,7 @@
         // 2. Add event on Main Category change
         // Developer message: Attach event
         console.log(
-          "[SearchModal] Attaching 'change' event listener to the main category filter."
+          "[SearchModal] ربط مستمع حدث 'change' بفلتر التصنيف الرئيسي."
         );
         mainCategoryFilter.addEventListener("change", () => {
           // Reset Sub Categories
@@ -718,19 +718,19 @@
           }
           // Developer message: Sub updated
           console.log(
-            "[SearchModal] Sub-category filter updated based on main category selection."
+            "[SearchModal] تم تحديث فلتر التصنيف الفرعي بناءً على اختيار التصنيف الرئيسي."
           );
         });
       } catch (error) {
         console.error(
-          "%c[SearchModal] Error loading category filters:",
+          "%c[SearchModal] خطأ في تحميل فلاتر التصنيفات:",
           "color: red;",
           error
         );
       }
       // Developer message: Completed
       console.log(
-        "[SearchModal] Category filters have been fully loaded and configured."
+        "[SearchModal] تم تحميل وتكوين فلاتر التصنيفات بالكامل."
       );
     }
 
@@ -740,7 +740,7 @@
     // Attach search events
     // Developer message: Attach search events
     console.log(
-      "[SearchModal] Attaching search event listeners to input fields and buttons."
+      "[SearchModal] ربط مستمعي أحداث البحث بحقول الإدخال والأزرار."
     );
     // Search only on button click now
 
@@ -749,7 +749,7 @@
     } else {
       // Error message if button not found
       console.error(
-        "[SearchModal] Search button (perform-search-btn) not found."
+        "[SearchModal] زر البحث (perform-search-btn) غير موجود."
       );
 
       // Add input animation event
@@ -766,7 +766,7 @@
 
     // Developer message: Init complete
     console.log(
-      "%c[SearchModal] Initialization complete. The search modal is ready.",
+      "%c[SearchModal] اكتملت التهيئة. نافذة البحث جاهزة.",
       "color: green; font-weight: bold;"
     );
   }

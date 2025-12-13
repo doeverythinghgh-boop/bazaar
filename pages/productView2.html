@@ -902,7 +902,7 @@
         });
 
         try {
-            console.log("Starting order submission...");
+            console.log("بدء إرسال الطلب...");
 
             // 2. Generate Order Key (Serial) - For Database PK only
             const order_key = generateOrderSerial();
@@ -921,14 +921,14 @@
                 // Using explicit product_key as requested + order_key for uniqueness
                 const newName = `${user_key}_${seller_key}_${product_key}_${order_key}_${index}`;
                 const finalName = `${newName}.${ext}`;
-                console.log(`Uploading ${finalName}...`);
+                console.log(`جارٍ رفع ${finalName}...`);
 
                 const uploadResult = await uploadFile2cf(file, finalName);
                 // Use the file name confirmed by server if available, otherwise use our generated name
                 // Note: uploadFile2cf returns { file: "filename", ... } on success usually
                 const actualName = uploadResult.file || finalName;
                 uploadedFileNames.push(actualName);
-                console.log(`Upload success: ${actualName}`);
+                console.log(`تم الرفع بنجاح: ${actualName}`);
             }
 
             // 4. Create Order in Database
@@ -948,7 +948,7 @@
                 ]
             };
 
-            console.log("Creating order:", orderData);
+            console.log("إنشاء الطلب:", orderData);
 
             const res = await fetch(`${baseURL}/api/orders`, {
                 method: 'POST',
@@ -957,7 +957,7 @@
             });
 
             if (!res.ok) {
-                throw new Error('Failed to create order');
+                throw new Error('فشل إنشاء الطلب');
             }
 
             // Success
@@ -1001,7 +1001,7 @@
     // ==============================================
 
     try {
-        console.log("Initializing product view 3D slider...", productSession);
+        console.log("تهيئة عرض المنتج سلايدر ثلاثي الأبعاد...", productSession);
         // Check session and clear old intervals if any
         if (typeof productView_sliderState !== 'undefined' && productView_sliderState.autoPlayInterval) {
             clearInterval(productView_sliderState.autoPlayInterval);
@@ -1013,6 +1013,6 @@
         productView_initOrderLogic();
 
     } catch (error) {
-        console.error("Error initializing product view:", error);
+        console.error("خطأ في تهيئة عرض المنتج:", error);
     }
 </script>

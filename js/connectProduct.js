@@ -73,7 +73,7 @@ async function getProductsByCategory(mainCatId, subCatId) {
         "%c[API-Debug] متغير baseURL غير معرف أو فارغ!",
         "color: red; font-weight: bold;"
       );
-      throw new Error("baseURL is not defined"); // Stop execution if variable is missing.
+      throw new Error("المتغير baseURL غير معرف"); // Stop execution if variable is missing.
     }
     // Use URLSearchParams to create the query string safely and correctly.
     // This ensures 'null' or 'undefined' values are not sent as part of the URL.
@@ -90,7 +90,7 @@ async function getProductsByCategory(mainCatId, subCatId) {
   } catch (error) {
     // Log any error and return `null`.
     console.error(
-      "%c[getProductsByCategory] failed:",
+      "%c[getProductsByCategory] فشل:",
       "color: red;",
       error
     );
@@ -132,7 +132,7 @@ async function getProductsByUser(userKey, filters = {}) {
     const data = await apiFetch(`/api/products?${params.toString()}`);
     return data.error ? null : data;
   } catch (error) {
-    console.error("%c[getProductsByUser] failed:", "color: red;", error);
+    console.error("%c[getProductsByUser] فشل:", "color: red;", error);
     return null;
   }
 }
@@ -151,14 +151,14 @@ async function getProductByKey(productKey) {
     const data = await apiFetch(`/api/products?product_key=${productKey}&single=true`, {
       specialHandlers: {
         404: () => {
-          console.warn("[API] getProductByKey: Product not found (404).");
+          console.warn("[API] getProductByKey: المنتج غير موجود (404).");
           return null;
         }
       }
     });
     return data;
   } catch (error) {
-    console.error("%c[getProductByKey] failed:", "color: red;", error);
+    console.error("%c[getProductByKey] فشل:", "color: red;", error);
     return null;
   }
 }
@@ -180,7 +180,7 @@ async function showProductDetails(productData, onCloseCallback, options = {}) {
   // Check for main and sub category data, which is necessary to display details correctly.
   if (!productData.MainCategory || !productData.SubCategory) {
     console.error(
-      "[Modal] Missing category data. Cannot open product details.",
+      "[Modal] بيانات الفئة مفقودة. لا يمكن فتح تفاصيل المنتج.",
       productData
     );
     Swal.fire(
@@ -194,7 +194,7 @@ async function showProductDetails(productData, onCloseCallback, options = {}) {
   }
 
   console.log(
-    "%c[Modal] Opening product details modal for:",
+    "%c[Modal] فتح نافذة تفاصيل المنتج لـ:",
     "color: darkcyan",
     productData.productName
   );
@@ -272,7 +272,7 @@ function populateProductDetails(productData, onCloseCallback, options = {}) {
   const thumbnailsContainer = document.getElementById(
     "product-modal-thumbnails"
   );
-  console.log("[Modal] Populating product data and images.");
+  console.log("[Modal] تعبئة بيانات المنتج والصور.");
   mainImage.src = productData.imageSrc[0]; // Display first image as main.
   thumbnailsContainer.innerHTML = ""; // Clear old thumbnails
   productData.imageSrc.forEach((src) => {
@@ -283,7 +283,7 @@ function populateProductDetails(productData, onCloseCallback, options = {}) {
     };
     // ✅ FIX: Handle image load failures due to network issues
     thumb.onerror = () => {
-      console.warn("[Modal] Thumbnail image failed to load:", src);
+      console.warn("[Modal] فشل تحميل الصورة المصغرة:", src);
       // Replace failed image with placeholder and retry button
       const placeholder = document.createElement("div");
       placeholder.className = "image-load-error-placeholder";
@@ -313,11 +313,11 @@ function populateProductDetails(productData, onCloseCallback, options = {}) {
       ? parseFloat(productData.pricePerItem)
       : 0;
     if (originalPrice > 0 && originalPrice !== currentPrice) {
-      console.log("[Modal] Displaying original price.");
+      console.log("[Modal] عرض السعر الأصلي.");
       originalPriceEl.textContent = `${originalPrice.toFixed(2)} جنيه`;
       originalPriceContainer.style.display = "block"; // Show container
     } else {
-      console.log("[Modal] Hiding original price.");
+      console.log("[Modal] إخفاء السعر الأصلي.");
       originalPriceContainer.style.display = "none"; // Hide container
       originalPriceEl.textContent = "";
     }
@@ -326,7 +326,7 @@ function populateProductDetails(productData, onCloseCallback, options = {}) {
   const modal = document.getElementById("product-details-modal");
   // Function to close modal.
   const closeModal = () => {
-    console.log("[Modal] Closing product details modal.");
+    console.log("[Modal] إغلاق نافذة تفاصيل المنتج.");
     modal.style.display = "none";
     document.body.classList.remove("modal-open");
     // Call callback function on close (if passed).
@@ -357,7 +357,7 @@ function populateProductDetails(productData, onCloseCallback, options = {}) {
     return;
   }
 
-  console.log("[Modal] Initializing quantity controls.");
+  console.log("[Modal] تهيئة أدوات التحكم في الكمية.");
   // Set max quantity
   selectedQuantityInput.max = productData.availableQuantity;
 
@@ -395,7 +395,7 @@ function populateProductDetails(productData, onCloseCallback, options = {}) {
     const loggedInUser = getCurrentUser();
 
     if (loggedInUser && !loggedInUser.is_guest) {
-      console.log("[Modal] Add to cart button clicked by a registered user.");
+      console.log("[Modal] تم النقر على زر الإضافة إلى السلة بواسطة مستخدم مسجل.");
       // If user is registered, proceed with adding to cart.
       const quantity = parseInt(
         document.getElementById("product-modal-selected-quantity").value,
@@ -413,7 +413,7 @@ function populateProductDetails(productData, onCloseCallback, options = {}) {
     } else {
       // This condition checks if user is guest or not logged in at all.
       console.warn(
-        "[Modal] Add to cart button clicked by guest or non-logged-in user. Prompting for login/registration."
+        "[Modal] تم النقر على زر الإضافة إلى السلة بواسطة ضيف أو مستخدم غير مسجل. طلب تسجيل الدخول/التسجيل."
       );
       // If user is not registered, show alert to log in.
       Swal.fire({
@@ -425,7 +425,7 @@ function populateProductDetails(productData, onCloseCallback, options = {}) {
         cancelButtonText: "إلغاء",
       }).then((result) => {
         if (result.isConfirmed) {
-          console.log("[Modal] User chose to log in. Redirecting...");
+          console.log("[Modal] اختار المستخدم تسجيل الدخول. جاري التوجيه...");
           mainLoader("./pages/login.html", "index-user-container", 0, undefined, "hiddenLoginIcon", true);
 
         }

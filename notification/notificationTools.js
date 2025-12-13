@@ -31,7 +31,7 @@ async function shouldNotify(eventKey, role) {
     if (!config) {
         if (!cachedDefaultConfig) { // استخدام الكاش الداخلي كخط دفاع ثانٍ
             try {
-                console.warn('[Notifications] Config not in window, fetching JSON...');
+                console.warn('[Notifications] التكوين غير موجود في window، جارٍ جلب ملف JSON...');
                 const response = await fetch('/notification_config.json');
                 if (response.ok) {
                     cachedDefaultConfig = await response.json();
@@ -39,10 +39,10 @@ async function shouldNotify(eventKey, role) {
                     // تحديث المتغير العام للمستقبل
                     window.globalNotificationConfig = config;
                 } else {
-                    console.error('[Notifications] Failed to fetch JSON config:', response.status);
+                    console.error('[Notifications] فشل جلب تكوين JSON:', response.status);
                 }
             } catch (e) {
-                console.error('[Notifications] Error fetching JSON config:', e);
+                console.error('[Notifications] خطأ في جلب تكوين JSON:', e);
             }
         } else {
             config = cachedDefaultConfig;
@@ -65,7 +65,7 @@ async function shouldNotify(eventKey, role) {
         return criticalDefaults[eventKey][role];
     }
 
-    console.warn(`[Notifications] Config missing for ${eventKey}.${role}, defaulting to TRUE per user requirement.`);
+    console.warn(`[Notifications] التكوين مفقود لـ ${eventKey}.${role}، يتم الافتراض بـ TRUE وفقاً لمتطلبات المستخدم.`);
     return true;
 }
 /**
@@ -261,10 +261,13 @@ async function getActiveDeliveryRelations(sellerKey) {
         if (relations.error) {
             throw new Error(relations.error);
         }
-        console.log(`%c[API] getActiveDeliveryRelations successful for seller ${sellerKey}.`, "color: green;", relations);
+        if (relations.error) {
+            throw new Error(relations.error);
+        }
+        console.log(`%c[API] نجح getActiveDeliveryRelations للبائع ${sellerKey}.`, "color: green;", relations);
         return relations;
     } catch (error) {
-        console.error(`%c[getActiveDeliveryRelations] for seller ${sellerKey} failed:`, "color: red;", error);
+        console.error(`%c[getActiveDeliveryRelations] للبائع ${sellerKey} فشل:`, "color: red;", error);
         return null;
     }
 }
@@ -316,13 +319,13 @@ async function getUsersTokens(usersKeys) {
 
         // التعامل مع حالة الاستجابة الفارغة أو الخطأ الذي يرجعه الخادم/apiFetch
         if (result && result.error) {
-            console.error('[FCM] API returned an error:', result.error);
+            console.error('[FCM] أرجعت API خطأ:', result.error);
         }
         return [];
 
     } catch (error) {
         // معالجة أخطاء الشبكة أو الأخطاء التي لم يتم التعامل معها في apiFetch
-        console.error('[FCM] Critical error during token fetch:', error);
+        console.error('[FCM] خطأ حرج أثناء جلب التوكن:', error);
         return [];
     }
 }
@@ -341,8 +344,8 @@ async function getUsersTokens(usersKeys) {
  * @async
  */
 async function sendTokenToServer(userKey, token, platform) {
-    console.log(`%c[FCM] Sending token to server...`, "color: #fd7e14");
-    console.log(`[FCM] User Key: ${userKey} [FCM] FCM Token: ${token} [FCM] Platform: ${platform}`);
+    console.log(`%c[FCM] جارٍ إرسال التوكن إلى الخادم...`, "color: #fd7e14");
+    console.log(`[FCM] مفتاح المستخدم: ${userKey} [FCM] توكن FCM: ${token} [FCM] المنصة: ${platform}`);
 
     try {
         const response = await fetch(`${baseURL}/api/tokens`, {
@@ -358,21 +361,21 @@ async function sendTokenToServer(userKey, token, platform) {
         const responseData = await response.json();
         if (response.ok) {
             console.log(
-                "%c[FCM] Server successfully saved/updated the token.",
+                "%c[FCM] قام الخادم بحفظ/تحديث التوكن بنجاح.",
                 "color: #28a745",
                 responseData
             );
         } else {
             console.error(
-                "[FCM] Server failed to save token. Status:",
+                "[FCM] فشل الخادم في حفظ التوكن. الحالة:",
                 response.status,
-                "Response:",
+                "الاستجابة:",
                 responseData
             );
         }
     } catch (networkError) {
         console.error(
-            "%c[FCM] Network error while sending token:",
+            "%c[FCM] خطأ في الشبكة أثناء إرسال التوكن:",
             "color: #dc3545",
             networkError
         );
@@ -393,11 +396,11 @@ async function askForNotificationPermission() {
         typeof window.Android.requestNotificationPermission === "function"
     ) {
         console.log(
-            "Calling native function to request notification permission..."
+            "استدعاء الدالة الأصلية لطلب إذن الإشعارات..."
         );
         window.Android.requestNotificationPermission();
     } else {
-        console.log("Android interface not available.");
+        console.log("واجهة Android غير متاحة.");
     }
 }
 

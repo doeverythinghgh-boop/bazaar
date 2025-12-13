@@ -84,7 +84,7 @@ async function productSupportsWebP() {
  * @see productDebugBackground
  */
 function productForceResetBackground() {
-  console.log('%c[ProductForm] 🎨 FORCED Background Reset Started', 'color: red; font-weight: bold;');
+  console.log('%c[ProductForm] 🎨 بدء إعادة تعيين الخلفية القسري', 'color: red; font-weight: bold;');
 
   // فحص الحالة الحالية أولاً
   if (typeof productDebugBackground === 'function') {
@@ -100,7 +100,7 @@ function productForceResetBackground() {
 
   elements.forEach((element, index) => {
     if (element) {
-      console.log(`%c[ProductForm] 🎨 Resetting element ${index}`, 'color: orange;');
+      console.log(`%c[ProductForm] 🎨 إعادة تعيين العنصر ${index}`, 'color: orange;');
 
       // Remove all customizations
       element.style.removeProperty('background-color');
@@ -114,7 +114,7 @@ function productForceResetBackground() {
     }
   });
 
-  console.log('%c[ProductForm] 🎨 FORCED Background Reset Completed', 'color: green; font-weight: bold;');
+  console.log('%c[ProductForm] 🎨 اكتملت إعادة تعيين الخلفية القسري', 'color: green; font-weight: bold;');
 }
 
 /**
@@ -134,7 +134,7 @@ function productSetServiceCategoryBackground(newBackground) {
     document.documentElement.style.setProperty('--service-category-bg-color', newBackground);
   }
 
-  console.log(`%c[ProductForm] 🎨 Service category background changed to: ${newBackground}`, 'color: green; font-weight: bold;');
+  console.log(`%c[ProductForm] 🎨 تم تغيير خلفية فئة الخدمة إلى: ${newBackground}`, 'color: green; font-weight: bold;');
 
   // Update form if open
   if (typeof productUpdateExtendedMode === 'function') {
@@ -148,7 +148,7 @@ function productSetServiceCategoryBackground(newBackground) {
  */
 function productCheckBackgroundStatus() {
   const modal = document.querySelector('.add-product-modal');
-  console.group('%c[ProductForm] 🎨 Background Status Check', 'color: blue; font-weight: bold;');
+  console.group('%c[ProductForm] 🎨 فحص حالة الخلفية', 'color: blue; font-weight: bold;');
   console.log('SERVICE_CATEGORY_BACKGROUND:', window.SERVICE_CATEGORY_BACKGROUND);
   console.log('Modal element:', modal);
 
@@ -173,7 +173,7 @@ function productTestGradient() {
   const modal = document.querySelector('.add-product-modal');
   if (modal) {
     modal.style.background = window.SERVICE_CATEGORY_BACKGROUND;
-    console.log('%c[ProductForm] 🎨 Manual gradient test applied', 'color: green; font-weight: bold;');
+    console.log('%c[ProductForm] 🎨 تم تطبيق اختبار التدرج اليدوي', 'color: green; font-weight: bold;');
   }
 }
 

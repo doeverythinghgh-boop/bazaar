@@ -294,7 +294,7 @@
           // Update input value.
           e.target.value = value;
         } catch (error) {
-          console.error("[Register] Error handling phone input:", error);
+          console.error("[تسجيل] خطأ في معالجة إدخال الهاتف:", error);
         }
       });
     }
@@ -307,7 +307,7 @@
        */
       register_form.addEventListener("submit", async function (e) {
         e.preventDefault(); // Prevent form from submitting
-        console.log("%c[Register] Form submitted.", "color: blue;");
+        console.log("%c[تسجيل] تم إرسال النموذج.", "color: blue;");
         let register_isValid = true;
 
         // --- Validation ---
@@ -315,7 +315,7 @@
         // 1. Username validation
         clearError(register_username);
         const register_usernameValue = register_username.value.trim();
-        console.log("[Register] Validating username...");
+        console.log("[تسجيل] جاري التحقق من الاسم...");
         if (register_usernameValue === "") {
           showError(register_username, "الاسم مطلوب.");
           register_isValid = false;
@@ -330,7 +330,7 @@
         // 2. Phone validation
         clearError(register_phone);
         const register_phoneValue = register_phone.value.trim();
-        console.log("[Register] Validating phone number...");
+        console.log("[تسجيل] جاري التحقق من رقم الهاتف...");
         if (register_phoneValue === "") {
           showError(register_phone, "رقم الهاتف مطلوب.");
           register_isValid = false;
@@ -342,7 +342,7 @@
         // 3. Password validation
         clearError(register_password);
         const register_passwordValue = register_password.value.trim();
-        console.log("[Register] Validating password...");
+        console.log("[تسجيل] جاري التحقق من كلمة المرور...");
         if (register_passwordValue === "") {
           showError(register_password, "كلمة المرور مطلوبة.");
           register_isValid = false;
@@ -355,12 +355,12 @@
         }
 
         if (!register_isValid) {
-          console.warn("[Register] Validation failed.");
+          console.warn("[تسجيل] فشل التحقق.");
           return;
         }
 
         // Password confirmation is now mandatory
-        console.log("[Register] Prompting for password confirmation...");
+        console.log("[تسجيل] طلب تأكيد كلمة المرور...");
         const { value: register_confirmedPassword } = await Swal.fire({
           title: "تأكيد كلمة المرور",
           html: `
@@ -402,11 +402,11 @@
 
         // If user cancelled, stop registration.
         if (!register_confirmedPassword) {
-          console.log("[Register] Password confirmation cancelled by user.");
+          console.log("[تسجيل] تم إلغاء تأكيد كلمة المرور من قبل المستخدم.");
           return;
         }
         const register_userKey = register_generateSerialNumber(); // 🔑 Generate unique serial number (user_key)
-        console.log(`[Register] Generated new user_key: ${register_userKey}`);
+        console.log(`[تسجيل] تم توليد user_key جديد: ${register_userKey}`);
         const register_newUser = {
           username: register_username.value.trim(),
           phone: register_phone.value.trim(),
@@ -416,7 +416,7 @@
         };
 
         console.log(
-          "[Register] Sending new user data to API...",
+          "[تسجيل] إرسال بيانات المستخدم الجديد إلى API...",
           register_newUser
         );
         // Show loading message using SweetAlert2
@@ -435,7 +435,7 @@
 
           if (register_result && register_result.message) {
             console.log(
-              "%c[Register] Registration successful.",
+              "%c[تسجيل] تم التسجيل بنجاح.",
               "color: green;",
               register_result
             );
@@ -458,7 +458,7 @@
 
             // ✅ New: Initialize notifications for new user as in login page
             console.log(
-              "[Register] Initializing notifications for new user..."
+              "[تسجيل] تهيئة الإشعارات للمستخدم الجديد..."
             );
             if (userSession.user_key != "guest_user") {
               try {
@@ -470,13 +470,13 @@
                 }
               } catch (notifyErr) {
                 console.warn(
-                  "[Register] Error initializing notifications:",
+                  "[تسجيل] خطأ في تهيئة الإشعارات:",
                   notifyErr
                 );
               }
             }
             console.log(
-              "[Register] User data saved to localStorage. Redirecting to index.html..."
+              "[تسجيل] تم حفظ بيانات المستخدم في localStorage. جاري التوجيه إلى index.html..."
             );
 
             // Show welcome message before redirecting to home
@@ -509,20 +509,20 @@
             });
           } else if (register_result && register_result.error) {
             console.warn(
-              "[Register] API returned an error:",
+              "[تسجيل] أعاد API خطأ:",
               register_result.error
             );
             // If server error (e.g., duplicate phone number)
             showError(register_phone, register_result.error);
           } else {
-            console.error("[Register] Unknown API failure.");
+            console.error("[تسجيل] فشل API غير معروف.");
             // Unknown server failure
             showError(register_form, "حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى.");
           }
         } catch (error) {
           Swal.close(); // Ensure message is closed on error
           console.error(
-            "%c[Register] Critical error during registration:",
+            "%c[تسجيل] خطأ جسيم أثناء التسجيل:",
             "color: red; font-weight: bold;",
             error
           );
@@ -551,7 +551,7 @@
         });
       }
     } catch (error) {
-      console.error("[Register] Could not find or bind login link:", error);
+      console.error("[تسجيل] لم يتم العثور على رابط تسجيل الدخول أو ربطه:", error);
     }
 
     // New: Add password visibility toggle for the main form.

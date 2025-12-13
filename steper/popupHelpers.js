@@ -135,7 +135,7 @@ export function addStatusToggleListener(controlData, ordersData) {
             }
         });
     } catch (listenerError) {
-        console.error("Error in addStatusToggleListener:", listenerError);
+        console.error("خطأ في addStatusToggleListener:", listenerError);
     }
 }
 

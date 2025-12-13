@@ -44,7 +44,7 @@ function attachLogButtonListeners() {
         btn.addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation(); // Prevent toggling the checkbox/row
-            console.log(btn.dataset.key);
+            console.log('[بائع] مفتاح المنتج:', btn.dataset.key);
         });
     });
 }
@@ -242,7 +242,7 @@ export function showSellerConfirmationProductsAlert(data, ordersData) {
                                 selectedKeys: sellerSelectedKeys,
                                 deselectedKeys: sellerDeselectedKeys,
                             });
-                            console.log("Auto-saved seller confirmation state:", {
+                            console.log("الحفظ التلقائي لحالة تأكيد البائع:", {
                                 selectedKeys: sellerSelectedKeys,
                                 deselectedKeys: sellerDeselectedKeys,
                             });
@@ -254,7 +254,7 @@ export function showSellerConfirmationProductsAlert(data, ordersData) {
         });
     } catch (sellerConfirmAlertError) {
         console.error(
-            "Error in showSellerConfirmationProductsAlert:",
+            "خطأ في showSellerConfirmationProductsAlert:",
             sellerConfirmAlertError
         );
     }
@@ -311,7 +311,7 @@ export function showSellerRejectedProductsAlert(data, ordersData) {
         });
     } catch (rejectedAlertError) {
         console.error(
-            "Error in showSellerRejectedProductsAlert:",
+            "خطأ في showSellerRejectedProductsAlert:",
             rejectedAlertError
         );
     }

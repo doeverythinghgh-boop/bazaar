@@ -129,7 +129,7 @@ const notifiSetting_Controller = {
         try {
             localStorage.setItem(notifiSetting_STORAGE_KEY, JSON.stringify(this.notifiSetting_config));
             this.notifiSetting_showToast('تم حفظ الإعدادات بنجاح ✅');
-            console.log('[notifiSetting] Config saved:', this.notifiSetting_config);
+            console.log('[notifiSetting] تم حفظ الإعدادات:', this.notifiSetting_config);
         } catch (notifiSetting_error) {
             console.error('حدث خطأ أثناء حفظ الإعدادات:', notifiSetting_error);
             this.notifiSetting_showToast('فشل حفظ الإعدادات ❌');

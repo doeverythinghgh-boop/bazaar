@@ -363,7 +363,7 @@
       login_setupLoginForm();
 
     } catch (error) {
-      console.error("🚫 Error in loadPage function:", error);
+      console.error("🚫 خطأ في دالة loadPage:", error);
       // Show generic error to user using SweetAlert2.
 
     }
@@ -424,7 +424,7 @@
       }
 
     } catch (error) {
-      console.error("🚫 Error in login_setupLoginForm function:", error);
+      console.error("🚫 خطأ في دالة login_setupLoginForm:", error);
     }
   }
 
@@ -449,7 +449,7 @@
   async function login_handleSubmit(e) {
     try {
       console.log(
-        "%c[Login Page] Login button clicked.",
+        "%c[صفحة تسجيل الدخول] تم النقر على زر تسجيل الدخول.",
         "color: blue; font-weight: bold;"
       );
       // Prevent default form submission.
@@ -471,25 +471,25 @@
 
       // Validate Phone
       if (phoneValue === "") {
-        showError(loginPhoneInput, "Phone number is required.");
+        showError(loginPhoneInput, "رقم الهاتف مطلوب.");
         loginIsValid = false;
       } else if (phoneValue.length < 11) {
-        showError(loginPhoneInput, "Phone number must be at least 11 digits.");
+        showError(loginPhoneInput, "يجب أن يتكون رقم الهاتف من 11 رقمًا على الأقل.");
         loginIsValid = false;
       }
 
       // Validate Password
       if (passwordValue === "") {
-        showError(loginPasswordInput, "Password is required.");
+        showError(loginPasswordInput, "كلمة المرور مطلوبة.");
         loginIsValid = false;
       } else if (passwordValue.length < 4) {
-        showError(loginPasswordInput, "Password must be at least 4 characters.");
+        showError(loginPasswordInput, "يجب أن تكون كلمة المرور 4 أحرف على الأقل.");
         loginIsValid = false;
       }
 
       // 3. If all inputs are valid.
       if (loginIsValid) {
-        console.log("[Login Page] Form valid, verifying credentials...");
+        console.log("[صفحة تسجيل الدخول] النموذج صالح، جاري التحقق من الاعتمادات...");
 
         // Show loading popup.
         Swal.fire({
@@ -516,19 +516,19 @@
         } else {
           // Verification failed.
           console.error(
-            "[Login Page] Login failed:",
-            verificationResult?.error || "Unknown error"
+            "[صفحة تسجيل الدخول] فشل تسجيل الدخول:",
+            verificationResult?.error || "خطأ غير معروف"
           );
           Swal.close();
           const errorMessage =
-            "Incorrect password or phone number. please check them.";
+            "كلمة المرور أو رقم الهاتف غير صحيح. يرجى التحقق منهم.";
           if (typeof showError === "function") {
             showError(loginPasswordInput, errorMessage);
           }
         }
       }
     } catch (error) {
-      console.error("🚫 Error in login_handleSubmit:", error);
+      console.error("🚫 خطأ في login_handleSubmit:", error);
       // Close loading popup and show error.
 
     }
@@ -544,7 +544,7 @@
   async function login_handleLoginSuccess(user) {
     try {
       console.log(
-        "%c[Login Page] Entered login_handleLoginSuccess. User data:",
+        "%c[صفحة تسجيل الدخول] تم الدخول إلى login_handleLoginSuccess. بيانات المستخدم:",
         "color: green;",
         user
       );
@@ -559,7 +559,7 @@
         await askForNotificationPermission();
       } else {
         console.log(
-          "[Login Page] User not eligible for notifications, skipping setupFCM()."
+          "[صفحة تسجيل الدخول] المستخدم غير مؤهل للإشعارات، تخطي setupFCM()."
         );
       }
 
@@ -603,7 +603,7 @@
   function login_handleGuestLogin(event) {
     try {
       event.preventDefault(); // Prevent link from updating page.
-      console.log("[Auth] Logging in as a guest.");
+      console.log("[Auth] تسجيل الدخول كضيف.");
 
       // Create guest user object.
       const guestUser = {
@@ -630,7 +630,7 @@
         );
       }
     } catch (error) {
-      console.error("🚫 Error in login_handleGuestLogin function:", error);
+      console.error("🚫 خطأ في دالة login_handleGuestLogin:", error);
     }
   }
 

@@ -15,7 +15,7 @@
  */
 function productShowError(element, message) {
   if (!element) {
-    console.error('Cannot show error: element is null');
+    console.error('لا يمكن عرض الخطأ: العنصر غير موجود (null)');
     return;
   }
 
@@ -65,15 +65,15 @@ function productValidateForm() {
   const form = document.getElementById('add-product-form');
   const extendedMode = form ? form.dataset.extendedMode : 'unknown';
 
-  console.log(`%c[Validation] 🔍 Starting validation in mode: ${extendedMode}`,
+  console.log(`%c[التحقق] 🔍 بدء التحقق في الوضع: ${extendedMode}`,
     'color: teal; font-weight: bold;');
 
   let isValid = true;
   const images = window.productModule ? window.productModule.images : [];
   const uploaderEl = document.getElementById('image-uploader');
 
-  console.log('[ProductForm] Images count:', images.length);
-  console.log('[ProductForm] Uploader element:', uploaderEl);
+  console.log('[ProductForm] عدد الصور:', images.length);
+  console.log('[ProductForm] عنصر الرفع:', uploaderEl);
 
   // 1. Check for at least one image
   if (uploaderEl) {
@@ -81,15 +81,15 @@ function productValidateForm() {
   }
 
   if (images.length === 0) {
-    console.log('[ProductForm] No images found - showing error');
+    console.log('[ProductForm] لم يتم العثور على صور - عرض الخطأ');
     if (uploaderEl) {
       productShowError(uploaderEl, 'يجب إضافة صورة واحدة على الأقل للمنتج.');
     } else {
-      console.error('Uploader element not found for showing image error');
+      console.error('لم يتم العثور على عنصر الرفع لعرض خطأ الصورة');
     }
     isValid = false;
   } else {
-    console.log('[ProductForm] Images validation passed');
+    console.log('[ProductForm] نجح التحقق من الصور');
   }
 
   // 2. Check for main category selection
@@ -199,7 +199,7 @@ function productValidateForm() {
   }
 
   if (!isValid) {
-    console.warn('[ProductForm] Validation failed with errors');
+    console.warn('[ProductForm] فشل التحقق مع وجود أخطاء');
 
     // Scroll to the first field with error
     setTimeout(() => {
@@ -212,7 +212,7 @@ function productValidateForm() {
       }
     }, 100);
   } else {
-    console.log('%c[ProductForm] Validation passed successfully.', 'color: green;');
+    console.log('%c[ProductForm] تم التحقق بنجاح.', 'color: green;');
   }
 
   return isValid;
@@ -301,7 +301,7 @@ function productQuickValidateField(field) {
  * @see productResetModalBackground
  */
 function productCleanupForm() {
-  console.log('%c[ProductForm] 🧹 Cleaning up form and resetting background', 'color: gray;');
+  console.log('%c[ProductForm] 🧹 تنظيف النموذج وإعادة تعيين الخلفية', 'color: gray;');
 
   // إعادة تعيين لون الخلفية
   if (typeof productResetModalBackground === 'function') {

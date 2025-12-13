@@ -436,14 +436,14 @@
          *   Loads existing images and sets up the form mode.
          */
         async function initializeEditProductForm() {
-            console.log('%c[ProductForm] Initializing edit form...', 'color: blue;');
+            console.log('%c[ProductForm] تهيئة نموذج التعديل...', 'color: blue;');
 
             if (!productSession) {
-                console.error('%c[ProductForm] productSession not found!', 'color: red;');
+                console.error('%c[ProductForm] لم يتم العثور على productSession!', 'color: red;');
 
                 return;
             } else {
-                console.log('%c[ProductForm] productSession found!', 'color: green;');
+                console.log('%c[ProductForm] تم العثور على productSession!', 'color: green;');
             }
 
             const form = document.getElementById('edit-product-form');
@@ -453,7 +453,7 @@
             // Set edit mode
             form.dataset.mode = 'edit';
             form.dataset.productKey = productSession.product_key;
-            console.log(`[ProductForm] Editing product: ${productSession.product_key}`);
+            console.log(`[ProductForm] تعديل المنتج: ${productSession.product_key}`);
 
             window.productModule.originalImageNames = []; // Reset
 
@@ -475,7 +475,7 @@
             // Load existing images
             await window.productModule.loadExistingImages();
 
-            console.log('%c[ProductForm] Edit form initialized successfully.', 'color: green;');
+            console.log('%c[ProductForm] تم تهيئة نموذج التعديل بنجاح.', 'color: green;');
         }
 
         // Make functions and variables globally available
@@ -657,7 +657,7 @@
                 const imageNames = productSession.ImageName.split(',').filter(name => name.trim());
                 window.productModule.originalImageNames = [...imageNames];
 
-                console.log(`[ProductForm] Loading ${imageNames.length} existing images`);
+                console.log(`[ProductForm] تحميل ${imageNames.length} صور موجودة`);
 
                 for (let i = 0; i < imageNames.length; i++) {
                     const name = imageNames[i].trim();
@@ -686,7 +686,7 @@
                         }
                     };
                     img.onerror = () => {
-                        console.error(`Failed to load image: ${name}`);
+                        console.error(`فشل تحميل الصورة: ${name}`);
                         state.status = 'error';
                         createPreviewItem(state, '');
                         state._metaEl.textContent = 'فشل التحميل';
@@ -709,7 +709,7 @@
              * @param {string} id - The ID of the image to remove.
              */
             function removeImage(id) {
-                console.log(`[ImageUploader] Attempting to delete image with ID: ${id}`);
+                console.log(`[ImageUploader] محاولة حذف الصورة بالمعرف: ${id}`);
                 Swal.fire({
                     title: 'هل أنت متأكد؟',
                     text: "هل تريد حقاً حذف هذه الصورة؟",
@@ -725,7 +725,7 @@
                         if (idx > -1) {
                             const state = images[idx];
                             if (state._el) state._el.remove();
-                            console.log(`[ImageUploader] Image ${id} removed from view.`);
+                            console.log(`[ImageUploader] تمت إزالة الصورة ${id} من العرض.`);
                             images.splice(idx, 1);
                         }
                     }
@@ -740,7 +740,7 @@
              * @param {FileList|Array<File>} fileList - List of files.
              */
             async function handleNewFiles(fileList) {
-                console.log(`[ImageUploader] Handling ${fileList.length} new files.`);
+                console.log(`[ImageUploader] معالجة ${fileList.length} ملفات جديدة.`);
                 clearError(uploaderEl);
 
                 const filesArr = Array.from(fileList).slice(0, MAX_FILES - images.length);
@@ -752,17 +752,17 @@
                     createPreviewItem(state);
 
                     try {
-                        console.log(`[ImageUploader] Compressing image: ${file.name}`);
+                        console.log(`[ImageUploader] ضغط الصورة: ${file.name}`);
                         state.status = 'compressing';
                         const compressed = await compressImage(file);
                         state.compressedBlob = compressed;
                         state.status = 'ready';
-                        console.log(`%c[ImageUploader] Image compressed successfully: ${file.name} -> ${formatBytes(compressed.size)}`, 'color: green;');
+                        console.log(`%c[ImageUploader] تم ضغط الصورة بنجاح: ${file.name} -> ${formatBytes(compressed.size)}`, 'color: green;');
                         if (state._metaEl) {
                             state._metaEl.textContent = formatBytes(compressed.size);
                         }
                     } catch (err) {
-                        console.error('%c[ImageUploader] Error compressing image:', 'color: red;', err);
+                        console.error('%c[ImageUploader] خطأ في ضغط الصورة:', 'color: red;', err);
                         state.status = 'error';
                         if (state._metaEl) {
                             state._metaEl.textContent = 'خطأ';

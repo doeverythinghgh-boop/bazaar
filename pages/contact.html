@@ -891,12 +891,12 @@
                     }
                   });
               } catch (error) {
-                console.error("Error toggling FAQ item:", error);
+                console.error("خطأ في تبديل عنصر الأسئلة الشائعة:", error);
               }
             });
           });
       } catch (error) {
-        console.error("Error initializing FAQ section:", error);
+        console.error("خطأ في تهيئة قسم الأسئلة الشائعة:", error);
       }
 
       // Form and Services Tabs Functionality
@@ -969,13 +969,13 @@
                   }, 100);
                 }
               } catch (error) {
-                console.error("Error switching tabs:", error);
+                console.error("خطأ في تبديل علامات التبويب:", error);
               }
             });
           }
         });
       } catch (error) {
-        console.error("Error initializing Form/Services tabs:", error);
+        console.error("خطأ في تهيئة علامات تبويب النموذج/الخدمات:", error);
       }
 
       // Form Submission
@@ -999,18 +999,18 @@
               if (contact_name && contact_email) {
                 // In a real application, you would send data to server here
                 alert(
-                  `Thank you ${contact_name} for contacting us! We will reply to your message at ${contact_email} as soon as possible.`
+                  `شكراً لك ${contact_name} لتواصلك معنا! سنرد على رسالتك في ${contact_email} في أقرب وقت ممكن.`
                 );
                 document.getElementById("contact_contactForm").reset();
               } else {
-                alert("Please fill in the required fields");
+                alert("يرجى ملء الحقول المطلوبة");
               }
             } catch (error) {
-              console.error("Error submitting form:", error);
+              console.error("خطأ في إرسال النموذج:", error);
             }
           });
       } catch (error) {
-        console.error("Error setting up contact form:", error);
+        console.error("خطأ في إعداد نموذج الاتصال:", error);
       }
 
       // Animate service cards on scroll
@@ -1041,7 +1041,7 @@
             contact_observer.observe(contact_card);
           });
       } catch (error) {
-        console.error("Error setting up scroll observer:", error);
+        console.error("خطأ في إعداد مراقب التمرير:", error);
       }
 
       // Legal Pages Tabs Functionality
@@ -1119,12 +1119,12 @@
                 }, 200);
               }
             } catch (error) {
-              console.error("Error switching legal tabs:", error);
+              console.error("خطأ في تبديل علامات التبويب القانونية:", error);
             }
           });
         });
       } catch (error) {
-        console.error("Error setting up legal pages:", error);
+        console.error("خطأ في إعداد الصفحات القانونية:", error);
       }
 
       insertUniqueSnapshot("../pages/header.html", "header-container101", 100);

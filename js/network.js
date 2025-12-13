@@ -61,7 +61,7 @@ async function performActualConnectionCheck() {
   lastConnectionCheck = Date.now();
 
   try {
-    if (!navigator.onLine) throw new Error("navigator.onLine is false");
+    if (!navigator.onLine) throw new Error("لا يوجد اتصال بالإنترنت (navigator.onLine is false)");
 
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 3000);
@@ -76,7 +76,7 @@ async function performActualConnectionCheck() {
 
     // 🔹 Connection restored
     if (!isConnectedCache) {
-      console.log("%c[Network] تم استعادة الاتصال بالإنترنت.", "color: green;");
+      console.log("%c[الشبكة] تم استعادة الاتصال بالإنترنت.", "color: green;");
     }
 
     isConnectedCache = true;
@@ -92,7 +92,7 @@ async function performActualConnectionCheck() {
   } catch (error) {
     // 🔻 Connection lost
     if (isConnectedCache) {
-      console.warn("%c[Network] انقطع الاتصال بالإنترنت.", "color: red;");
+      console.warn("%c[الشبكة] انقطع الاتصال بالإنترنت.", "color: red;");
     }
 
     isConnectedCache = false;
@@ -194,7 +194,7 @@ async function apiFetch(endpoint, options = {}) {
     fetchOptions.body = JSON.stringify(body);
   }
 
-  console.log(`%c[API Fetch] ${method} ${endpoint}`, 'color: #b81717ff;', body ? { payload: body } : '');
+  console.log(`%c[جلب API] ${method} ${endpoint}`, 'color: #b81717ff;', body ? { payload: body } : '');
 
   try {
     const response = await fetch(url, fetchOptions);
@@ -206,7 +206,7 @@ async function apiFetch(endpoint, options = {}) {
     const data = await response.json();
 
     if (!response.ok) {
-      return { error: data.error || `HTTP error! status: ${response.status}` };
+      return { error: data.error || `خطأ HTTP! الحالة: ${response.status}` };
     }
     return data;
   } catch (error) {

@@ -705,17 +705,17 @@
                 }
 
                 try {
-                    console.log('URL:', salesMovement_url);
+                    console.log('الرابط:', salesMovement_url);
                     const salesMovement_response = await fetch(salesMovement_url);
 
                     if (!salesMovement_response.ok) {
-                        throw new Error(`HTTP error! status: ${salesMovement_response.status}`);
+                        throw new Error(`خطأ HTTP! الحالة: ${salesMovement_response.status}`);
                     }
 
                     const salesMovement_data = await salesMovement_response.json();
                     console.log('تم جلب البيانات بنجاح:', salesMovement_data);
                     if (salesMovement_data && salesMovement_data.length > 0) {
-                        console.log('First order items sample:', salesMovement_data[0].order_items);
+                        console.log('عينة عناصر الطلب الأول:', salesMovement_data[0].order_items);
                     }
 
                     // You can process and display data here
