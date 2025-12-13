@@ -981,7 +981,7 @@
       // Form Submission
       /**
        * @description Handles the contact form submission.
-       * Validates input and shows a thank you message.
+       * Opens user's default email client with pre-filled data to send to suezbazaar@gmail.com
        */
       try {
         document
@@ -991,22 +991,55 @@
               e.preventDefault();
 
               // Get form values
-              const contact_name = document.getElementById("contact_name").value;
-              const contact_email =
-                document.getElementById("contact_email").value;
+              const contact_name = document.getElementById("contact_name").value.trim();
+              const contact_email = document.getElementById("contact_email").value.trim();
+              const contact_phone = document.getElementById("contact_phone").value.trim();
+              const contact_service = document.getElementById("contact_service").value;
+              const contact_message = document.getElementById("contact_message").value.trim();
 
               // Simple validation
-              if (contact_name && contact_email) {
-                // In a real application, you would send data to server here
-                alert(
-                  `شكراً لك ${contact_name} لتواصلك معنا! سنرد على رسالتك في ${contact_email} في أقرب وقت ممكن.`
-                );
-                document.getElementById("contact_contactForm").reset();
+              if (contact_name && contact_email && contact_message) {
+                // Build email subject
+                const subject = `رسالة من ${contact_name} - نموذج الاتصال`;
+
+                // Build email body
+                let body = `الاسم: ${contact_name}\n`;
+                body += `البريد الإلكتروني: ${contact_email}\n`;
+
+                if (contact_phone) {
+                  body += `رقم الهاتف: ${contact_phone}\n`;
+                }
+
+                if (contact_service) {
+                  const serviceNames = {
+                    'consulting': 'استشارات تسويقية',
+                    'digital': 'تسويق رقمي',
+                    'branding': 'تصميم الهوية البصرية',
+                    'social': 'إدارة وسائل التواصل الاجتماعي',
+                    'seo': 'تحسين محركات البحث',
+                    'other': 'خدمة أخرى'
+                  };
+                  body += `نوع الخدمة: ${serviceNames[contact_service] || contact_service}\n`;
+                }
+
+                body += `\nالرسالة:\n${contact_message}`;
+
+                // Create mailto link
+                const mailtoLink = `mailto:suezbazaar@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+
+                // Open user's email client directly
+                window.location.href = mailtoLink;
+
+                // Reset form after a short delay to allow mailto to open
+                setTimeout(() => {
+                  document.getElementById("contact_contactForm").reset();
+                }, 500);
               } else {
-                alert("يرجى ملء الحقول المطلوبة");
+                alert("يرجى ملء الحقول المطلوبة (الاسم، البريد الإلكتروني، الرسالة)");
               }
             } catch (error) {
               console.error("خطأ في إرسال النموذج:", error);
+              alert("حدث خطأ أثناء معالجة النموذج. يرجى المحاولة مرة أخرى.");
             }
           });
       } catch (error) {

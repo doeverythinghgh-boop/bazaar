@@ -397,7 +397,7 @@
         <div class="productView_seller_message_box" id="productView_seller_message_container">
             <h4 id="productView_seller_message_header">
                 <i class="fas fa-comment-dots" id="productView_seller_message_icon"></i>
-                رسالة من البائع
+                رسالة من مقدم الخدمة
             </h4>
             <p id="productView_seller_message_text"></p>
         </div>
@@ -493,7 +493,7 @@
         nextBtn.style.display = 'none';
 
         if (!images || images.length === 0) {
-            sliderTrack.innerHTML = '<p style="text-align:center; color:#666; width:100%;">لا توجد صور للمنتج</p>';
+            sliderTrack.innerHTML = '<p style="text-align:center; color:#666; width:100%;">لا توجد صور للخدمة</p>';
             return;
         }
 
@@ -709,12 +709,12 @@
      */
     function productView_viewDetails(productData) {
         try {
-            console.log("[productView_] عرض التفاصيل مع السلايدر...");
+            console.log("[productView_] عرض تفاصيل الخدمة مع السلايدر...");
             const { name, description, sellerMessage } = productView_domElements;
 
             name.textContent = productData.productName || "غير متوفر";
             description.textContent = productData.description || "لا يوجد وصف متاح.";
-            sellerMessage.textContent = productData.sellerMessage || "لا توجد رسالة من البائع.";
+            sellerMessage.textContent = productData.sellerMessage || "لا توجد رسالة من مقدم الخدمة.";
 
             // Build slider
             const images = productData.imageSrc || [];
@@ -875,110 +875,111 @@
     async function productView_sendOrder() {
         // Validation
         if (showLoginAlert()) {
-        
-        
 
-        const note = productView_orderEls.note.value.trim();
-        if (productView_orderImages.length === 0 && !note) {
-            Swal.fire('تنبيه', 'يرجى إضافة ملاحظة أو صورة واحدة على الأقل', 'warning');
-            return;
-        }
 
-        // 1. Setup Keys
-        // User provided data shows 'user_key' is the seller's key in productSession[0]
-        const productData = productSession[0];
-        const product_key = productData.product_key; // PRODUCTKEY (From Product Data)
-        const seller_key = productData.user_key;     // sellerKey (From Product Data)
 
-        const user_key = userSession.user_key;       // USERKEY (From User Session)
-
-        // Show loading
-        Swal.fire({
-            title: 'جاري الإرسال...',
-            html: 'يرجى الانتظار بينما نقوم برفع الصور وإنشاء الطلب',
-            allowOutsideClick: false,
-            didOpen: () => Swal.showLoading()
-        });
-
-        try {
-            console.log("بدء إرسال الطلب...");
-
-            // 2. Generate Order Key (Serial) - For Database PK only
-            const order_key = generateSerial();
-
-            // 3. Upload Images
-            const uploadedFileNames = [];
-
-            for (let i = 0; i < productView_orderImages.length; i++) {
-                const file = productView_orderImages[i];
-                const index = i + 1;
-                // Get extension from compressed blob (if available) or fallback to name
-                // This converts .tif -> .webp/.jpg automatically in the filename
-                const ext = (file.extension || file.name.split('.').pop() || 'jpg').toLowerCase();
-
-                // Naming: USERKEY_sellerKey_PRODUCTKEY_ORDERKEY_{index}
-                // Using explicit product_key as requested + order_key for uniqueness
-                const newName = `${user_key}_${seller_key}_${product_key}_${order_key}_${index}`;
-                const finalName = `${newName}.${ext}`;
-                console.log(`جارٍ رفع ${finalName}...`);
-
-                const uploadResult = await uploadFile2cf(file, finalName);
-                // Use the file name confirmed by server if available, otherwise use our generated name
-                // Note: uploadFile2cf returns { file: "filename", ... } on success usually
-                const actualName = uploadResult.file || finalName;
-                uploadedFileNames.push(actualName);
-                console.log(`تم الرفع بنجاح: ${actualName}`);
+            const note = productView_orderEls.note.value.trim();
+            if (productView_orderImages.length === 0 && !note) {
+                Swal.fire('تنبيه', 'يرجى إضافة ملاحظة أو صورة واحدة على الأقل', 'warning');
+                return;
             }
 
-            // 4. Create Order in Database
-            const total_amount = 0;
+            // 1. Setup Keys
+            // User provided data shows 'user_key' is the seller's key in productSession[0]
+            const productData = productSession[0];
+            const product_key = productData.product_key; // PRODUCTKEY (From Product Data)
+            const seller_key = productData.user_key;     // sellerKey (From Product Data)
 
-            const orderData = {
-                order_key: order_key,
-                user_key: user_key,
-                total_amount: total_amount,
-                items: [
-                    {
-                        product_key: product_key,
-                        quantity: 1,
-                        seller_key: seller_key,
-                        note: note
-                    }
-                ]
-            };
+            const user_key = userSession.user_key;       // USERKEY (From User Session)
 
-            console.log("إنشاء الطلب:", orderData);
-
-            const res = await fetch(`${baseURL}/api/orders`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(orderData)
-            });
-
-            if (!res.ok) {
-                throw new Error('فشل إنشاء الطلب');
-            }
-
-            // Success
-            localStorage.setItem('showOrderPhotoMessage', 'true');
-
+            // Show loading
             Swal.fire({
-                icon: 'success',
-                title: 'تم الإرسال بنجاح',
-                
-                confirmButtonText: 'حسناً'
-            }).then(() => {
-                          mainLoader("./pages/home.html","index-home-container",0,undefined,"hiddenHomeIcon",false);
-
+                title: 'جاري الإرسال...',
+                html: 'يرجى الانتظار بينما نقوم برفع الصور وإنشاء الطلب',
+                allowOutsideClick: false,
+                didOpen: () => Swal.showLoading()
             });
 
-        } catch (error) {
-            console.error(error);
+            try {
+                console.log("بدء إرسال الطلب...");
 
+                // 2. Generate Order Key (Serial) - For Database PK only
+                const order_key = generateSerial();
+
+                // 3. Upload Images
+                const uploadedFileNames = [];
+
+                for (let i = 0; i < productView_orderImages.length; i++) {
+                    const file = productView_orderImages[i];
+                    const index = i + 1;
+                    // Get extension from compressed blob (if available) or fallback to name
+                    // This converts .tif -> .webp/.jpg automatically in the filename
+                    const ext = (file.extension || file.name.split('.').pop() || 'jpg').toLowerCase();
+
+                    // Naming: USERKEY_sellerKey_PRODUCTKEY_ORDERKEY_{index}
+                    // Using explicit product_key as requested + order_key for uniqueness
+                    const newName = `${user_key}_${seller_key}_${product_key}_${order_key}_${index}`;
+                    const finalName = `${newName}.${ext}`;
+                    console.log(`جارٍ رفع ${finalName}...`);
+
+                    const uploadResult = await uploadFile2cf(file, finalName);
+                    // Use the file name confirmed by server if available, otherwise use our generated name
+                    // Note: uploadFile2cf returns { file: "filename", ... } on success usually
+                    const actualName = uploadResult.file || finalName;
+                    uploadedFileNames.push(actualName);
+                    console.log(`تم الرفع بنجاح: ${actualName}`);
+                }
+
+                // 4. Create Order in Database
+                const total_amount = 0;
+
+                const orderData = {
+                    order_key: order_key,
+                    user_key: user_key,
+                    total_amount: total_amount,
+                    items: [
+                        {
+                            product_key: product_key,
+                            quantity: 1,
+                            seller_key: seller_key,
+                            note: note
+                        }
+                    ]
+                };
+
+                console.log("إنشاء الطلب:", orderData);
+
+                const res = await fetch(`${baseURL}/api/orders`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(orderData)
+                });
+
+                if (!res.ok) {
+                    throw new Error('فشل إنشاء الطلب');
+                }
+
+                // Success
+                localStorage.setItem('showOrderPhotoMessage', 'true');
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'تم الإرسال بنجاح',
+
+                    confirmButtonText: 'حسناً'
+                }).then(() => {
+                    mainLoader("./pages/home.html", "index-home-container", 0, undefined, "hiddenHomeIcon", false);
+
+                });
+
+            } catch (error) {
+                console.error(error);
+
+            }
         }
-    }}
+    }
 
-    
+
 
 
     // ==============================================
@@ -986,7 +987,7 @@
     // ==============================================
 
     try {
-        console.log("تهيئة عرض المنتج سلايدر ثلاثي الأبعاد...", productSession);
+        console.log("تهيئة عرض الخدمة سلايدر ثلاثي الأبعاد...", productSession);
         // Check session and clear old intervals if any
         if (typeof productView_sliderState !== 'undefined' && productView_sliderState.autoPlayInterval) {
             clearInterval(productView_sliderState.autoPlayInterval);
@@ -998,6 +999,6 @@
         productView_initOrderLogic();
 
     } catch (error) {
-        console.error("خطأ في تهيئة عرض المنتج:", error);
+        console.error("خطأ في تهيئة عرض الخدمة:", error);
     }
 </script>

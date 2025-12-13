@@ -45,6 +45,7 @@ function attachLogButtonListeners() {
             e.preventDefault();
             e.stopPropagation(); // Prevent toggling the checkbox/row
             console.log('[بائع] مفتاح المنتج:', btn.dataset.key);
+            localStorage.setItem('productKeyFromStepReview', btn.dataset.key);
         });
     });
 }
@@ -165,7 +166,7 @@ export function showSellerConfirmationProductsAlert(data, ordersData) {
                         </div>
                         <button type="button" class="btn-show-key" data-key="${product.product_key}" 
                                 style="padding: 2px 6px; font-size: 0.8em; cursor: pointer; border: 1px solid #ccc; background: #f0f0f0; border-radius: 4px;">
-                            key
+                            المنتج
                         </button>
                     </div>
                 `;

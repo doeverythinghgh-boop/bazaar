@@ -1105,7 +1105,7 @@
 
                     try {
                         // جلب بيانات المنتج
-                        const salesMovement_response = await fetch(`${baseURL} / api / products ? product_key = ${salesMovement_currentProductKey}`);
+                        const salesMovement_response = await fetch(`${baseURL}/api/products?product_key=${salesMovement_currentProductKey}`);
 
                         if (!salesMovement_response.ok) {
                             throw new Error(`HTTP error! status: ${salesMovement_response.status}`);
