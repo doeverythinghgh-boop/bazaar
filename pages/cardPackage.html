@@ -588,33 +588,10 @@
     <script>
 
         async function sendOrder2Excution() {
-            // 1. Fetch Data
+            // 1. Check Session (Fix inverted condition)
+            if (showLoginAlert()) {
+            // 2. Fetch Data
             const cart = getCart();
-
-            // 2. Check Session (Fix inverted condition)
-            if (!userSession || userSession.user_key == "guest_user") {
-                Swal.fire({
-                    title: "مطلوب التسجيل",
-                    text: "لإتمام عملية الشراء، يجب عليك تسجيل الدخول أو إنشاء حساب جديد.",
-                    icon: "info",
-                    showCancelButton: true,
-                    confirmButtonText: "تسجيل الدخول",
-                    cancelButtonText: "إلغاء",
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        mainLoader(
-                            "./pages/login.html",
-                            "index-user-container",
-                            0,
-                            undefined,
-                            "hiddenLoginIcon",
-                            true
-                        );
-                    }
-                });
-                return;
-            }
-
             // 3. Check Cart
             if (cart.length === 0) {
                 Swal.fire("السلة فارغة", "لا توجد منتجات في السلة لإتمام الشراء.", "info");
@@ -690,6 +667,7 @@
             } else if (result.value && result.value.error) {
                 console.error("حدث خطأ", `فشل إرسال الطلب: ${result.value.error}`, "error");
             }
+        }
         }
 
         // Global Variables

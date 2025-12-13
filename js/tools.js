@@ -470,4 +470,35 @@ async function loader(pageUrl, containerId, waitMs = 300) {
 
 /////////////////////////////////
 
+/**
+ * @description Shows a SweetAlert2 modal prompting the user to log in.
+ *   If confirmed, it navigates to the login page using mainLoader.
+ *   Checks guest session status.
+ * @function showLoginAlert
+ * @returns {boolean} - Returns false if the user is a guest (and shows alert), true otherwise.
+ */
+function showLoginAlert() {
+  if (!userSession || userSession.user_key == "guest_user") {
+    Swal.fire({
+      icon: "info",
+      title: "تنبيه",
+      text: "يرجى تسجيل الدخول أولاً للتمكن من استخدام هذه الميزة.",
+      showCancelButton: true,
+      confirmButtonText: "تسجيل الدخول",
+      cancelButtonText: "إلغاء",
+      customClass: { popup: 'fullscreen-swal' }, // Apply custom style
+    }).then((result) => {
+      if (result.isConfirmed) {
+        if (typeof mainLoader === 'function') {
+          mainLoader("./pages/login.html", "index-user-container", 0, undefined, "hiddenLoginIcon", true);
+        } else {
+          console.error("mainLoader function is not defined");
+        }
+      }
+    });
+    return false;
+  }
+  return true;
+}
+
 

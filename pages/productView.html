@@ -474,7 +474,7 @@
         try {
             productView_domElements.addToCartBtn.onclick = async () => {
 
-                if (userSession && Number(userSession.is_seller) > -1) {
+                if (showLoginAlert()) {
                     console.log("[productView_] المستخدم مسجل دخول، جاري الإضافة للسلة...");
                     const quantity = parseInt(productView_domElements.selectedQuantityInput.value, 10);
 
@@ -487,23 +487,7 @@
                         seller_key: productData.user_key,
                     };
                     addToCart(productInfoForCart, quantity); // Defined externally
-                } else {
-                    console.warn("[productView_] مستخدم زائر. جاري التوجيه لتسجيل الدخول.");
-                    // Use preset SweetAlert2 style
-                    Swal.fire({
-                        icon: "info",
-                        title: "تنبيه",
-                        text: "يرجى تسجيل الدخول أولاً لإضافة منتجات إلى السلة.",
-                        showCancelButton: true,
-                        confirmButtonText: "تسجيل الدخول",
-                        cancelButtonText: "إلغاء",
-                        customClass: { popup: 'fullscreen-swal' }, // Apply custom style
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            mainLoader("./pages/login.html", "index-user-container", 0, undefined, "hiddenLoginIcon", true);
-                        }
-                    });
-                }
+                } 
             };
         } catch (error) {
             console.error("productView_setupAddToCart - خطأ في تهيئة زر الإضافة إلى السلة:", error);

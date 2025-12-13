@@ -394,7 +394,7 @@
         .getElementById("index-sales-movement-btn")
         .addEventListener("click", async () => {
           // Check if user is logged in.
-          if (userSession) {
+          if (showLoginAlert()) {
             const container = document.getElementById("index-salesMovement-container");
             if (container.innerHTML == "") {
               await mainLoader(
@@ -415,30 +415,7 @@
                 false
               );
             }
-          } else {
-            // If not logged in, show a confirmation modal.
-            Swal.fire({
-              icon: "info",
-              title: "تسجيل الدخول مطلوب",
-              text: "لعرض مبيعاتك ومنتجاتك، يرجى تسجيل الدخول أولاً.",
-              showCancelButton: true,
-              confirmButtonText: "تسجيل الدخول",
-              cancelButtonText: "إلغاء",
-            }).then((result) => {
-              if (result.isConfirmed) {
-                // If confirmed, redirect to login page.
-                console.log("[Modal] اختار المستخدم تسجيل الدخول. جاري التوجيه...");
-                mainLoader(
-                  "./pages/login.html",
-                  "index-user-container",
-                  0,
-                  undefined,
-                  "hiddenLoginIcon",
-                  true
-                );
-              }
-            });
-          }
+          } 
         });
 
       // [Step 5.9] Bind "Notifications" button.
@@ -449,7 +426,9 @@
       document
         .getElementById("index-notifications-btn")
         .addEventListener("click", () => {
+          if( showLoginAlert()){
           mainLoader("./notification/page/notifications.html", "index-notifications-container", 0, undefined, "showHomeIcon", true);
+          }
         });
 
       document

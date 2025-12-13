@@ -394,7 +394,7 @@ function populateProductDetails(productData, onCloseCallback, options = {}) {
     // Check if user is logged in (not guest).
     const loggedInUser = getCurrentUser();
 
-    if (loggedInUser && !loggedInUser.is_guest) {
+    if (showLoginAlert()) {
       console.log("[Modal] تم النقر على زر الإضافة إلى السلة بواسطة مستخدم مسجل.");
       // If user is registered, proceed with adding to cart.
       const quantity = parseInt(
@@ -410,26 +410,6 @@ function populateProductDetails(productData, onCloseCallback, options = {}) {
         seller_key: productData.user_key, // Include seller key for notifications
       };
       addToCart(productInfoForCart, quantity);
-    } else {
-      // This condition checks if user is guest or not logged in at all.
-      console.warn(
-        "[Modal] تم النقر على زر الإضافة إلى السلة بواسطة ضيف أو مستخدم غير مسجل. طلب تسجيل الدخول/التسجيل."
-      );
-      // If user is not registered, show alert to log in.
-      Swal.fire({
-        icon: "info",
-        title: "يجب تسجيل الدخول",
-        text: "لإضافة منتجات إلى السلة، يرجى تسجيل الدخول أولاً.",
-        showCancelButton: true,
-        confirmButtonText: "تسجيل الدخول",
-        cancelButtonText: "إلغاء",
-      }).then((result) => {
-        if (result.isConfirmed) {
-          console.log("[Modal] اختار المستخدم تسجيل الدخول. جاري التوجيه...");
-          mainLoader("./pages/login.html", "index-user-container", 0, undefined, "hiddenLoginIcon", true);
-
-        }
-      });
-    }
+    } 
   });
 }

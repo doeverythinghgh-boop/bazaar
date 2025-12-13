@@ -133,7 +133,7 @@ async function clearAndNavigateToLogin() {
   setUserNameInIndexBar();
   checkImpersonationMode();
   // [Step 1] Call `mainLoader` to load login page content into the main user container.
-  console.log("[Auth] دخلنا دالة clearAndNavigateToLogin 00000000000. جاري تحميل صفحة تسجيل الدخول...");
+  console.log("[Auth] دخلنا دالة clearAndNavigateToLogin . جاري تحميل صفحة تسجيل الدخول...");
   await mainLoader(
     "pages/login.html",
     "index-user-container",
