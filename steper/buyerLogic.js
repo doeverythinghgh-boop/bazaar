@@ -24,6 +24,9 @@ export function getProductsForReview(ordersData, userId, userType) {
         console.log(`[BuyerLogic] getProductsForReview | Total Orders: ${ordersData.length} | User Orders: ${currentUserOrders.length} | ID: ${userId}`);
         return currentUserOrders.flatMap((order) => order.order_items.map((item) => item.product_key));
     } else if (userType === "seller") {
+        return ordersData.flatMap((order) =>
+            order.order_items.filter((item) => item.seller_key == userId).map((item) => item.product_key)
+        );
     } else if (userType === "admin") {
         return ordersData.flatMap((order) => order.order_items.map((item) => item.product_key));
     }
