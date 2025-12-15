@@ -16,7 +16,9 @@ import {
 import {
     showSellerConfirmationProductsAlert,
     showSellerRejectedProductsAlert,
+    showSellerRejectedProductsAlert,
     showShippingInfoAlert,
+    showSellerDeliveryConfirmationAlert
 } from "./sellerPopups.js";
 import { showBuyerShippingInfoAlert } from "./buyerPopups.js";
 
@@ -92,6 +94,8 @@ function handleStepClick(stepId, controlData, ordersData, isBuyerLocked) {
         case "step-delivered":
             if (["buyer", "courier", "admin"].includes(userType)) {
                 showDeliveryConfirmationAlert(controlData, ordersData);
+            } else if (userType === "seller") {
+                showSellerDeliveryConfirmationAlert(controlData, ordersData);
             }
             break;
 

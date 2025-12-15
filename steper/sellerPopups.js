@@ -230,3 +230,63 @@ export function showShippingInfoAlert(data, ordersData) {
         console.error("Error in showShippingInfoAlert:", error);
     }
 }
+// Import Logic and UI from Buyer modules for the "Delivered" view
+import {
+    getDeliveryProducts,
+    getUserDetailsForDelivery
+} from "./buyerLogic.js";
+import {
+    generateDeliveryUserInfoHtml,
+    generateDeliveryItemsHtml
+} from "./buyerUi.js";
+
+/**
+ * Displays product receipt confirmation (Delivered Step) for the Seller (Read-Only).
+ * @function showSellerDeliveryConfirmationAlert
+ * @param {object} data
+ * @param {Array<object>} ordersData
+ */
+export function showSellerDeliveryConfirmationAlert(data, ordersData) {
+    try {
+        const userId = data.currentUser.idUser;
+        const userType = data.currentUser.type;
+
+        // Reuse buyer logic which already filters by seller_key for "seller" type
+        const productsToDeliver = getDeliveryProducts(ordersData, userId, userType);
+
+        if (productsToDeliver.length === 0) {
+            Swal.fire({
+                title: "No delivered/shipped products",
+                text: "No products in delivery stage.",
+                icon: "info",
+                confirmButtonText: "Close",
+                customClass: { popup: "fullscreen-swal" },
+            });
+            return;
+        }
+
+        const userDetails = getUserDetailsForDelivery(productsToDeliver, ordersData);
+        const userInfoHtml = generateDeliveryUserInfoHtml(userDetails);
+        const checkboxesHtml = generateDeliveryItemsHtml(productsToDeliver);
+
+        Swal.fire({
+            title: "Confirm Product Receipt (Read-Only)",
+            html: `<div id="delivery-confirmation-container" style="display: flex; flex-direction: column; align-items: start; width: 100%;">
+                    ${userInfoHtml}
+                    ${checkboxesHtml}
+                   </div>`,
+            icon: "info",
+            confirmButtonText: "Close",
+            customClass: { popup: "fullscreen-swal" },
+            didOpen: () => {
+                attachLogButtonListeners();
+                // Disable all inputs to make it read-only
+                const popup = Swal.getPopup();
+                const inputs = popup.querySelectorAll('input, select, textarea');
+                inputs.forEach(input => input.disabled = true);
+            },
+        });
+    } catch (error) {
+        console.error("Error in showSellerDeliveryConfirmationAlert:", error);
+    }
+}
