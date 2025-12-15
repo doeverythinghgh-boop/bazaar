@@ -28,13 +28,18 @@
         align-items: center;
         justify-content: center;
         gap: 4px;
-        background: #f8f9fa;
-        border: 2px solid #e0e0e0;
+        background: transparent;
+        border: 1px solid #e0e0e0;
         border-radius: 6px;
         padding: 3px 8px;
         min-height: auto;
         transition: all 0.2s ease;
         cursor: pointer;
+    }
+    
+    .salesMovement_radioOption:has(input[type="radio"]:checked) {
+        border-color: #667eea;
+        background: transparent;
     }
 
     /* Style the option when the sibling input is checked? 
@@ -84,6 +89,10 @@
     
     .salesMovement_radioLabel i {
         font-size: 18px;
+        color: #333;
+    }
+    
+    .salesMovement_radioLabel:has(input[type="radio"]:checked) i {
         color: #667eea;
     }
     
@@ -622,10 +631,10 @@
         align-items: center;
         justify-content: center;
         gap: 4px;
-        background: white;
+        background: transparent;
         color: #667eea;
-        border: 2px solid #667eea;
-        padding: 6px 12px;
+        border: 1px solid #667eea;
+        padding: 3px 8px;
         border-radius: 8px;
         font-weight: 600;
         cursor: pointer;
@@ -634,7 +643,7 @@
     }
 
     .salesMovement_refreshBtn:active {
-        background: #f0f0f0;
+        background: transparent;
         transform: scale(0.98);
     }
 
