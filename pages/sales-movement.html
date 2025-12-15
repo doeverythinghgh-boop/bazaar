@@ -14,85 +14,81 @@
 
     .salesMovement_radioGroup {
         width: 100%;
-        border-collapse: separate;
-        border-spacing: 12px 0;
-        table-layout: fixed;
-    }
-
-    .salesMovement_radioGroup tr {
-        width: 100%;
+        display: flex;
+        flex-wrap: wrap; /* Allow wrapping on very small screens */
+        gap: 15px;
+        justify-content: center;
+        margin-bottom: 20px;
     }
 
     .salesMovement_radioOption {
-        position: relative;
-        width: 33.333%;
-        padding: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        background: #f8f9fa;
+        border: 2px solid #e0e0e0;
+        border-radius: 6px;
+        padding: 3px 8px;
+        min-height: auto;
+        transition: all 0.2s ease;
+        cursor: pointer;
     }
 
+    /* Style the option when the sibling input is checked? 
+       We can't easily style the PARENT (.salesMovement_radioOption) based on the child input without :has().
+       But we CAN style the sibling label. 
+       Let's stick to a simpler "Standard" look where the button container doesn't drastically change, 
+       or we move the input inside if we want full box control. 
+       
+       DECISION: I will change the HTML structure slightly to wrap the input inside the label 
+       OR keep the current structure and just style the label to be the text part, 
+       and let the Input sit next to it.
+       
+       Let's strip the "Card" look if it interferes, or just apply it to the label?
+       Actually, users usually prefer the "Segmented Control" look but with visible radios if they ask for "Known Radio Buttons".
+       
+       Let's just make the Input visible and sitting next to the Label.
+     */
+
     .salesMovement_radioOption input[type="radio"] {
-        position: absolute;
-        opacity: 0;
+        opacity: 1;
+        position: static; 
+        width: 16px;
+        height: 16px;
         cursor: pointer;
+        margin: 0;
+        accent-color: #667eea;
     }
 
     .salesMovement_radioLabel {
-        display: block;
-        padding: 15px 20px;
-        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-        border: 2px solid #e0e0e0;
-        border-radius: 12px;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        font-size: 16px;
-        font-weight: 500;
+        display: inline-block;
+        width: auto;
+        padding: 0;
+        background: transparent;
+        border: none;
+        border-radius: 0;
         color: #333;
-        text-align: center;
-        position: relative;
-        overflow: hidden;
-        box-sizing: border-box;
-        min-height: 50px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        font-weight: 500;
+        font-size: 14px;
+        min-height: auto;
+        box-shadow: none;
+        cursor: pointer;
+        transition: none;
     }
-
-    .salesMovement_radioLabel::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 0;
-        height: 100%;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        transition: width 0.3s ease;
-        z-index: 0;
-    }
-
-    .salesMovement_radioLabel span {
-        position: relative;
-        z-index: 1;
-    }
-
-    .salesMovement_radioOption input[type="radio"]:checked+.salesMovement_radioLabel {
-        border-color: #667eea;
-        color: white;
+    
+    /* Remove the old checked/active styles that targeted the label as a button */
+    .salesMovement_radioOption input[type="radio"]:checked + .salesMovement_radioLabel {
+        background: transparent;
+        border-color: transparent;
+        color: #667eea; /* Highlight text color when selected */
         font-weight: 600;
-        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
-        transform: translateY(-2px);
+        box-shadow: none;
+        transform: none;
     }
 
-    .salesMovement_radioOption input[type="radio"]:checked+.salesMovement_radioLabel::before {
-        width: 100%;
-    }
-
-    .salesMovement_radioLabel:hover {
-        border-color: #667eea;
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
-    }
-
-    .salesMovement_radioOption input[type="radio"]:checked+.salesMovement_radioLabel:hover {
-        box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+    .salesMovement_radioOption input[type="radio"]:active + .salesMovement_radioLabel {
+        transform: none;
     }
 
     /* ========================================
@@ -108,15 +104,15 @@
     }
 
     .salesMovement_orderCard {
-        background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+        background: white;
         border-radius: 16px;
         padding: 20px;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
         cursor: pointer;
-        transition: all 0.3s ease;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
         position: relative;
         overflow: hidden;
-        border: 2px solid transparent;
+        border: 1px solid #eee;
     }
 
     .salesMovement_orderCard::before {
@@ -126,17 +122,12 @@
         left: 0;
         width: 100%;
         height: 4px;
-        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
-    }
-
-    .salesMovement_orderCard:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
-        border-color: #667eea;
+        background: #667eea;
     }
 
     .salesMovement_orderCard:active {
-        transform: translateY(-2px);
+        transform: scale(0.98);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     }
 
     .salesMovement_cardHeader {
@@ -145,15 +136,12 @@
         gap: 10px;
         margin-bottom: 15px;
         padding-bottom: 12px;
-        border-bottom: 1px solid #e0e0e0;
+        border-bottom: 1px solid #f0f0f0;
     }
 
     .salesMovement_cardIcon {
         font-size: 24px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
+        color: #667eea;
     }
 
     .salesMovement_cardTitle {
@@ -288,7 +276,7 @@
         right: auto;
         margin: 0 auto 10px auto;
         display: flex;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: #667eea;
         border: none;
         border-radius: 50%;
         width: 40px;
@@ -298,17 +286,12 @@
         cursor: pointer;
         align-items: center;
         justify-content: center;
-        transition: all 0.3s ease;
+        transition: all 0.2s ease;
         box-shadow: 0 4px 10px rgba(102, 126, 234, 0.3);
     }
 
-    .salesMovement_closeBtn:hover {
-        transform: rotate(90deg) scale(1.1);
-        box-shadow: 0 6px 15px rgba(102, 126, 234, 0.5);
-    }
-
     .salesMovement_closeBtn:active {
-        transform: rotate(90deg) scale(0.95);
+        transform: scale(0.95);
     }
 
     .salesMovement_modalBody {
@@ -324,10 +307,7 @@
         margin-bottom: 20px;
         padding-bottom: 15px;
         border-bottom: 3px solid #667eea;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
+        color: #667eea;
     }
 
     .salesMovement_modalSection {
@@ -354,11 +334,6 @@
         transition: all 0.2s ease;
     }
 
-    .salesMovement_modalInfo:hover {
-        background: #e9ecef;
-        transform: translateX(5px);
-    }
-
     .salesMovement_modalInfoLabel {
         font-weight: 500;
         color: #666;
@@ -370,17 +345,12 @@
     }
 
     .salesMovement_productItem {
-        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        background: #f8f9fa;
         border-radius: 12px;
         padding: 15px;
         margin-bottom: 12px;
         border-left: 4px solid #667eea;
-        transition: all 0.3s ease;
-    }
-
-    .salesMovement_productItem:hover {
-        transform: translateX(5px);
-        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+        transition: all 0.2s ease;
     }
 
     .salesMovement_productName {
@@ -419,22 +389,18 @@
         }
 
         .salesMovement_radioGroup {
-            border-spacing: 6px 0;
+            gap: 8px;
         }
 
         .salesMovement_radioOption {
-            width: 33.333%;
+            padding: 3px 6px;
+            border-radius: 5px;
+            min-height: auto;
+            font-size: 12px;
         }
 
         .salesMovement_radioLabel {
-            padding: 10px 8px;
-            font-size: 13px;
-            border-radius: 8px;
-            min-height: 45px;
-        }
-
-        .salesMovement_radioLabel span {
-            font-size: 13px;
+            font-size: 12px;
         }
 
         .salesMovement_ordersContainer {
@@ -465,18 +431,18 @@
         }
 
         .salesMovement_radioGroup {
-            border-spacing: 8px 0;
+            gap: 10px;
         }
 
         .salesMovement_radioOption {
-            width: 33.333%;
+            padding: 3px 7px;
+            border-radius: 6px;
+            min-height: auto;
+            font-size: 13px;
         }
 
         .salesMovement_radioLabel {
-            padding: 11px 10px;
-            font-size: 14px;
-            border-radius: 10px;
-            min-height: 48px;
+            font-size: 13px;
         }
 
         .salesMovement_ordersContainer {
@@ -497,18 +463,18 @@
         }
 
         .salesMovement_radioGroup {
-            border-spacing: 8px 0;
+            gap: 12px;
         }
 
         .salesMovement_radioOption {
-            width: 33.333%;
+            padding: 3px 7px;
+            border-radius: 6px;
+            min-height: auto;
+            font-size: 13px;
         }
 
         .salesMovement_radioLabel {
-            padding: 12px 10px;
-            font-size: 14px;
-            border-radius: 11px;
-            min-height: 50px;
+            font-size: 13px;
         }
 
         .salesMovement_ordersContainer {
@@ -529,14 +495,14 @@
         }
 
         .salesMovement_radioGroup {
-            gap: 12px;
+            gap: 15px;
         }
 
-        .salesMovement_radioLabel {
-            padding: 15px 20px;
-            font-size: 16px;
-            border-radius: 12px;
-            min-height: 54px;
+        .salesMovement_radioOption {
+            padding: 3px 8px;
+            border-radius: 6px;
+            min-height: auto;
+            font-size: 14px;
         }
 
         .salesMovement_ordersContainer {
@@ -550,9 +516,9 @@
             padding: 28px;
         }
 
-        .salesMovement_radioLabel {
-            font-size: 16.5px;
-            min-height: 56px;
+        .salesMovement_radioOption {
+            min-height: auto;
+            font-size: 14px;
         }
     }
 
@@ -562,9 +528,9 @@
             padding: 30px;
         }
 
-        .salesMovement_radioLabel {
-            font-size: 17px;
-            min-height: 58px;
+        .salesMovement_radioOption {
+            min-height: auto;
+            font-size: 14px;
         }
     }
 
@@ -576,25 +542,27 @@
             margin: 0 auto;
         }
 
-        .salesMovement_radioLabel {
-            padding: 18px 25px;
-            font-size: 18px;
-            min-height: 60px;
+
+        
+        .salesMovement_radioOption {
+             padding: 3px 8px;
+             font-size: 14px;
+             min-height: auto;
         }
 
         .salesMovement_radioGroup {
-            gap: 15px;
+            gap: 20px;
         }
     }
 
     /* Improvements for touch devices */
     @media (hover: none) and (pointer: coarse) {
-        .salesMovement_radioLabel {
-            min-height: 50px;
-            padding: 15px 20px;
+        .salesMovement_radioOption {
+            min-height: 36px;
+            padding: 6px 10px;
         }
 
-        .salesMovement_radioLabel:active {
+        .salesMovement_radioOption:active {
             transform: scale(0.98);
         }
     }
@@ -606,11 +574,7 @@
         }
 
         .salesMovement_radioGroup {
-            border-spacing: 8px 0;
-        }
-
-        .salesMovement_radioOption {
-            width: 33.333%;
+            gap: 10px;
         }
 
         .salesMovement_radioLabel {
@@ -633,31 +597,22 @@
         border-radius: 10px;
         font-weight: 600;
         cursor: pointer;
-        transition: all 0.3s ease;
+        transition: all 0.2s ease;
         margin-top: 15px;
         width: 100%;
         font-size: 16px;
     }
 
-    .salesMovement_refreshBtn:hover {
-        background: #667eea;
-        color: white;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
-    }
-
     .salesMovement_refreshBtn:active {
-        transform: translateY(0);
+        background: #f0f0f0;
+        transform: translateY(1px);
     }
 
     .salesMovement_refreshIcon {
         font-size: 18px;
         transition: transform 0.5s ease;
     }
-
-    .salesMovement_refreshBtn:hover .salesMovement_refreshIcon {
-        transform: rotate(180deg);
-    }
+</style>
 </style>
 
 
@@ -665,28 +620,26 @@
     <div class="salesMovement_container">
 
         <div class="salesMovement_filterContainer">
-            <table class="salesMovement_radioGroup">
-                <tr>
-                    <td class="salesMovement_radioOption">
-                        <input type="radio" id="salesMovement_buyer" name="salesMovement_userType" value="buyer">
-                        <label for="salesMovement_buyer" class="salesMovement_radioLabel">
-                            <span>🛒 مشتري</span>
-                        </label>
-                    </td>
-                    <td class="salesMovement_radioOption">
-                        <input type="radio" id="salesMovement_seller" name="salesMovement_userType" value="seller">
-                        <label for="salesMovement_seller" class="salesMovement_radioLabel">
-                            <span>🏪 بائع</span>
-                        </label>
-                    </td>
-                    <td class="salesMovement_radioOption">
-                        <input type="radio" id="salesMovement_delivery" name="salesMovement_userType" value="delivery">
-                        <label for="salesMovement_delivery" class="salesMovement_radioLabel">
-                            <span>🚚 توصيل</span>
-                        </label>
-                    </td>
-                </tr>
-            </table>
+            <div class="salesMovement_radioGroup">
+                <div class="salesMovement_radioOption">
+                    <input type="radio" id="salesMovement_buyer" name="salesMovement_userType" value="buyer">
+                    <label for="salesMovement_buyer" class="salesMovement_radioLabel">
+                        <span>🛒 مشتري</span>
+                    </label>
+                </div>
+                <div class="salesMovement_radioOption">
+                    <input type="radio" id="salesMovement_seller" name="salesMovement_userType" value="seller">
+                    <label for="salesMovement_seller" class="salesMovement_radioLabel">
+                        <span>🏪 بائع</span>
+                    </label>
+                </div>
+                <div class="salesMovement_radioOption">
+                    <input type="radio" id="salesMovement_delivery" name="salesMovement_userType" value="delivery">
+                    <label for="salesMovement_delivery" class="salesMovement_radioLabel">
+                        <span>🚚 توصيل</span>
+                    </label>
+                </div>
+            </div>
             
             <button id="salesMovement_refreshButton" class="salesMovement_refreshBtn">
                 <span class="salesMovement_refreshIcon">↻</span>
@@ -922,7 +875,7 @@
                 if (salesMovement_savedType) {
                     console.log(`تم استعادة الاختيار المحفوظ: ${salesMovement_savedType} `);
                     // تحديد الراديو بوتن المناسب
-                    const salesMovement_radioToCheck = document.getElementById(`salesMovement_${salesMovement_savedType} `);
+                    const salesMovement_radioToCheck = document.getElementById(`salesMovement_${salesMovement_savedType}`);
                     if (salesMovement_radioToCheck) {
                         salesMovement_radioToCheck.checked = true;
                     }
