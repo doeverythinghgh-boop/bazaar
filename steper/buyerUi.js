@@ -56,7 +56,7 @@ export function generateReviewListHtml(productKeys, ordersData, isOverallLocked)
  */
 export function generateCancelledListHtml(cancelledKeys, ordersData) {
     if (cancelledKeys.length === 0) {
-        return '<p id="no-cancelled-items-message">No cancelled products.</p>';
+        return '<p id="no-cancelled-items-message">لا توجد منتجات تم إلغاؤها حالياً</p>';
     }
     const itemsHtml = cancelledKeys.map((key) => {
         const productName = getProductName(key, ordersData);
@@ -119,7 +119,7 @@ export function generateDeliveryItemsHtml(products) {
  */
 export function generateReturnedListHtml(returnedKeys, ordersData) {
     if (returnedKeys.length === 0) {
-        return '<p id="no-returned-items-message">No returned products.</p>';
+        return '<p id="no-returned-items-message">لا توجد منتجات تم إرجاعها حالياً</p>';
     }
     const itemsHtml = returnedKeys.map((key) => {
         const productName = getProductName(key, ordersData);
