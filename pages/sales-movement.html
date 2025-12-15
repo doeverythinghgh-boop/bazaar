@@ -62,7 +62,10 @@
     }
 
     .salesMovement_radioLabel {
-        display: inline-block;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
         width: auto;
         padding: 0;
         background: transparent;
@@ -77,17 +80,43 @@
         transition: none;
     }
     
-    /* Remove the old checked/active styles that targeted the label as a button */
-    .salesMovement_radioOption input[type="radio"]:checked + .salesMovement_radioLabel {
+    .salesMovement_radioLabel i {
+        font-size: 18px;
+        color: #667eea;
+    }
+    
+    .salesMovement_radioTextWrapper {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+    
+    .salesMovement_radioTextWrapper input[type="radio"] {
+        opacity: 1;
+        position: static; 
+        width: 16px;
+        height: 16px;
+        cursor: pointer;
+        margin: 0;
+        accent-color: #667eea;
+    }
+    
+    /* Update checked styles to work with input inside label */
+    .salesMovement_radioLabel:has(input[type="radio"]:checked) {
         background: transparent;
         border-color: transparent;
-        color: #667eea; /* Highlight text color when selected */
+        color: #667eea;
         font-weight: 600;
         box-shadow: none;
         transform: none;
     }
+    
+    .salesMovement_radioLabel:has(input[type="radio"]:checked) span {
+        color: #667eea;
+        font-weight: 600;
+    }
 
-    .salesMovement_radioOption input[type="radio"]:active + .salesMovement_radioLabel {
+    .salesMovement_radioLabel:has(input[type="radio"]:active) {
         transform: none;
     }
 
@@ -586,31 +615,35 @@
 
     /* Refresh Button Style */
     .salesMovement_refreshBtn {
-        display: flex;
+        display: inline-flex;
+        flex-direction: column;
         align-items: center;
         justify-content: center;
-        gap: 8px;
+        gap: 4px;
         background: white;
         color: #667eea;
         border: 2px solid #667eea;
-        padding: 10px 20px;
-        border-radius: 10px;
+        padding: 6px 12px;
+        border-radius: 8px;
         font-weight: 600;
         cursor: pointer;
         transition: all 0.2s ease;
         margin-top: 15px;
-        width: 100%;
-        font-size: 16px;
+        font-size: 14px;
     }
 
     .salesMovement_refreshBtn:active {
         background: #f0f0f0;
-        transform: translateY(1px);
+        transform: scale(0.98);
     }
 
     .salesMovement_refreshIcon {
         font-size: 18px;
         transition: transform 0.5s ease;
+    }
+    
+    .salesMovement_refreshIcon i {
+        color: #667eea;
     }
 </style>
 </style>
@@ -622,28 +655,37 @@
         <div class="salesMovement_filterContainer">
             <div class="salesMovement_radioGroup">
                 <div class="salesMovement_radioOption">
-                    <input type="radio" id="salesMovement_buyer" name="salesMovement_userType" value="buyer">
-                    <label for="salesMovement_buyer" class="salesMovement_radioLabel">
-                        <span>🛒 مشتري</span>
-                    </label>
+                <label for="salesMovement_buyer" class="salesMovement_radioLabel">
+                    <i class="fas fa-shopping-cart"></i>
+                    <div class="salesMovement_radioTextWrapper">
+                        <input type="radio" id="salesMovement_buyer" name="salesMovement_userType" value="buyer">
+                        <span>مشتري</span>
+                    </div>
+                </label>
                 </div>
                 <div class="salesMovement_radioOption">
-                    <input type="radio" id="salesMovement_seller" name="salesMovement_userType" value="seller">
-                    <label for="salesMovement_seller" class="salesMovement_radioLabel">
-                        <span>🏪 بائع</span>
-                    </label>
+                <label for="salesMovement_seller" class="salesMovement_radioLabel">
+                    <i class="fas fa-store"></i>
+                    <div class="salesMovement_radioTextWrapper">
+                        <input type="radio" id="salesMovement_seller" name="salesMovement_userType" value="seller">
+                        <span>بائع</span>
+                    </div>
+                </label>
                 </div>
                 <div class="salesMovement_radioOption">
-                    <input type="radio" id="salesMovement_delivery" name="salesMovement_userType" value="delivery">
-                    <label for="salesMovement_delivery" class="salesMovement_radioLabel">
-                        <span>🚚 توصيل</span>
-                    </label>
+                <label for="salesMovement_delivery" class="salesMovement_radioLabel">
+                    <i class="fas fa-truck"></i>
+                    <div class="salesMovement_radioTextWrapper">
+                        <input type="radio" id="salesMovement_delivery" name="salesMovement_userType" value="delivery">
+                        <span>توصيل</span>
+                    </div>
+                </label>
                 </div>
             </div>
             
             <button id="salesMovement_refreshButton" class="salesMovement_refreshBtn">
-                <span class="salesMovement_refreshIcon">↻</span>
-                <span>تحديث البيانات</span>
+                <i class="fas fa-sync-alt salesMovement_refreshIcon"></i>
+                <span>تحديث</span>
             </button>
         </div>
 
@@ -657,7 +699,7 @@
     <div id="salesMovement_orderModal" class="salesMovement_modal">
         <div class="salesMovement_modalContent">
             <button class="salesMovement_closeBtn" id="salesMovement_closeModal">
-                <span>×</span>
+                <span><i class="fas fa-times"></i></span>
             </button>
             <div id="salesMovement_modalBody" class="salesMovement_modalBody">
                 <!-- Order details will be added here dynamically -->
@@ -738,7 +780,7 @@
                 if (!salesMovement_data || salesMovement_data.length === 0) {
                     salesMovement_container.innerHTML = `
                         <div class="salesMovement_emptyState">
-                            <div class="salesMovement_emptyIcon">📦</div>
+                            <div class="salesMovement_emptyIcon"><i class="fas fa-box-open"></i></div>
                             <div class="salesMovement_emptyText">لا توجد طلبات حالياً</div>
                         </div>
                     `;
@@ -762,16 +804,16 @@
                     salesMovement_cardsHTML += `
                         <div class="salesMovement_orderCard" data-order-index="${salesMovement_index}">
                             <div class="salesMovement_cardHeader">
-                                <span class="salesMovement_cardIcon">📋</span>
+                                <span class="salesMovement_cardIcon"><i class="fas fa-clipboard-list"></i></span>
                                 <span class="salesMovement_cardTitle">طلب #${salesMovement_order.order_key}</span>
                             </div>
                             <div class="salesMovement_cardBody">
                                 <div class="salesMovement_cardInfo">
-                                    <span>📅 التاريخ:</span>
+                                    <span><i class="fas fa-calendar-alt"></i> التاريخ:</span>
                                     <span>${salesMovement_formattedDate}</span>
                                 </div>
                                 <div class="salesMovement_cardInfo">
-                                    <span>📦 عدد المنتجات:</span>
+                                    <span><i class="fas fa-boxes"></i> عدد المنتجات:</span>
                                     <span>${salesMovement_productCount}</span>
                                 </div>
                             </div>
@@ -851,7 +893,7 @@
                 const salesMovement_container = document.getElementById('salesMovement_ordersContainer');
                 salesMovement_container.innerHTML = `
                     <div class="salesMovement_emptyState">
-                        <div class="salesMovement_emptyIcon">⚠️</div>
+                        <div class="salesMovement_emptyIcon"><i class="fas fa-exclamation-triangle"></i></div>
                         <div class="salesMovement_emptyText">حدث خطأ في عرض الطلبات</div>
                     </div>
                 `;
@@ -1069,7 +1111,7 @@
                 const salesMovement_container = document.getElementById('salesMovement_ordersContainer');
                 salesMovement_container.innerHTML = `
                     <div class="salesMovement_loading">
-                        ⏳ جاري تحميل الطلبات...
+                        <i class="fas fa-hourglass-half"></i> جاري تحميل الطلبات...
                     </div>
                 `;
             } catch (salesMovement_error) {
