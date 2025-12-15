@@ -205,8 +205,8 @@ export function saveItemStatus(productKey, status) {
     };
     updateGlobalStepperAppData(currentState);
 
-    // Persist to LocalStorage
-    localStorage.setItem(STORAGE_KEYS.ITEMS, JSON.stringify(currentState.items));
+    // Persist to LocalStorage using the correct AppKey
+    saveAppState(currentState);
 
     // Sync to Server
     // Find order key for this product
