@@ -75,9 +75,10 @@ export function initializeState() {
         console.log("🔄 [State] Merged Global Data causing sync update.");
 
         // Detailed merge logic for item statuses
+        // Detailed merge logic for item statuses
         const savedItems = state.items; // Reference to the items object in the merged state
-        if (globalStepperAppData.ordersData) {
-            globalStepperAppData.ordersData.forEach(order => {
+        if (ordersData) {
+            ordersData.forEach(order => {
                 if (order.order_items) {
                     order.order_items.forEach(item => {
                         // Developer Log: Tracing Status

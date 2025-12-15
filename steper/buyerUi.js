@@ -25,6 +25,9 @@ export function generateReviewListHtml(productKeys, ordersData, isOverallLocked)
     return productKeys.map((productKey) => {
         const productName = getProductName(productKey, ordersData);
         const status = loadItemStatus(productKey);
+        // Developer Log: Tracing Rendering
+        console.log(`[BuyerPopups] 🖌️ Rendering ${productKey} with status: ${status}`);
+
         const isChecked = status !== ITEM_STATUS.CANCELLED;
         // Logic: item is locked if the WHOLE step is locked OR if the item itself is explicitly processed
         // (Not Pending and Not Cancelled -> meaning Confirmed/Shipped etc.)
