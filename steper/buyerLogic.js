@@ -85,6 +85,10 @@ export function getReturnedProducts(ordersData, userId, userType) {
 
     return ordersData.flatMap(order =>
         order.order_items.filter(item => {
+            if (userType === "buyer" && order.user_key !== userId) return false;
+            // For seller, ensure they own the item
+            if (userType === "seller" && item.seller_key != userId) return false;
+
             const status = loadItemStatus(item.product_key);
             return status === ITEM_STATUS.RETURNED;
         }).map(i => i.product_key)

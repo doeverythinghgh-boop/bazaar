@@ -231,13 +231,16 @@ export function showShippingInfoAlert(data, ordersData) {
     }
 }
 // Import Logic and UI from Buyer modules for the "Delivered" view
+// Import Logic and UI from Buyer modules for the "Delivered" and "Returned" view
 import {
     getDeliveryProducts,
+    getReturnedProducts,
     getUserDetailsForDelivery
 } from "./buyerLogic.js";
 import {
     generateDeliveryUserInfoHtml,
-    generateDeliveryItemsHtml
+    generateDeliveryItemsHtml,
+    generateReturnedListHtml
 } from "./buyerUi.js";
 
 /**
@@ -288,5 +291,34 @@ export function showSellerDeliveryConfirmationAlert(data, ordersData) {
         });
     } catch (error) {
         console.error("Error in showSellerDeliveryConfirmationAlert:", error);
+    }
+}
+
+/**
+ * Displays returned products (Returned Step) for the Seller (Read-Only).
+ * @function showSellerReturnedProductsAlert
+ * @param {object} data
+ * @param {Array<object>} ordersData
+ */
+export function showSellerReturnedProductsAlert(data, ordersData) {
+    try {
+        const userId = data.currentUser.idUser;
+        const userType = data.currentUser.type;
+
+        const returnedKeys = getReturnedProducts(ordersData, userId, userType);
+        const htmlContent = generateReturnedListHtml(returnedKeys, ordersData); // Reusing Buyer UI for list gen
+
+        Swal.fire({
+            title: "Returned Products (Read-Only)",
+            html: htmlContent,
+            icon: returnedKeys.length > 0 ? "warning" : "success",
+            confirmButtonText: "Close",
+            customClass: { popup: "fullscreen-swal" },
+            didOpen: () => {
+                attachLogButtonListeners();
+            }
+        });
+    } catch (error) {
+        console.error("Error in showSellerReturnedProductsAlert:", error);
     }
 }

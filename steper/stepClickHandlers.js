@@ -17,7 +17,8 @@ import {
     showSellerConfirmationProductsAlert,
     showSellerRejectedProductsAlert,
     showShippingInfoAlert,
-    showSellerDeliveryConfirmationAlert
+    showSellerDeliveryConfirmationAlert,
+    showSellerReturnedProductsAlert
 } from "./sellerPopups.js";
 import { showBuyerShippingInfoAlert, showBuyerRejectedProductsAlert } from "./buyerPopups.js";
 
@@ -103,7 +104,11 @@ function handleStepClick(stepId, controlData, ordersData, isBuyerLocked) {
             break;
 
         case "step-returned":
-            showReturnedProductsAlert(controlData, ordersData);
+            if (userType === 'seller') {
+                showSellerReturnedProductsAlert(controlData, ordersData);
+            } else {
+                showReturnedProductsAlert(controlData, ordersData);
+            }
             break;
     }
 }
