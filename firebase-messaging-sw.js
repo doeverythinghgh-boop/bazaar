@@ -43,7 +43,8 @@ firebase.initializeApp({
 const messaging = firebase.messaging();
 
 // استيراد مدير قاعدة البيانات لحفظ الإشعارات
-importScripts("/notification/notification-db-manager.js");
+// استيراد مدير قاعدة البيانات لحفظ الإشعارات
+importScripts("notification/notification-db-manager.js");
 
 /**
  * @description يتعامل مع رسائل FCM (Firebase Cloud Messaging) عندما يكون التطبيق في الخلفية أو مغلقًا.
@@ -94,7 +95,7 @@ messaging.onBackgroundMessage((payload) => {
   // ملاحظة: تم تعديل مسار الأيقونة ليتوافق مع مسار المشروع الحالي.
   return self.registration.showNotification(title, {
     body,
-    icon: '/images/icons/icon-192x192.png',
+    icon: 'images/icons/icon-192x192.png',
   });
 });
 

@@ -220,7 +220,7 @@
                     link.onclick = (e) => {
                         e.preventDefault();
                         window.parent.orderPhotoParams = { u, s, p, o };
-                        window.parent.mainLoader(`../pages/orderPhoto.html?u=${u}&s=${s}&p=${p}&o=${o}`, "index-orderPhoto-container", 0, undefined, "showHomeIcon", true);
+                        window.parent.mainLoader(`pages/orderPhoto.html?u=${u}&s=${s}&p=${p}&o=${o}`, "index-orderPhoto-container", 0, undefined, "showHomeIcon", true);
                     };
 
                     linkContainer.style.display = 'block';

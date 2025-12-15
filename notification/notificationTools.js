@@ -32,7 +32,7 @@ async function shouldNotify(eventKey, role) {
         if (!cachedDefaultConfig) { // استخدام الكاش الداخلي كخط دفاع ثانٍ
             try {
                 console.warn('[Notifications] التكوين غير موجود في window، جارٍ جلب ملف JSON...');
-                const response = await fetch('/notification_config.json');
+                const response = await fetch('notification_config.json');
                 if (response.ok) {
                     cachedDefaultConfig = await response.json();
                     config = cachedDefaultConfig;
