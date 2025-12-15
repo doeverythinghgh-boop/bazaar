@@ -16,7 +16,6 @@ import {
 import {
     showSellerConfirmationProductsAlert,
     showSellerRejectedProductsAlert,
-    showSellerRejectedProductsAlert,
     showShippingInfoAlert,
     showSellerDeliveryConfirmationAlert
 } from "./sellerPopups.js";
