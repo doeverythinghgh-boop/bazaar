@@ -662,7 +662,7 @@
         "[SearchModal] بدء تحميل فلاتر التصنيفات من 'list.json'."
       );
       try {
-        const response = await fetch("../shared/list.json");
+        const response = await fetch("shared/list.json");
         if (!response.ok) throw new Error("فشل تحميل فلاتر التصنيفات");
         const data = await response.json();
         const categories = data.categories;

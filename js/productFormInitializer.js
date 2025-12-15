@@ -127,7 +127,7 @@ async function productInitializeAddProductForm(editProductData = null) {
   // ... rest of the code unchanged ...
   try {
     console.log('[ProductForm] جاري تحميل الفئات من ../shared/list.json');
-    const response = await fetch("../shared/list.json");
+    const response = await fetch("shared/list.json");
     if (!response.ok) throw new Error("Network response was not ok");
     const data = await response.json();
     const categories = data.categories;
