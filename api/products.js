@@ -81,7 +81,7 @@ export default async function handler(request) {
         args = [product_key];
       }
 
-      // 2. Search / Filter Public Market
+      // 2. Search / Filter Public Market (or User's Market if user_key provided)
       else if ((searchTerm && searchTerm !== 'null') || (MainCategory && MainCategory !== 'null')) {
         sql = `
           SELECT p.*, u.username as seller_username, u.phone as seller_phone 
@@ -98,6 +98,12 @@ export default async function handler(request) {
           // Admin Search: Filter by status if provided
           whereClauses.push("p.is_approved = ?");
           args.push(parseInt(status));
+        }
+
+        // ✅ FIX: Filter by user_key if provided (Search within User's products)
+        if (user_key) {
+           whereClauses.push("p.user_key = ?");
+           args.push(user_key);
         }
 
         if (searchTerm) {

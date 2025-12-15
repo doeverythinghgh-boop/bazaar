@@ -412,7 +412,7 @@
   /**
    * @function loadProducts
    * @description Fetches the user's products from server with optional filters.
-   * @param {object} [filters={}] - Optional filters object containing searchName, MainCategory, SubCategory
+   * @param {object} [filters={}] - Optional filters object containing searchTerm, MainCategory, SubCategory
    */
   async function loadProducts(filters = {}) {
     console.log("%c[Products] جارٍ تحميل المنتجات بالفلاتر:", "color: blue;", filters);
@@ -421,20 +421,46 @@
     loadingState.style.display = "block";
     emptyState.style.display = "none";
 
-    // Fetch products from database with filters (server-side filtering)
-    myProducts = await getProductsByUser(userSession.user_key, filters);
-
-    console.log(`%c[Products] تم تحميل ${myProducts ? myProducts.length : 0} منتجات`, "color: green;");
-
-    // Check if no products found
-    if (!myProducts || myProducts.length === 0) {
-      showEmptyState();
-      return;
+    // Build URL params
+    const params = new URLSearchParams();
+    params.append("user_key", userSession.user_key || ""); // Filter by current user
+    
+    // Normalize Arabic text and use searchTerm
+    if (filters.searchTerm) {
+       params.append("searchTerm", normalizeArabicText(filters.searchTerm));
     }
+    if (filters.MainCategory) params.append("MainCategory", filters.MainCategory);
+    if (filters.SubCategory) params.append("SubCategory", filters.SubCategory);
 
-    // Render products (already filtered by server)
-    renderProducts(myProducts);
-    loadingState.style.display = "none";
+    // Reuse existing API endpoint
+    const url = `${baseURL}/api/products?${params.toString()}`;
+
+    try {
+       const response = await fetch(url);
+       if (!response.ok) throw new Error("فشل جلب المنتجات");
+       myProducts = await response.json();
+
+       console.log(`%c[Products] تم تحميل ${myProducts ? myProducts.length : 0} منتجات`, "color: green;");
+
+       // Check if no products found
+       if (!myProducts || myProducts.length === 0) {
+         showEmptyState();
+         return;
+       }
+
+       // Render products (already filtered by server)
+       renderProducts(myProducts);
+       loadingState.style.display = "none";
+
+    } catch (error) {
+       console.error("[Products] خطأ في جلب المنتجات:", error);
+       // Hide loader, but show no error to user (as requested)
+       loadingState.style.display = "none"; 
+       // Optionally show empty state if fetch failed to avoid broken UI
+       if(productsGrid.innerHTML === "") {
+          showEmptyState(); 
+       }
+    }
   }
 
   /**
@@ -570,7 +596,7 @@
     }
 
     console.log("%c[Products] تعديل المنتج:", "color: blue;", product);
-    const result = await CategoryModal.show(product.MainCategory, product.SubCategory, "Edit Product Market");
+    const result = await CategoryModal.show(product.MainCategory, product.SubCategory, "السوق الحالي للمنتج");
     if (result.status === 'success') {
       console.log('تم الاختيار:', result.mainId, result.subId);
 
@@ -705,19 +731,19 @@
    */
   async function filterProducts() {
     // Collect search criteria
-    const searchName = searchInput.value.trim();
+    const searchTerm = searchInput.value.trim();
     const mainCategory = mainCategoryFilter.value;
     const subCategory = subCategoryFilter.value;
 
     console.log("%c[Products] بحث بالمعايير:", "color: blue;", {
-      searchName,
+      searchTerm,
       mainCategory,
       subCategory
     });
 
     // Build filters object (only include non-empty values)
     const filters = {};
-    if (searchName) filters.searchName = searchName;
+    if (searchTerm) filters.searchTerm = searchTerm;
     if (mainCategory) filters.MainCategory = mainCategory;
     if (subCategory) filters.SubCategory = subCategory;
 
