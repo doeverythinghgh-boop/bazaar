@@ -13,7 +13,7 @@ import { updateServerItemStatus } from "./dataFetchers.js";
  * Sets up the global state structure.
  */
 export function initializeState() {
-    console.log("🚀 [State] Initializing (In-Memory Only)...");
+    console.log("🚀 [State] Initializing (In-Memory Only - Server Synced)...");
 
     // Initialize default structure if needed
     const state = {
@@ -29,16 +29,41 @@ export function initializeState() {
         updateGlobalStepperAppData(state);
     }
 
-    // Populate items status from ordersData (Single Source of Truth)
+    // Populate items and dates from ordersData (Single Source of Truth)
     const currentItems = {};
+    const currentDates = {};
+
     if (ordersData) {
         ordersData.forEach(order => {
+            // 1. Extract Dates from order_status JSON
+            if (order.order_status) {
+                const parts = order.order_status.split('#');
+                if (parts.length >= 3) {
+                    try {
+                        const jsonStr = parts.slice(2).join('#');
+                        if (jsonStr) {
+                            const parsed = JSON.parse(jsonStr);
+                            Object.keys(parsed).forEach(key => {
+                                if (key.startsWith("__date_")) {
+                                    // It's a date!
+                                    const stepId = key.replace(/__date_|__/g, '');
+                                    if (stepId) currentDates[stepId] = parsed[key];
+                                }
+                            });
+                        }
+                    } catch (e) {
+                        console.warn("[State] Failed to parse JSON for dates in initializeState", e);
+                    }
+                }
+            }
+
+            // 2. Extract Items
             if (order.order_items) {
                 order.order_items.forEach(item => {
                     if (item.item_status) {
                         currentItems[item.product_key] = {
                             status: item.item_status,
-                            timestamp: new Date().toISOString() // We could parse this from order_status if needed
+                            timestamp: new Date().toISOString()
                         };
                     }
                 });
@@ -49,6 +74,9 @@ export function initializeState() {
     // Update global state with derived items
     if (!globalStepperAppData.items) globalStepperAppData.items = {};
     Object.assign(globalStepperAppData.items, currentItems);
+
+    if (!globalStepperAppData.dates) globalStepperAppData.dates = {};
+    Object.assign(globalStepperAppData.dates, currentDates);
 }
 
 /**
@@ -73,13 +101,28 @@ export function loadStepState(stepId) {
 
 /**
  * Saves the activation date for a step.
- * In-memory only.
+ * Syncs to Server via order_status JSON.
  * @param {string} stepId 
  * @param {string} dateStr 
  */
-export function saveStepDate(stepId, dateStr) {
+export async function saveStepDate(stepId, dateStr) {
+    // 1. Update Memory
     if (!globalStepperAppData.dates) globalStepperAppData.dates = {};
     globalStepperAppData.dates[stepId] = dateStr;
+
+    // 2. Sync to Server
+    if (ordersData && ordersData.length > 0) {
+        const orderKey = ordersData[0].order_key;
+        // Construct special key: __date_step-review__
+        const specialKey = `__date_${stepId}__`;
+
+        try {
+            console.log(`[State] Syncing Date: ${specialKey} = ${dateStr}`);
+            await updateServerItemStatus(orderKey, specialKey, dateStr);
+        } catch (e) {
+            console.error(`[State] Failed to sync date for ${stepId}`, e);
+        }
+    }
 }
 
 /**
@@ -120,11 +163,6 @@ export async function saveItemStatus(productKey, status) {
         };
 
         // Also update the ordersData array in memory to keep it fresh
-        // (This logic was partially in updateLocalOrderStatus, we reinforce it here implicitly 
-        // because updateServerItemStatus helper might calls updateLocalOrderStatus. 
-        // We trust the helper to do the "local" part too, or we do it here. 
-        // check dataFetchers.js: yes it calls updateLocalOrderStatus)
-
         console.log(`[State] ✅ Status saved and synced: ${productKey} = ${status}`);
 
     } catch (e) {
