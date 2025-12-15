@@ -47,7 +47,7 @@ export function getConfirmationProducts(ordersData, sellerId, userType) {
 
     const sellerOwnedProducts = ordersData.flatMap((order) =>
         order.order_items
-            .filter((item) => userType === "admin" || item.seller_key === sellerId)
+            .filter((item) => userType === "admin" || item.seller_key == sellerId)
             .map((item) => {
                 return {
                     product_key: item.product_key,
@@ -77,7 +77,7 @@ export function getRejectedProducts(ordersData, sellerId, userType) {
 
     return ordersData.flatMap(order =>
         order.order_items.filter(item => {
-            const isOwner = userType === "admin" || item.seller_key === sellerId;
+            const isOwner = userType === "admin" || item.seller_key == sellerId;
             const status = loadItemStatus(item.product_key);
             return isOwner && status === ITEM_STATUS.REJECTED;
         })
