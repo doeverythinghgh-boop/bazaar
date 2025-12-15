@@ -20,7 +20,8 @@ export function getProductsForReview(ordersData, userId, userType) {
     if (!ordersData) return [];
 
     if (userType === "buyer") {
-        const currentUserOrders = ordersData.filter((order) => order.user_key === userId);
+        const currentUserOrders = ordersData.filter((order) => order.user_key == userId); // Loose comparison for safety
+        console.log(`[BuyerLogic] getProductsForReview | Total Orders: ${ordersData.length} | User Orders: ${currentUserOrders.length} | ID: ${userId}`);
         return currentUserOrders.flatMap((order) => order.order_items.map((item) => item.product_key));
     } else if (userType === "seller") {
         return ordersData.flatMap((order) =>

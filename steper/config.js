@@ -80,7 +80,6 @@ export const initializationPromise = new Promise((resolve) => {
             setOrdersData(orders);
             resolve();
         };
-        // Resolve immediately to allow flow to proceed if data is handled asynchronously elsewhere
-        resolve();
+        // Removed premature resolve() to force waiting for data injection.
     }
 });

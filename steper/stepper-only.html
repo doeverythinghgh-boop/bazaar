@@ -127,11 +127,61 @@
 
 </html>
 <script type="module">
-    import { ordersData } from './config.js';
+    import { ordersData, initializationPromise } from './config.js';
+
+    // Steps definition - static configuration for the stepper
+    const DEFAULT_STEPS = [
+        { id: "step-review", no: "1" },
+        { id: "step-confirmed", no: "2" },
+        { id: "step-shipped", no: "3" },
+        { id: "step-delivered", no: "4" }
+    ];
+
+    // User Permissions definition - static configuration
+    const DEFAULT_USERS = [
+        {
+            type: "buyer",
+            allowedSteps: ["step-review", "step-confirmed", "step-delivered", "step-cancelled", "step-returned"]
+        },
+        {
+            type: "seller",
+            allowedSteps: ["step-confirmed", "step-shipped", "step-rejected"]
+        },
+        {
+            type: "courier",
+            allowedSteps: ["step-shipped", "step-delivered"]
+        },
+        {
+            type: "admin",
+            allowedSteps: ["step-review", "step-confirmed", "step-shipped", "step-delivered", "step-cancelled", "step-rejected", "step-returned"]
+        }
+    ];
 
     document.addEventListener('DOMContentLoaded', () => {
-        // Check for data availability
+        // 1. Data Bridging: Fetch data from parent window if available
+        if (window.parent && window.parent.globalStepperAppData && window.initializeStepperData) {
+            console.log("🔗 [StepperOnly] Found parent data, bridging...");
+            const parentData = window.parent.globalStepperAppData;
+
+            const control = {
+                currentUser: {
+                    idUser: parentData.idUser,
+                    type: "unknown" // Will be determined by logic
+                },
+                steps: DEFAULT_STEPS,
+                users: DEFAULT_USERS
+            };
+            const orders = parentData.ordersData || [];
+
+            // Inject data into the app
+            window.initializeStepperData(control, orders);
+        } else {
+            console.warn("⚠️ [StepperOnly] No parent data found or initializeStepperData missing.");
+        }
+
+        // 2. Photo Link Logic (Existing)
         const checkData = setInterval(() => {
+            // Need to check the exported ordersData, or wait for initialization
             if (ordersData && ordersData.length > 0) {
                 clearInterval(checkData);
                 initPhotoLink();
@@ -154,22 +204,15 @@
 
                 // Only show for special orders where total_amount is 0
                 if (item && order.total_amount == 0) {
-                    // We assume the first item defines the context (User, Seller, Product)
                     const u = order.user_key;
                     const s = item.seller_key;
-                    // REVERT: Use product_key as 'p' because images are named with the Product Key.
                     const p = item.product_key;
-                    // NEW: Pass order_key as 'o' for uniqueness check
                     const o = order.order_key;
 
                     link.onclick = (e) => {
                         e.preventDefault();
-                        // Set parameters in parent window for orderPhoto.html to access
                         window.parent.orderPhotoParams = { u, s, p, o };
-                        //index-orderPhoto-container
                         window.parent.mainLoader(`../pages/orderPhoto.html?u=${u}&s=${s}&p=${p}&o=${o}`, "index-orderPhoto-container", 0, undefined, "showHomeIcon", true);
-
-
                     };
 
                     linkContainer.style.display = 'block';

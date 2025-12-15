@@ -30,6 +30,12 @@ async function initApp() {
         initializeState();
 
         // 3. User Role Logic
+        // 3. User Role Logic
+        if (!controlData.currentUser) {
+            console.error("❌ [Main] 'currentUser' is missing in controlData.", controlData);
+            throw new Error("Missing currentUser data. Cannot determine user role.");
+        }
+
         const userId = controlData.currentUser.idUser;
         const userType = determineUserType(userId, ordersData, controlData);
 

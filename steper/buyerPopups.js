@@ -150,6 +150,8 @@ export function showProductKeysAlert(data, ordersData, isModificationLocked) {
 
         const isOverallLocked = isModificationLocked || (userType !== "buyer" && userType !== "admin");
 
+        console.log(`[BuyerPopup] showProductKeysAlert | User: ${userId} (${userType}) | Products: ${productKeys.length} | Locked: ${isOverallLocked}`);
+
         // Use UI module to generate HTML
         const htmlContent = generateReviewListHtml(productKeys, ordersData, isOverallLocked);
 

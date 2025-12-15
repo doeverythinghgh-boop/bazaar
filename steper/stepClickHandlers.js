@@ -49,12 +49,15 @@ export function addStepClickListeners(controlData, ordersData, isBuyerReviewModi
  * @param {boolean} isBuyerLocked - Buyer lock flag.
  */
 function handleStepClick(stepId, controlData, ordersData, isBuyerLocked) {
-    if (!isStepAllowedForCurrentUser(stepId, controlData)) {
+    const userType = controlData.currentUser.type;
+    const isAllowed = isStepAllowedForCurrentUser(stepId, controlData);
+
+    console.log(`[StepClick] Clicked: ${stepId}, User: ${userType}, Allowed: ${isAllowed}`);
+
+    if (!isAllowed) {
         showUnauthorizedAlert();
         return;
     }
-
-    const userType = controlData.currentUser.type;
 
     switch (stepId) {
         case "step-review":

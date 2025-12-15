@@ -18,6 +18,10 @@ import { getProductName } from "./commonUtils.js";
  * @returns {string} HTML string.
  */
 export function generateReviewListHtml(productKeys, ordersData, isOverallLocked) {
+    if (!productKeys || productKeys.length === 0) {
+        return '<div style="text-align: center; padding: 20px; color: #666;">لا توجد منتجات للمراجعة حالياً (No products found).</div>';
+    }
+
     return productKeys.map((productKey) => {
         const productName = getProductName(productKey, ordersData);
         const status = loadItemStatus(productKey);
