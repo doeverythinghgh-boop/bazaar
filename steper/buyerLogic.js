@@ -36,16 +36,37 @@ export function getProductsForReview(ordersData, userId, userType) {
 export function getCancelledProducts(ordersData, userId, userType) {
     if (!ordersData) return [];
 
+    // Helper: Find sellers associated with this courier
+    let associatedSellers = [];
+    if (userType === "courier") {
+        associatedSellers = ordersData.flatMap(order => 
+            order.order_items.filter(item => {
+                const dKey = item.supplier_delivery?.delivery_key;
+                if (Array.isArray(dKey)) return dKey.includes(userId);
+                return dKey === userId;
+            }).map(item => item.seller_key)
+        );
+    }
+
     return ordersData.flatMap(order =>
         order.order_items.filter(item => {
             const status = loadItemStatus(item.product_key);
 
-            // Developer Log: Tracing Cancellation Logic
-            console.log(`[BuyerLogic] getCancelledProducts | Checking ${item.product_key} | Status: ${status} | User: ${userId} vs OrderUser: ${order.user_key}`);
-
             // Visibility check
             if (userType === "buyer" && order.user_key != userId) return false;
             if (userType === "seller" && item.seller_key != userId) return false;
+            if (userType === "courier") {
+                 // Courier sees cancelled items if they belong to a seller they work with
+                 // Note: Ideally we check if *this specific order* was assigned, but cancelled items might not have reached assignment.
+                 // The requirement says: "according to the seller they follow".
+                 // So if the courier is associated with Seller X on ANY product, they see Seller X's cancelled products?
+                 // Let's assume strict association: The Courier typically doesn't "belong" to a seller permanently in this data model,
+                 // but is assigned per item.
+                 // However, for a Cancelled item, it might not have a courier assigned yet.
+                 // Requirement: "rejected/cancelled according to the seller they follow".
+                 // Implementation: Check if the item's seller is in the list of sellers this courier has handled valid items for.
+                 return associatedSellers.includes(item.seller_key);
+            }
 
             return status === ITEM_STATUS.CANCELLED;
         }).map(i => i.product_key)

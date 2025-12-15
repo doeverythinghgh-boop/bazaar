@@ -84,12 +84,27 @@ export function getConfirmationProducts(ordersData, sellerId, userType) {
 export function getRejectedProducts(ordersData, sellerId, userType) {
     if (!ordersData) return [];
 
+    let associatedSellerIds = [];
+    if (userType === 'courier') {
+        const courierId = sellerId; // sellerId param acts as userId in the caller context
+        associatedSellerIds = ordersData.flatMap(order => 
+            order.order_items.filter(item => {
+                const dKey = item.supplier_delivery?.delivery_key;
+                if (Array.isArray(dKey)) return dKey.includes(courierId);
+                return dKey === courierId;
+            }).map(item => item.seller_key)
+        );
+    }
+
     return ordersData.flatMap(order =>
         order.order_items.filter(item => {
             let isOwner = false;
             if (userType === 'admin') isOwner = true;
             else if (userType === 'seller') isOwner = item.seller_key == sellerId;
-            else if (userType === 'buyer') isOwner = order.user_key == sellerId; // sellerId param is actually userId
+            else if (userType === 'buyer') isOwner = order.user_key == sellerId; 
+            else if (userType === 'courier') {
+                isOwner = associatedSellerIds.includes(item.seller_key);
+            }
 
             const status = loadItemStatus(item.product_key);
             return isOwner && status === ITEM_STATUS.REJECTED;
