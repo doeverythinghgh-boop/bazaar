@@ -60,9 +60,9 @@ function handleConfirmationSave(data, ordersData) {
 
     checkboxes.forEach(cb => {
         if (!cb.disabled) {
-            const newStatus = cb.checked ? ITEM_STATUS.CONFIRMED : ITEM_STATUS.PENDING;
+            const newStatus = cb.checked ? ITEM_STATUS.CONFIRMED : ITEM_STATUS.REJECTED;
             const currentStatus = loadItemStatus(cb.value);
-            if (currentStatus !== newStatus && (currentStatus === ITEM_STATUS.PENDING || currentStatus === ITEM_STATUS.CONFIRMED)) {
+            if (currentStatus !== newStatus && (currentStatus === ITEM_STATUS.PENDING || currentStatus === ITEM_STATUS.CONFIRMED || currentStatus === ITEM_STATUS.REJECTED)) {
                 saveItemStatus(cb.value, newStatus);
                 changed = true;
             }
