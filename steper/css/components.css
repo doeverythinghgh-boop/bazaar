@@ -14,7 +14,8 @@
     transition: opacity 0.3s ease, transform 0.3s ease;
     transform: translateY(-10px);
     opacity: 0;
-    display: none; /* مخفي افتراضياً */
+    display: none;
+    /* مخفي افتراضياً */
 }
 
 .alert-message.show {
@@ -42,21 +43,37 @@
    النوافذ المنبثقة (Popups) - تحسين الحجم (Minimum Size)
    ============================================ */
 div:where(.swal2-container) .fullscreen-swal {
-    width: auto !important; /* العرض يتناسب مع المحتوى */
-    min-width: 300px; /* حد أدنى للعرض لضمان القراءة */
-    max-width: 95vw !important; /* لا يتجاوز عرض الشاشة */
-    
-    height: auto !important; /* الارتفاع يتناسب مع المحتوى */
-    max-height: 90vh !important; /* لا يتجاوز ارتفاع الشاشة */
-    
-    padding: 1rem !important;
+    width: auto !important;
+    min-width: 350px;
+    /* زيادة الحد الأدنى قليلاً */
+    max-width: 95vw !important;
+
+    height: auto !important;
+    max-height: 90vh !important;
+
+    padding: 1.5rem !important;
+    /* توسيع الحشو قليلاً */
+}
+
+/* تنسيق عنوان النافذة ليكون في سطر واحد */
+div:where(.swal2-container) .fullscreen-swal .swal2-title {
+    white-space: nowrap !important;
+    /* منع التفاف النص */
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    /* إضافة ثلاث نقاط إذا زاد عن الشاشة */
+    width: 100% !important;
+    display: block !important;
+    padding: 0 10px !important;
+    font-size: 1.2em !important;
+    /* ضبط حجم الخط */
 }
 
 .fullscreen-swal .swal2-html-container {
-    overflow-y: auto !important; /* تفعيل التمرير إذا زاد المحتوى */
-    max-height: 75vh !important;
-    margin: 5px 0 !important;
+    overflow-y: auto !important;
+    max-height: 70vh !important;
+    /* تقليل الارتفاع المتاح للمحتوى لترك مساحة للعنوان */
+    margin: 10px 0 !important;
     padding: 5px !important;
-    text-align: right; /* ضمان اتجاه النص */
+    text-align: right;
 }
-
