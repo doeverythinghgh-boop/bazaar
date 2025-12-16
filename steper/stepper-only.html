@@ -247,6 +247,8 @@
             // Get current count
             let count = parseInt(localStorage.getItem(TUTORIAL_KEY) || '0', 10);
 
+            console.log(`[Tutorial] Current count: ${count}, Max runs: ${MAX_RUNS}`);
+
             // Check if tutorial should run
             if (count >= MAX_RUNS) {
                 console.log('[Tutorial] Auto-scroll tutorial already completed.');
@@ -260,6 +262,8 @@
 
             // Get the stepper wrapper (the scrollable element)
             const wrapper = document.getElementById('primary-stepper-wrapper');
+            console.log('[Tutorial] Wrapper element:', wrapper);
+
             if (!wrapper) {
                 console.warn('[Tutorial] Stepper wrapper not found.');
                 return;
@@ -267,7 +271,15 @@
 
             // Wait 1 second for content to fully render
             setTimeout(() => {
+                console.log('[Tutorial] Checking scroll dimensions...');
+                console.log('[Tutorial] scrollWidth:', wrapper.scrollWidth);
+                console.log('[Tutorial] clientWidth:', wrapper.clientWidth);
+                console.log('[Tutorial] scrollLeft (initial):', wrapper.scrollLeft);
+                console.log('[Tutorial] Computed style overflow-x:', window.getComputedStyle(wrapper).overflowX);
+                console.log('[Tutorial] Direction:', window.getComputedStyle(wrapper).direction);
+
                 const maxScroll = wrapper.scrollWidth - wrapper.clientWidth;
+                console.log('[Tutorial] Max scroll distance:', maxScroll);
 
                 if (maxScroll <= 0) {
                     console.log('[Tutorial] No scroll needed, all steps visible.');
@@ -276,9 +288,16 @@
 
                 console.log(`[Tutorial] Starting scroll animation. Max scroll: ${maxScroll}px`);
 
-                // Perform smooth scroll animation
+                // For RTL, we need to scroll from right to left
                 const startTime = performance.now();
-                const startScroll = wrapper.scrollLeft;
+                const isRTL = window.getComputedStyle(wrapper).direction === 'rtl';
+
+                // In RTL, start from max scroll position (right side) and go to 0 (left side)
+                const startScroll = isRTL ? maxScroll : 0;
+                const endScroll = isRTL ? 0 : maxScroll;
+
+                console.log('[Tutorial] RTL mode:', isRTL);
+                console.log('[Tutorial] Start scroll:', startScroll, 'End scroll:', endScroll);
 
                 function animateScroll(currentTime) {
                     const elapsed = currentTime - startTime;
@@ -290,13 +309,14 @@
                         : 1 - Math.pow(-2 * progress + 2, 2) / 2;
 
                     // Calculate scroll position
-                    const scrollPosition = startScroll + (maxScroll * easeProgress);
+                    const scrollPosition = startScroll + ((endScroll - startScroll) * easeProgress);
                     wrapper.scrollLeft = scrollPosition;
 
                     if (progress < 1) {
                         requestAnimationFrame(animateScroll);
                     } else {
                         console.log('[Tutorial] Auto-scroll completed.');
+                        console.log('[Tutorial] Final scrollLeft:', wrapper.scrollLeft);
                     }
                 }
 
