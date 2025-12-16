@@ -23,7 +23,8 @@ import {
     getDeliveryProducts,
     getReturnedProducts,
     getConfirmedProducts,
-    getUserDetailsForDelivery
+    getUserDetailsForDelivery,
+    groupConfirmedProductsBySeller
 } from "./buyerLogic.js";
 
 import {
@@ -32,7 +33,8 @@ import {
     generateDeliveryUserInfoHtml,
     generateDeliveryItemsHtml,
     generateReturnedListHtml,
-    generateConfirmedListHtml
+    generateConfirmedListHtml,
+    generateSellerGroupedHtml
 } from "./buyerUi.js";
 
 // Import reused Logic and UI from Seller modules
@@ -438,3 +440,69 @@ export function showBuyerShippingInfoAlert(data, ordersData) {
         console.error("Error in showBuyerShippingInfoAlert:", error);
     }
 }
+
+/**
+ * Displays confirmed products for Courier (Delivery Service) showing Seller Details.
+ * @function showCourierConfirmedProductsAlert
+ * @param {object} data - Control Data.
+ * @param {Array<object>} ordersData - Orders Data.
+ */
+export async function showCourierConfirmedProductsAlert(data, ordersData) {
+    try {
+        const userId = data.currentUser.idUser;
+        const userType = data.currentUser.type;
+
+        // 1. Get products confirmed for this courier
+        const confirmedKeys = getConfirmedProducts(ordersData, userId, userType);
+
+        if (confirmedKeys.length === 0) {
+            Swal.fire({
+                title: "المنتجات المؤكدة",
+                text: "لا توجد منتجات مؤكدة حالياً.",
+                icon: "info",
+                confirmButtonText: "حسنًا",
+                customClass: { popup: "fullscreen-swal" },
+            });
+            return;
+        }
+
+        // 2. Fetch ALL users to resolve Seller Names (Name, Phone, Address)
+        // Note: fetchUsers() is global from js/connectUsers.js
+        let allUsers = [];
+        if (typeof window.fetchUsers === 'function') {
+            Swal.showLoading(); // Show loading while fetching
+            const result = await window.fetchUsers();
+            if (result && Array.isArray(result.users)) {
+                allUsers = result.users;
+            } else if (Array.isArray(result)) {
+                allUsers = result;
+            }
+            if (Swal.isVisible()) Swal.close();
+        } else {
+            console.warn("[BuyerPopups] fetchUsers is not available globally.");
+            // Fallback: Try to use local users list from control data (permissions) if useful, or empty
+            allUsers = data.users || [];
+        }
+
+        // 3. Group by Seller
+        const groupedData = groupConfirmedProductsBySeller(confirmedKeys, ordersData, allUsers);
+
+        // 4. Generate UI
+        const htmlContent = generateSellerGroupedHtml(groupedData);
+
+        Swal.fire({
+            title: "المنتجات المطلوب توصيلها",
+            html: `<div id="courier-confirmed-container">${htmlContent}</div>`,
+            icon: "info",
+            confirmButtonText: "إغلاق",
+            customClass: { popup: "fullscreen-swal" },
+            didOpen: () => {
+                attachLogButtonListeners();
+            }
+        });
+
+    } catch (error) {
+        console.error("Error in showCourierConfirmedProductsAlert:", error);
+    }
+}
+

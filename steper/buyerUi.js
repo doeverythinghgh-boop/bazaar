@@ -188,3 +188,44 @@ export function generateConfirmedListHtml(confirmedKeys, ordersData) {
     }).join("");
     return `<div id="confirmed-products-container"><p>المنتجات التي تم تأكيدها بواسطة البائع:</p><ul id="confirmed-products-list" style="list-style: none; padding: 0; margin-top: 10px;">${itemsHtml}</ul></div>`;
 }
+
+/**
+ * Generates HTML for the "Delivery Service" view of confirmed products.
+ * Shows products grouped by Seller with Seller details.
+ * @param {Array<{seller: object, products: Array<object>}>} groupedData
+ * @returns {string} HTML string.
+ */
+export function generateSellerGroupedHtml(groupedData) {
+    if (!groupedData || groupedData.length === 0) return "<p class='text-center'>لا توجد منتجات.</p>";
+
+    return groupedData.map(group => `
+        <div class="seller-group-container" style="margin-bottom: 20px; border: 1px solid #ddd; border-radius: 8px; overflow: hidden;">
+            <div class="seller-header" style="background-color: #f8f9fa; padding: 10px; border-bottom: 1px solid #ddd; text-align: right; direction: rtl;">
+                <h5 style="margin: 0; color: #333; font-size: 1.1em; font-weight: bold;">البائع: ${group.seller.name}</h5>
+                <div style="font-size: 0.9em; color: #666; margin-top: 5px;">
+                    <span><i class="fas fa-phone"></i> ${group.seller.phone}</span> | 
+                    <span><i class="fas fa-map-marker-alt"></i> ${group.seller.address}</span>
+                </div>
+            </div>
+            <div class="seller-products" style="padding: 10px;">
+                <table style="width: 100%; text-align: right; direction: rtl; border-collapse: collapse;">
+                    <thead>
+                        <tr style="border-bottom: 2px solid #eee;">
+                            <th style="padding: 5px;">المنتج</th>
+                            <th style="padding: 5px;">السعر</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${group.products.map(p => `
+                            <tr style="border-bottom: 1px solid #eee;">
+                                <td style="padding: 8px;">${p.name}</td>
+                                <td style="padding: 8px;">${p.price || '-'}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    `).join("");
+}
+

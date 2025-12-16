@@ -39,7 +39,7 @@ export function getCancelledProducts(ordersData, userId, userType) {
     // Helper: Find sellers associated with this courier
     let associatedSellers = [];
     if (userType === "courier") {
-        associatedSellers = ordersData.flatMap(order => 
+        associatedSellers = ordersData.flatMap(order =>
             order.order_items.filter(item => {
                 const dKey = item.supplier_delivery?.delivery_key;
                 if (Array.isArray(dKey)) return dKey.includes(userId);
@@ -56,16 +56,16 @@ export function getCancelledProducts(ordersData, userId, userType) {
             if (userType === "buyer" && order.user_key != userId) return false;
             if (userType === "seller" && item.seller_key != userId) return false;
             if (userType === "courier") {
-                 // Courier sees cancelled items if they belong to a seller they work with
-                 // Note: Ideally we check if *this specific order* was assigned, but cancelled items might not have reached assignment.
-                 // The requirement says: "according to the seller they follow".
-                 // So if the courier is associated with Seller X on ANY product, they see Seller X's cancelled products?
-                 // Let's assume strict association: The Courier typically doesn't "belong" to a seller permanently in this data model,
-                 // but is assigned per item.
-                 // However, for a Cancelled item, it might not have a courier assigned yet.
-                 // Requirement: "rejected/cancelled according to the seller they follow".
-                 // Implementation: Check if the item's seller is in the list of sellers this courier has handled valid items for.
-                 return associatedSellers.includes(item.seller_key);
+                // Courier sees cancelled items if they belong to a seller they work with
+                // Note: Ideally we check if *this specific order* was assigned, but cancelled items might not have reached assignment.
+                // The requirement says: "according to the seller they follow".
+                // So if the courier is associated with Seller X on ANY product, they see Seller X's cancelled products?
+                // Let's assume strict association: The Courier typically doesn't "belong" to a seller permanently in this data model,
+                // but is assigned per item.
+                // However, for a Cancelled item, it might not have a courier assigned yet.
+                // Requirement: "rejected/cancelled according to the seller they follow".
+                // Implementation: Check if the item's seller is in the list of sellers this courier has handled valid items for.
+                return associatedSellers.includes(item.seller_key);
             }
 
             return status === ITEM_STATUS.CANCELLED;
@@ -159,3 +159,57 @@ export function getUserDetailsForDelivery(products, ordersData) {
     });
     return userDetails;
 }
+
+/**
+ * Groups confirmed products by Seller and attaches Seller Details.
+ * Used for Delivery Service view in "Step Consfirmed".
+ * @function groupConfirmedProductsBySeller
+ * @param {Array<string>} productKeys - List of product keys to process.
+ * @param {Array<object>} ordersData - Orders data.
+ * @param {Array<object>} allUsers - List of all users (to find seller info).
+ * @returns {Array<{seller: object, products: Array<object>}>} Grouped data.
+ */
+export function groupConfirmedProductsBySeller(productKeys, ordersData, allUsers) {
+    const grouped = {};
+
+    productKeys.forEach(key => {
+        // Find the item and its order
+        let foundItem = null;
+        let foundOrder = null;
+
+        for (const order of ordersData) {
+            const item = order.order_items.find(i => i.product_key === key);
+            if (item) {
+                foundItem = item;
+                foundOrder = order;
+                break;
+            }
+        }
+
+        if (foundItem && foundOrder) {
+            const sellerKey = foundItem.seller_key;
+
+            if (!grouped[sellerKey]) {
+                // Find seller details
+                const sellerUser = allUsers.find(u => u.user_key === sellerKey);
+                grouped[sellerKey] = {
+                    seller: {
+                        name: sellerUser?.username || "غير معروف",
+                        phone: sellerUser?.phone || "غير متاح",
+                        address: sellerUser?.address || "غير متاح"
+                    },
+                    products: []
+                };
+            }
+
+            grouped[sellerKey].products.push({
+                name: foundItem.product_name || "منتج",
+                quantity: 1, // Quantity is usually 1 per item row in this system's logic or derived
+                price: foundItem.total_price // or price_per_item
+            });
+        }
+    });
+
+    return Object.values(grouped);
+}
+

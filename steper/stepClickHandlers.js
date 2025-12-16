@@ -20,7 +20,7 @@ import {
     showSellerDeliveryConfirmationAlert,
     showSellerReturnedProductsAlert
 } from "./sellerPopups.js";
-import { showBuyerShippingInfoAlert, showBuyerRejectedProductsAlert } from "./buyerPopups.js";
+import { showBuyerShippingInfoAlert, showBuyerRejectedProductsAlert, showCourierConfirmedProductsAlert } from "./buyerPopups.js";
 
 /**
  * Attaches click event listeners to all step indicators.
@@ -70,6 +70,8 @@ function handleStepClick(stepId, controlData, ordersData, isBuyerLocked) {
         case "step-confirmed":
             if (userType === "buyer") {
                 showBuyerConfirmedProductsAlert(controlData, ordersData);
+            } else if (userType === "courier") {
+                showCourierConfirmedProductsAlert(controlData, ordersData);
             } else if (["seller", "admin"].includes(userType)) {
                 showSellerConfirmationProductsAlert(controlData, ordersData);
             }
