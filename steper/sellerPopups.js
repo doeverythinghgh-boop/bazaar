@@ -148,11 +148,12 @@ function handleConfirmationSave(data, ordersData) {
                     // Save items first
                     await Promise.all(updates.map(u => saveItemStatus(u.key, u.status)));
 
-                    // Then Lock
+                    // Then Lock using Seller ID
                     if (ordersData && ordersData.length > 0) {
                         const orderKey = ordersData[0].order_key;
-                        await saveConfirmationLock(orderKey, true, ordersData);
-                        console.log('[SellerPopups] Confirmation permanently locked for order:', orderKey);
+                        const sellerId = data.currentUser.idUser; // Identify current seller
+                        await saveConfirmationLock(orderKey, true, ordersData, sellerId);
+                        console.log('[SellerPopups] Confirmation permanently locked for order:', orderKey, 'Seller:', sellerId);
                     }
 
                     Swal.fire({
@@ -251,11 +252,18 @@ export function showSellerConfirmationProductsAlert(data, ordersData) {
         const products = getConfirmationProducts(ordersData, data.currentUser.idUser, data.currentUser.type);
         const htmlContent = generateConfirmationTableHtml(products, ordersData);
 
-        // Check lock status from local ordersData
+        // Check lock status from local ordersData using Seller ID
         let isLocked = false;
         if (ordersData && ordersData.length > 0) {
             const orderKey = ordersData[0].order_key;
-            isLocked = getConfirmationLockStatus(ordersData, orderKey);
+            // Admin checks "Lock" is ambiguous? Admin overrides anyway.
+            // Seller checks THEIR OWN lock.
+            // If user is admin, lock is irrelevant effectively, but let's check for display purposes?
+            // Actually, if we pass admin ID, it won't find a lock for "admin_id" probably.
+            // But logic below says `canEdit = userType === 'admin' || !isLocked`.
+            // So if Admin, isLocked is ignored.
+            // If Seller, checks their specific lock.
+            isLocked = getConfirmationLockStatus(ordersData, orderKey, data.currentUser.idUser);
         }
 
         // Determine if editing is allowed

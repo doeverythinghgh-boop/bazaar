@@ -1,5 +1,9 @@
 
 /**
+ <user_rules>
+ C:\Users\hesham\.gemini\GEMINI.md
+ * 
+ * 
  * @file note/code.js
  * @description A collection of code notes, snippets, and temporary test calls.
  * This file is not structured as a module but contains various JavaScript examples or debug code.

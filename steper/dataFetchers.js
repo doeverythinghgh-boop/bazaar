@@ -57,21 +57,28 @@ export async function updateServerItemStatus(orderKey, productKey, status) {
 
 /**
  * Saves confirmation lock status to server using existing API.
- * Uses a special key "__confirmation_locked__" in the order_status JSON.
+ * Uses a special key "__confirmation_locked_{sellerId}__" in the order_status JSON.
  * @param {string} orderKey - The order key
  * @param {boolean} isLocked - Lock status (true = locked, false = unlocked)
  * @param {Array<object>} ordersData - Orders data to update locally
+ * @param {string} sellerId - The ID of the seller to lock
  * @returns {Promise<void>}
  */
-export async function saveConfirmationLock(orderKey, isLocked, ordersData) {
-    // Use the special key "__confirmation_locked__" as product_key
+export async function saveConfirmationLock(orderKey, isLocked, ordersData, sellerId) {
+    if (!sellerId) {
+        console.error("[DataFetchers] saveConfirmationLock: sellerId is required");
+        return;
+    }
+    // Use the special key "__confirmation_locked_{sellerId}__" as product_key
+    const lockKey = `__confirmation_locked_${sellerId}__`;
     const lockValue = isLocked ? "locked" : "unlocked";
-    await updateServerItemStatus(orderKey, "__confirmation_locked__", lockValue);
+
+    await updateServerItemStatus(orderKey, lockKey, lockValue);
 
     // Update local ordersData immediately to reflect the lock
-    updateLocalOrderStatus(orderKey, "__confirmation_locked__", lockValue, ordersData);
+    updateLocalOrderStatus(orderKey, lockKey, lockValue, ordersData);
 
-    console.log(`[DataFetchers] Confirmation lock ${lockValue} for order: ${orderKey}`);
+    console.log(`[DataFetchers] Confirmation lock ${lockValue} for order: ${orderKey}, seller: ${sellerId}`);
 }
 
 /**
@@ -128,10 +135,12 @@ function updateLocalOrderStatus(orderKey, productKey, status, ordersData) {
  * Reads from order_status JSON without making server calls.
  * @param {Array<object>} ordersData - Orders data array
  * @param {string} orderKey - The order key
+ * @param {string} sellerId - The seller ID to check lock for
  * @returns {boolean} Lock status (true = locked, false = unlocked)
  */
-export function getConfirmationLockStatus(ordersData, orderKey) {
+export function getConfirmationLockStatus(ordersData, orderKey, sellerId) {
     if (!ordersData || ordersData.length === 0) return false;
+    if (!sellerId) return false;
 
     const order = ordersData.find(o => o.order_key === orderKey);
     if (!order || !order.order_status) return false;
@@ -143,8 +152,11 @@ export function getConfirmationLockStatus(ordersData, orderKey) {
     const jsonStr = parts.slice(2).join('#');
     try {
         const statuses = JSON.parse(jsonStr);
-        const isLocked = statuses["__confirmation_locked__"] === "locked";
-        console.log(`[DataFetchers] Lock status for order ${orderKey}: ${isLocked}`);
+        // Check specific seller lock
+        const lockKey = `__confirmation_locked_${sellerId}__`;
+        const isLocked = statuses[lockKey] === "locked";
+
+        console.log(`[DataFetchers] Lock status for order ${orderKey}, seller ${sellerId}: ${isLocked}`);
         return isLocked;
     } catch (e) {
         console.warn("[DataFetchers] Failed to parse order_status JSON:", e);
