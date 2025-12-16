@@ -59,8 +59,8 @@ div:where(.swal2-container) .fullscreen-swal {
 div:where(.swal2-container) .fullscreen-swal .swal2-title {
     white-space: nowrap !important;
     /* منع التفاف النص */
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
+    overflow-x: auto !important;
+    /*text-overflow: ellipsis !important;*/
     /* إضافة ثلاث نقاط إذا زاد عن الشاشة */
     width: 100% !important;
     display: block !important;
@@ -72,6 +72,9 @@ div:where(.swal2-container) .fullscreen-swal .swal2-title {
 .fullscreen-swal .swal2-html-container {
     overflow: auto !important;
     max-height: 70vh !important;
+    max-width: 95vw !important;
+    height: fit-content !important;
+    width: fit-content !important;
     /* تقليل الارتفاع المتاح للمحتوى لترك مساحة للعنوان */
     margin: 3px !important;
     padding: 3px !important;
