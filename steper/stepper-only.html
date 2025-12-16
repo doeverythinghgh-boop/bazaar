@@ -288,16 +288,36 @@
 
                 console.log(`[Tutorial] Starting scroll animation. Max scroll: ${maxScroll}px`);
 
-                // For RTL, we need to scroll from right to left
+                // Detect RTL scroll behavior
                 const startTime = performance.now();
                 const isRTL = window.getComputedStyle(wrapper).direction === 'rtl';
 
-                // In RTL, start from max scroll position (right side) and go to 0 (left side)
-                const startScroll = isRTL ? maxScroll : 0;
-                const endScroll = isRTL ? 0 : maxScroll;
+                // Test RTL scroll behavior by setting a small value
+                const originalScroll = wrapper.scrollLeft;
+                wrapper.scrollLeft = 10;
+                const testValue = wrapper.scrollLeft;
+                wrapper.scrollLeft = originalScroll;
 
-                console.log('[Tutorial] RTL mode:', isRTL);
-                console.log('[Tutorial] Start scroll:', startScroll, 'End scroll:', endScroll);
+                let startScroll, endScroll;
+
+                if (isRTL) {
+                    // Check if browser uses positive or negative values for RTL
+                    if (testValue > 0) {
+                        // Firefox/Safari: positive values
+                        startScroll = maxScroll;
+                        endScroll = 0;
+                        console.log('[Tutorial] RTL (positive values): scroll from', maxScroll, 'to 0');
+                    } else {
+                        // Chrome: negative values
+                        startScroll = 0;
+                        endScroll = -maxScroll;
+                        console.log('[Tutorial] RTL (negative values): scroll from 0 to', -maxScroll);
+                    }
+                } else {
+                    startScroll = 0;
+                    endScroll = maxScroll;
+                    console.log('[Tutorial] LTR: scroll from 0 to', maxScroll);
+                }
 
                 function animateScroll(currentTime) {
                     const elapsed = currentTime - startTime;
