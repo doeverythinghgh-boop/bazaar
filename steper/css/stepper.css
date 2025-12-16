@@ -13,6 +13,8 @@
     gap: 0;
     position: relative;
     padding: 1rem 1.5rem;
+    overflow-x: auto;
+    scroll-behavior: smooth;
 }
 
 /* عنصر الخطوة الفردي */
