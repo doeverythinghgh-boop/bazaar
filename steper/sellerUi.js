@@ -34,7 +34,7 @@ export function generateCheckboxCell(productKey, productName, isChecked, isDisab
             </div>
             <button type="button" class="btn-show-key" data-key="${productKey}" 
                     style="padding: 2px 6px; font-size: 0.8em; cursor: pointer; border: 1px solid #ccc; background: #f0f0f0; border-radius: 4px;">
-                المنتج
+                <i class="fas fa-eye"></i>
             </button>
         </div>
     `;
@@ -110,7 +110,7 @@ export function generateRejectedListHtml(products) {
             <span>${item.product_name}</span>
             <button type="button" class="btn-show-key" data-key="${item.product_key}" 
                     style="padding: 2px 6px; font-size: 0.8em; cursor: pointer; border: 1px solid #ccc; background: #f0f0f0; border-radius: 4px;">
-                المنتج
+                <i class="fas fa-eye"></i>
             </button>
         </li>
     `).join("");
@@ -148,7 +148,7 @@ export function generateShippingTableHtml(products) {
                     </label> 
                     <button type="button" class="btn-show-key" data-key="${item.product_key}" 
                             style="float:left; padding: 2px 6px; font-size: 0.8em; cursor: pointer; border: 1px solid #ccc; background: #f0f0f0; border-radius: 4px; margin-right: 5px;">
-                        المنتج
+                        <i class="fas fa-eye"></i>
                     </button>
                 </td>
                 <td style="padding: 8px; border: 1px solid #ddd;">${names || '-'}</td>
