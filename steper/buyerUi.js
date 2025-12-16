@@ -41,7 +41,7 @@ export function generateReviewListHtml(productKeys, ordersData, isOverallLocked)
                         ${isItemLocked ? "disabled" : ""}>
                     <label for="review-checkbox-${productKey}" style="margin-right: 8px;">${productName} <small>(${status})</small></label>
                 </div>
-                <button type="button" class="btn-show-key" data-key="${productKey}" style="padding: 2px 6px; font-size: 0.8em; cursor: pointer; border: 1px solid #ccc; background: #f0f0f0; border-radius: 4px;">Product</button>
+                <button type="button" class="btn-show-key" data-key="${productKey}" style="padding: 2px 6px; font-size: 0.8em; cursor: pointer; border: 1px solid #ccc; background: #f0f0f0; border-radius: 4px;"><i class="fas fa-eye"></i></button>
             </div>
         `;
     }).join("");
@@ -63,7 +63,7 @@ export function generateCancelledListHtml(cancelledKeys, ordersData) {
         return `
             <li id="cancelled-item-${key}" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
                 <span>${productName}</span>
-                <button type="button" class="btn-show-key" data-key="${key}" style="padding: 2px 6px; font-size: 0.8em; cursor: pointer; border: 1px solid #ccc; background: #f0f0f0; border-radius: 4px;">Product</button>
+                <button type="button" class="btn-show-key" data-key="${key}" style="padding: 2px 6px; font-size: 0.8em; cursor: pointer; border: 1px solid #ccc; background: #f0f0f0; border-radius: 4px;"><i class="fas fa-eye"></i></button>
             </li>
         `;
     }).join("");
@@ -104,7 +104,7 @@ export function generateDeliveryItemsHtml(products) {
                         style="margin-right: 8px;">
                       <label for="delivery-checkbox-${item.product_key}">${item.product_name}</label>
                   </div>
-                  <button type="button" class="btn-show-key" data-key="${item.product_key}" style="padding: 2px 6px; font-size: 0.8em; cursor: pointer; border: 1px solid #ccc; background: #f0f0f0; border-radius: 4px;">Product</button>
+                  <button type="button" class="btn-show-key" data-key="${item.product_key}" style="padding: 2px 6px; font-size: 0.8em; cursor: pointer; border: 1px solid #ccc; background: #f0f0f0; border-radius: 4px;"><i class="fas fa-eye"></i></button>
             </div>
         `;
     }).join("");
@@ -126,7 +126,7 @@ export function generateReturnedListHtml(returnedKeys, ordersData) {
         return `
             <li id="returned-item-${key}" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
                 <span>${productName}</span>
-                <button type="button" class="btn-show-key" data-key="${key}" style="padding: 2px 6px; font-size: 0.8em; cursor: pointer; border: 1px solid #ccc; background: #f0f0f0; border-radius: 4px;">Product</button>
+                <button type="button" class="btn-show-key" data-key="${key}" style="padding: 2px 6px; font-size: 0.8em; cursor: pointer; border: 1px solid #ccc; background: #f0f0f0; border-radius: 4px;"><i class="fas fa-eye"></i></button>
             </li>
         `;
     }).join("");
@@ -179,9 +179,9 @@ export function generateConfirmedListHtml(confirmedKeys, ordersData) {
                     <div style="flex-grow: 1;">
                         <span style="font-weight: bold;">${productName}</span>
                         ${deliveryInfo}
-                        <br><small style="color:green">الحالة: ${status}</small>
+                        
                     </div>
-                    <button type="button" class="btn-show-key" data-key="${key}" style="padding: 2px 6px; font-size: 0.8em; cursor: pointer; border: 1px solid #ccc; background: #f0f0f0; border-radius: 4px; margin-right: 5px;">Product</button>
+                    <button type="button" class="btn-show-key" data-key="${key}" style="padding: 2px 6px; font-size: 0.8em; cursor: pointer; border: 1px solid #ccc; background: #f0f0f0; border-radius: 4px; margin-right: 5px;"><i class="fas fa-eye"></i></button>
                 </div>
             </li>
         `;

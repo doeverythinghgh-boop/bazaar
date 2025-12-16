@@ -1,5 +1,5 @@
 /* ============================================
-   رسائل التنبيه ومعلومات المستخدم (Alerts & User Info)
+   Alerts & User Info
    ============================================ */
 .alert-message {
     color: var(--color-rejected);
@@ -15,7 +15,7 @@
     transform: translateY(-10px);
     opacity: 0;
     display: none;
-    /* مخفي افتراضياً */
+    /* Hidden by default */
 }
 
 .alert-message.show {
@@ -40,33 +40,33 @@
 }
 
 /* ============================================
-   النوافذ المنبثقة (Popups) - تحسين الحجم (Minimum Size)
+   Popups - Optimized Size (Minimum Size)
    ============================================ */
 div:where(.swal2-container) .fullscreen-swal {
     width: fit-content !important;
     min-width: fit-content;
-    /* زيادة الحد الأدنى قليلاً */
+    /* Slightly increase minimum width */
     max-width: 95vw !important;
 
     height: fit-content !important;
     max-height: 90vh !important;
 
     padding: 3px !important;
-    /* توسيع الحشو قليلاً */
+    /* Slightly increase padding */
 }
 
-/* تنسيق عنوان النافذة ليكون في سطر واحد */
+/* Format popup title to be on a single line */
 div:where(.swal2-container) .fullscreen-swal .swal2-title {
     white-space: nowrap !important;
-    /* منع التفاف النص */
+    /* Prevent text wrapping */
     overflow-x: auto !important;
     /*text-overflow: ellipsis !important;*/
-    /* إضافة ثلاث نقاط إذا زاد عن الشاشة */
+    /* Add ellipsis if overflows screen */
     width: 100% !important;
     display: block !important;
     padding: 3px !important;
     font-size: 1.2em !important;
-    /* ضبط حجم الخط */
+    /* Adjust font size */
 }
 
 .fullscreen-swal .swal2-html-container {
@@ -75,19 +75,18 @@ div:where(.swal2-container) .fullscreen-swal .swal2-title {
     max-width: 95vw !important;
     height: fit-content !important;
     width: fit-content !important;
-    /* تقليل الارتفاع المتاح للمحتوى لترك مساحة للعنوان */
+    /* Reduce available height for content to leave space for title */
     margin: 3px !important;
     padding: 3px !important;
     text-align: center !important;
-    /* توسيط المحتوى */
+    /* Center alignment */
 }
 
 /* ============================================
-   توسيط جميع العناصر الداخلية بالقوة
    FORCE CENTERING FOR ALL POPUP CHILDREN
    ============================================ */
 
-/* 1. جداول وقوائم */
+/* 1. Tables and Lists */
 .fullscreen-swal table,
 .fullscreen-swal tr,
 .fullscreen-swal td,
@@ -98,18 +97,18 @@ div:where(.swal2-container) .fullscreen-swal .swal2-title {
 .fullscreen-swal .user-details-container {
     text-align: center !important;
     justify-content: center !important;
-    /* للعناصر Flex */
+    /* For Flex items */
     margin-left: auto !important;
     margin-right: auto !important;
 }
 
-/* 2. عناصر Flex (مثل checkbox-item) */
+/* 2. Flex Items (like checkbox-item) */
 .fullscreen-swal .checkbox-item,
 .fullscreen-swal li[style*="display: flex"] {
     justify-content: center !important;
 }
 
-/* 3. حاويات الأزرار في الأسفل */
+/* 3. Bottom Button Containers */
 .fullscreen-swal .swal2-actions {
     justify-content: center !important;
 }
