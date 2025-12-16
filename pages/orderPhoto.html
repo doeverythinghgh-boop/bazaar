@@ -80,7 +80,7 @@
          */
 
         // R2 Bucket Public URL
-        const orderPh_R2_BASE_URL = 'https://pub-e828389e2f1e484c89d8fb652c540c12.r2.dev';
+        // const orderPh_R2_BASE_URL = 'https://pub-e828389e2f1e484c89d8fb652c540c12.r2.dev';
 
         /**
          * @function orderPh_main
@@ -192,7 +192,7 @@
                     // We try all extensions. The first one that loads wins.
                     // If multiple exist (unlikely), we just take the first one that triggers onload.
                     orderPh_extensions.forEach(orderPh_ext => {
-                        const orderPh_url = `${orderPh_R2_BASE_URL}/${orderPh_baseName}.${orderPh_ext}`;
+                        const orderPh_url = getPublicR2FileUrl(`${orderPh_baseName}.${orderPh_ext}`);
                         const orderPh_img = new Image();
                         orderPh_img.onload = () => {
                             if (!orderPh_foundUrl) {

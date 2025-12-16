@@ -60,7 +60,7 @@ const notifiSetting_Controller = {
      * @returns {Promise<void>}
      */
     async notifiSetting_loadDefaults() {
-        const r2Url = 'https://pub-e828389e2f1e484c89d8fb652c540c12.r2.dev/notification_config.json';
+        const r2Url = getPublicR2FileUrl('notification_config.json');
         const timestamp = new Date().getTime(); // Cache busting
         try {
             console.log('محاولة تحميل الإعدادات من Cloudflare...');

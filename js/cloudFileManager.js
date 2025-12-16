@@ -20,6 +20,25 @@
 
 
 /**
+ * @description Base URL for the Cloudflare Worker file management endpoint.
+ * @type {string}
+ * @const
+ */
+const CF_WORKER_BASE_URL = "https://bidstory-files.bidsstories.workers.dev";
+const R2_PUBLIC_BASE_URL = "https://pub-e828389e2f1e484c89d8fb652c540c12.r2.dev";
+
+/**
+ * @description Generates the full public URL for a file stored in Cloudflare R2.
+ * @param {string} fileName - The name of the file.
+ * @returns {string} - The full public URL.
+ */
+function getPublicR2FileUrl(fileName) {
+  if (!fileName) return "";
+  const cleanName = fileName.startsWith("/") ? fileName.substring(1) : fileName;
+  return `${R2_PUBLIC_BASE_URL}/${cleanName}`;
+}
+
+/**
  * @description Ensures a valid authentication token (X-Auth-Key) exists for Cloudflare Workers interaction.
  *   If a token exists in `localStorage`, it returns it.Otherwise, it fetches a new token from `/login` endpoint
   * and saves it to`localStorage`.
@@ -33,7 +52,7 @@ async function ensureToken2cf() {
   if (existing) return existing;
 
   try {
-    const res = await fetch(baseUrl + "/login");
+    const res = await fetch(CF_WORKER_BASE_URL + "/login");
     const { token } = await res.json();
     localStorage.setItem("X-Auth-Key", token);
     return token;
@@ -67,7 +86,7 @@ async function uploadFile2cf(blob, fileName, onLog = console.log) {
   onLog("🟢 🚀 بدء رفع الملف...");
 
   try {
-    const res = await fetch(baseUrl + "/upload", {
+    const res = await fetch(CF_WORKER_BASE_URL + "/upload", {
       method: "POST",
       headers: { "X-Auth-Key": token },
       body: formData
@@ -104,7 +123,7 @@ async function downloadFile2cf(fileName, onLog = console.log) {
   }
 
   const token = await ensureToken2cf();
-  const url = `${baseUrl}/download?file=${encodeURIComponent(fileName)}`;
+  const url = `${CF_WORKER_BASE_URL}/download?file=${encodeURIComponent(fileName)}`;
 
   onLog("🔄 بدء تحميل الملف...");
 
@@ -147,7 +166,7 @@ async function deleteFile2cf(fileName, onLog = console.log) {
   }
 
   const token = await ensureToken2cf();
-  const url = `${baseUrl}/delete?file=${encodeURIComponent(fileName)}`;
+  const url = `${CF_WORKER_BASE_URL}/delete?file=${encodeURIComponent(fileName)}`;
 
   onLog("⚠️ جاري حذف الملف...");
 

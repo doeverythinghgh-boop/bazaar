@@ -32,7 +32,7 @@ async function shouldNotify(eventKey, role) {
         if (!cachedDefaultConfig) { // استخدام الكاش الداخلي كخط دفاع ثانٍ
             try {
                 console.warn('[Notifications] التكوين غير موجود في window، جارٍ جلب ملف JSON من السحابة...');
-                const r2Url = 'https://pub-e828389e2f1e484c89d8fb652c540c12.r2.dev/notification_config.json';
+                const r2Url = getPublicR2FileUrl('notification_config.json');
                 const timestamp = new Date().getTime();
                 const response = await fetch(`${r2Url}?t=${timestamp}`);
 

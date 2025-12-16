@@ -621,8 +621,7 @@
             original_price: productData.original_price,
             imageSrc: productData.ImageName
               ? productData.ImageName.split(",").map(
-                (name) =>
-                  `https://pub-e828389e2f1e484c89d8fb652c540c12.r2.dev/${name}`
+                (name) => getPublicR2FileUrl(name)
               )
               : [],
             availableQuantity: productData.product_quantity,
@@ -778,7 +777,7 @@
       ? product.ImageName.split(",")[0]
       : null;
     const imageUrl = firstImageName
-      ? `https://pub-e828389e2f1e484c89d8fb652c540c12.r2.dev/${firstImageName}`
+      ? getPublicR2FileUrl(firstImageName)
       : "images/placeholder.png";
 
     // Determine if service

@@ -341,7 +341,7 @@
 
       // [Step 0] Load notification configurations from server (Single Source of Truth)
       try {
-        const r2Url = 'https://pub-e828389e2f1e484c89d8fb652c540c12.r2.dev/notification_config.json';
+        const r2Url = getPublicR2FileUrl('notification_config.json');
         const timestamp = new Date().getTime();
         const response = await fetch(`${r2Url}?t=${timestamp}`);
         if (response.ok) {

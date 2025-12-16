@@ -36,7 +36,7 @@
         transition: all 0.2s ease;
         cursor: pointer;
     }
-    
+
     .salesMovement_radioOption:has(input[type="radio"]:checked) {
         border-color: #667eea;
         background: transparent;
@@ -60,7 +60,7 @@
 
     .salesMovement_radioOption input[type="radio"] {
         opacity: 1;
-        position: static; 
+        position: static;
         width: 16px;
         height: 16px;
         cursor: pointer;
@@ -86,32 +86,32 @@
         cursor: pointer;
         transition: none;
     }
-    
+
     .salesMovement_radioLabel i {
         font-size: 18px;
         color: #333;
     }
-    
+
     .salesMovement_radioLabel:has(input[type="radio"]:checked) i {
         color: #667eea;
     }
-    
+
     .salesMovement_radioTextWrapper {
         display: flex;
         align-items: center;
         gap: 4px;
     }
-    
+
     .salesMovement_radioTextWrapper input[type="radio"] {
         opacity: 1;
-        position: static; 
+        position: static;
         width: 16px;
         height: 16px;
         cursor: pointer;
         margin: 0;
         accent-color: #667eea;
     }
-    
+
     /* Update checked styles to work with input inside label */
     .salesMovement_radioLabel:has(input[type="radio"]:checked) {
         background: transparent;
@@ -121,7 +121,7 @@
         box-shadow: none;
         transform: none;
     }
-    
+
     .salesMovement_radioLabel:has(input[type="radio"]:checked) span {
         color: #667eea;
         font-weight: 600;
@@ -583,11 +583,11 @@
         }
 
 
-        
+
         .salesMovement_radioOption {
-             padding: 3px 8px;
-             font-size: 14px;
-             min-height: auto;
+            padding: 3px 8px;
+            font-size: 14px;
+            min-height: auto;
         }
 
         .salesMovement_radioGroup {
@@ -651,7 +651,7 @@
         font-size: 18px;
         transition: transform 0.5s ease;
     }
-    
+
     .salesMovement_refreshIcon i {
         color: #667eea;
     }
@@ -665,34 +665,35 @@
         <div class="salesMovement_filterContainer">
             <div class="salesMovement_radioGroup">
                 <div class="salesMovement_radioOption">
-                <label for="salesMovement_buyer" class="salesMovement_radioLabel">
-                    <i class="fas fa-shopping-cart"></i>
-                    <div class="salesMovement_radioTextWrapper">
-                        <input type="radio" id="salesMovement_buyer" name="salesMovement_userType" value="buyer">
-                        <span>مشتري</span>
-                    </div>
-                </label>
+                    <label for="salesMovement_buyer" class="salesMovement_radioLabel">
+                        <i class="fas fa-shopping-cart"></i>
+                        <div class="salesMovement_radioTextWrapper">
+                            <input type="radio" id="salesMovement_buyer" name="salesMovement_userType" value="buyer">
+                            <span>مشتري</span>
+                        </div>
+                    </label>
                 </div>
                 <div class="salesMovement_radioOption">
-                <label for="salesMovement_seller" class="salesMovement_radioLabel">
-                    <i class="fas fa-store"></i>
-                    <div class="salesMovement_radioTextWrapper">
-                        <input type="radio" id="salesMovement_seller" name="salesMovement_userType" value="seller">
-                        <span>بائع</span>
-                    </div>
-                </label>
+                    <label for="salesMovement_seller" class="salesMovement_radioLabel">
+                        <i class="fas fa-store"></i>
+                        <div class="salesMovement_radioTextWrapper">
+                            <input type="radio" id="salesMovement_seller" name="salesMovement_userType" value="seller">
+                            <span>بائع</span>
+                        </div>
+                    </label>
                 </div>
                 <div class="salesMovement_radioOption">
-                <label for="salesMovement_delivery" class="salesMovement_radioLabel">
-                    <i class="fas fa-truck"></i>
-                    <div class="salesMovement_radioTextWrapper">
-                        <input type="radio" id="salesMovement_delivery" name="salesMovement_userType" value="delivery">
-                        <span>توصيل</span>
-                    </div>
-                </label>
+                    <label for="salesMovement_delivery" class="salesMovement_radioLabel">
+                        <i class="fas fa-truck"></i>
+                        <div class="salesMovement_radioTextWrapper">
+                            <input type="radio" id="salesMovement_delivery" name="salesMovement_userType"
+                                value="delivery">
+                            <span>توصيل</span>
+                        </div>
+                    </label>
                 </div>
             </div>
-            
+
             <button id="salesMovement_refreshButton" class="salesMovement_refreshBtn">
                 <i class="fas fa-sync-alt salesMovement_refreshIcon"></i>
                 <span>تحديث</span>
@@ -968,25 +969,25 @@
         // زر التحديث
         const salesMovement_refreshBtn = document.getElementById('salesMovement_refreshButton');
         if (salesMovement_refreshBtn) {
-            salesMovement_refreshBtn.addEventListener('click', function() {
+            salesMovement_refreshBtn.addEventListener('click', function () {
                 try {
                     const selectedRadio = document.querySelector('input[name="salesMovement_userType"]:checked');
                     if (selectedRadio) {
                         console.log('🔄 تحديث البيانات يدويًا...');
-                        
+
                         // إضافة تأثير بصري (لف الأيقونة)
                         const icon = this.querySelector('.salesMovement_refreshIcon');
-                        if(icon) icon.style.transform = 'rotate(360deg)';
-                        
+                        if (icon) icon.style.transform = 'rotate(360deg)';
+
                         salesMovement_fetchOrders(selectedRadio.value);
 
                         // إعادة ضبط الأيقونة بعد وقت قصير
                         setTimeout(() => {
-                            if(icon) icon.style.transform = '';
+                            if (icon) icon.style.transform = '';
                         }, 500);
                     } else {
-                         // Default fallback if nothing selected
-                         salesMovement_fetchOrders('buyer');
+                        // Default fallback if nothing selected
+                        salesMovement_fetchOrders('buyer');
                     }
                 } catch (error) {
                     console.error('خطأ في زر التحديث:', error);
@@ -1207,7 +1208,7 @@
                             original_price: product.original_price,
                             imageSrc: product.ImageName
                                 ? product.ImageName.split(",").map(
-                                    (name) => `https://pub-e828389e2f1e484c89d8fb652c540c12.r2.dev/${name}`
+                                    (name) => getPublicR2FileUrl(name)
                                 )
                                 : [],
                             availableQuantity: product.product_quantity,

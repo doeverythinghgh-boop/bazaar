@@ -216,18 +216,19 @@
     // --- If dates don't match or no saved copy, fetch from network ---
     console.log('%c[AdverModule] الذاكرة المؤقتة قديمة أو فارغة. جاري الجلب من الشبكة...', 'color: orange; font-weight: bold;');
 
-    const R2_PUBLIC_URL = 'https://pub-e828389e2f1e484c89d8fb652c540c12.r2.dev';
+    // const R2_PUBLIC_URL = 'https://pub-e828389e2f1e484c89d8fb652c540c12.r2.dev';
     const fetchedImages = [];
 
     // ✅ NEW: Attempt to fetch manifest (advertisements.json)
     // We now rely entirely on this file. No guessing.
     try {
-      const manifestRes = await fetch(`${R2_PUBLIC_URL}/advertisements.json?t=${Date.now()}`);
+      const manifestUrl = getPublicR2FileUrl('advertisements.json');
+      const manifestRes = await fetch(`${manifestUrl}?t=${Date.now()}`);
       if (manifestRes.ok) {
         const manifestData = await manifestRes.json();
         if (Array.isArray(manifestData) && manifestData.length > 0) {
           console.log('%c[AdverModule] تم تحميل البيان.', 'color: green;', manifestData);
-          manifestData.forEach(img => fetchedImages.push(`${R2_PUBLIC_URL}/${img}`));
+          manifestData.forEach(img => fetchedImages.push(getPublicR2FileUrl(img)));
         } else {
           console.warn("[AdverModule] البيان فارغ.");
         }

@@ -12,6 +12,7 @@
       transform: translateY(-50px);
       opacity: 0;
     }
+
     to {
       transform: translateY(0);
       opacity: 1;
@@ -150,10 +151,12 @@
       transform: scale(1);
       box-shadow: 0 0 0 0 rgba(0, 123, 255, 0.7);
     }
+
     70% {
       transform: scale(1.05);
       box-shadow: 0 0 0 10px rgba(0, 123, 255, 0);
     }
+
     100% {
       transform: scale(1);
       box-shadow: 0 0 0 0 rgba(0, 123, 255, 0);
@@ -349,7 +352,8 @@
           <td colspan="2" id="p2m-search-input-cell">
             <div class="p2m-input-container" id="p2m-input-container" style="padding-right: 0px">
               <i class="fas fa-search p2m-input-icon" id="p2m-search-icon" aria-hidden="true"></i>
-              <input type="search" id="search-input" placeholder="اكتب اسم المنتج الذي تبحث عنه..." autocomplete="off" />
+              <input type="search" id="search-input" placeholder="اكتب اسم المنتج الذي تبحث عنه..."
+                autocomplete="off" />
             </div>
           </td>
         </tr>
@@ -366,7 +370,8 @@
             </div>
           </td>
           <td id="p2m-search-btn-cell">
-            <button type="button" class="p2m-search-btn" id="search-btn" aria-label="بحث" style="width: 100%; height: 50px; border-radius: 50px">
+            <button type="button" class="p2m-search-btn" id="search-btn" aria-label="بحث"
+              style="width: 100%; height: 50px; border-radius: 50px">
               <i class="fas fa-search" id="p2m-search-btn-icon"></i>
             </button>
           </td>
@@ -412,7 +417,7 @@
   const subCategoryFilter = document.getElementById("sub-category-filter");
 
   // Base Image URL
-  const CLOUDFLARE_BASE_URL = "https://pub-e828389e2f1e484c89d8fb652c540c12.r2.dev/";
+  // const CLOUDFLARE_BASE_URL = "https://pub-e828389e2f1e484c89d8fb652c540c12.r2.dev/";
 
   /**
    * @function loadProducts
@@ -429,10 +434,10 @@
     // Build URL params
     const params = new URLSearchParams();
     params.append("user_key", userSession.user_key || ""); // Filter by current user
-    
+
     // Normalize Arabic text and use searchTerm
     if (filters.searchTerm) {
-       params.append("searchTerm", normalizeArabicText(filters.searchTerm));
+      params.append("searchTerm", normalizeArabicText(filters.searchTerm));
     }
     if (filters.MainCategory) params.append("MainCategory", filters.MainCategory);
     if (filters.SubCategory) params.append("SubCategory", filters.SubCategory);
@@ -441,30 +446,30 @@
     const url = `${baseURL}/api/products?${params.toString()}`;
 
     try {
-       const response = await fetch(url);
-       if (!response.ok) throw new Error("فشل جلب المنتجات");
-       myProducts = await response.json();
+      const response = await fetch(url);
+      if (!response.ok) throw new Error("فشل جلب المنتجات");
+      myProducts = await response.json();
 
-       console.log(`%c[Products] تم تحميل ${myProducts ? myProducts.length : 0} منتجات`, "color: green;");
+      console.log(`%c[Products] تم تحميل ${myProducts ? myProducts.length : 0} منتجات`, "color: green;");
 
-       // Check if no products found
-       if (!myProducts || myProducts.length === 0) {
-         showEmptyState();
-         return;
-       }
+      // Check if no products found
+      if (!myProducts || myProducts.length === 0) {
+        showEmptyState();
+        return;
+      }
 
-       // Render products (already filtered by server)
-       renderProducts(myProducts);
-       loadingState.style.display = "none";
+      // Render products (already filtered by server)
+      renderProducts(myProducts);
+      loadingState.style.display = "none";
 
     } catch (error) {
-       console.error("[Products] خطأ في جلب المنتجات:", error);
-       // Hide loader, but show no error to user (as requested)
-       loadingState.style.display = "none"; 
-       // Optionally show empty state if fetch failed to avoid broken UI
-       if(productsGrid.innerHTML === "") {
-          showEmptyState(); 
-       }
+      console.error("[Products] خطأ في جلب المنتجات:", error);
+      // Hide loader, but show no error to user (as requested)
+      loadingState.style.display = "none";
+      // Optionally show empty state if fetch failed to avoid broken UI
+      if (productsGrid.innerHTML === "") {
+        showEmptyState();
+      }
     }
   }
 
@@ -519,7 +524,7 @@
       ? product.ImageName.split(",")[0].trim()
       : null;
 
-    const imageUrl = firstImage ? CLOUDFLARE_BASE_URL + firstImage : null;
+    const imageUrl = firstImage ? getPublicR2FileUrl(firstImage) : null;
 
     // Truncate product name if too long
     const displayName =
@@ -566,7 +571,7 @@
           original_price: product.original_price,
           imageSrc: product.ImageName
             ? product.ImageName.split(",").map(
-              (name) => `${CLOUDFLARE_BASE_URL}${name.trim()}`
+              (name) => getPublicR2FileUrl(name.trim())
             )
             : [],
           availableQuantity: product.product_quantity,
@@ -608,10 +613,10 @@
       product.MainCategory = result.mainId;
       product.SubCategory = result.subId;
       productSession = product;
-      mainCategorySelectToAdd=result.mainId;
-      subCategorySelectToAdd=result.subId;
+      mainCategorySelectToAdd = result.mainId;
+      subCategorySelectToAdd = result.subId;
 
-    productAddSetType(true);
+      productAddSetType(true);
 
     }
   }
