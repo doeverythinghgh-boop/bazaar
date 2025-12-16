@@ -37,3 +37,26 @@
     justify-content: center;
     gap: 1rem;
 }
+
+/* ============================================
+   النوافذ المنبثقة (Popups) - تحسين الحجم (Minimum Size)
+   ============================================ */
+div:where(.swal2-container) .fullscreen-swal {
+    width: auto !important; /* العرض يتناسب مع المحتوى */
+    min-width: 300px; /* حد أدنى للعرض لضمان القراءة */
+    max-width: 95vw !important; /* لا يتجاوز عرض الشاشة */
+    
+    height: auto !important; /* الارتفاع يتناسب مع المحتوى */
+    max-height: 90vh !important; /* لا يتجاوز ارتفاع الشاشة */
+    
+    padding: 1rem !important;
+}
+
+.fullscreen-swal .swal2-html-container {
+    overflow-y: auto !important; /* تفعيل التمرير إذا زاد المحتوى */
+    max-height: 75vh !important;
+    margin: 5px 0 !important;
+    padding: 5px !important;
+    text-align: right; /* ضمان اتجاه النص */
+}
+
