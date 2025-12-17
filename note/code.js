@@ -1,8 +1,9 @@
 
 /**
  <user_rules>
- C:\Users\hesham\.gemini\GEMINI.md
+\.gemini\GEMINI.md
  * 
+يضمن حساب الهوامش الداخلية ضمن العرض الكلي للعنصر
  * 
  * @file note/code.js
  * @description A collection of code notes, snippets, and temporary test calls.

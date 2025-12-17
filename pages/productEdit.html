@@ -1,10 +1,16 @@
 <style>
+    * {
+        box-sizing: border-box;
+    }
+
     .edit-product-modal {
         background: white;
         border-radius: 15px;
         box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
         width: 100%;
         max-width: 800px;
+        /* Center on larger screens */
+        margin: 20px auto; 
         padding: 30px;
         position: relative;
     }
@@ -57,6 +63,8 @@
         font-size: 16px;
         transition: all 0.3s ease;
         background-color: #f8f9fa;
+        /* Ensure minimum height for touch targets */
+        min-height: 44px;
     }
 
     .edit-product-modal__input:focus,
@@ -120,7 +128,9 @@
         transition: all 0.3s ease;
         display: flex;
         align-items: center;
+        justify-content: center; /* Center content */
         gap: 8px;
+        min-height: 44px; /* Touch target size */
     }
 
     .btn-warning {
@@ -157,7 +167,7 @@
 
     .edit-product-modal__previews {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); /* Adjusted for better fit */
         gap: 15px;
     }
 
@@ -228,6 +238,9 @@
         padding: 12px 30px;
         font-size: 18px;
         border-radius: 30px;
+        width: 100%; /* Full width on small to medium screens by default, overridden by max-width */
+        max-width: 300px;
+        margin: 0 auto;
     }
 
     .edit-product-modal__error-message {
@@ -293,9 +306,12 @@
     @media (max-width: 768px) {
         .edit-product-modal {
             padding: 20px 15px;
+            /* Less padding on small screens */
             border-radius: 12px;
             margin: 10px;
+            /* Center with small margin */
             width: auto;
+            /* Take up most of width */
         }
 
         .edit-product-modal__title {
@@ -305,17 +321,19 @@
 
         .edit-product-modal__form-row {
             flex-direction: column;
+            /* Stack form rows */
             gap: 15px;
-        }
-
-        .edit-product-modal__submit-container .btn {
-            width: 100%;
-            padding: 14px;
-            font-size: 16px;
         }
     }
 
     @media (max-width: 480px) {
+        .edit-product-modal {
+            padding: 15px 10px;
+            width: 98%;
+            /* Almost full width */
+            margin: 5px auto;
+        }
+
         .edit-product-modal__uploader-actions {
             justify-content: center;
         }
@@ -330,12 +348,17 @@
         }
 
         .btn {
-            padding: 10px;
-            font-size: 13px;
+            font-size: 14px;
         }
-        
+
         .edit-product-modal__label {
             font-size: 14px;
+        }
+
+        .edit-product-modal__preview-remove {
+            width: 28px;
+            height: 28px;
+            opacity: 1; /* Always visible on mobile for easier access */
         }
     }
 </style>

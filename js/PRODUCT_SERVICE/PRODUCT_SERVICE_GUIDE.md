@@ -265,7 +265,7 @@ document.getElementById("dash-add-product-btn").addEventListener("click", () => 
 ### 2. عرض تفاصيل منتج/خدمة
 
 ```javascript
-// في search.html أو product2Me.html
+// في search.html أو product2Me/product2Me.html
 const productData = {
     product_key: "123",
     productName: "اسم المنتج",
