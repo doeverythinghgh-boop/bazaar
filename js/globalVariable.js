@@ -214,7 +214,7 @@ function loadProductForm(options = {}) {
   // Determine page path
   let pagePath;
   if (editMode) {
-    pagePath = isService ? "./pages/productEdit2.html" : "./pages/productEdit.html";
+    pagePath = isService ? "./pages/productEdit2/productEdit2.html" : "./pages/productEdit/productEdit.html";
   } else {
     pagePath = isService ? "./pages/productAdd2/productAdd2.html" : "./pages/productAdd/productAdd.html";
   }
