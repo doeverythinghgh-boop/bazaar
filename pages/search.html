@@ -555,7 +555,6 @@
      *   Attaches click events to product cards to open details modal.
      * @param {Array<Object>} results - Array of product objects.
      * @returns {void}
-     * @see showProductDetails
      */
     function displaySearchResults(results) {
       // Developer message: Start displaying results
@@ -633,8 +632,9 @@
             SubCategory: productData.SubCategory, // Pass Sub Category ID
             type: productData.serviceType,
           };
-          productSession = [productDataForModal, true];
-          productViewLayout(productDataForModal.type);
+
+          // Use new loadProductView function
+          loadProductView(productDataForModal, true);
         });
       });
     }
@@ -771,7 +771,7 @@
   }
 
   function generateSearchResultHTML(product) {
-    let SERVICE_CATEGORY_NoPrice_ID = 6;
+
     // Handle images
     const firstImageName = product.ImageName
       ? product.ImageName.split(",")[0]
@@ -780,8 +780,8 @@
       ? getPublicR2FileUrl(firstImageName)
       : "images/placeholder.png";
 
-    // Determine if service
-    const isService = product.MainCategory == SERVICE_CATEGORY_NoPrice_ID;
+    // Determine if service using helper function
+    const isService = isServiceCategory(product.MainCategory, product.SubCategory);
     const price = parseFloat(product.product_price);
 
     // Build HTML for search result

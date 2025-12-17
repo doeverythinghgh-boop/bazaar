@@ -1,0 +1,78 @@
+{
+    "serviceMainCategories": [
+        6,
+        20
+    ],
+    "serviceSubCategories": [
+        {
+            "mainId": 3,
+            "subId": 5,
+            "description": "خدمات تطوير المواقع والتطبيقات"
+        },
+        {
+            "mainId": 6,
+            "subId": 9,
+            "description": "خدمات تعليمية"
+        },
+        {
+            "mainId": 6,
+            "subId": 7,
+            "description": "خدمات تجميلية شخصية"
+        },
+        {
+            "mainId": 6,
+            "subId": 4,
+            "description": "تصميم جرافيك وتصوير"
+        },
+        {
+            "mainId": 7,
+            "subId": 3,
+            "description": "خدمات الشحن والتوصيل"
+        },
+        {
+            "mainId": 7,
+            "subId": 5,
+            "description": "خدمات صيانة المركبات"
+        },
+        {
+            "mainId": 7,
+            "subId": 6,
+            "description": "خدمات تأجير المركبات"
+        },
+        {
+            "mainId": 12,
+            "subId": 5,
+            "description": "خدمات رعاية وتدريب الحيوانات"
+        },
+        {
+            "mainId": 13,
+            "subId": 7,
+            "description": "خدمات التغليف والتنسيق"
+        },
+        {
+            "mainId": 16,
+            "subId": 5,
+            "description": "خدمات الوساطة العقارية"
+        },
+        {
+            "mainId": 16,
+            "subId": 6,
+            "description": "خدمات التصميم والديكور الداخلي"
+        },
+        {
+            "mainId": 17,
+            "subId": 8,
+            "description": "خدمات تنظيم المناسبات"
+        },
+        {
+            "mainId": 17,
+            "subId": 5,
+            "description": "خدمات التصوير والفيديو"
+        }
+    ],
+    "settings": {
+        "hidePrice": true,
+        "serviceType": "2",
+        "productType": "0"
+    }
+}

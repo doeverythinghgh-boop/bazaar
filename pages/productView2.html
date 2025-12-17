@@ -707,7 +707,7 @@
      * @description Displays product details and initializes the slider.
      * @param {object} productData - The product data object.
      */
-    function productView_viewDetails(productData,options = {}) {
+    function productView_viewDetails(productData, options = {}) {
         try {
             console.log("[productView_] عرض تفاصيل الخدمة مع السلايدر...");
             const showAddToCart = options.showAddToCart !== false;
@@ -991,13 +991,27 @@
     // ==============================================
 
     try {
-        console.log("تهيئة عرض الخدمة سلايدر ثلاثي الأبعاد...", productSession);
+        console.log("تهيئة عرض الخدمة سلايدر ثلاثي الأبعاد...");
         // Check session and clear old intervals if any
         if (typeof productView_sliderState !== 'undefined' && productView_sliderState.autoPlayInterval) {
             clearInterval(productView_sliderState.autoPlayInterval);
         }
 
-        productView_viewDetails(productSession[0],productSession[1]);
+        // Get product data from state manager (new approach)
+        const productData = ProductStateManager.getCurrentProduct();
+        const viewOptions = ProductStateManager.getViewOptions();
+
+        if (productData) {
+            productView_viewDetails(productData, viewOptions);
+        } else {
+            // Fallback to old approach for backward compatibility
+            console.warn("[productView2] لم يتم العثور على بيانات في State Manager، استخدام productSession");
+            if (productSession) {
+                productView_viewDetails(productSession[0], productSession[1]);
+            } else {
+                console.error("[productView2] لا توجد بيانات منتج للعرض");
+            }
+        }
 
         // Initialize Order Logic
         productView_initOrderLogic();

@@ -487,7 +487,7 @@
                         seller_key: productData.user_key,
                     };
                     addToCart(productInfoForCart, quantity); // Defined externally
-                } 
+                }
             };
         } catch (error) {
             console.error("productView_setupAddToCart - خطأ في تهيئة زر الإضافة إلى السلة:", error);
@@ -570,9 +570,23 @@
     // ==============================================
 
     try {
-        console.log("تهيئة وحدة عرض المنتج بالحالة المستلمة:", productSession);
-        // productSession[0] is product data, productSession[1] is showAddToCart option
-        productView_viewDetails(productSession[0], productSession[1]);
+        // Get product data from state manager (new approach)
+        const productData = ProductStateManager.getCurrentProduct();
+        const viewOptions = ProductStateManager.getViewOptions();
+
+        console.log("تهيئة وحدة عرض المنتج من State Manager:", productData, viewOptions);
+
+        if (productData) {
+            productView_viewDetails(productData, viewOptions);
+        } else {
+            // Fallback to old approach for backward compatibility
+            console.warn("[productView] لم يتم العثور على بيانات في State Manager، استخدام productSession");
+            if (productSession) {
+                productView_viewDetails(productSession[0], productSession[1]);
+            } else {
+                console.error("[productView] لا توجد بيانات منتج للعرض");
+            }
+        }
     } catch (error) {
         console.error("خطأ في تهيئة نافذة عرض المنتج:", error);
     }

@@ -52,6 +52,7 @@ window.myProducts = null;
  * @param {string} View - View type ('0' for normal view, '2' for alternate view).
  * @returns {void}
  * @see mainLoader
+ * @deprecated Use loadProductView() instead for better flexibility.
  */
 function productViewLayout(View) {
   console.log('-----------نوع الخدمه-----------', View);
@@ -84,11 +85,52 @@ function productViewLayout(View) {
 }
 
 /**
+ * @description Load appropriate product view page based on product data.
+ * @function loadProductView
+ * @param {object} productData - Product data object containing MainCategory, SubCategory, etc.
+ * @param {object|boolean} [options={}] - View options (can be object or boolean for backward compatibility).
+ * @returns {void}
+ * @see ProductStateManager
+ * @see isServiceCategory
+ */
+function loadProductView(productData, options = {}) {
+  // Handle backward compatibility: if options is boolean, convert to object
+  const viewOptions = typeof options === 'boolean' ? { showAddToCart: options } : options;
+
+  // Store state
+  ProductStateManager.setProductForView(productData, viewOptions);
+
+  // Determine product type using service category helper
+  const isService = isServiceCategory(
+    productData.MainCategory,
+    productData.SubCategory
+  );
+
+  // Load appropriate page
+  const pagePath = isService
+    ? "pages/productView2.html"
+    : "pages/productView.html";
+
+  console.log(`[ProductView] تحميل صفحة ${isService ? 'الخدمة' : 'المنتج'} للفئة ${productData.MainCategory}/${productData.SubCategory}`);
+
+  mainLoader(
+    pagePath,
+    "index-product-container",
+    0,
+    undefined,
+    "showHomeIcon",
+    true
+  );
+}
+
+
+/**
  * @description Directs the user to the add new product page, setting the product type based on the selected category.
  * @function productAddSetType
  * @param {boolean} [editMode=false] - Is it edit existing product mode? (Currently not fully used in this logic).
  * @returns {void}
  * @see mainLoader
+ * @deprecated Use loadProductForm() instead for better flexibility.
  */
 function productAddSetType(editMode = false) {
   if (mainCategorySelectToAdd == 6) {
@@ -117,7 +159,7 @@ function productAddSetType(editMode = false) {
       );
     }
 
-  }else{
+  } else {
     if (productTypeToAdd == 2) {
       mainLoader(
         "./pages/productEdit2.html",
@@ -141,6 +183,55 @@ function productAddSetType(editMode = false) {
 
 }
 
+/**
+ * @description Load appropriate add/edit page based on selected categories.
+ * @function loadProductForm
+ * @param {object} [options={}] - Options object.
+ * @param {boolean} [options.editMode=false] - Is edit mode?
+ * @param {object} [options.productData=null] - Product data (for edit mode).
+ * @returns {void}
+ * @see ProductStateManager
+ * @see isServiceCategory
+ */
+function loadProductForm(options = {}) {
+  const { editMode = false, productData = null } = options;
+
+  // Get selected categories
+  const categories = ProductStateManager.getSelectedCategories();
+  if (!categories) {
+    console.error('[ProductForm] لم يتم تحديد الفئات');
+    return;
+  }
+
+  // Determine if service using helper function
+  const isService = isServiceCategory(categories.mainId, categories.subId);
+
+  // Store product data if edit mode
+  if (editMode && productData) {
+    ProductStateManager.setProductForView(productData);
+  }
+
+  // Determine page path
+  let pagePath;
+  if (editMode) {
+    pagePath = isService ? "./pages/productEdit2.html" : "./pages/productEdit.html";
+  } else {
+    pagePath = isService ? "./pages/productAdd2.html" : "./pages/productAdd.html";
+  }
+
+  console.log(`[ProductForm] تحميل صفحة ${editMode ? 'تعديل' : 'إضافة'} ${isService ? 'خدمة' : 'منتج'} للفئة ${categories.mainId}/${categories.subId}`);
+
+  mainLoader(
+    pagePath,
+    "index-product-container",
+    0,
+    undefined,
+    "showHomeIcon",
+    true
+  );
+}
+
+
 
 
 /**
@@ -150,22 +241,30 @@ function productAddSetType(editMode = false) {
  * @returns {Promise<void>}
  * @throws {Error} - If there's an error displaying the category modal or setting product layout.
  * @see CategoryModal.show
- * @see productAddSetType
+ * @see ProductStateManager
+ * @see loadProductForm
  */
 async function showAddProductModal() {
   try {
 
     const result = await CategoryModal.show();
     if (result.status === 'success') {
-      console.log('تم الاختيار:', result.mainId, result.subId);
-      mainCategorySelectToAdd = result.mainId; // Main category selected when adding product
-      subCategorySelectToAdd = result.subId; // Sub category selected when adding product
-      productAddSetType();
+      console.log('[AddProduct] تم اختيار الفئات:', result.mainId, result.subId);
+
+      // Store in new state manager
+      ProductStateManager.setSelectedCategories(result.mainId, result.subId);
+
+      // Also update old global variables for backward compatibility
+      mainCategorySelectToAdd = result.mainId;
+      subCategorySelectToAdd = result.subId;
+
+      // Use new function
+      loadProductForm({ editMode: false });
     }
 
 
   } catch (error) {
-    console.error("خطأ في عرض نافذة إضافة المنتج:", error);
+    console.error("[AddProduct] خطأ في عرض نافذة إضافة المنتج:", error);
 
   }
 }

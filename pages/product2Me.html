@@ -578,9 +578,12 @@
           sellerMessage: product.user_message,
           description: product.product_description,
           serviceType: product.serviceType,
+          MainCategory: product.MainCategory,
+          SubCategory: product.SubCategory,
         };
-        productSession = [productDataForModal, false];
-        productViewLayout(product.serviceType);
+
+        // Use new loadProductView function
+        loadProductView(productDataForModal, false);
       }
     });
 
@@ -606,17 +609,22 @@
     console.log("%c[Products] تعديل المنتج:", "color: blue;", product);
     const result = await CategoryModal.show(product.MainCategory, product.SubCategory, "السوق الحالي للمنتج");
     if (result.status === 'success') {
-      console.log('تم الاختيار:', result.mainId, result.subId);
+      console.log('[EditProduct] تم اختيار الفئات:', result.mainId, result.subId);
 
-      // result.mainId, result.subId are selected category IDs
-
+      // Update product categories
       product.MainCategory = result.mainId;
       product.SubCategory = result.subId;
-      productSession = product;
+
+      // Store in new state manager
+      ProductStateManager.setSelectedCategories(result.mainId, result.subId);
+
+      // Also update old global variables for backward compatibility
       mainCategorySelectToAdd = result.mainId;
       subCategorySelectToAdd = result.subId;
+      productSession = product;
 
-      productAddSetType(true);
+      // Use new function
+      loadProductForm({ editMode: true, productData: product });
 
     }
   }
