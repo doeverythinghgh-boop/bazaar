@@ -1,11 +1,12 @@
 /docs
 # مجلد تبعيات Node.js
 /node_modules
-
+/note
 # ملفات السجل (Logs)
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+api\database-analysis.js
 .npm
 
 *.js.html

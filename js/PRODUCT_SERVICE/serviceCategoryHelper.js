@@ -1,5 +1,5 @@
 /**
- * @file js/serviceCategoryHelper.js
+ * @file js/PRODUCT_SERVICE/serviceCategoryHelper.js
  * @description Helper module for service category detection and management.
  * Provides functions to check if a category is a service based on configuration.
  */
@@ -25,7 +25,7 @@ async function loadServiceConfig() {
     }
 
     try {
-        const response = await fetch('js/serviceCategories.config.json');
+        const response = await fetch('js/PRODUCT_SERVICE/serviceCategories.config.json');
         if (!response.ok) {
             throw new Error(`فشل تحميل ملف التكوين: ${response.status}`);
         }

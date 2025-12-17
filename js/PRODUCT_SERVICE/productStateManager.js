@@ -1,5 +1,5 @@
 /**
- * @file js/productStateManager.js
+ * @file js/PRODUCT_SERVICE/productStateManager.js
  * @description Centralized state management for product operations.
  * Replaces global variables with a clean, encapsulated API.
  */
