@@ -160,8 +160,8 @@ function loadProductForm(options = {})
   - يحصل على الفئات المختارة من `ProductStateManager`
   - يحدد نوع العنصر باستخدام `isServiceCategory()`
   - يحمل الصفحة المناسبة:
-    - `productAdd2.html` / `productEdit2.html` للخدمات
-    - `productAdd.html` / `productEdit.html` للمنتجات
+    - `productAdd2/productAdd2.html` / `productEdit2/productEdit2.html` للخدمات
+    - `productAdd/productAdd.html` / `productEdit/productEdit.html` للمنتجات
 
 **مثال:**
 ```javascript
@@ -197,8 +197,8 @@ async function showAddProductModal()
 
 | الصفحة | الاستخدام | الوصف |
 |--------|-----------|-------|
-| [`productView.html`](/bazaar/pages/productView.html) | عرض المنتجات | تعرض تفاصيل المنتج مع السعر والكمية وزر الإضافة للسلة |
-| [`productView2.html`](/bazaar/pages/productView2.html) | عرض الخدمات | تعرض تفاصيل الخدمة مع سلايدر ثلاثي الأبعاد ونموذج طلب صور |
+| [`productView/productView.html`](/bazaar/pages/productView/productView.html) | عرض المنتجات | تعرض تفاصيل المنتج مع السعر والكمية وزر الإضافة للسلة |
+| [`productView2/productView2.html`](/bazaar/pages/productView2/productView2.html) | عرض الخدمات | تعرض تفاصيل الخدمة مع سلايدر ثلاثي الأبعاد ونموذج طلب صور |
 
 **كيفية قراءة البيانات:**
 ```javascript
@@ -217,8 +217,8 @@ if (productData) {
 
 | الصفحة | الاستخدام | الوصف |
 |--------|-----------|-------|
-| [`productAdd.html`](/bazaar/pages/productAdd.html) | إضافة منتج | نموذج إضافة منتج مع حقول السعر والكمية |
-| [`productAdd2.html`](/bazaar/pages/productAdd2.html) | إضافة خدمة | نموذج إضافة خدمة بدون حقول السعر والكمية |
+| [`productAdd/productAdd.html`](/bazaar/pages/productAdd/productAdd.html) | إضافة منتج | نموذج إضافة منتج مع حقول السعر والكمية |
+| [`productAdd2/productAdd2.html`](/bazaar/pages/productAdd2/productAdd2.html) | إضافة خدمة | نموذج إضافة خدمة بدون حقول السعر والكمية |
 
 **كيفية قراءة الفئات:**
 ```javascript
@@ -233,8 +233,8 @@ const categories = ProductStateManager.getSelectedCategories();
 
 | الصفحة | الاستخدام | الوصف |
 |--------|-----------|-------|
-| [`productEdit.html`](/bazaar/pages/productEdit.html) | تعديل منتج | نموذج تعديل منتج موجود |
-| [`productEdit2.html`](/bazaar/pages/productEdit2.html) | تعديل خدمة | نموذج تعديل خدمة موجودة |
+| [`productEdit/productEdit.html`](/bazaar/pages/productEdit/productEdit.html) | تعديل منتج | نموذج تعديل منتج موجود |
+| [`productEdit2/productEdit2.html`](/bazaar/pages/productEdit2/productEdit2.html) | تعديل خدمة | نموذج تعديل خدمة موجودة |
 
 **كيفية قراءة البيانات:**
 ```javascript
@@ -381,10 +381,10 @@ function generateSearchResultHTML(product) {
 
 | العملية | الدالة المستخدمة | الصفحة المحملة |
 |---------|-------------------|-----------------|
-| **عرض منتج** | `loadProductView(data, options)` | `productView.html` |
-| **عرض خدمة** | `loadProductView(data, options)` | `productView2.html` |
-| **إضافة منتج** | `loadProductForm({editMode: false})` | `productAdd.html` |
-| **إضافة خدمة** | `loadProductForm({editMode: false})` | `productAdd2.html` |
-| **تعديل منتج** | `loadProductForm({editMode: true, productData})` | `productEdit.html` |
-| **تعديل خدمة** | `loadProductForm({editMode: true, productData})` | `productEdit2.html` |
+| **عرض منتج** | `loadProductView(data, options)` | `productView/productView.html` |
+| **عرض خدمة** | `loadProductView(data, options)` | `productView2/productView2.html` |
+| **إضافة منتج** | `loadProductForm({editMode: false})` | `productAdd/productAdd.html` |
+| **إضافة خدمة** | `loadProductForm({editMode: false})` | `productAdd2/productAdd2.html` |
+| **تعديل منتج** | `loadProductForm({editMode: true, productData})` | `productEdit/productEdit.html` |
+| **تعديل خدمة** | `loadProductForm({editMode: true, productData})` | `productEdit2/productEdit2.html` |
 | **التحقق من النوع** | `isServiceCategory(mainId, subId)` | - |

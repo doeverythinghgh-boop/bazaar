@@ -64,7 +64,7 @@ function productViewLayout(View) {
   if (View == '0') {
     //option = t/f ==> view or hidden pasket option
     mainLoader(
-      "pages/productView.html",
+      "pages/productView/productView.html",
       "index-product-container",
       0,
       undefined,
@@ -74,7 +74,7 @@ function productViewLayout(View) {
   }
   if (View == '2') {
     mainLoader(
-      "pages/productView2.html",
+      "pages/productView2/productView2.html",
       "index-product-container",
       0,
       undefined,
@@ -108,8 +108,8 @@ function loadProductView(productData, options = {}) {
 
   // Load appropriate page
   const pagePath = isService
-    ? "pages/productView2.html"
-    : "pages/productView.html";
+    ? "pages/productView2/productView2.html"
+    : "pages/productView/productView.html";
 
   console.log(`[ProductView] تحميل صفحة ${isService ? 'الخدمة' : 'المنتج'} للفئة ${productData.MainCategory}/${productData.SubCategory}`);
 
