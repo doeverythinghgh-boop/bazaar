@@ -1,5 +1,10 @@
 /* Original CSS Styles */
 
+/* Ensure box-sizing is handled correctly */
+.add-product-modal * {
+    box-sizing: border-box;
+}
+
 .add-product-modal {
     background: white;
     border-radius: 15px;
@@ -8,6 +13,7 @@
     max-width: 800px;
     padding: 30px;
     position: relative;
+    margin: 20px auto; /* Centered with margin */
 }
 
 .add-product-modal__title {
@@ -58,6 +64,7 @@
     font-size: 16px;
     transition: all 0.3s ease;
     background-color: #f8f9fa;
+    width: 100%; /* Ensure full width */
 }
 
 .add-product-modal__input:focus,
@@ -85,10 +92,12 @@
 .add-product-modal__form-row {
     display: flex;
     gap: 15px;
+    flex-wrap: wrap; /* Allow wrapping on smaller screens */
 }
 
 .add-product-modal__form-row .add-product-modal__form-group {
     flex: 1;
+    min-width: 150px; /* Minimum width before wrapping */
 }
 
 /* Image Upload Styles */
@@ -123,6 +132,7 @@
     align-items: center;
     justify-content: center;
     gap: 8px;
+    min-height: 44px; /* Touch target size */
 }
 
 .btn-primary {
@@ -130,10 +140,19 @@
     color: white;
 }
 
-.btn-primary:hover {
+.btn-primary:active, .btn-primary:focus { /* Changed from hover for touch */
     background-color: #2980b9;
     transform: translateY(-2px);
 }
+
+/* Fallback for Desktop Hover */
+@media (hover: hover) {
+    .btn-primary:hover {
+        background-color: #2980b9;
+        transform: translateY(-2px);
+    }
+}
+
 
 .btn-ghost {
     background-color: transparent;
@@ -141,10 +160,18 @@
     color: #34495e;
 }
 
-.btn-ghost:hover {
+.btn-ghost:active, .btn-ghost:focus {
     background-color: #ecf0f1;
     border-color: #3498db;
     color: #3498db;
+}
+
+@media (hover: hover) {
+    .btn-ghost:hover {
+        background-color: #ecf0f1;
+        border-color: #3498db;
+        color: #3498db;
+    }
 }
 
 .btn-icon {
@@ -159,7 +186,7 @@
 
 .add-product-modal__previews {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); /* More responsive grid */
     gap: 15px;
 }
 
@@ -170,11 +197,6 @@
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease;
     aspect-ratio: 1;
-}
-
-.add-product-modal__preview:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
 }
 
 .add-product-modal__preview--selected {
@@ -201,13 +223,19 @@
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    opacity: 0;
+    opacity: 1; /* Always visible on touch usually better, or use active state */
     transition: opacity 0.3s ease;
 }
 
-.add-product-modal__preview:hover .add-product-modal__preview-remove {
-    opacity: 1;
+@media (hover: hover) {
+    .add-product-modal__preview-remove {
+        opacity: 0;
+    }
+    .add-product-modal__preview:hover .add-product-modal__preview-remove {
+        opacity: 1;
+    }
 }
+
 
 .add-product-modal__preview-meta {
     position: absolute;
@@ -230,6 +258,9 @@
     padding: 12px 30px;
     font-size: 18px;
     border-radius: 30px;
+    width: 100%; /* Default full width on mobile/small */
+    max-width: 300px; /* Max width for larger screens */
+    margin: 0 auto;
 }
 
 .add-product-modal__error-message {
@@ -257,35 +288,49 @@
     width: 100%;
     border-radius: 8px;
     margin-bottom: 15px;
+     /* Ensure video doesn't overflow height on small landscape screens */
+     max-height: 80vh;
+     object-fit: cover;
 }
 
 .camera-controls {
     text-align: center;
+    display: flex;
+    justify-content: center;
+    gap: 15px;
 }
 
 .close-button {
     position: absolute;
-    top: 15px;
-    left: 15px;
-    background: none;
+    top: 10px;
+    left: 10px;
+    background: rgba(255, 255, 255, 0.8); /* Better visibility */
     border: none;
+    border-radius: 50%;
+    width: 35px;
+    height: 35px;
     font-size: 20px;
     color: #7f8c8d;
     cursor: pointer;
     z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .close-button:hover {
     color: #e74c3c;
+    background: white;
 }
 
-/* Responsive Design */
+/* Responsive Design Overrides */
+
+/* Tablet & Mobile */
 @media (max-width: 768px) {
     .add-product-modal {
         padding: 20px 15px;
-        border-radius: 12px;
-        margin: 10px;
-        width: auto;
+        margin: 10px auto;
+        width: 95%; /* Use more width on small screens */
     }
 
     .add-product-modal__title {
@@ -293,19 +338,32 @@
         margin-bottom: 20px;
     }
 
+    /* Stack form row items if space is tight */
     .add-product-modal__form-row {
-        flex-direction: column;
-        gap: 15px;
-    }
-
-    .add-product-modal__submit-container .btn {
-        width: 100%;
-        padding: 14px;
-        font-size: 16px;
+        gap: 10px;
     }
 }
 
+/* Mobile Specific */
 @media (max-width: 480px) {
+    .add-product-modal {
+        padding: 15px 10px;
+        margin: 5px auto;
+        width: 98%;
+        border-radius: 12px;
+    }
+    
+    .add-product-modal__title {
+        font-size: 20px;
+        padding-bottom: 10px;
+        margin-bottom: 15px;
+    }
+
+    /* Force column layout for form rows on very small screens */
+    .add-product-modal__form-row {
+        flex-direction: column;
+    }
+
     .add-product-modal__uploader-actions {
         justify-content: center;
     }
@@ -319,12 +377,28 @@
         gap: 10px;
     }
 
+    /* Better touch targets */
     .btn {
-        padding: 10px;
-        font-size: 13px;
+        padding: 12px;
+        font-size: 16px; 
     }
     
     .add-product-modal__label {
         font-size: 14px;
+    }
+    
+    .add-product-modal__hint {
+        font-size: 12px;
+        text-align: center;
+    }
+
+    .add-product-modal__submit-container .btn {
+        width: 100%; /* Full width button */
+        max-width: none;
+    }
+
+    /* Fix character counter placement */
+    .add-product-modal__char-counter {
+        font-size: 11px;
     }
 }
