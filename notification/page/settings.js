@@ -99,10 +99,16 @@ const notifiSetting_Controller = {
      * @returns {void}
      */
     notifiSetting_loadConfig() {
-        // لا نحتاج لدمج localStorage هنا لأننا حملنا البيانات الكاملة من السحابة في notifiSetting_loadDefaults
-        // ولكن للتأكد، إذا كانت Config فارغة، نحاول ملئها من Default
-        if (Object.keys(this.notifiSetting_config).length === 0) {
-            this.notifiSetting_config = JSON.parse(JSON.stringify(notifiSetting_DEFAULT_CONFIG));
+        try {
+            // لا نحتاج لدمج localStorage هنا لأننا حملنا البيانات الكاملة من السحابة في notifiSetting_loadDefaults
+            // ولكن للتأكد، إذا كانت Config فارغة، نحاول ملئها من Default
+            if (Object.keys(this.notifiSetting_config).length === 0) {
+                this.notifiSetting_config = JSON.parse(JSON.stringify(notifiSetting_DEFAULT_CONFIG));
+            }
+        } catch (notifiSetting_error) {
+            console.error('حدث خطأ أثناء تحميل إعدادات التكوين:', notifiSetting_error);
+            // محاولة تعيين الافتراضيات كحل بديل
+            this.notifiSetting_config = JSON.parse(JSON.stringify(notifiSetting_DEFAULT_CONFIG || {}));
         }
     },
     /**

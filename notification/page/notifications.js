@@ -112,31 +112,35 @@ const NotificationPage = {
      * @description تهيئة عناصر DOM
      */
     initElements() {
-        this.elements = {
-            // الحاويات
-            container: document.getElementById('notifications-container'),
-            list: document.getElementById('notifications-list'),
-            stats: document.getElementById('notifications-stats'),
-            emptyState: document.getElementById('empty-state'),
-            loadingState: document.getElementById('loading-state'),
-            errorState: document.getElementById('error-state'),
+        try {
+            this.elements = {
+                // الحاويات
+                container: document.getElementById('notifications-container'),
+                list: document.getElementById('notifications-list'),
+                stats: document.getElementById('notifications-stats'),
+                emptyState: document.getElementById('empty-state'),
+                loadingState: document.getElementById('loading-state'),
+                errorState: document.getElementById('error-state'),
 
-            // أدوات التحكم
-            filterType: document.getElementById('filter-type'),
-            filterStatus: document.getElementById('filter-status'),
-            searchInput: document.getElementById('search-input'),
-            sortSelect: document.getElementById('sort-select'),
-            refreshBtn: document.getElementById('refresh-btn'),
-            autoRefreshToggle: document.getElementById('auto-refresh-toggle'),
-            markAllReadBtn: document.getElementById('mark-all-read-btn'),
-            clearFiltersBtn: document.getElementById('clear-filters-btn'),
+                // أدوات التحكم
+                filterType: document.getElementById('filter-type'),
+                filterStatus: document.getElementById('filter-status'),
+                searchInput: document.getElementById('search-input'),
+                sortSelect: document.getElementById('sort-select'),
+                refreshBtn: document.getElementById('refresh-btn'),
+                autoRefreshToggle: document.getElementById('auto-refresh-toggle'),
+                markAllReadBtn: document.getElementById('mark-all-read-btn'),
+                clearFiltersBtn: document.getElementById('clear-filters-btn'),
 
-            // الإحصائيات
-            totalCountEl: document.getElementById('total-count'),
-            unreadCountEl: document.getElementById('unread-count'),
-            sentCountEl: document.getElementById('sent-count'),
-            receivedCountEl: document.getElementById('received-count')
-        };
+                // الإحصائيات
+                totalCountEl: document.getElementById('total-count'),
+                unreadCountEl: document.getElementById('unread-count'),
+                sentCountEl: document.getElementById('sent-count'),
+                receivedCountEl: document.getElementById('received-count')
+            };
+        } catch (error) {
+            console.error('[Notifications] خطأ في تهيئة العناصر:', error);
+        }
     },
     /**
      * @returns {void}
@@ -198,17 +202,21 @@ const NotificationPage = {
      * @description تطبيق قيم الفلاتر على عناصر DOM
      */
     applyFilterValues() {
-        if (this.elements.filterType) {
-            this.elements.filterType.value = this.filters.type;
-        }
-        if (this.elements.filterStatus) {
-            this.elements.filterStatus.value = this.filters.status;
-        }
-        if (this.elements.searchInput) {
-            this.elements.searchInput.value = this.filters.search;
-        }
-        if (this.elements.sortSelect) {
-            this.elements.sortSelect.value = this.filters.sortBy;
+        try {
+            if (this.elements.filterType) {
+                this.elements.filterType.value = this.filters.type;
+            }
+            if (this.elements.filterStatus) {
+                this.elements.filterStatus.value = this.filters.status;
+            }
+            if (this.elements.searchInput) {
+                this.elements.searchInput.value = this.filters.search;
+            }
+            if (this.elements.sortSelect) {
+                this.elements.sortSelect.value = this.filters.sortBy;
+            }
+        } catch (error) {
+            console.error('[Notifications] خطأ في تطبيق قيم الفلاتر:', error);
         }
     },
     /**
@@ -219,10 +227,14 @@ const NotificationPage = {
      * @description تحديث زر التحديث التلقائي
      */
     updateAutoRefreshToggle() {
-        if (this.elements.autoRefreshToggle) {
-            this.elements.autoRefreshToggle.checked = this.refreshSettings.autoRefresh;
-            this.elements.autoRefreshToggle.nextElementSibling.textContent =
-                this.refreshSettings.autoRefresh ? 'مفعل' : 'معطل';
+        try {
+            if (this.elements.autoRefreshToggle) {
+                this.elements.autoRefreshToggle.checked = this.refreshSettings.autoRefresh;
+                this.elements.autoRefreshToggle.nextElementSibling.textContent =
+                    this.refreshSettings.autoRefresh ? 'مفعل' : 'معطل';
+            }
+        } catch (error) {
+            console.error('[Notifications] خطأ في تحديث زر التحديث التلقائي:', error);
         }
     },
     /**
@@ -233,103 +245,115 @@ const NotificationPage = {
      * @description إعداد مستمعي الأحداث
      */
     setupEventListeners() {
-        // أحداث التصفية
-        if (this.elements.filterType) {
-            this.elements.filterType.addEventListener('change', (e) => {
-                this.filters.type = e.target.value;
-                this.applyFilters();
-                this.saveSettings();
-            });
-        }
-
-        if (this.elements.filterStatus) {
-            this.elements.filterStatus.addEventListener('change', (e) => {
-                this.filters.status = e.target.value;
-                this.applyFilters();
-                this.saveSettings();
-            });
-        }
-
-        if (this.elements.searchInput) {
-            // بحث فوري مع debounce
-            let searchTimeout;
-            this.elements.searchInput.addEventListener('input', (e) => {
-                clearTimeout(searchTimeout);
-                searchTimeout = setTimeout(() => {
-                    this.filters.search = e.target.value.trim();
+        try {
+            // أحداث التصفية
+            if (this.elements.filterType) {
+                this.elements.filterType.addEventListener('change', (e) => {
+                    this.filters.type = e.target.value;
                     this.applyFilters();
                     this.saveSettings();
-                }, 300);
-            });
-        }
+                });
+            }
 
-        if (this.elements.sortSelect) {
-            this.elements.sortSelect.addEventListener('change', (e) => {
-                this.filters.sortBy = e.target.value;
-                this.applyFilters();
-                this.saveSettings();
-            });
-        }
+            if (this.elements.filterStatus) {
+                this.elements.filterStatus.addEventListener('change', (e) => {
+                    this.filters.status = e.target.value;
+                    this.applyFilters();
+                    this.saveSettings();
+                });
+            }
 
-        // أحداث الأزرار
-        if (this.elements.refreshBtn) {
-            this.elements.refreshBtn.addEventListener('click', () => {
-                this.refreshNotifications();
-            });
-        }
+            if (this.elements.searchInput) {
+                // بحث فوري مع debounce
+                let searchTimeout;
+                this.elements.searchInput.addEventListener('input', (e) => {
+                    clearTimeout(searchTimeout);
+                    searchTimeout = setTimeout(() => {
+                        this.filters.search = e.target.value.trim();
+                        this.applyFilters();
+                        this.saveSettings();
+                    }, 300);
+                });
+            }
 
-        if (this.elements.autoRefreshToggle) {
-            this.elements.autoRefreshToggle.addEventListener('change', (e) => {
-                this.refreshSettings.autoRefresh = e.target.checked;
-                if (this.refreshSettings.autoRefresh) {
-                    this.startAutoRefresh();
-                } else {
-                    this.stopAutoRefresh();
+            if (this.elements.sortSelect) {
+                this.elements.sortSelect.addEventListener('change', (e) => {
+                    this.filters.sortBy = e.target.value;
+                    this.applyFilters();
+                    this.saveSettings();
+                });
+            }
+
+            // أحداث الأزرار
+            if (this.elements.refreshBtn) {
+                this.elements.refreshBtn.addEventListener('click', () => {
+                    this.refreshNotifications();
+                });
+            }
+
+            if (this.elements.autoRefreshToggle) {
+                this.elements.autoRefreshToggle.addEventListener('change', (e) => {
+                    this.refreshSettings.autoRefresh = e.target.checked;
+                    if (this.refreshSettings.autoRefresh) {
+                        this.startAutoRefresh();
+                    } else {
+                        this.stopAutoRefresh();
+                    }
+                    this.updateAutoRefreshToggle();
+                    this.saveSettings();
+                });
+            }
+
+            if (this.elements.markAllReadBtn) {
+                this.elements.markAllReadBtn.addEventListener('click', () => {
+                    this.markAllAsRead();
+                });
+            }
+
+            if (this.elements.clearFiltersBtn) {
+                this.elements.clearFiltersBtn.addEventListener('click', () => {
+                    this.clearFilters();
+                });
+            }
+
+            // حدث إضافة إشعار جديد
+            window.addEventListener('notificationLogAdded', async (event) => {
+                try {
+                    console.log('[Notifications] حدث إشعار جديد:', event.detail);
+
+                    // التحقق من أن الصفحة مهيأة ومفتوحة
+                    if (!this.state || !this.elements || !this.elements.list) {
+                        console.log('[Notifications] الصفحة غير مهيأة - تجاهل الحدث');
+                        return;
+                    }
+
+                    // إعادة تحميل البيانات من قاعدة البيانات بدلاً من الإضافة المباشرة
+                    // لتجنب التكرار (لأن notification-global.js يستمع لنفس الحدث)
+                    await this.refreshNotifications();
+
+                    // إظهار toast فقط للإشعارات المستلمة (received) وليس المرسلة (sent)
+                    // وفقط إذا كانت الصفحة مفتوحة ومرئية
+                    if (!document.hidden && event.detail && event.detail.type === 'received') {
+                        this.showToast('تم استقبال إشعار جديد', 'info');
+                    }
+                } catch (innerError) {
+                    console.error('[Notifications] خطأ عند استقبال إشعار جديد:', innerError);
                 }
-                this.updateAutoRefreshToggle();
-                this.saveSettings();
             });
-        }
 
-        if (this.elements.markAllReadBtn) {
-            this.elements.markAllReadBtn.addEventListener('click', () => {
-                this.markAllAsRead();
+            // تحديث عند عودة الصفحة للتركيز
+            document.addEventListener('visibilitychange', () => {
+                try {
+                    if (!document.hidden) {
+                        this.refreshNotifications();
+                    }
+                } catch (innerError) {
+                    console.error('[Notifications] خطأ عند تغيير حالة الظهور:', innerError);
+                }
             });
+        } catch (error) {
+            console.error('[Notifications] خطأ في إعداد مستمعي الأحداث:', error);
         }
-
-        if (this.elements.clearFiltersBtn) {
-            this.elements.clearFiltersBtn.addEventListener('click', () => {
-                this.clearFilters();
-            });
-        }
-
-        // حدث إضافة إشعار جديد
-        window.addEventListener('notificationLogAdded', async (event) => {
-            console.log('[Notifications] حدث إشعار جديد:', event.detail);
-
-            // التحقق من أن الصفحة مهيأة ومفتوحة
-            if (!this.state || !this.elements || !this.elements.list) {
-                console.log('[Notifications] الصفحة غير مهيأة - تجاهل الحدث');
-                return;
-            }
-
-            // إعادة تحميل البيانات من قاعدة البيانات بدلاً من الإضافة المباشرة
-            // لتجنب التكرار (لأن notification-global.js يستمع لنفس الحدث)
-            await this.refreshNotifications();
-
-            // إظهار toast فقط للإشعارات المستلمة (received) وليس المرسلة (sent)
-            // وفقط إذا كانت الصفحة مفتوحة ومرئية
-            if (!document.hidden && event.detail && event.detail.type === 'received') {
-                this.showToast('تم استقبال إشعار جديد', 'info');
-            }
-        });
-
-        // تحديث عند عودة الصفحة للتركيز
-        document.addEventListener('visibilitychange', () => {
-            if (!document.hidden) {
-                this.refreshNotifications();
-            }
-        });
     },
     /**
      * @returns {void}
@@ -349,12 +373,16 @@ const NotificationPage = {
      * @description إعداد العداد العالمي
      */
     setupGlobalCounter() {
-        if (window.GLOBAL_NOTIFICATIONS) {
-            window.GLOBAL_NOTIFICATIONS.onCountUpdate = (count) => {
-                if (this.elements.unreadCountEl) {
-                    this.elements.unreadCountEl.textContent = count;
-                }
-            };
+        try {
+            if (window.GLOBAL_NOTIFICATIONS) {
+                window.GLOBAL_NOTIFICATIONS.onCountUpdate = (count) => {
+                    if (this.elements.unreadCountEl) {
+                        this.elements.unreadCountEl.textContent = count;
+                    }
+                };
+            }
+        } catch (error) {
+            console.error('[Notifications] خطأ في إعداد العداد العالمي:', error);
         }
     },
     /**
@@ -415,17 +443,21 @@ const NotificationPage = {
      * @async
      */
     async refreshNotifications() {
-        if (this.state.isLoading) return;
+        try {
+            if (this.state.isLoading) return;
 
-        // إضافة تأثير للزر
-        if (this.elements.refreshBtn) {
-            this.elements.refreshBtn.classList.add('refreshing');
-            setTimeout(() => {
-                this.elements.refreshBtn.classList.remove('refreshing');
-            }, 1000);
+            // إضافة تأثير للزر
+            if (this.elements.refreshBtn) {
+                this.elements.refreshBtn.classList.add('refreshing');
+                setTimeout(() => {
+                    this.elements.refreshBtn.classList.remove('refreshing');
+                }, 1000);
+            }
+
+            await this.loadNotifications();
+        } catch (error) {
+            console.error('[Notifications] خطأ في تحديث الإشعارات:', error);
         }
-
-        await this.loadNotifications();
     },
     /**
      * @returns {Promise<void>}
@@ -437,14 +469,18 @@ const NotificationPage = {
      * @description بدء التحديث التلقائي
      */
     startAutoRefresh() {
-        this.stopAutoRefresh(); // إيقاف أي مؤقت سابق
+        try {
+            this.stopAutoRefresh(); // إيقاف أي مؤقت سابق
 
-        if (this.refreshSettings.autoRefresh) {
-            this.refreshSettings.refreshTimer = setInterval(() => {
-                this.refreshNotifications();
-            }, this.refreshSettings.refreshInterval);
+            if (this.refreshSettings.autoRefresh) {
+                this.refreshSettings.refreshTimer = setInterval(() => {
+                    this.refreshNotifications();
+                }, this.refreshSettings.refreshInterval);
 
-            console.log('[Notifications] تم تفعيل التحديث التلقائي');
+                console.log('[Notifications] تم تفعيل التحديث التلقائي');
+            }
+        } catch (error) {
+            console.error('[Notifications] خطأ في تشغيل التحديث التلقائي:', error);
         }
     },
     /**
@@ -457,10 +493,14 @@ const NotificationPage = {
      * @description إيقاف التحديث التلقائي
      */
     stopAutoRefresh() {
-        if (this.refreshSettings.refreshTimer) {
-            clearInterval(this.refreshSettings.refreshTimer);
-            this.refreshSettings.refreshTimer = null;
-            console.log('[Notifications] تم إيقاف التحديث التلقائي');
+        try {
+            if (this.refreshSettings.refreshTimer) {
+                clearInterval(this.refreshSettings.refreshTimer);
+                this.refreshSettings.refreshTimer = null;
+                console.log('[Notifications] تم إيقاف التحديث التلقائي');
+            }
+        } catch (error) {
+            console.error('[Notifications] خطأ في إيقاف التحديث التلقائي:', error);
         }
     },
     /**
@@ -472,37 +512,41 @@ const NotificationPage = {
      * @param {Array} notifications
      */
     updateStats(notifications) {
-        const stats = {
-            total: notifications.length,
-            unread: notifications.filter(n => n.status === 'unread').length,
-            sent: notifications.filter(n => n.type === 'sent').length,
-            received: notifications.filter(n => n.type === 'received').length
-        };
+        try {
+            const stats = {
+                total: notifications.length,
+                unread: notifications.filter(n => n.status === 'unread').length,
+                sent: notifications.filter(n => n.type === 'sent').length,
+                received: notifications.filter(n => n.type === 'received').length
+            };
 
-        this.state.stats = stats;
+            this.state.stats = stats;
 
-        // تحديث واجهة المستخدم
-        if (this.elements.totalCountEl) {
-            this.elements.totalCountEl.textContent = stats.total;
-        }
-        if (this.elements.unreadCountEl) {
-            this.elements.unreadCountEl.textContent = stats.unread;
-        }
-        if (this.elements.sentCountEl) {
-            this.elements.sentCountEl.textContent = stats.sent;
-        }
-        if (this.elements.receivedCountEl) {
-            this.elements.receivedCountEl.textContent = stats.received;
-        }
-
-        // تحديث العداد العالمي
-        if (window.GLOBAL_NOTIFICATIONS) {
-            window.GLOBAL_NOTIFICATIONS.unreadCount = stats.unread;
-            window.GLOBAL_NOTIFICATIONS.updateBrowserTitle();
-            // تحديث شارة التنبيهات أيضاً
-            if (typeof window.GLOBAL_NOTIFICATIONS.notifyCountUpdate === 'function') {
-                window.GLOBAL_NOTIFICATIONS.notifyCountUpdate();
+            // تحديث واجهة المستخدم
+            if (this.elements.totalCountEl) {
+                this.elements.totalCountEl.textContent = stats.total;
             }
+            if (this.elements.unreadCountEl) {
+                this.elements.unreadCountEl.textContent = stats.unread;
+            }
+            if (this.elements.sentCountEl) {
+                this.elements.sentCountEl.textContent = stats.sent;
+            }
+            if (this.elements.receivedCountEl) {
+                this.elements.receivedCountEl.textContent = stats.received;
+            }
+
+            // تحديث العداد العالمي
+            if (window.GLOBAL_NOTIFICATIONS) {
+                window.GLOBAL_NOTIFICATIONS.unreadCount = stats.unread;
+                window.GLOBAL_NOTIFICATIONS.updateBrowserTitle();
+                // تحديث شارة التنبيهات أيضاً
+                if (typeof window.GLOBAL_NOTIFICATIONS.notifyCountUpdate === 'function') {
+                    window.GLOBAL_NOTIFICATIONS.notifyCountUpdate();
+                }
+            }
+        } catch (error) {
+            console.error('[Notifications] خطأ في تحديث الإحصائيات:', error);
         }
     },
     /**
@@ -516,37 +560,41 @@ const NotificationPage = {
      * @description تطبيق الفلاتر
      */
     applyFilters() {
-        let filtered = [...this.state.notifications];
+        try {
+            let filtered = [...this.state.notifications];
 
-        // فلترة حسب النوع
-        if (this.filters.type !== 'all') {
-            filtered = filtered.filter(n => n.type === this.filters.type);
+            // فلترة حسب النوع
+            if (this.filters.type !== 'all') {
+                filtered = filtered.filter(n => n.type === this.filters.type);
+            }
+
+            // فلترة حسب الحالة
+            if (this.filters.status !== 'all') {
+                filtered = filtered.filter(n => n.status === this.filters.status);
+            }
+
+            // فلترة حسب البحث
+            if (this.filters.search) {
+                const searchTerm = this.filters.search.toLowerCase();
+                filtered = filtered.filter(n =>
+                    (n.title && n.title.toLowerCase().includes(searchTerm)) ||
+                    (n.body && n.body.toLowerCase().includes(searchTerm)) ||
+                    (n.relatedUser && n.relatedUser.name && n.relatedUser.name.toLowerCase().includes(searchTerm))
+                );
+            }
+
+            // ترتيب النتائج
+            filtered.sort((a, b) => {
+                const dateA = new Date(a.timestamp);
+                const dateB = new Date(b.timestamp);
+                return this.filters.sortBy === 'newest' ? dateB - dateA : dateA - dateB;
+            });
+
+            this.state.filteredNotifications = filtered;
+            this.renderNotifications();
+        } catch (error) {
+            console.error('[Notifications] خطأ في تطبيق الفلاتر:', error);
         }
-
-        // فلترة حسب الحالة
-        if (this.filters.status !== 'all') {
-            filtered = filtered.filter(n => n.status === this.filters.status);
-        }
-
-        // فلترة حسب البحث
-        if (this.filters.search) {
-            const searchTerm = this.filters.search.toLowerCase();
-            filtered = filtered.filter(n =>
-                (n.title && n.title.toLowerCase().includes(searchTerm)) ||
-                (n.body && n.body.toLowerCase().includes(searchTerm)) ||
-                (n.relatedUser && n.relatedUser.name && n.relatedUser.name.toLowerCase().includes(searchTerm))
-            );
-        }
-
-        // ترتيب النتائج
-        filtered.sort((a, b) => {
-            const dateA = new Date(a.timestamp);
-            const dateB = new Date(b.timestamp);
-            return this.filters.sortBy === 'newest' ? dateB - dateA : dateA - dateB;
-        });
-
-        this.state.filteredNotifications = filtered;
-        this.renderNotifications();
     },
     /**
      * @returns {void}
@@ -557,16 +605,20 @@ const NotificationPage = {
      * @description مسح جميع الفلاتر
      */
     clearFilters() {
-        this.filters = {
-            type: 'all',
-            status: 'all',
-            search: '',
-            sortBy: 'newest'
-        };
+        try {
+            this.filters = {
+                type: 'all',
+                status: 'all',
+                search: '',
+                sortBy: 'newest'
+            };
 
-        this.applyFilterValues();
-        this.applyFilters();
-        this.saveSettings();
+            this.applyFilterValues();
+            this.applyFilters();
+            this.saveSettings();
+        } catch (error) {
+            console.error('[Notifications] خطأ في مسح الفلاتر:', error);
+        }
     },
     /**
      * @returns {void}
@@ -579,54 +631,58 @@ const NotificationPage = {
      * @description عرض الإشعارات في واجهة المستخدم (تخطيط واتساب)
      */
     renderNotifications() {
-        if (!this.elements.list) return;
+        try {
+            if (!this.elements.list) return;
 
-        // إظهار/إخفاء الحالات المختلفة
-        if (this.state.isLoading) {
-            this.showLoading();
-            return;
-        }
-
-        if (this.state.hasError) {
-            this.showError();
-            return;
-        }
-
-        if (this.state.filteredNotifications.length === 0) {
-            this.showEmptyState();
-            return;
-        }
-
-        // إخفاء الحالات
-        this.hideAllStates();
-
-        // تنظيف القائمة
-        this.elements.list.innerHTML = '';
-
-        let lastDateString = '';
-
-        this.state.filteredNotifications.forEach(notification => {
-            const date = new Date(notification.timestamp);
-            const dateString = date.toLocaleDateString('ar-EG', {
-                weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
-            });
-
-            // إضافة فاصل التاريخ إذا اختلف عن السابق
-            // ملاحظة: مع "الأحدث أولاً"، التواريخ ستكون تنازلية. الفواصل ستظهر عند تغير اليوم.
-            if (dateString !== lastDateString) {
-                const divider = document.createElement('div');
-                divider.className = 'date-divider';
-                divider.innerHTML = `<span>${dateString}</span>`;
-                this.elements.list.appendChild(divider);
-                lastDateString = dateString;
+            // إظهار/إخفاء الحالات المختلفة
+            if (this.state.isLoading) {
+                this.showLoading();
+                return;
             }
 
-            const notificationElement = this.createNotificationElement(notification);
-            this.elements.list.appendChild(notificationElement);
-        });
+            if (this.state.hasError) {
+                this.showError();
+                return;
+            }
 
-        // التمرير لأسفل القائمة (اختياري، لكن في واتساب يتم التمرير للأحدث)
-        // في حالتنا "الأحدث في الأعلى"، لذا لا داعي للتمرير.
+            if (this.state.filteredNotifications.length === 0) {
+                this.showEmptyState();
+                return;
+            }
+
+            // إخفاء الحالات
+            this.hideAllStates();
+
+            // تنظيف القائمة
+            this.elements.list.innerHTML = '';
+
+            let lastDateString = '';
+
+            this.state.filteredNotifications.forEach(notification => {
+                const date = new Date(notification.timestamp);
+                const dateString = date.toLocaleDateString('ar-EG', {
+                    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+                });
+
+                // إضافة فاصل التاريخ إذا اختلف عن السابق
+                // ملاحظة: مع "الأحدث أولاً"، التواريخ ستكون تنازلية. الفواصل ستظهر عند تغير اليوم.
+                if (dateString !== lastDateString) {
+                    const divider = document.createElement('div');
+                    divider.className = 'date-divider';
+                    divider.innerHTML = `<span>${dateString}</span>`;
+                    this.elements.list.appendChild(divider);
+                    lastDateString = dateString;
+                }
+
+                const notificationElement = this.createNotificationElement(notification);
+                this.elements.list.appendChild(notificationElement);
+            });
+            // التمرير لأسفل القائمة (اختياري، لكن في واتساب يتم التمرير للأحدث)
+            // في حالتنا "الأحدث في الأعلى"، لذا لا داعي للتمرير.
+        } catch (error) {
+            console.error('[Notifications] خطأ في رسم الإشعارات:', error);
+            this.showError('حدث خطأ أثناء عرض الإشعارات');
+        }
     },
     /**
      * @returns {void}
@@ -644,47 +700,53 @@ const NotificationPage = {
      * @returns {HTMLElement}
      */
     createNotificationElement(notification) {
-        const element = document.createElement('div');
-        // تحديد الكلاس بناءً على النوع (مرسل/مستلم)
-        const typeClass = notification.type === 'sent' ? 'sent' : 'received';
-        element.className = `notification-item ${typeClass}`;
-        element.dataset.id = notification.id;
+        try {
+            const element = document.createElement('div');
+            // تحديد الكلاس بناءً على النوع (مرسل/مستلم)
+            const typeClass = notification.type === 'sent' ? 'sent' : 'received';
+            element.className = `notification-item ${typeClass}`;
+            element.dataset.id = notification.id;
 
-        // تنسيق الوقت (ساعة:دقيقة ص/م)
-        const date = new Date(notification.timestamp);
-        const timeString = date.toLocaleTimeString('ar-EG', {
-            hour: '2-digit', minute: '2-digit', hour12: true
-        });
+            // تنسيق الوقت (ساعة:دقيقة ص/م)
+            const date = new Date(notification.timestamp);
+            const timeString = date.toLocaleTimeString('ar-EG', {
+                hour: '2-digit', minute: '2-digit', hour12: true
+            });
 
-        // اسم المرسل/المستخدم
-        const senderName = notification.type === 'sent' ? 'أنت' :
-            (notification.relatedUser && notification.relatedUser.name ? notification.relatedUser.name : 'مستخدم');
+            // اسم المرسل/المستخدم
+            const senderName = notification.type === 'sent' ? 'أنت' :
+                (notification.relatedUser && notification.relatedUser.name ? notification.relatedUser.name : 'مستخدم');
 
-        // حالة القراءة (للمرسل فقط أو للكل حسب الرغبة، في واتساب تظهر للمرسل)
-        // سنظهرها للكل هنا لتوفير وظيفة "التبديل"
-        const statusClass = notification.status === 'read' ? 'read' : 'unread';
-        const statusIcon = notification.status === 'read' ? 'fa-check-double' : 'fa-check';
+            // حالة القراءة (للمرسل فقط أو للكل حسب الرغبة، في واتساب تظهر للمرسل)
+            // سنظهرها للكل هنا لتوفير وظيفة "التبديل"
+            const statusClass = notification.status === 'read' ? 'read' : 'unread';
+            const statusIcon = notification.status === 'read' ? 'fa-check-double' : 'fa-check';
 
-        element.innerHTML = `
-            <div class="notification-header">
-                <span class="sender-name">${this.escapeHtml(senderName)}</span>
-            </div>
-            <div class="notification-body">
-                <p>${this.escapeHtml(notification.body || notification.title || '')}</p>
-            </div>
-            <div class="notification-meta">
-                <span class="notification-time">${timeString}</span>
-                <span class="read-status ${statusClass}" title="تغيير الحالة">
-                    <i class="fas ${statusIcon}"></i>
-                </span>
-            </div>
-        `;
+            element.innerHTML = `
+                <div class="notification-header">
+                    <span class="sender-name">${this.escapeHtml(senderName)}</span>
+                </div>
+                <div class="notification-body">
+                    <p>${this.escapeHtml(notification.body || notification.title || '')}</p>
+                </div>
+                <div class="notification-meta">
+                    <span class="notification-time">${timeString}</span>
+                    <span class="read-status ${statusClass}" title="تغيير الحالة">
+                        <i class="fas ${statusIcon}"></i>
+                    </span>
+                </div>
+            `;
 
-        // إضافة مستمع حدث للنقر لتبديل الحالة (للمحاكاة)
-        const statusEl = element.querySelector('.read-status');
+            // إضافة مستمع حدث للنقر لتبديل الحالة (للمحاكاة)
+            const statusEl = element.querySelector('.read-status');
 
-
-        return element;
+            return element;
+        } catch (error) {
+            console.error('[Notifications] خطأ في إنشاء عنصر الإشعار:', error);
+            const errDiv = document.createElement('div');
+            errDiv.textContent = 'خطأ في عرض الإشعار';
+            return errDiv;
+        }
     },
     /**
      * @see escapeHtml

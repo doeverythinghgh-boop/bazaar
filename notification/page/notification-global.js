@@ -75,10 +75,14 @@ window.GLOBAL_NOTIFICATIONS = {
      * @description إعادة العداد إلى الصفر عند فتح صفحة الإشعارات
      */
     resetCounter: function () {
-        this.setLastOpenedTime(new Date());
-        this.unreadCount = 0;
-        this.notifyCountUpdate();
-        this.updateBrowserTitle();
+        try {
+            this.setLastOpenedTime(new Date());
+            this.unreadCount = 0;
+            this.notifyCountUpdate();
+            this.updateBrowserTitle();
+        } catch (error) {
+            console.error('[Global] خطأ في تصفير العداد:', error);
+        }
     },
     /**
      * @returns {void}
@@ -187,28 +191,32 @@ window.GLOBAL_NOTIFICATIONS = {
      * @returns {void}
      */
     updateNotificationBadge: function () {
-        // استخدام الشارة الموجودة فعلياً في index.html
-        const badge = document.getElementById('notifications-badge');
+        try {
+            // استخدام الشارة الموجودة فعلياً في index.html
+            const badge = document.getElementById('notifications-badge');
 
-        if (!badge) {
-            console.warn('[Global] لم يتم العثور على عنصر الشارة notifications-badge');
-            return;
-        }
+            if (!badge) {
+                console.warn('[Global] لم يتم العثور على عنصر الشارة notifications-badge');
+                return;
+            }
 
-        //console.log(`[Global] تحديث الشارة: العدد = ${this.unreadCount}`);
+            //console.log(`[Global] تحديث الشارة: العدد = ${this.unreadCount}`);
 
-        // تحديث المحتوى والعرض
-        if (this.unreadCount > 0) {
-            badge.textContent = this.unreadCount > 99 ? '99+' : this.unreadCount;
-            // إظهار الشارة (flex لأن التصميم يعتمد عليها للتوسيط)
-            badge.style.display = 'flex';
-            // تأكيد اللون (احترازي)
-            badge.style.backgroundColor = '#dc3545';
-            //console.log(`[Global] ✅ تم إظهار الشارة بالعدد: ${badge.textContent}`);
-        } else {
-            // إخفاء الشارة
-            badge.style.display = 'none';
-            //console.log('[Global] ⭕ تم إخفاء الشارة (العدد = 0)');
+            // تحديث المحتوى والعرض
+            if (this.unreadCount > 0) {
+                badge.textContent = this.unreadCount > 99 ? '99+' : this.unreadCount;
+                // إظهار الشارة (flex لأن التصميم يعتمد عليها للتوسيط)
+                badge.style.display = 'flex';
+                // تأكيد اللون (احترازي)
+                badge.style.backgroundColor = '#dc3545';
+                //console.log(`[Global] ✅ تم إظهار الشارة بالعدد: ${badge.textContent}`);
+            } else {
+                // إخفاء الشارة
+                badge.style.display = 'none';
+                //console.log('[Global] ⭕ تم إخفاء الشارة (العدد = 0)');
+            }
+        } catch (error) {
+            console.error('[Global] خطأ في تحديث الشارة:', error);
         }
     },
     /**
@@ -247,32 +255,46 @@ window.GLOBAL_NOTIFICATIONS = {
      * @description إعداد مستمعي الأحداث
      */
     setupEventListeners: function () {
-        // الاستماع لحدث إضافة إشعار جديد
-        // الاستماع لحدث إضافة إشعار جديد
-        window.addEventListener('notificationLogAdded', async (event) => {
-            console.log('[Global] حدث إشعار جديد:', event.detail);
+        try {
+            // الاستماع لحدث إضافة إشعار جديد
+            // الاستماع لحدث إضافة إشعار جديد
+            window.addEventListener('notificationLogAdded', async (event) => {
+                try {
+                    console.log('[Global] حدث إشعار جديد:', event.detail);
 
-            // تشغيل صوت التنبيه للإشعارات المستلمة فقط
-            //يجب ايقافها عند وجود تطبيق اندرويد لانها تعمل بشكل مختلف هناك
-            if (event.detail && event.detail.type === 'received' && !window.Android) {
-                playNotificationSound();
-            }
+                    // تشغيل صوت التنبيه للإشعارات المستلمة فقط
+                    //يجب ايقافها عند وجود تطبيق اندرويد لانها تعمل بشكل مختلف هناك
+                    if (event.detail && event.detail.type === 'received' && !window.Android) {
+                        if (typeof playNotificationSound === 'function') {
+                            playNotificationSound();
+                        }
+                    }
 
-            // إعادة حساب العدد الكلي من قاعدة البيانات لضمان الدقة وتجنب الأخطاء التراكمية
-            await this.updateCounter();
+                    // إعادة حساب العدد الكلي من قاعدة البيانات لضمان الدقة وتجنب الأخطاء التراكمية
+                    await this.updateCounter();
 
-            // إظهار إشعار نظام إذا كان مسموحاً وكان الإشعار غير مقروء
-            if (event.detail.status === 'unread') {
-                this.showSystemNotification(event.detail);
-            }
-        });
+                    // إظهار إشعار نظام إذا كان مسموحاً وكان الإشعار غير مقروء
+                    if (event.detail.status === 'unread') {
+                        this.showSystemNotification(event.detail);
+                    }
+                } catch (innerError) {
+                    console.error('[Global] خطأ داخل مستمع notificationLogAdded:', innerError);
+                }
+            });
 
-        // الاستماع لحدث تحديث حالة الإشعار (مقروء/غير مقروء)
-        window.addEventListener('notificationStatusUpdated', async (event) => {
-            console.log('[Global] تم تحديث حالة إشعار:', event.detail);
-            // إعادة حساب العدد الكلي
-            await this.updateCounter();
-        });
+            // الاستماع لحدث تحديث حالة الإشعار (مقروء/غير مقروء)
+            window.addEventListener('notificationStatusUpdated', async (event) => {
+                try {
+                    console.log('[Global] تم تحديث حالة إشعار:', event.detail);
+                    // إعادة حساب العدد الكلي
+                    await this.updateCounter();
+                } catch (innerError) {
+                    console.error('[Global] خطأ داخل مستمع notificationStatusUpdated:', innerError);
+                }
+            });
+        } catch (error) {
+            console.error('[Global] خطأ في إعداد المستمعين:', error);
+        }
     },
     /**
      * @returns {void}
@@ -318,30 +340,34 @@ window.GLOBAL_NOTIFICATIONS = {
      * @param {object} notification
      */
     createNotification: function (notification) {
-        const title = notification.title || 'إشعار جديد';
-        const body = notification.body || notification.message || 'لديك إشعار جديد';
+        try {
+            const title = notification.title || 'إشعار جديد';
+            const body = notification.body || notification.message || 'لديك إشعار جديد';
 
-        const notif = new Notification(title, {
-            body: body,
-            icon: '/favicon.ico',
-            tag: `notification_${notification.id || Date.now()}`,
-            requireInteraction: false
-        });
+            const notif = new Notification(title, {
+                body: body,
+                icon: '/favicon.ico',
+                tag: `notification_${notification.id || Date.now()}`,
+                requireInteraction: false
+            });
 
-        // عند النقر على الإشعار، افتح صفحة الإشعارات
-        notif.onclick = function () {
-            window.focus();
-            this.close();
-            // يمكن توجيه المستخدم لصفحة الإشعارات
-            if (window.location.pathname.includes('notifications')) {
-                window.location.reload();
-            } else {
-                window.location.href = '/notifications.html';
-            }
-        }.bind(notif);
+            // عند النقر على الإشعار، افتح صفحة الإشعارات
+            notif.onclick = function () {
+                window.focus();
+                this.close();
+                // يمكن توجيه المستخدم لصفحة الإشعارات
+                if (window.location.pathname.includes('notifications')) {
+                    window.location.reload();
+                } else {
+                    window.location.href = '/notifications.html';
+                }
+            }.bind(notif);
 
-        // إغلاق الإشعار تلقائياً بعد 5 ثوان
-        setTimeout(() => notif.close(), 5000);
+            // إغلاق الإشعار تلقائياً بعد 5 ثوان
+            setTimeout(() => notif.close(), 5000);
+        } catch (error) {
+            console.error('[Global] خطأ في إنشاء إشعار النظام:', error);
+        }
     },
     /**
      * @returns {void}

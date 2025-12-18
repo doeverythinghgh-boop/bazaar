@@ -10,7 +10,7 @@ insertUniqueSnapshot("pages/header.html", "profile-header-container", 300);
 
 // 1. Define Elements and Variables (DOM Elements & State)
 // ----------------------------------------------------
-const profileElements = {
+var profileElements = {
     // Input Fields
     usernameInput: document.getElementById("profile-username"),
     phoneInput: document.getElementById("profile-phone"),
@@ -41,7 +41,7 @@ let profileIsPasswordVerified = false;
  * @param {string} message - The error message to display.
  * @param {object} validationState - Object to track validation state (sets isValid to false).
  */
-const profileShowError = (inputElement, message, validationState) => {
+var profileShowError = (inputElement, message, validationState) => {
     try {
         const errorDiv = document.getElementById(`${inputElement.id}-error`);
         if (errorDiv) errorDiv.textContent = message;
@@ -55,7 +55,7 @@ const profileShowError = (inputElement, message, validationState) => {
  * @function profileClearErrors
  * @description Clears all error messages from the form fields.
  */
-const profileClearErrors = () => {
+var profileClearErrors = () => {
     try {
         document.querySelectorAll(".profile-error-message")
             .forEach((el) => (el.textContent = ""));
@@ -70,7 +70,7 @@ const profileClearErrors = () => {
  * @param {string} inputId - The ID of the input field.
  * @param {string} toggleId - The ID of the toggle icon.
  */
-const profileTogglePasswordVisibility = (inputId, toggleId) => {
+var profileTogglePasswordVisibility = (inputId, toggleId) => {
     try {
         const input = document.getElementById(inputId);
         const toggleIcon = document.getElementById(toggleId);

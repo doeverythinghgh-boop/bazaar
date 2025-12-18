@@ -1,5 +1,5 @@
-const salesMovement_STORAGE_KEY = 'sales_movement_user_type';
-const salesMovement_radioButtons = document.querySelectorAll('input[name="salesMovement_userType"]');
+var salesMovement_STORAGE_KEY = 'sales_movement_user_type';
+var salesMovement_radioButtons = document.querySelectorAll('input[name="salesMovement_userType"]');
 
 // Function to fetch orders based on user type
 async function salesMovement_fetchOrders(salesMovement_userType) {
@@ -246,7 +246,7 @@ try {
 }
 
 // زر التحديث
-const salesMovement_refreshBtn = document.getElementById('salesMovement_refreshButton');
+var salesMovement_refreshBtn = document.getElementById('salesMovement_refreshButton');
 if (salesMovement_refreshBtn) {
     salesMovement_refreshBtn.addEventListener('click', function () {
         try {
@@ -423,8 +423,8 @@ function salesMovement_hideLoading() {
 }
 
 // إغلاق النافذة المنبثقة
-const salesMovement_closeModalBtn = document.getElementById('salesMovement_closeModal');
-const salesMovement_modal = document.getElementById('salesMovement_orderModal');
+var salesMovement_closeModalBtn = document.getElementById('salesMovement_closeModal');
+var salesMovement_modal = document.getElementById('salesMovement_orderModal');
 
 if (salesMovement_closeModalBtn) {
     salesMovement_closeModalBtn.addEventListener('click', function () {
@@ -534,7 +534,7 @@ async function salesMovement_checkProductKeyChanges() {
 }
 
 // بدء المراقبة كل 100 ملي ثانية
-const salesMovement_productKeyWatcher = setInterval(salesMovement_checkProductKeyChanges, 100);
+var salesMovement_productKeyWatcher = setInterval(salesMovement_checkProductKeyChanges, 100);
 
 // تنظيف المراقبة عند إغلاق الصفحة (اختياري)
 window.addEventListener('beforeunload', function () {

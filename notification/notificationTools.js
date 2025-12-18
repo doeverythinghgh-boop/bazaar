@@ -128,10 +128,15 @@ function saveNotificationFromAndroid(notificationJson) {
  * @see apiFetch
  */
 async function sendNotification(token, title, body) {
-    return await apiFetch('/api/send-notification', {
-        method: 'POST',
-        body: { token, title, body },
-    });
+    try {
+        return await apiFetch('/api/send-notification', {
+            method: 'POST',
+            body: { token, title, body },
+        });
+    } catch (error) {
+        console.error('[Notifications] خطأ في إرسال الإشعار الفردي:', error);
+        return { error: error.message };
+    }
 }
 /**
  * @async
@@ -287,11 +292,16 @@ async function getActiveDeliveryRelations(sellerKey) {
  * @see getActiveDeliveryRelations - الدالة التي تجلب علاقات التوصيل النشطة.
  */
 async function getTokensForActiveDelivery2Seller(sellerKey) {
-    const deliveryUsers = await getActiveDeliveryRelations(sellerKey);
-    const deliveryTokens = deliveryUsers
-        ?.map((user) => user.fcmToken)
-        .filter(Boolean); // استخراج التوكنات الصالحة فقط
-    return deliveryTokens;
+    try {
+        const deliveryUsers = await getActiveDeliveryRelations(sellerKey);
+        const deliveryTokens = deliveryUsers
+            ?.map((user) => user.fcmToken)
+            .filter(Boolean); // استخراج التوكنات الصالحة فقط
+        return deliveryTokens;
+    } catch (error) {
+        console.error('[Notifications] خطأ في جلب توكنات التوصيل:', error);
+        return [];
+    }
 }
 
 
@@ -395,17 +405,21 @@ async function sendTokenToServer(userKey, token, platform) {
  * @returns {Promise<void>} - يُرجع وعدًا (Promise) لا يُرجع قيمة عند الاكتمال.
  */
 async function askForNotificationPermission() {
-    // التحقق من وجود الكائن 'Android' للتأكد من أن الكود يعمل داخل تطبيق أندرويد
-    if (
-        window.Android &&
-        typeof window.Android.requestNotificationPermission === "function"
-    ) {
-        console.log(
-            "استدعاء الدالة الأصلية لطلب إذن الإشعارات..."
-        );
-        window.Android.requestNotificationPermission();
-    } else {
-        console.log("واجهة Android غير متاحة.");
+    try {
+        // التحقق من وجود الكائن 'Android' للتأكد من أن الكود يعمل داخل تطبيق أندرويد
+        if (
+            window.Android &&
+            typeof window.Android.requestNotificationPermission === "function"
+        ) {
+            console.log(
+                "استدعاء الدالة الأصلية لطلب إذن الإشعارات..."
+            );
+            window.Android.requestNotificationPermission();
+        } else {
+            console.log("واجهة Android غير متاحة.");
+        }
+    } catch (error) {
+        console.error('[Notifications] خطأ في طلب إذن الإشعارات (Android):', error);
     }
 }
 
@@ -418,17 +432,21 @@ async function askForNotificationPermission() {
  * @see userSession
  */
 function onUserLoggedOutAndroid() {
-    if (
-        window.Android &&
-        typeof window.Android.onUserLoggedOut === "function"
-    ) {
-        console.log("[Auth] إعلام الواجهة الأصلية بتسجيل خروج المستخدم...");
-        window.Android.onUserLoggedOut(userSession.user_key);
-        // ✅ إضافة: حذف توكن الأندرويد من localStorage
-        localStorage.removeItem("android_fcm_key");
-        console.log(
-            "[Auth] تم حذف توكن الأندرويد (android_fcm_key) من localStorage."
-        );
+    try {
+        if (
+            window.Android &&
+            typeof window.Android.onUserLoggedOut === "function"
+        ) {
+            console.log("[Auth] إعلام الواجهة الأصلية بتسجيل خروج المستخدم...");
+            window.Android.onUserLoggedOut(userSession.user_key);
+            // ✅ إضافة: حذف توكن الأندرويد من localStorage
+            localStorage.removeItem("android_fcm_key");
+            console.log(
+                "[Auth] تم حذف توكن الأندرويد (android_fcm_key) من localStorage."
+            );
+        }
+    } catch (error) {
+        console.error('[Auth] خطأ في تسجيل خروج Android:', error);
     }
 }
 

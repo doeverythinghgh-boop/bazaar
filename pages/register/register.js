@@ -3,11 +3,11 @@
  * @description Handles new user registration functionality, including form validation, password confirmation, and serial number generation for user keys.
  */
 
-const register_form = document.getElementById("register_form");
-const register_username = document.getElementById("register_username");
-const register_phone = document.getElementById("register_phone");
-const register_password = document.getElementById("register_password");
-const register_address = document.getElementById("register_address");
+var register_form = document.getElementById("register_form");
+var register_username = document.getElementById("register_username");
+var register_phone = document.getElementById("register_phone");
+var register_password = document.getElementById("register_password");
+var register_address = document.getElementById("register_address");
 
 // Clear input fields on page load to ensure they are always empty.
 if (register_username) register_username.value = "";
@@ -305,7 +305,7 @@ try {
 }
 
 // New: Add password visibility toggle for the main form.
-const register_togglePasswordIcon = document.getElementById(
+var register_togglePasswordIcon = document.getElementById(
   "register_toggle-password-icon"
 );
 if (register_togglePasswordIcon && register_password) {

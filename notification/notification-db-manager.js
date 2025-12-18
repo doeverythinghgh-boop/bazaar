@@ -53,40 +53,44 @@ async function initDB() {
       return resolve(db);
     }
 
-    const request = indexedDB.open(DB_NAME, DB_VERSION);
+    try {
+      const request = indexedDB.open(DB_NAME, DB_VERSION);
 
-    request.onerror = (event) => {
-      console.error('[DB] خطأ في فتح قاعدة البيانات:', event.target.error);
-      reject('فشل فتح قاعدة البيانات.');
-    };
+      request.onerror = (event) => {
+        console.error('[DB] خطأ في فتح قاعدة البيانات:', event.target.error);
+        reject('فشل فتح قاعدة البيانات.');
+      };
 
-    request.onupgradeneeded = (event) => {
-      const tempDb = event.target.result;
-      console.log('[DB] جاري ترقية/إنشاء قاعدة البيانات...');
+      request.onupgradeneeded = (event) => {
+        const tempDb = event.target.result;
+        console.log('[DB] جاري ترقية/إنشاء قاعدة البيانات...');
 
-      // ✅ تبسيط: بما أننا في مرحلة التطوير، سنقوم بإنشاء البنية الكاملة مباشرة.
-      // هذا الكود يعمل فقط عند إنشاء قاعدة البيانات لأول مرة أو عند زيادة رقم الإصدار.
-      if (!tempDb.objectStoreNames.contains(NOTIFICATIONS_STORE)) {
-        console.log(`[DB] جاري إنشاء مخزن الكائنات: ${NOTIFICATIONS_STORE}`);
-        const store = tempDb.createObjectStore(NOTIFICATIONS_STORE, {
-          keyPath: 'id',
-          autoIncrement: true,
-        });
-        // إنشاء جميع الفهارس المطلوبة مرة واحدة
-        store.createIndex('timestamp', 'timestamp', { unique: false });
-        store.createIndex('type', 'type', { unique: false });
-        store.createIndex('status', 'status', { unique: false });
-        store.createIndex('messageId', 'messageId', { unique: true });
-      }
-    };
+        // ✅ تبسيط: بما أننا في مرحلة التطوير، سنقوم بإنشاء البنية الكاملة مباشرة.
+        // هذا الكود يعمل فقط عند إنشاء قاعدة البيانات لأول مرة أو عند زيادة رقم الإصدار.
+        if (!tempDb.objectStoreNames.contains(NOTIFICATIONS_STORE)) {
+          console.log(`[DB] جاري إنشاء مخزن الكائنات: ${NOTIFICATIONS_STORE}`);
+          const store = tempDb.createObjectStore(NOTIFICATIONS_STORE, {
+            keyPath: 'id',
+            autoIncrement: true,
+          });
+          // إنشاء جميع الفهارس المطلوبة مرة واحدة
+          store.createIndex('timestamp', 'timestamp', { unique: false });
+          store.createIndex('type', 'type', { unique: false });
+          store.createIndex('status', 'status', { unique: false });
+          store.createIndex('messageId', 'messageId', { unique: true });
+        }
+      };
 
-    // ✅ إصلاح: تأكد من أن `resolve` لا يتم استدعاؤه إلا بعد اكتمال `onupgradeneeded` (إن وجد) و `onsuccess`.
-    request.onsuccess = (event) => {
-      db = event.target.result;
-      console.log('[DB] تم فتح قاعدة البيانات بنجاح.');
-      resolve(db);
-    };
-
+      // ✅ إصلاح: تأكد من أن `resolve` لا يتم استدعاؤه إلا بعد اكتمال `onupgradeneeded` (إن وجد) و `onsuccess`.
+      request.onsuccess = (event) => {
+        db = event.target.result;
+        console.log('[DB] تم فتح قاعدة البيانات بنجاح.');
+        resolve(db);
+      };
+    } catch (e) {
+      console.error('[DB] استثناء غير متوقع أثناء فتح قاعدة البيانات:', e);
+      reject(e);
+    }
   });
 
   return dbPromise;
@@ -150,31 +154,36 @@ async function addNotificationLog(notificationData) {
  * @see addNotificationLog
  */
 function addRecord(store, notificationData, resolve, reject) {
-  const request = store.add(notificationData);
+  try {
+    const request = store.add(notificationData);
 
-  request.onsuccess = () => {
-    console.log('[DB] تم إضافة سجل إشعار بنجاح:', notificationData.type);
-    // ✅ جديد: إرسال حدث مخصص لإعلام التطبيق بوجود سجل جديد.
-    // هذا يسمح بتحديث الواجهات المفتوحة (مثل نافذة سجل الإشعارات) بشكل فوري.
-    // التحقق من وجود window قبل إرسال الحدث (للتوافق مع Service Worker)
-    if (typeof window !== 'undefined') {
-      const newLogEvent = new CustomEvent('notificationLogAdded', {
-        // نمرر بيانات الإشعار مع المعرف الجديد الذي تم إنشاؤه بواسطة IndexedDB.
-        detail: { ...notificationData, id: request.result }
-      });
-      window.dispatchEvent(newLogEvent);
-    } else {
-      // يمكن هنا إضافة منطق للمراسلة مع Client في Service Worker إذا لزم الأمر
-      // ولكن الحفظ في DB كافٍ حالياً لأن الصفحة ستقرأ منه عند التحديث
-      console.log('[DB] بيئة Service Worker: تم الحفظ دون إرسال حدث نافذة.');
-    }
-    resolve(request.result); // إرجاع المفتاح الجديد كما كان
-  };
+    request.onsuccess = () => {
+      console.log('[DB] تم إضافة سجل إشعار بنجاح:', notificationData.type);
+      // ✅ جديد: إرسال حدث مخصص لإعلام التطبيق بوجود سجل جديد.
+      // هذا يسمح بتحديث الواجهات المفتوحة (مثل نافذة سجل الإشعارات) بشكل فوري.
+      // التحقق من وجود window قبل إرسال الحدث (للتوافق مع Service Worker)
+      if (typeof window !== 'undefined') {
+        const newLogEvent = new CustomEvent('notificationLogAdded', {
+          // نمرر بيانات الإشعار مع المعرف الجديد الذي تم إنشاؤه بواسطة IndexedDB.
+          detail: { ...notificationData, id: request.result }
+        });
+        window.dispatchEvent(newLogEvent);
+      } else {
+        // يمكن هنا إضافة منطق للمراسلة مع Client في Service Worker إذا لزم الأمر
+        // ولكن الحفظ في DB كافٍ حالياً لأن الصفحة ستقرأ منه عند التحديث
+        console.log('[DB] بيئة Service Worker: تم الحفظ دون إرسال حدث نافذة.');
+      }
+      resolve(request.result); // إرجاع المفتاح الجديد كما كان
+    };
 
-  request.onerror = (event) => {
-    console.error('[DB] فشل إضافة سجل إشعار:', event.target.error);
-    reject('فشل إضافة السجل.');
-  };
+    request.onerror = (event) => {
+      console.error('[DB] فشل إضافة سجل إشعار:', event.target.error);
+      reject('فشل إضافة السجل.');
+    };
+  } catch (error) {
+    console.error('[DB] استثناء أثناء إضافة السجل:', error);
+    reject(error);
+  }
 }
 
 /**

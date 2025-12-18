@@ -1,22 +1,22 @@
 // ✅ Simple IIFE usage without assigning to window
 console.log('%c[ProductForm] بدء تهيئة نموذج إضافة الخدمة...', 'color: blue;');
 // --- Default Compression Settings ---
-const IMAGE_MAX_WIDTH = 1600; // Max width after compression
-const IMAGE_MAX_HEIGHT = 1600; // Max height after compression
-const IMAGE_QUALITY = 0.75; // Compression quality 0..1
-const MAX_FILES = 6; // Reasonable limit of images
+var IMAGE_MAX_WIDTH = 1600; // Max width after compression
+var IMAGE_MAX_HEIGHT = 1600; // Max height after compression
+var IMAGE_QUALITY = 0.75; // Compression quality 0..1
+var MAX_FILES = 6; // Reasonable limit of images
 
 // DOM Elements
-const fileInput0 = document.getElementById('fileInput00');
-const pickFilesBtn = document.getElementById('pick-files-btn');
-const takePhotoBtn = document.getElementById('take-photo-btn');
-const previewsEl = document.getElementById('previews');
-const uploaderEl = document.getElementById('image-uploader');
-const form = document.getElementById('add-product-form');
-const descriptionTextarea = document.getElementById('product-description');
-const productNameInput = document.getElementById('product-name');
-const sellerMessageTextarea = document.getElementById('seller-message');
-const notesInput = document.getElementById('product-notes');
+var fileInput0 = document.getElementById('fileInput00');
+var pickFilesBtn = document.getElementById('pick-files-btn');
+var takePhotoBtn = document.getElementById('take-photo-btn');
+var previewsEl = document.getElementById('previews');
+var uploaderEl = document.getElementById('image-uploader');
+var form = document.getElementById('add-product-form');
+var descriptionTextarea = document.getElementById('product-description');
+var productNameInput = document.getElementById('product-name');
+var sellerMessageTextarea = document.getElementById('seller-message');
+var notesInput = document.getElementById('product-notes');
 
 // --- Helper functions for error handling ---
 /**
@@ -61,7 +61,7 @@ function formatBytes(bytes, decimals = 2) {
     return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
 }
 
-const images = [];
+var images = [];
 let idCounter = 1;
 
 // Helper: Generate lightweight unique ID
@@ -75,7 +75,7 @@ async function supportsWebP() {
     if (!blob) return false;
     try { await createImageBitmap(blob); return true; } catch (e) { return false; }
 }
-const WEBP_SUPPORTED_PROMISE = supportsWebP();
+var WEBP_SUPPORTED_PROMISE = supportsWebP();
 
 // --- Compression function: Takes File or Blob and returns compressed Blob ---
 // --- Compression Function: Takes File or Blob, returns compressed Blob ---

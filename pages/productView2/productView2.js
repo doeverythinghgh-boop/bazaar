@@ -8,7 +8,7 @@
     //  DOM Elements Access
     // ==============================================
 
-    const productView_domElements = {
+    var productView_domElements = {
         name: document.getElementById("productView_name"),
         description: document.getElementById("productView_description_text"),
         sellerMessage: document.getElementById("productView_seller_message_text"),
