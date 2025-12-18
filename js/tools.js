@@ -514,4 +514,3 @@ function generateSerial() {
   }
   return serial;
 }
-
