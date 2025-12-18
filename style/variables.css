@@ -3,6 +3,7 @@
   @description Contains the main color and font variables for the project.
 */
 /* تمت إضافة متغيرات جديدة لتحسين التناسق */
+@import url('fonts.css');
 
 :root {
   --primary-color: #007bff; /* Main blue color */

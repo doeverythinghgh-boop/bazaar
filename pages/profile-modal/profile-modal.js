@@ -29,7 +29,7 @@ var profileElements = {
 };
 
 // State to track if old password was successfully verified (to reduce Swal.fire repetition)
-let profileIsPasswordVerified = false;
+var profileIsPasswordVerified = false;
 
 // 2. Local Helper Functions
 // ----------------------------------------------------

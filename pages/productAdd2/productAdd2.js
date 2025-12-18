@@ -62,7 +62,7 @@ function formatBytes(bytes, decimals = 2) {
 }
 
 var images = [];
-let idCounter = 1;
+var idCounter = 1;
 
 // Helper: Generate lightweight unique ID
 function genId() { return 'img_' + (Date.now() + idCounter++); }
@@ -250,7 +250,7 @@ function removeImage(id) {
     });
 }
 
-let stop = 0;
+var stop = 0;
 // --- Handle new files when selected or dropped ---
 /**
  * @function handleNewFiles

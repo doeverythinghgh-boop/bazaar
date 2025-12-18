@@ -9,10 +9,9 @@
   <link rel="icon" href="favicon.ico" type="image/x-icon" />
   <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
 
-  <!-- 1. Fonts & Third Party CSS -->
-  <link id="font-tajawal" href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap"
-    rel="stylesheet" />
-  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.2/css/all.css" />
+  <!-- 1. Third Party CSS & Fonts Performance -->
+  <link rel="preload" href="assets/fontawesome/webfonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="stylesheet" href="assets/fontawesome/css/all.css" />
 
   <!-- 2. Core Variables & Base Styles -->
   <link rel="stylesheet" href="style/variables.css" />
@@ -24,7 +23,7 @@
   <!---region main javaScript files (Ordered by Dependency)---->
 
   <!-- 1. Third Party Libraries -->
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" defer></script>
+  <script src="assets/libs/sweetalert2/sweetalert2.all.min.js" defer></script>
 
   <!-- 2. Configuration & Globals (No Dependencies) -->
   <script src="js/config.js" defer></script>

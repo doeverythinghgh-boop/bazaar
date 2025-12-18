@@ -163,8 +163,8 @@ async function setupFirebaseWeb() {
         // استيراد Firebase ديناميكيًا (تحميل السكربتات العالمية)
         // ملاحظة: إصدارات v8 UMD تقوم بتعيين المتغير العام 'firebase' عند تحميلها ولا تدعم التصدير عبر ES Modules بشكل قياسي.
         if (!window.firebase) {
-            await import("https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js");
-            await import("https://www.gstatic.com/firebasejs/8.10.1/firebase-messaging.js");
+            await import("../assets/libs/firebase/firebase-app-8.10.1.js");
+            await import("../assets/libs/firebase/firebase-messaging-8.10.1.js");
         }
 
         const firebase = window.firebase;

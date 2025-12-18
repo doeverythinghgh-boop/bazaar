@@ -446,7 +446,7 @@ if (salesMovement_modal) {
 // ========================================
 
 // متغير لمنع التنفيذ المتكرر
-let salesMovement_isProcessingProductKey = false;
+var salesMovement_isProcessingProductKey = false;
 
 // دالة للتحقق من التغييرات
 async function salesMovement_checkProductKeyChanges() {
