@@ -82,19 +82,25 @@ async function initAdverModule(container, forceRefresh = false) {
     console.log('%c[AdverModule] الذاكرة المؤقتة قديمة أو فارغة. جاري الجلب من الشبكة...', 'color: orange; font-weight: bold;');
 
     const fetchedImages = [];
+    let fetchSuccess = false;
 
     // ✅ NEW: Attempt to fetch manifest (advertisements.json)
-    // We now rely entirely on this file. No guessing.
     try {
+        if (typeof getPublicR2FileUrl !== 'function') {
+            throw new Error("getPublicR2FileUrl is not defined");
+        }
+
         const manifestUrl = getPublicR2FileUrl('advertisements.json');
         const manifestRes = await fetch(`${manifestUrl}?t=${Date.now()}`);
+
         if (manifestRes.ok) {
             const manifestData = await manifestRes.json();
-            if (Array.isArray(manifestData) && manifestData.length > 0) {
+            if (Array.isArray(manifestData)) {
                 console.log('%c[AdverModule] تم تحميل البيان.', 'color: green;', manifestData);
                 manifestData.forEach(img => fetchedImages.push(getPublicR2FileUrl(img)));
+                fetchSuccess = true;
             } else {
-                console.warn("[AdverModule] البيان فارغ.");
+                console.warn("[AdverModule] تنسيق البيان غير صالح.");
             }
         } else {
             console.error(`[AdverModule] فشل تحميل البيان: ${manifestRes.status}`);
@@ -103,24 +109,39 @@ async function initAdverModule(container, forceRefresh = false) {
         console.error("[AdverModule] فشل فحص البيان:", e);
     }
 
-    // ✅ NEW: Save new images and update date to localStorage
-    if (fetchedImages.length > 0) {
-        console.log(`[AdverModule] تم جلب ${fetchedImages.length} صور. جاري تخزين النتائج.`);
-        localStorage.setItem(CACHE_KEY_IMAGES, JSON.stringify(fetchedImages));
-        if (serverTimestamp) {
-            localStorage.setItem(CACHE_KEY_TIMESTAMP, serverTimestamp);
+    // ✅ NEW: Logic to handle results safely
+    if (fetchSuccess) {
+        if (fetchedImages.length > 0) {
+            // Case 1: New images found
+            console.log(`[AdverModule] تم جلب ${fetchedImages.length} صور. جاري تحديث الذاكرة.`);
+            localStorage.setItem(CACHE_KEY_IMAGES, JSON.stringify(fetchedImages));
+            if (serverTimestamp) {
+                localStorage.setItem(CACHE_KEY_TIMESTAMP, serverTimestamp);
+            }
+            localStorage.setItem(CACHE_KEY_LAST_CHECK, Date.now());
+            buildSlider(container, fetchedImages);
+        } else {
+            // Case 2: Manifest loaded but is empty (Admin removed all ads)
+            console.warn('[AdverModule] لا توجد إعلانات في البيان الجديد.');
+            const noAdsMsg = container.querySelector('.no-ads-message');
+            if (noAdsMsg) noAdsMsg.style.display = 'block';
+
+            // Should we clear cache? Yes, because this is an explicit "empty" state.
+            localStorage.removeItem(CACHE_KEY_IMAGES);
+            container.innerHTML = '<p class="no-ads-message">لا توجد إعلانات حالياً.</p>';
         }
-        localStorage.setItem(CACHE_KEY_LAST_CHECK, Date.now());
-
-        buildSlider(container, fetchedImages);
     } else {
-        // If no images found in manifest
-        console.warn('[AdverModule] لم يتم العثور على إعلانات في البيان.');
-        const noAdsMsg = container.querySelector('.no-ads-message');
-        if (noAdsMsg) noAdsMsg.style.display = 'block';
-
-        // Clean old cache to avoid displaying invalid images
-        localStorage.removeItem(CACHE_KEY_IMAGES);
+        // Case 3: Fetch Failed (Network error, CORS, etc.)
+        // FALLBACK: Try to use cached images even if expired
+        console.warn('[AdverModule] فشل الجلب. محاولة استخدام النسخة القديمة...');
+        if (cachedImages && cachedImages.length > 0) {
+            console.log('[AdverModule] تم استرجاع النسخة القديمة من الذاكرة.');
+            buildSlider(container, cachedImages);
+        } else {
+            // Real failure: No network and no cache
+            const noAdsMsg = container.querySelector('.no-ads-message');
+            if (noAdsMsg) noAdsMsg.style.display = 'block';
+        }
     }
 }
 
