@@ -196,11 +196,11 @@
     // ==============================================
     //  Image Compression Logic
     // ==============================================
-    const IMAGE_MAX_WIDTH = 1920;
-    const IMAGE_MAX_HEIGHT = 1920;
-    const IMAGE_QUALITY = 0.8;
+    var IMAGE_MAX_WIDTH = 1920;
+    var IMAGE_MAX_HEIGHT = 1920;
+    var IMAGE_QUALITY = 0.8;
 
-    const WEBP_SUPPORTED_PROMISE = (async () => {
+    var WEBP_SUPPORTED_PROMISE = (async () => {
         const canvas = document.createElement('canvas');
         if (!!(canvas.getContext && canvas.getContext('2d'))) {
             return canvas.toDataURL('image/webp').indexOf('data:image/webp') === 0;
@@ -301,12 +301,12 @@
     //  Order Photo Logic
     // ==============================================
 
-    let pv2_orderImages = []; // Stores file objects
-    const MAX_ORDER_IMAGES = 4;
-    const MAX_IMAGE_SIZE_MB = 5;
+    var pv2_orderImages = []; // Stores file objects
+    var MAX_ORDER_IMAGES = 4;
+    var MAX_IMAGE_SIZE_MB = 5;
 
     // Elements
-    const pv2_orderEls = {
+    var pv2_orderEls = {
         note: document.getElementById('pv2_note'),
         uploader: document.getElementById('pv2_uploader_area'),
         fileInput: document.getElementById('pv2_fileInput'),

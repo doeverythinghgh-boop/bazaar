@@ -116,7 +116,7 @@ async function sendOrder2Excution() {
 }
 
 // Global Variables
-let cartPage_currentProductKeyForNote = '';
+var cartPage_currentProductKeyForNote = '';
 
 // Page Initialization
 try {
