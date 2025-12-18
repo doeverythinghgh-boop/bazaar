@@ -538,6 +538,15 @@
                 // Success
                 localStorage.setItem('showOrderPhotoMessage', 'true');
 
+                // [Notifications] Send notifications to Admin and Seller
+                if (typeof handlePurchaseNotifications === 'function') {
+                    const finalOrderForNotify = { ...orderData, id: order_key };
+                    handlePurchaseNotifications(finalOrderForNotify)
+                        .catch(err => console.error('[productView2] خطأ في إرسال الإشعارات:', err));
+                } else {
+                    console.warn('[productView2] دالة handlePurchaseNotifications غير متوفرة');
+                }
+
                 Swal.fire({
                     icon: 'success',
                     title: 'تم الإرسال بنجاح',
