@@ -8,8 +8,8 @@
 
 // ✅ إصلاح: استخدام Firebase v8 المتوافق مع `importScripts` بدلاً من v12.
 // هذا يحل مشكلة "Failed to load script" داخل عامل الخدمة.
-importScripts("https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js");
-importScripts("https://www.gstatic.com/firebasejs/8.10.1/firebase-messaging.js");
+importScripts("assets/libs/firebase/firebase-app-8.10.1.js");
+importScripts("assets/libs/firebase/firebase-messaging-8.10.1.js");
 
 /**
  * @description تهيئة تطبيق Firebase باستخدام الصيغة القديمة (v8).
