@@ -725,19 +725,19 @@ async function notifyOnStepActivation({
     stepId,
     stepName,
     buyerKey = '',
-    sellerKeys = [], // استقبال مفاتيح البائعين
+    sellerKeys = [],
     deliveryKeys = [],
     orderId = '',
-    userName = ''
+    userName = '',
+    actingUserId = ''
 }) {
-    console.log(`[Notifications] بدء إرسال إشعارات تفعيل المرحلة: ${stepName} (${stepId})`);
+    console.log(`[Notifications] بدء إرسال إشعارات تفعيل المرحلة: ${stepName} (${stepId}) - القائم بالفعل: ${actingUserId}`);
 
     try {
-        // إرسال الإشعارات بالتوازي لتحسين الأداء
         const notificationPromises = [];
 
-        // 1. إشعار المشتري
-        if (buyerKey && await shouldNotify(stepId, 'buyer')) {
+        // 1. إشعار المشتري (تصفية إذا كان المشتري هو القائم بالفعل)
+        if (buyerKey && buyerKey !== actingUserId && await shouldNotify(stepId, 'buyer')) {
             notificationPromises.push(
                 notifyBuyerOnStepChange(buyerKey, stepId, stepName, orderId)
             );
@@ -750,18 +750,22 @@ async function notifyOnStepActivation({
             );
         }
 
-        // 3. إشعار البائعين (جديد: يشمل step-delivered وأي مرحلة أخرى مفعلة للبائع)
-        if (sellerKeys && sellerKeys.length > 0 && await shouldNotify(stepId, 'seller')) {
+        // تصفية القائم بالفعل من قوائم البائعين والمناديب
+        const filteredSellerKeys = sellerKeys.filter(k => k !== actingUserId);
+        const filteredDeliveryKeys = deliveryKeys.filter(k => k !== actingUserId);
+
+        // 3. إشعار البائعين
+        if (filteredSellerKeys.length > 0 && await shouldNotify(stepId, 'seller')) {
             notificationPromises.push(
-                notifySellerOnStepChange(sellerKeys, stepId, stepName, orderId)
+                notifySellerOnStepChange(filteredSellerKeys, stepId, stepName, orderId)
             );
         }
 
         // 4. إشعار خدمات التوصيل
         if (['step-confirmed', 'step-shipped', 'step-delivered'].includes(stepId)) {
-            if (deliveryKeys && deliveryKeys.length > 0 && await shouldNotify(stepId, 'delivery')) {
+            if (filteredDeliveryKeys.length > 0 && await shouldNotify(stepId, 'delivery')) {
                 notificationPromises.push(
-                    notifyDeliveryOnStepChange(deliveryKeys, stepId, stepName, orderId)
+                    notifyDeliveryOnStepChange(filteredDeliveryKeys, stepId, stepName, orderId)
                 );
             }
         }
@@ -861,20 +865,23 @@ async function notifyOnSubStepActivation({
     buyerKey = '',
     sellerKeys = [],
     orderId = '',
-    userName = ''
+    userName = '',
+    actingUserId = ''
 }) {
-    console.log(`[Notifications] بدء إرسال إشعارات المرحلة الفرعية: ${stepName} (${stepId})`);
+    console.log(`[Notifications] بدء إرسال إشعارات المرحلة الفرعية: ${stepName} (${stepId}) - القائم بالفعل: ${actingUserId}`);
 
     try {
         const notificationPromises = [];
+
+        const filteredSellerKeys = sellerKeys.filter(k => k !== actingUserId);
 
         // حسب نوع المرحلة الفرعية
         switch (stepId) {
             case 'step-cancelled':
                 // ملغي: إشعار البائعين + الإدارة
-                if (sellerKeys && sellerKeys.length > 0 && await shouldNotify('step-cancelled', 'seller')) {
+                if (filteredSellerKeys.length > 0 && await shouldNotify('step-cancelled', 'seller')) {
                     notificationPromises.push(
-                        notifySellerOnStepChange(sellerKeys, stepId, stepName, orderId)
+                        notifySellerOnStepChange(filteredSellerKeys, stepId, stepName, orderId)
                     );
                 }
                 if (await shouldNotify('step-cancelled', 'admin')) {
@@ -886,8 +893,7 @@ async function notifyOnSubStepActivation({
 
             case 'step-rejected':
                 // مرفوض: إشعار المشتري + الإدارة
-                if (buyerKey && await shouldNotify('step-rejected', 'buyer')) {
-                    // تحديث رسالة المشتري للمرحلة "مرفوض"
+                if (buyerKey && buyerKey !== actingUserId && await shouldNotify('step-rejected', 'buyer')) {
                     const title = "منتجات مرفوضة";
                     const body = `تم رفض بعض المنتجات من طلبك${orderId ? ` رقم #${orderId}` : ''} لعدم توفرها.`;
                     const buyerTokens = await getUsersTokens([buyerKey]);
@@ -906,9 +912,9 @@ async function notifyOnSubStepActivation({
 
             case 'step-returned':
                 // مرتجع: إشعار البائعين + الإدارة
-                if (sellerKeys && sellerKeys.length > 0 && await shouldNotify('step-returned', 'seller')) {
+                if (filteredSellerKeys.length > 0 && await shouldNotify('step-returned', 'seller')) {
                     notificationPromises.push(
-                        notifySellerOnStepChange(sellerKeys, stepId, stepName, orderId)
+                        notifySellerOnStepChange(filteredSellerKeys, stepId, stepName, orderId)
                     );
                 }
                 if (await shouldNotify('step-returned', 'admin')) {

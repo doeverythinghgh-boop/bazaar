@@ -175,16 +175,12 @@ function handleConfirmationSave(data, ordersData) {
                             const metadata = extractNotificationMetadata(ordersData, data);
 
                             // 1. Notify Confirmed
-                            const relevantSellers = extractRelevantSellerKeys(updates, ordersData);
-                            // Filter out current seller (they don't need a push notification for their own action)
-                            const actingSellerId = data.currentUser.idUser;
-                            const sellersToNotify = relevantSellers.filter(s => s !== actingSellerId);
-
                             window.notifyOnStepActivation({
                                 stepId: 'step-confirmed',
                                 stepName: 'تأكيد الطلب',
                                 ...metadata,
-                                sellerKeys: sellersToNotify
+                                sellerKeys: relevantSellers,
+                                deliveryKeys: relevantDelivery
                             });
 
                             // 2. Notify Rejected (if any)
@@ -194,7 +190,8 @@ function handleConfirmationSave(data, ordersData) {
                                     stepId: 'step-rejected',
                                     stepName: 'منتجات مرفوضة',
                                     ...metadata,
-                                    sellerKeys: sellersToNotify
+                                    sellerKeys: relevantSellers,
+                                    deliveryKeys: relevantDelivery
                                 });
                             }
                         }
@@ -331,20 +328,41 @@ async function handleShippingSave(data, ordersData) {
                     }).then(async () => {
                         updateCurrentStepFromState(data, ordersData);
 
-                        // [Notifications] Dispatch Notifications (Buyer Only)
-                        if (typeof window.notifyBuyerOnStepChange === 'function' && typeof window.shouldNotify === 'function') {
-                            const metadata = extractNotificationMetadata(ordersData, data);
-                            const shouldSend = await window.shouldNotify('step-shipped', 'buyer');
+                        const metadata = extractNotificationMetadata(ordersData, data);
+                        const relevantDelivery = extractRelevantDeliveryKeys(updates, ordersData);
 
-                            if (shouldSend) {
-                                window.notifyBuyerOnStepChange(
+                        // Filter out current user
+                        const actingUserId = data.currentUser.idUser;
+                        const deliveryToNotify = relevantDelivery.filter(d => d !== actingUserId);
+
+                        // [Notifications] Dispatch Notifications (Buyer + Relevant Delivery)
+                        const notificationPromises = [];
+
+                        // 1. Notify Buyer
+                        if (typeof window.notifyBuyerOnStepChange === 'function' && typeof window.shouldNotify === 'function') {
+                            const shouldSendBuyer = await window.shouldNotify('step-shipped', 'buyer');
+                            if (shouldSendBuyer) {
+                                notificationPromises.push(window.notifyBuyerOnStepChange(
                                     metadata.buyerKey,
                                     'step-shipped',
                                     'شحن الطلب',
                                     metadata.orderId
-                                );
+                                ));
                             }
                         }
+
+                        // 2. Notify Delivery (Targeted)
+                        if (deliveryToNotify.length > 0 && typeof window.notifyOnStepActivation === 'function') {
+                            notificationPromises.push(window.notifyOnStepActivation({
+                                stepId: 'step-shipped',
+                                stepName: 'شحن الطلب',
+                                ...metadata,
+                                sellerKeys: [], // No need to notify other sellers of shipping normally
+                                deliveryKeys: deliveryToNotify
+                            }));
+                        }
+
+                        await Promise.all(notificationPromises);
                     });
                 } catch (error) {
                     console.error("Save failed", error);

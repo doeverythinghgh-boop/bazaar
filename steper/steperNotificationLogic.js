@@ -48,11 +48,14 @@ export function extractNotificationMetadata(ordersData, controlData) {
         sellerKeys = Array.from(sellerKeysSet);
     }
 
+    let actingUserId = '';
+
     if (controlData.currentUser) {
         userName = controlData.currentUser.name || controlData.currentUser.idUser || '';
+        actingUserId = controlData.currentUser.idUser || '';
     }
 
-    return { buyerKey, deliveryKeys, sellerKeys, orderId, userName };
+    return { buyerKey, deliveryKeys, sellerKeys, orderId, userName, actingUserId };
 }
 
 /**
@@ -156,4 +159,37 @@ export function extractRelevantSellerKeys(updates, ordersData) {
     });
 
     return Array.from(sellerKeysSet);
+}
+
+/**
+ * Extracts delivery keys for only the items being updated.
+ * @function extractRelevantDeliveryKeys
+ * @param {Array<object>} updates - Array of { key: item_key, status: new_status }.
+ * @param {Array<object>} ordersData - Original orders data to find item details.
+ * @returns {Array<string>} Unique list of relevant delivery keys.
+ */
+export function extractRelevantDeliveryKeys(updates, ordersData) {
+    if (!updates || updates.length === 0 || !ordersData) return [];
+
+    const deliveryKeysSet = new Set();
+    const updateKeys = updates.map(u => u.key);
+
+    ordersData.forEach(order => {
+        if (order.order_items && Array.isArray(order.order_items)) {
+            order.order_items.forEach(item => {
+                if (updateKeys.includes(item.item_key)) {
+                    if (item.supplier_delivery && item.supplier_delivery.delivery_key) {
+                        const dKey = item.supplier_delivery.delivery_key;
+                        if (Array.isArray(dKey)) {
+                            dKey.forEach(k => { if (k) deliveryKeysSet.add(k); });
+                        } else if (dKey) {
+                            deliveryKeysSet.add(dKey);
+                        }
+                    }
+                }
+            });
+        }
+    });
+
+    return Array.from(deliveryKeysSet);
 }

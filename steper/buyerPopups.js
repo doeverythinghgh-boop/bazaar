@@ -300,12 +300,14 @@ async function handleDeliverySave(data, ordersData) {
                         if (typeof window.notifyOnStepActivation === 'function') {
                             const metadata = extractNotificationMetadata(ordersData, data);
                             const relevantSellers = extractRelevantSellerKeys(updates, ordersData);
+                            const relevantDelivery = extractRelevantDeliveryKeys(updates, ordersData);
 
                             window.notifyOnStepActivation({
                                 stepId: 'step-delivered',
                                 stepName: 'تأكيد الاستلام',
                                 ...metadata,
-                                sellerKeys: relevantSellers
+                                sellerKeys: relevantSellers,
+                                deliveryKeys: relevantDelivery
                             });
                         }
                     });

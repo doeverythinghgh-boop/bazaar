@@ -130,16 +130,12 @@ function executeStepActivation(stepToActivate, controlData, ordersData) {
 function dispatchNotifications(stepToActivate, controlData, ordersData) {
     const metadata = extractNotificationMetadata(ordersData, controlData);
 
-    // Main Step Notification
+    // Main Step Notification (Broadcast to all parties in the order for major step changes)
     if (typeof notifyOnStepActivation === 'function') {
         notifyOnStepActivation({
             stepId: stepToActivate.id,
             stepName: stepToActivate.name || stepToActivate.id,
-            buyerKey: metadata.buyerKey,
-            deliveryKeys: metadata.deliveryKeys,
-            sellerKeys: metadata.sellerKeys,
-            orderId: metadata.orderId,
-            userName: metadata.userName
+            ...metadata
         });
     }
 
@@ -148,7 +144,10 @@ function dispatchNotifications(stepToActivate, controlData, ordersData) {
         const subStepPayload = checkSubStepConditions(stepToActivate.id, metadata);
         if (subStepPayload) {
             console.log(`[Notifications] Sub-step condition met: ${subStepPayload.stepName}`);
-            notifyOnSubStepActivation(subStepPayload);
+            notifyOnSubStepActivation({
+                ...subStepPayload,
+                actingUserId: metadata.actingUserId
+            });
         }
     }
 }
