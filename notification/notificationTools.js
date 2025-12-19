@@ -36,8 +36,8 @@ async function loadNotificationMessages() {
     if (notificationMessages) return notificationMessages;
     try {
         const timestamp = new Date().getTime();
-        // تحميل الملف محلياً حصراً بناءً على مساره في المشروع
-        const response = await fetch(`notification/notification_messages.json?t=${timestamp}`);
+        // تحميل الملف محلياً حصراً بناءً على مساره في المشروع (استخدام / لضمان الجلب من الجذر)
+        const response = await fetch(`/notification/notification_messages.json?t=${timestamp}`);
 
         if (response.ok) {
             notificationMessages = await response.json();
