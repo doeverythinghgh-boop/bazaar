@@ -1,7 +1,7 @@
 
 /**
  <user_rules>
-\.gemini\GEMINI.md
+.gemini\GEMINI.md هل تحترمة
  * 
 يضمن حساب الهوامش الداخلية ضمن العرض الكلي للعنصر
  * 
