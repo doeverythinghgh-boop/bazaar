@@ -174,7 +174,11 @@ function productView_setupQuantityControls(productData, dom) {
                 selectedQuantityInput.value = currentVal + 1;
                 productView_updateTotalPrice(pricePerItem, dom);
             } else {
-                console.log("[productView_] تم الوصول للحد الأقصى للكمية المتاحة.");
+                Swal.fire({
+                    icon: 'warning',
+                    text: 'تم الوصول للحد الأقصى للكمية المتاحة.',
+                    confirmButtonText: 'موافق'
+                });
             }
         };
 
