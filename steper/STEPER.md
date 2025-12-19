@@ -36,7 +36,7 @@
 1.  **`steper/dataFetchers.js`**:
     *   `saveConfirmationLock(orderKey, isLocked, ordersData, sellerId)`: تحفظ حالة القفل في السيرفر وتحدث الذاكرة المحلية.
     *   `getConfirmationLockStatus(ordersData, orderKey, sellerId)`: تقرأ حالة القفل من `order_status` المحلي.
-2.  **`steper/sellerPopups.js`**:
+2.  **`steper/sellerPopups/confirmation.js`** (عبر `sellerPopups.js`):
     *   `showSellerConfirmationProductsAlert`: تفحص القفل قبل فتح النافذة. إذا كان مغلقاً (Locked) والمستخدم ليس `admin`، يتم:
         *   تعطيل جميع مربعات الاختيار (`disabled = true`).
         *   إخفاء زر الحفظ.
@@ -49,7 +49,7 @@
 1.  **`steper/dataFetchers.js`**:
     *   `saveShippingLock(orderKey, isLocked, ordersData, sellerId)`: تحفظ حالة القفل في السيرفر وتحدث الذاكرة المحلية.
     *   `getShippingLockStatus(ordersData, orderKey, sellerId)`: تقرأ حالة القفل من `order_status` المحلي.
-2.  **`steper/sellerPopups.js`**:
+2.  **`steper/sellerPopups/shipping.js`** (عبر `sellerPopups.js`):
     *   `showShippingInfoAlert`: تفحص القفل قبل فتح النافذة. إذا كان مغلقاً (Locked) والمستخدم ليس `admin`، يتم:
         *   تعطيل جميع مربعات الاختيار (`disabled = true`).
         *   إخفاء زر الحفظ.
@@ -62,7 +62,7 @@
 1.  **`steper/dataFetchers.js`**:
     *   `saveDeliveryLock(orderKey, isLocked, ordersData, buyerId)`: تحفظ حالة القفل في السيرفر وتحدث الذاكرة المحلية.
     *   `getDeliveryLockStatus(ordersData, orderKey, buyerId)`: تقرأ حالة القفل من `order_status` المحلي.
-2.  **`steper/buyerPopups.js`**:
+2.  **`steper/buyerPopups/delivery.js`** (عبر `buyerPopups.js`):
     *   `showDeliveryConfirmationAlert`: تفحص القفل قبل فتح النافذة. إذا كان مغلقاً (Locked) والمستخدم ليس `admin`، يتم:
         *   تعطيل جميع مربعات الاختيار (`disabled = true`).
         *   إخفاء زر الحفظ.
