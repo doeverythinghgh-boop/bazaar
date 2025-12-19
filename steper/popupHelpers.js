@@ -73,7 +73,7 @@ function handleStepActivationAttempt(checkboxElement, controlData, ordersData) {
             Swal.fire({
                 title: "تنبيه",
                 text: validation.errorMessage,
-                icon: "warning",
+
                 confirmButtonText: "حسنًا",
                 customClass: { popup: "fullscreen-swal" },
             });
@@ -86,7 +86,7 @@ function handleStepActivationAttempt(checkboxElement, controlData, ordersData) {
     Swal.fire({
         title: "تأكيد تفعيل المرحلة",
         text: "بمجرد تفعيل هذه المرحلة، لا يمكنك التراجع. هل أنت متأكد؟",
-        icon: "warning",
+
         showCancelButton: true,
         confirmButtonColor: "#3085d6",
         cancelButtonColor: "#d33",

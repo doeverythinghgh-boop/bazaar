@@ -66,7 +66,7 @@ export function showBuyerRejectedProductsAlert(data, ordersData) {
         Swal.fire({
             title: "المنتجات المرفوضة",
             html: `<div id="buyer-rejected-container">${htmlContent}</div>`,
-            icon: "error", // Use error icon for rejected
+
             confirmButtonText: "إغلاق",
             customClass: { popup: "fullscreen-swal" },
             didOpen: () => {
@@ -143,7 +143,7 @@ async function handleReviewSave(data, ordersData) {
             await Promise.all(updates.map(u => saveItemStatus(u.key, u.status)));
 
             Swal.fire({
-                icon: 'success',
+
                 title: 'تم التحديث',
                 text: 'تم تحديث اختيار المنتجات بنجاح.',
                 timer: 1500,
@@ -169,7 +169,7 @@ async function handleReviewSave(data, ordersData) {
             });
         } catch (error) {
             Swal.fire({
-                icon: 'error',
+
                 title: 'فشل الحفظ',
                 text: 'حدث خطأ أثناء حفظ البيانات. برجاء المحاولة مرة أخرى.',
                 confirmButtonText: 'حسنًا'
@@ -240,7 +240,7 @@ async function handleDeliverySave(data, ordersData) {
     Swal.fire({
         title: 'تأكيد الحفظ النهائي',
         html: htmlContent,
-        icon: 'warning',
+
         showCancelButton: true,
         confirmButtonText: 'تأكيد الحفظ',
         cancelButtonText: 'إلغاء',
@@ -286,7 +286,7 @@ async function handleDeliverySave(data, ordersData) {
                     }
 
                     Swal.fire({
-                        icon: 'success',
+
                         title: 'تم الحفظ بنجاح',
                         text: 'تم حفظ التسليم بشكل نهائي.',
                         timer: 1500,
@@ -308,7 +308,7 @@ async function handleDeliverySave(data, ordersData) {
                 } catch (error) {
                     console.error("Save failed", error);
                     Swal.fire({
-                        icon: 'error',
+
                         title: 'فشل الحفظ',
                         text: 'حدث خطأ أثناء حفظ البيانات.',
                         confirmButtonText: 'حسنًا'
@@ -390,7 +390,7 @@ export function showUnselectedProductsAlert(data, ordersData) {
         Swal.fire({
             title: "المنتجات الملغاة",
             html: `<div id="cancelled-products-container">${htmlContent}</div>`,
-            icon: cancelledKeys.length > 0 ? "info" : "success",
+
             confirmButtonText: "حسنًا",
             customClass: { popup: "fullscreen-swal" },
             didOpen: () => {
@@ -420,7 +420,7 @@ export function showDeliveryConfirmationAlert(data, ordersData) {
             Swal.fire({
                 title: "لا توجد منتجات لتأكيد استلامها",
                 text: "بانتظار شحن المنتجات.",
-                icon: "info",
+
                 confirmButtonText: "حسنًا",
                 customClass: { popup: "fullscreen-swal" },
             });
@@ -496,7 +496,7 @@ export function showReturnedProductsAlert(data, ordersData) {
         Swal.fire({
             title: "المنتجات المرتجعة",
             html: `<div id="buyer-returned-container">${htmlContent}</div>`,
-            icon: returnedKeys.length > 0 ? "warning" : "success",
+
             confirmButtonText: "حسنًا",
             customClass: { popup: "fullscreen-swal" },
             didOpen: () => {
@@ -525,7 +525,7 @@ export function showBuyerConfirmedProductsAlert(data, ordersData) {
         Swal.fire({
             title: "المنتجات المؤكدة",
             html: `<div id="buyer-confirmed-container">${htmlContent}</div>`,
-            icon: confirmedKeys.length > 0 ? "success" : "info",
+
             confirmButtonText: "حسنًا",
             customClass: { popup: "fullscreen-swal" },
             didOpen: () => {
@@ -554,7 +554,7 @@ export function showBuyerShippingInfoAlert(data, ordersData) {
         Swal.fire({
             title: "منتجات قيد الشحن",
             html: `<div id="buyer-shipping-container">${htmlContent}</div>`,
-            icon: "info",
+
             confirmButtonText: "إغلاق",
             customClass: { popup: "fullscreen-swal" },
             didOpen: () => {
@@ -637,7 +637,7 @@ export async function showCourierConfirmedProductsAlert(data, ordersData) {
         Swal.fire({
             title: "المنتجات المطلوب توصيلها",
             html: `<div id="courier-confirmed-container">${htmlContent}</div>`,
-            icon: "info",
+
             confirmButtonText: "إغلاق",
             customClass: { popup: "fullscreen-swal" },
             didOpen: () => {

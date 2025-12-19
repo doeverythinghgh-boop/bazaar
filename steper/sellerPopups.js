@@ -116,7 +116,7 @@ function handleConfirmationSave(data, ordersData) {
     Swal.fire({
         title: 'تأكيد الحفظ النهائي',
         html: htmlContent,
-        icon: 'warning',
+
         showCancelButton: true,
         confirmButtonText: 'تأكيد الحفظ',
         cancelButtonText: 'إلغاء',
@@ -161,7 +161,7 @@ function handleConfirmationSave(data, ordersData) {
                     }
 
                     Swal.fire({
-                        icon: 'success',
+
                         title: 'تم الحفظ بنجاح',
                         text: 'تم حفظ التأكيد بشكل نهائي.',
                         timer: 1500,
@@ -194,7 +194,7 @@ function handleConfirmationSave(data, ordersData) {
                 } catch (error) {
                     console.error("Save failed", error);
                     Swal.fire({
-                        icon: 'error',
+
                         title: 'فشل الحفظ',
                         text: 'حدث خطأ أثناء الاتصال بالسيرفر.',
                         confirmButtonText: 'حسنًا'
@@ -267,7 +267,7 @@ async function handleShippingSave(data, ordersData) {
     Swal.fire({
         title: 'تأكيد الحفظ النهائي',
         html: htmlContent,
-        icon: 'warning',
+
         showCancelButton: true,
         confirmButtonText: 'تأكيد الحفظ',
         cancelButtonText: 'إلغاء',
@@ -315,7 +315,7 @@ async function handleShippingSave(data, ordersData) {
                     }
 
                     Swal.fire({
-                        icon: 'success',
+
                         title: 'تم الحفظ بنجاح',
                         text: 'تم حفظ الشحن بشكل نهائي.',
                         timer: 1500,
@@ -341,7 +341,7 @@ async function handleShippingSave(data, ordersData) {
                 } catch (error) {
                     console.error("Save failed", error);
                     Swal.fire({
-                        icon: 'error',
+
                         title: 'فشل الحفظ',
                         text: 'حدث خطأ أثناء الاتصال بالسيرفر.',
                         confirmButtonText: 'حسنًا'
@@ -443,7 +443,7 @@ export function showSellerRejectedProductsAlert(data, ordersData) {
         Swal.fire({
             title: "المنتجات المرفوضة",
             html: `<div id="seller-rejected-container">${htmlContent}</div>`,
-            icon: rejectedProducts.length > 0 ? "info" : "success",
+
             confirmButtonText: "حسنًا",
             customClass: { popup: "fullscreen-swal" },
             didOpen: () => attachLogButtonListeners()
@@ -468,7 +468,7 @@ export function showShippingInfoAlert(data, ordersData) {
             Swal.fire({
                 title: "لا توجد منتجات للشحن",
                 text: "يجب تأكيد المنتجات أولاً.",
-                icon: "warning",
+
                 confirmButtonText: "حسنًا",
                 customClass: { popup: "fullscreen-swal" },
             });
@@ -555,7 +555,7 @@ export function showSellerDeliveryConfirmationAlert(data, ordersData) {
             Swal.fire({
                 title: "لا توجد منتجات تم توصيلها/شحنها",
                 text: "لا توجد منتجات في مرحلة التوصيل.",
-                icon: "info",
+
                 confirmButtonText: "إغلاق",
                 customClass: { popup: "fullscreen-swal" },
             });
@@ -575,7 +575,7 @@ export function showSellerDeliveryConfirmationAlert(data, ordersData) {
                     ${userInfoHtml}
                     ${checkboxesHtml}
                    </div>`,
-            icon: "info",
+
             confirmButtonText: "إغلاق",
             customClass: { popup: "fullscreen-swal" },
             didOpen: () => {
@@ -608,7 +608,7 @@ export function showSellerReturnedProductsAlert(data, ordersData) {
         Swal.fire({
             title: "المنتجات المرتجعة (قراءة فقط)",
             html: `<div id="seller-returned-container">${htmlContent}</div>`,
-            icon: returnedKeys.length > 0 ? "warning" : "success",
+
             confirmButtonText: "إغلاق",
             customClass: { popup: "fullscreen-swal" },
             didOpen: () => {
