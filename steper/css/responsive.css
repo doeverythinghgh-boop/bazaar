@@ -1,162 +1,136 @@
 /* ============================================
-   التصميم المتجاوب (Responsive Design)
+   التصميم المتجاوب (Responsive Design) - Enhanced
    ============================================ */
 
-/* للأجهزة اللوحية (Tablets) */
+/* للأجهزة اللوحية (Tablets) واللاب توب الصغير */
 @media (max-width: 1024px) {
     .container {
-        padding: 2.5rem 1.5rem;
-    }
-
-    h1 {
-        font-size: 2.1rem;
-        margin-bottom: 3rem;
-    }
-
-    .step-item {
-        width: calc(100% / 6);
-        min-width: 100px;
-    }
-
-    .step-circle {
-        width: 50px;
-        height: 50px;
-        font-size: 1.1rem;
-    }
-
-    .step-circle i {
-        font-size: 1.1rem;
-    }
-
-    .step-label {
-        font-size: 0.9rem;
-        margin-top: 0.8rem;
-    }
-
-    .step-description {
-        font-size: 0.8rem;
-    }
-}
-
-/* للأجهزة المحمولة الكبيرة (Large Mobile) */
-@media (max-width: 768px) {
-    .container {
-        padding: 2rem 1rem;
-        border-radius: 16px;
+        padding: 1.5rem;
     }
 
     h1 {
         font-size: 1.8rem;
-        margin-bottom: 2.5rem;
-    }
-
-    .stepper-wrapper {
-        overflow-x: auto;
-        /* السماح بالتمرير الأفقي */
-        justify-content: flex-start;
-        padding-bottom: 1rem;
-        padding: 1rem 0.5rem;
-        scroll-behavior: smooth;
-    }
-
-    /* تخصيص شريط التمرير */
-    .stepper-wrapper::-webkit-scrollbar {
-        height: 4px;
-    }
-
-    .stepper-wrapper::-webkit-scrollbar-track {
-        background: var(--bg-secondary);
-        border-radius: 10px;
-    }
-
-    .stepper-wrapper::-webkit-scrollbar-thumb {
-        background: var(--color-primary);
-        border-radius: 10px;
+        margin-bottom: 2rem;
     }
 
     .step-item {
-        width: auto;
-        flex: 0 0 115px;
-    }
-
-    .step-item:not(:last-child)::after {
-        width: 90%;
+        min-width: 80px;
     }
 
     .step-circle {
-        width: 45px;
-        height: 45px;
-        font-size: 1rem;
-    }
-
-    .step-circle i {
-        font-size: 1rem;
+        width: 48px;
+        height: 48px;
+        font-size: 1.1rem;
     }
 
     .step-label {
-        font-size: 0.8rem;
-        margin-top: 0.7rem;
-    }
-
-    .step-description {
-        font-size: 0.75rem;
-        width: 100%;
+        font-size: 0.85rem;
     }
 }
 
-/* للأجهزة المحمولة الصغيرة (Small Mobile) */
-@media (max-width: 480px) {
+/* الأجهزة المحمولة (Large Mobile) */
+@media (max-width: 768px) {
     .container {
-        padding: 1.5rem 1rem;
-        border-radius: 14px;
+        padding: 1rem;
     }
 
     h1 {
         font-size: 1.5rem;
-        margin-bottom: 2rem;
+        margin-bottom: 1.5rem;
     }
 
-    .stepper-container {
-        padding: 0.75rem 0;
-    }
-
+    /* تحسين شريط التمرير */
     .stepper-wrapper {
+        justify-content: flex-start;
+        /* مهم للتمرير */
+        padding: 0.5rem;
         gap: 0.5rem;
-        padding: 0.75rem 0;
     }
 
     .step-item {
-        flex: 0 0 100px;
-        gap: 0;
+        flex: 0 0 90px;
+        /* عرض ثابت لكل خطوة لضمان التمرير */
+        width: auto;
+    }
+
+    .step-item:not(:last-child)::after {
+        width: 100%;
+        left: -50%;
     }
 
     .step-circle {
-        width: 40px;
-        height: 40px;
-        font-size: 0.9rem;
+        width: 42px;
+        height: 42px;
+        font-size: 1rem;
+    }
+}
+
+/* الأجهزة المحمولة الصغيرة (Small Mobile) */
+@media (max-width: 480px) {
+    .container {
+        padding: 0.5rem;
+    }
+
+    h1 {
+        font-size: 1.2rem;
+        margin-bottom: 1rem;
+    }
+
+    .stepper-container {
+        padding: 0.5rem 0;
+    }
+
+    .stepper-wrapper {
+        padding: 0.5rem 0;
+    }
+
+    .step-circle {
+        width: 36px;
+        height: 36px;
+        font-size: 0.85rem;
+        border-width: 2px;
     }
 
     .step-circle i {
-        font-size: 0.9rem;
+        font-size: 0.8rem;
     }
 
     .step-label {
         font-size: 0.7rem;
-        margin-top: 0.5rem;
-    }
-
-    .step-description {
-        display: block;
-        /* إظهار الوصف */
-        font-size: 0.7rem;
-        /* تصغير الخط قليلاً */
-        margin-top: 0.2rem;
+        margin-top: 0.3rem;
     }
 
     .step-item:not(:last-child)::after {
-        display: block;
-        /* إظهار الخطوط الرابطة */
-        top: 20px;
-        /* تعديل موقع الخط ليتناسب مع حجم الدائرة الجديد (40px / 2 = 20px) */
+        top: 18px;
+        /* نصف 36px */
+        height: 2px;
     }
+
+    .step-description {
+        font-size: 0.7rem;
+        margin-top: 5px;
+    }
+}
+
+/* شاشات صغيرة جداً (مثل الساعات أو نوافذ iframe ضيقة للغاية) */
+@media (max-width: 320px) {
+    .step-item {
+        flex: 0 0 75px;
+    }
+
+    .step-label {
+        font-size: 0.6rem;
+    }
+}
+
+/* إخفاء شريط التمرير ولكن السماح باللمس (اختياري، لجمالية أكثر) */
+.stepper-wrapper {
+    -ms-overflow-style: none;
+    /* IE and Edge */
+    scrollbar-width: none;
+    /* Firefox */
+}
+
+.stepper-wrapper::-webkit-scrollbar {
+    display: none;
 }
