@@ -231,7 +231,7 @@ export async function showCourierConfirmedProductsAlert(data, ordersData) {
                         const sellerName = btn.dataset.name;
 
                         Swal.fire({
-                            html: `<iframe src="/location/LOCATION.html?lat=${lat}&lng=${lng}&viewOnly=true" style="width: 100%; height: 80vh; border: none; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);"></iframe>`,
+                            html: `<iframe src="/location/LOCATION.html?lat=${lat}&lng=${lng}&viewOnly=true" style="width: 100%; height: 95vh; border: none; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);"></iframe>`,
                             showConfirmButton: false,
                             showCloseButton: false,
                             padding: '0',
