@@ -71,7 +71,7 @@ div:where(.swal2-container) .fullscreen-swal .swal2-title {
 
 .fullscreen-swal .swal2-html-container {
     overflow: auto !important;
-    max-height: 70vh !important;
+    max-height: 90vh !important;
     max-width: 95vw !important;
     height: fit-content !important;
     width: fit-content !important;
