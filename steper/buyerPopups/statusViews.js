@@ -231,10 +231,22 @@ export async function showCourierConfirmedProductsAlert(data, ordersData) {
                         const sellerName = btn.dataset.name;
 
                         Swal.fire({
-                            html: `<iframe src="/location/LOCATION.html?lat=${lat}&lng=${lng}&viewOnly=true" style="width: 100%; height: 75vh; min-height: 400px; border: none; border-radius: 8px;"></iframe>`,
+                            html: `<iframe src="/location/LOCATION.html?lat=${lat}&lng=${lng}&viewOnly=true" style="width: 100%; height: 80vh; border: none; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);"></iframe>`,
                             showConfirmButton: false,
-                            showCloseButton: true,
-                            customClass: { popup: "fullscreen-swal" }
+                            showCloseButton: false,
+                            padding: '0',
+                            background: 'transparent',
+                            customClass: { popup: "fullscreen-swal" },
+                            didOpen: () => {
+                                // استماع لرسالة الإغلاق القادمة من نافذة الخريطة
+                                const handleMapMsg = (event) => {
+                                    if (event.data && event.data.type === 'CLOSE_LOCATION_MODAL') {
+                                        Swal.close();
+                                        window.removeEventListener('message', handleMapMsg);
+                                    }
+                                };
+                                window.addEventListener('message', handleMapMsg);
+                            }
                         });
                     });
                 });

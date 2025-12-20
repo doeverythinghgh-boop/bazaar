@@ -26,20 +26,13 @@ location_app.init = function () {
             const buttonsToHide = [
                 'location_saveBtn',
                 'location_gpsBtn',
-                'location_resetBtn',
-                'location_closeBtn'
+                'location_resetBtn'
+                // Note: Keep location_closeBtn visible so user can exit the map
             ];
             buttonsToHide.forEach(id => {
                 const btn = document.getElementById(id);
                 if (btn) btn.style.display = 'none';
             });
-
-            // Adjust sharing button position if needed (it will be the only one)
-            const shareBtn = document.getElementById('location_shareBtn');
-            if (shareBtn) {
-                shareBtn.style.flex = '1';
-                shareBtn.style.justifyContent = 'center';
-            }
         }
 
         console.log("[Core] -> Setting up Map...");
