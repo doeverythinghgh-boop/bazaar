@@ -166,8 +166,6 @@ export function showDeliveryConfirmationAlert(data, ordersData) {
         const userId = data.currentUser.idUser;
         const userType = data.currentUser.type;
 
-        console.log(`[DeliveryPopup] Initializing. OrdersData sample user_location:`, ordersData[0]?.user_location);
-
         const productsToDeliver = getDeliveryProducts(ordersData, userId, userType);
 
         if (productsToDeliver.length === 0) {

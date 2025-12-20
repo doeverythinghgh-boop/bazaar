@@ -210,7 +210,7 @@ export default async function handler(request) {
           u.username as user_name,
           u.phone as user_phone,
           u.Address as user_address,
-          u.Location as user_location
+          u.location as user_location
         FROM orders o
         JOIN users u ON o.user_key = u.user_key
         WHERE o.order_key IN (${placeholders})
