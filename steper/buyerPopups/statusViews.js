@@ -193,10 +193,11 @@ export async function showCourierConfirmedProductsAlert(data, ordersData) {
             const result = await window.apiFetch('/api/users');
             if (result && !result.error && Array.isArray(result)) {
                 allUsers = result;
-                console.log("[BuyerPopups] Users fetched. Sample user location:", allUsers[0]?.location);
+                console.log("[BuyerPopups] Users fetched. Keys of first user:", Object.keys(allUsers[0] || {}).join(', '));
+                console.log("[BuyerPopups] First user content:", JSON.stringify(allUsers[0]));
             } else if (result && !result.error && result.users) {
                 allUsers = result.users;
-                console.log("[BuyerPopups] Users fetched (obj). Sample user location:", allUsers[0]?.location);
+                console.log("[BuyerPopups] Users fetched (obj). Keys of first user:", Object.keys(allUsers[0] || {}).join(', '));
             } else {
                 console.warn("[BuyerPopups] apiFetch for users failed:", result);
             }
