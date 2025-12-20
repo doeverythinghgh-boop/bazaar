@@ -150,6 +150,7 @@ export function getUserDetailsForDelivery(products, ordersData) {
         const parentOrder = ordersData.find(o => o.order_items.includes(item));
         if (parentOrder && !seenUsers.has(parentOrder.user_key)) {
             seenUsers.add(parentOrder.user_key);
+            console.log(`[BuyerLogic] Extracted user for delivery: ${parentOrder.user_name}, Location:`, parentOrder.user_location);
             userDetails.push({
                 name: parentOrder.user_name || "N/A",
                 phone: parentOrder.user_phone || "N/A",
