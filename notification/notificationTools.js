@@ -203,13 +203,19 @@ function saveNotificationFromAndroid(notificationJson) {
  * @see apiFetch
  */
 async function sendNotification(token, title, body) {
+    // التحقق من صحة التوكن قبل الإرسال لتجنب طلبات غير ضرورية
+    if (!token || token === 'undefined' || token === 'null' || typeof token !== 'string') {
+        console.error('[Notifications] تجاهل محاولة إرسال إشعار بتوكن غير صالح:', token);
+        return { error: 'Invalid or missing token', tokenStatus: 'broken' };
+    }
+
     try {
         return await apiFetch('/api/send-notification', {
             method: 'POST',
             body: { token, title, body },
         });
     } catch (error) {
-        console.error('[Notifications] خطأ في إرسال الإشعار الفردي:', error);
+        console.error('[Notifications] خطأ في طلب إرسال الإشعار:', error);
         return { error: error.message };
     }
 }
@@ -275,9 +281,11 @@ async function sendNotificationsToTokens(allTokens, title, body) {
         let diffLog = [];
 
         results.forEach((result, index) => {
+            const currentToken = allTokens[index] ? `...${allTokens[index].slice(-10)}` : 'N/A';
             if (result && result.error) {
-                console.error(`[Notifications ERROR] إشعار رقم ${index + 1} فشل:`, result.error);
-                diffLog.push({ index: index + 1, status: 'failed', error: result.error });
+                console.error(`[Notifications ERROR] إشعار رقم ${index + 1} فشل. التوكن: ${currentToken}. السبب:`, result.error);
+                if (result.code) console.error(`[Notifications ERROR] كود الخطأ: ${result.code}`);
+                diffLog.push({ index: index + 1, status: 'failed', error: result.error, token: currentToken });
             } else {
                 successCount++;
             }

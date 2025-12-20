@@ -67,19 +67,19 @@ const serviceAccount = {
 
 // تهيئة التطبيق فقط إذا لم يتم تهيئته من قبل وإذا كانت جميع متغيرات البيئة موجودة
 if (!admin.apps.length && missingEnvVars.length === 0) {
-    try {
-        admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
-        firebaseInitialized = true;
-        console.log("[Firebase Init] Firebase Admin SDK initialized successfully.");
-    } catch (e) {
-        initializationError = e.message;
-        console.error("[Firebase Init] FATAL: Failed to initialize Firebase Admin SDK.", e);
-    }
+  try {
+    admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
+    firebaseInitialized = true;
+    console.log("[Firebase Init] Firebase Admin SDK initialized successfully.");
+  } catch (e) {
+    initializationError = e.message;
+    console.error("[Firebase Init] FATAL: Failed to initialize Firebase Admin SDK.", e);
+  }
 } else if (missingEnvVars.length > 0) {
-    initializationError = `Missing environment variables: ${missingEnvVars.join(', ')}`;
-    console.error(`[Firebase Init] FATAL: ${initializationError}`);
+  initializationError = `Missing environment variables: ${missingEnvVars.join(', ')}`;
+  console.error(`[Firebase Init] FATAL: ${initializationError}`);
 } else if (admin.apps.length > 0) {
-    firebaseInitialized = true; // تم تهيئته بالفعل في استدعاء سابق
+  firebaseInitialized = true; // تم تهيئته بالفعل في استدعاء سابق
 }
 
 /**
@@ -113,11 +113,17 @@ export default async function handler(req, res) {
   }
 
   const { token, title, body } = req.body;
-  console.log(`[API: /api/send-notification] استلام طلب لإرسال إشعار إلى توكن: ...${token ? token.slice(-10) : 'N/A'}`);
+  console.log(`[API: /api/send-notification] استلام طلب لإرسال إشعار.`);
+  console.log(`[API: /api/send-notification] المشروع المستخدم: ${serviceAccount.project_id}`);
+  console.log(`[API: /api/send-notification] التوكن المستهدف: ...${token ? String(token).slice(-10) : 'N/A'}`);
 
   try {
+    // التحقق من صحة التوكن قبل الإرسال
+    if (!token || token === "undefined" || token === "null") {
+      throw new Error("Invalid token: token is missing or 'undefined'/'null' string.");
+    }
+
     // ✅ إصلاح: إرسال حمولة `data` فقط لضمان استدعاء onBackgroundMessage دائمًا.
-    // هذا يعطينا التحكم الكامل في كيفية عرض الإشعار في الخلفية.
     const message = {
       token: token,
       data: { title, body }
@@ -127,6 +133,11 @@ export default async function handler(req, res) {
     res.status(200).json({ success: true });
   } catch (error) {
     console.error(`[API: /api/send-notification] فشل: حدث خطأ أثناء إرسال الإشعار:`, error);
-    res.status(500).json({ error: error.message });
+    // إرسال تفاصيل الخطأ للعميل للمساعدة في التشخيص
+    res.status(500).json({
+      error: error.message,
+      code: error.code,
+      projectId: serviceAccount.project_id
+    });
   }
 }
