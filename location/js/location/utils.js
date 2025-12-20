@@ -8,6 +8,56 @@
  */
 
 /**
+ * Close the location app and notify parent
+ * @memberof location_app
+ * @returns {void}
+ */
+location_app.closeLocationApp = function () {
+    if (window.parent && window.parent !== window) {
+        // Silent save: if a location is selected, send it to parent without alerts
+        const saved = this.location_getSavedLocation();
+        if (saved) {
+            window.parent.postMessage({
+                type: 'LOCATION_SELECTED',
+                coordinates: `${saved.lat}, ${saved.lng}`,
+                lat: saved.lat,
+                lng: saved.lng
+            }, '*');
+        } else {
+            // No coordinates selected, notify parent to clear/reset
+            window.parent.postMessage({ type: 'LOCATION_RESET' }, '*');
+        }
+
+        // Notify parent to close the modal
+        window.parent.postMessage({ type: 'CLOSE_LOCATION_MODAL' }, '*');
+    }
+};
+
+/**
+ * Save current markers location and notify parent
+ * @memberof location_app
+ * @returns {void}
+ */
+location_app.saveSelectedLocation = function () {
+    const saved = this.location_getSavedLocation();
+    if (!saved) {
+        this.location_showAlert('تنبيه', 'يرجى تحديد موقع على الخريطة أولاً', 'warning');
+        return;
+    }
+
+    if (window.parent && window.parent !== window) {
+        window.parent.postMessage({
+            type: 'LOCATION_SELECTED',
+            coordinates: `${saved.lat}, ${saved.lng}`,
+            lat: saved.lat,
+            lng: saved.lng
+        }, '*');
+    }
+
+    this.location_showAlert('تم الحفظ', 'تم حفظ الموقع وإرساله بنجاح', 'success');
+};
+
+/**
  * Reset the saved location to defaults
  * @memberof location_app
  * @returns {Promise<void>}
@@ -41,7 +91,11 @@ location_app.resetLocation = async function () {
         }
 
         this.location_map.flyTo(this.location_defaultCoords, this.location_defaultZoom);
-        this.location_showAlert('تمت العملية', 'تمت إعادة التعيين بنجاح', 'success');
+
+        // Notify parent window that location has been reset
+        if (window.parent && window.parent !== window) {
+            window.parent.postMessage({ type: 'LOCATION_RESET' }, '*');
+        }
 
     } catch (error) {
         console.error('Error resetting location:', error);
@@ -102,6 +156,16 @@ location_app.shareCoordinates = async function () {
                 document.body.removeChild(location_textArea);
             }
             this.location_showAlert('تم النسخ', 'تم نسخ الإحداثيات إلى الحافظة', 'success');
+        }
+
+        // NEW: Always try to notify parent window if in an iframe
+        if (window.parent && window.parent !== window) {
+            window.parent.postMessage({
+                type: 'LOCATION_SELECTED',
+                coordinates: location_coordinates,
+                lat: location_saved.lat,
+                lng: location_saved.lng
+            }, '*');
         }
 
     } catch (error) {

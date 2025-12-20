@@ -58,5 +58,5 @@ const location_app = {
      * Local storage key for saved location
      * @type {string}
      */
-    location_storageKey: 'bidstory_user_saved_location'
+    location_storageKey: 'saved_location'
 };

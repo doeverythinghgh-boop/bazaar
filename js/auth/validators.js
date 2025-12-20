@@ -62,8 +62,28 @@ const AuthValidators = {
         if (!username) {
             return { isValid: false, message: "الاسم مطلوب." };
         }
-        if (username.length < 8 || username.length > 30) {
-            return { isValid: false, message: "يجب أن يكون الاسم بين 8 و 30 حرفًا." };
+        if (username.length < 3 || username.length > 30) {
+            return { isValid: false, message: "يجب أن يكون الاسم بين 3 و 30 حرفًا." };
+        }
+        return { isValid: true, message: "" };
+    },
+
+    /**
+     * @function validateAddress
+     * @description Validates an address.
+     * @param {string} address - The address string.
+     * @returns {object} - { isValid: boolean, message: string }
+     */
+    validateAddress: (address, hasCoordinates = false) => {
+        if (!address || address.trim().length === 0) {
+            if (hasCoordinates) {
+                // Return generic message, the UI will show the detailed thanks
+                return { isValid: false, message: "يرجى كتابة وصف دقيق (مثل الدور أو علامة مميزة)." };
+            }
+            return { isValid: false, message: "العنوان مطلوب لتسهيل عملية التوصيل." };
+        }
+        if (address.trim().length < 5) {
+            return { isValid: false, message: "يرجى إدخال عنوان أكثر تفصيلاً (5 أحرف على الأقل)." };
         }
         return { isValid: true, message: "" };
     }

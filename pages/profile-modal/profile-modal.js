@@ -109,7 +109,43 @@ function profileInitializeData() {
         profileElements.confirmPasswordInput.value = "";
         profileElements.passwordErrorDiv.textContent = "";
 
-        profileIsPasswordVerified = false; // Reset verification state
+        // NEW: Restore saved location from userSession or localStorage
+        const savedLocation = localStorage.getItem('saved_location') || localStorage.getItem('bidstory_user_saved_location');
+        const coordsInput = document.getElementById("profile-coords");
+        const locationBtn = document.getElementById("profile-location-btn");
+        const addressError = document.getElementById("profile-address-error");
+
+        // Prioritize session coordinates if they exist
+        let initialCoords = userSession.coordinates || "";
+
+        if (!initialCoords && savedLocation) {
+            try {
+                const parsed = JSON.parse(savedLocation);
+                if (parsed && (parsed.lat || parsed.lng)) {
+                    initialCoords = parsed.coordinates || `${parsed.lat}, ${parsed.lng}`;
+                }
+            } catch (e) {
+                console.error("Error parsing saved location in profile:", e);
+            }
+        }
+
+        if (initialCoords && coordsInput) {
+            coordsInput.value = initialCoords;
+            if (locationBtn) locationBtn.classList.add("is-success");
+            if (addressError) {
+                const addressInput = document.getElementById("profile-address");
+                addressError.style.color = "#10b981";
+                addressError.style.display = "block";
+
+                if (addressInput && addressInput.value.trim() !== "") {
+                    // Address already has details
+                    addressError.innerHTML = '<i class="fas fa-check-circle"></i> شكراً لك! تم ربط موقعك المحفوظ بنجاح.';
+                } else {
+                    // Address is empty
+                    addressError.innerHTML = '<i class="fas fa-check-circle"></i> شكراً لك! تم العثور على موقعك المحفوظ.<br/>يرجى الآن كتابة وصف دقيق (مثلاً: الدور أو علامة مميزة) أعلاه.';
+                }
+            }
+        }
     } catch (error) {
         console.error("خطأ في تهيئة بيانات الملف الشخصي (profileInitializeData):", error);
     }
@@ -190,7 +226,9 @@ function profileValidateInputs() {
     AuthUI.clearFieldValidationMsg(profileElements.usernameInput);
     AuthUI.clearFieldValidationMsg(profileElements.phoneInput);
     AuthUI.clearFieldValidationMsg(profileElements.newPasswordInput);
+    AuthUI.clearFieldValidationMsg(profileElements.newPasswordInput);
     AuthUI.clearFieldValidationMsg(profileElements.confirmPasswordInput);
+    AuthUI.clearFieldValidationMsg(profileElements.addressInput);
 
     const username = profileElements.usernameInput.value.trim();
     const phone = profileElements.phoneInput.value.trim();
@@ -209,6 +247,14 @@ function profileValidateInputs() {
     const phoneValidation = AuthValidators.validatePhone(phone);
     if (!phoneValidation.isValid) {
         AuthUI.showFieldValidationMsg(profileElements.phoneInput, phoneValidation.message);
+        result.isValid = false;
+    }
+
+    // Validate Address
+    const hasCoords = !!(document.getElementById("profile-coords")?.value);
+    const addressValidation = AuthValidators.validateAddress(address, hasCoords);
+    if (!addressValidation.isValid) {
+        AuthUI.showFieldValidationMsg(profileElements.addressInput, addressValidation.message);
         result.isValid = false;
     }
 
@@ -245,6 +291,12 @@ async function profileHandleSaveChanges() {
     if (username !== userSession.username) updatedData.username = username;
     if (phone !== userSession.phone) updatedData.phone = phone;
     if (address !== (userSession.Address || "")) updatedData.address = address;
+
+    const coordInput = document.getElementById("profile-coords");
+    if (coordInput && coordInput.value) {
+        updatedData.coordinates = coordInput.value;
+    }
+
     if (profileElements.changePasswordCheckbox.checked && password) {
         updatedData.password = password;
     }
@@ -366,6 +418,69 @@ function profileSetupListeners() {
             e.preventDefault();
             profileHandleAccountDeletion(userSession);
         });
+
+        // Location Picker Support
+        const locationBtn = document.getElementById("profile-location-btn");
+        if (locationBtn) {
+            locationBtn.addEventListener("click", () => {
+                Swal.fire({
+                    html: `
+                      <div style="width: 100%; height: 500px; overflow: hidden; border-radius: 15px;">
+                        <iframe 
+                          src="location/LOCATION.html" 
+                          style="width: 100%; height: 100%; border: none;"
+                          id="profile_location-iframe"
+                        ></iframe>
+                      </div>
+                    `,
+                    showConfirmButton: false,
+                    showCloseButton: false,
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    padding: '0px',
+                    customClass: { popup: 'fullscreen-swal' },
+                    didOpen: () => {
+                        const handleProfileMessage = (event) => {
+                            const locationBtn = document.getElementById("profile-location-btn");
+                            const addressError = document.getElementById("profile-address-error");
+                            const profile_coordsInput = document.getElementById("profile-coords");
+
+                            if (event.data && event.data.type === 'LOCATION_SELECTED') {
+                                const coords = event.data.coordinates;
+                                if (profile_coordsInput) profile_coordsInput.value = coords;
+
+                                // UX Improvement: Show success state and update hint
+                                if (locationBtn) locationBtn.classList.add("is-success");
+                                if (addressError) {
+                                    const addressInput = document.getElementById("profile-address");
+                                    addressError.style.color = "#10b981";
+                                    addressError.style.display = "block";
+
+                                    if (addressInput && addressInput.value.trim() !== "") {
+                                        // Specific address already exists, just show success icon/msg
+                                        addressError.innerHTML = '<i class="fas fa-check-circle"></i> تم ربط الموقع بنجاح!';
+                                    } else {
+                                        // Address empty, show reminder
+                                        addressError.innerHTML = '<i class="fas fa-check-circle"></i> شكراً لك على تحديد موقعك بدقة!<br/>يرجى الآن كتابة وصف دقيق (مثلاً: الدور أو علامة مميزة) أعلاه.';
+                                    }
+                                }
+                            } else if (event.data && event.data.type === 'LOCATION_RESET') {
+                                if (profile_coordsInput) profile_coordsInput.value = "";
+                                if (locationBtn) locationBtn.classList.remove("is-success");
+                                if (addressError) {
+                                    addressError.style.color = "";
+                                    addressError.innerHTML = "أسرع للتوصيل: اختيار موقعك من الخريطة يضمن وصول المندوب إليك بسرعة فائقة.";
+                                }
+                            } else if (event.data && event.data.type === 'CLOSE_LOCATION_MODAL') {
+                                Swal.close();
+                                window.removeEventListener('message', handleProfileMessage);
+                            }
+                        };
+                        window.addEventListener('message', handleProfileMessage);
+                    }
+                });
+            });
+        }
     } catch (error) {
         console.error("خطأ في تهيئة مستمعي الأحداث (profileSetupListeners):", error);
     }

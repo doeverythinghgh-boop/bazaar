@@ -21,9 +21,20 @@
     </div>
 
     <div id="profile-address-group" class="profile-form-group">
-        <label id="profile-address-label" for="profile-address">العنوان (اختياري)</label>
+        <label id="profile-address-label" for="profile-address">العنوان بالتفصيل (مثل: الدور، علامة مميزة)</label>
         <i class="fas fa-map-marker-alt profile-input-icon"></i>
-        <input id="profile-address" class="profile-form-control" placeholder="العنوان (اختياري)" />
+        <div class="profile-input-with-button">
+            <input id="profile-address" class="profile-form-control"
+                placeholder="مثلاً: شارع السلام، الدور الثالث، بجوار مسجد القدس" />
+            <input type="hidden" id="profile-coords" />
+            <div class="profile-location-wrapper">
+                <button type="button" id="profile-location-btn" class="profile-icon-btn" title="تحديد من الخريطة">
+                    <i class="fas fa-map-marked-alt"></i>
+                    <i class="fas fa-check-circle profile-success-icon"></i>
+                </button>
+                <span class="profile-location-badge">أسرع للتوصيل</span>
+            </div>
+        </div>
         <div id="profile-address-error" class="profile-error-message"></div>
     </div>
 

@@ -9,17 +9,19 @@
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
-    <!-- SweetAlert2 CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
-
-    <!-- Material Icons -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
+    <!-- Font Awesome (Local) -->
+    <link rel="stylesheet" href="../assets/fontawesome/css/all.css" />
 
     <!-- Custom CSS -->
     <link rel="stylesheet" href="location_styles.css" />
 </head>
 
 <body>
+    <!-- Close Button (Modern) -->
+    <button id="location_closeBtn" class="location_btn-close" onclick="location_app.closeLocationApp()">
+        <i class="fas fa-times"></i>
+    </button>
+
     <!-- Loading overlay -->
     <div id="location_loadingOverlay" class="location_loading-overlay">
         <div id="location_spinner" class="location_spinner"></div>
@@ -31,24 +33,29 @@
 
     <!-- Controls panel -->
     <div class="location_controls">
+        <button id="location_saveBtn" class="location_btn location_btn-save"
+            onclick="location_app.saveSelectedLocation()">
+            <i class="fas fa-save"></i>
+            <span class="location_btn-text">حفظ</span>
+        </button>
         <button id="location_gpsBtn" class="location_btn location_btn-gps" onclick="location_app.getLocationByGPS()">
-            <span id="location_gpsIcon" class="material-symbols-outlined">my_location</span>
+            <i id="location_gpsIcon" class="fas fa-crosshairs"></i>
             <span id="location_gpsText" class="location_btn-text">تحديد</span>
         </button>
         <button id="location_shareBtn" class="location_btn location_btn-share"
             onclick="location_app.shareCoordinates()">
-            <span id="location_shareIcon" class="material-symbols-outlined">share</span>
+            <i id="location_shareIcon" class="fas fa-share-alt"></i>
             <span id="location_shareText" class="location_btn-text">مشاركة</span>
         </button>
         <button id="location_resetBtn" class="location_btn location_btn-reset" onclick="location_app.resetLocation()">
-            <span id="location_resetIcon" class="material-symbols-outlined">delete_forever</span>
+            <i id="location_resetIcon" class="fas fa-trash-alt"></i>
             <span id="location_resetText" class="location_btn-text">إعادة ضبط</span>
         </button>
     </div>
 
-    <!-- External libraries -->
+    <!-- External libraries (Local) -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="../assets/libs/sweetalert2/sweetalert2.all.min.js"></script>
 
     <!-- Main application modules -->
     <script src="js/location/config.js"></script>

@@ -74,7 +74,7 @@ const AuthUI = {
         if (!inputElement) return;
         const errorDiv = document.getElementById(`${inputElement.id}-error`);
         if (errorDiv) {
-            errorDiv.textContent = message;
+            errorDiv.innerHTML = message;
             errorDiv.style.display = 'block';
         }
     },
