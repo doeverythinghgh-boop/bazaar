@@ -16,21 +16,13 @@ location_app.getLocationByGPS = function () {
     return new Promise((resolve) => {
         try {
             if (!navigator.geolocation) {
-                this.location_showAlert(
-                    'غير مدعوم',
-                    'المتصفح الحالي لا يدعم خدمة تحديد الموقع',
-                    'error'
-                );
+                this.location_showAlert('غير مدعوم', 'المتصفح الحالي لا يدعم خدمة تحديد الموقع', 'error');
                 resolve();
                 return;
             }
 
             if (this.location_isBusy) {
-                this.location_showAlert(
-                    'جاري العمل',
-                    'يتم الآن تحديد موقع آخر، الرجاء الانتظار',
-                    'info'
-                );
+                this.location_showAlert('جاري العمل', 'يتم الآن تحديد موقع آخر، الرجاء الانتظار', 'info');
                 resolve();
                 return;
             }
@@ -44,21 +36,44 @@ location_app.getLocationByGPS = function () {
                 allowOutsideClick: false,
                 allowEscapeKey: false,
                 didOpen: () => Swal.showLoading(),
-                customClass: { popup: 'location_fullscreen-swal' }
+                customClass: { popup: 'fullscreen-swal' }
             });
 
-            // Geolocation options (optimized for mobile and desktop)
-            const location_options = {
-                enableHighAccuracy: true,
-                timeout: 30000, // 30 seconds for better mobile support
-                maximumAge: 0
+            console.log("[GPS] Starting Priority 1 (High Accuracy)...");
+
+            const attemptPosition = (options, isFallback = false) => {
+                console.log(`[GPS] Calling getCurrentPosition (${isFallback ? "Fallback" : "Primary"})...`, options);
+
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        console.log("[GPS] Success callback triggered.");
+                        this.location_onGPSSuccess(position, resolve);
+                    },
+                    (error) => {
+                        console.warn(`[GPS] Error callback (${isFallback ? "Fallback" : "Primary"}). Code:`, error.code, "Msg:", error.message);
+
+                        // If primary HighAccuracy failed with Timeout (3) or Position Unavailable (2), try LowAccuracy
+                        if (!isFallback && (error.code === 3 || error.code === 2)) {
+                            console.log("[GPS] Attempting Fallback (HighAccuracy: false) with generous cache...");
+                            attemptPosition({
+                                enableHighAccuracy: false,
+                                timeout: 20000,
+                                maximumAge: 600000 // 10 minutes cache allowance
+                            }, true);
+                        } else {
+                            this.location_onGPSError(error, resolve);
+                        }
+                    },
+                    options
+                );
             };
 
-            navigator.geolocation.getCurrentPosition(
-                (position) => this.location_onGPSSuccess(position, resolve),
-                (error) => this.location_onGPSError(error, resolve),
-                location_options
-            );
+            // Initial Attempt: High Accuracy, 20s timeout
+            attemptPosition({
+                enableHighAccuracy: true,
+                timeout: 20000,
+                maximumAge: 0
+            });
 
         } catch (error) {
             console.error('Error in GPS location retrieval:', error);
@@ -83,6 +98,7 @@ location_app.location_onGPSSuccess = function (position, resolve) {
         const location_lat = position.coords.latitude;
         const location_lng = position.coords.longitude;
         const location_accuracy = position.coords.accuracy;
+        console.log("[GPS] Position acquired:", location_lat, location_lng, "Accuracy:", location_accuracy);
 
         this.location_handleLocationSelection(location_lat, location_lng);
 

@@ -134,9 +134,7 @@ function profileInitializeData() {
 
         // Restore saved location
         // Search in all possible property names to be safe
-        console.log("[Profile] Available session keys:", Object.keys(user));
-        let initialCoords = user.location || user.Coordinates || user.coordinates || user.user_location || "";
-        console.log("[Profile] Raw extracted coordinates:", initialCoords);
+        let initialCoords = user.location || user.Location || user.Coordinates || user.coordinates || user.user_location || "";
 
         // Final fallback: check direct localStorage for very old sessions if needed
         if (!initialCoords) {
@@ -144,6 +142,7 @@ function profileInitializeData() {
         }
 
         if (initialCoords && initialCoords.includes(",")) {
+            console.log("%c[Profile] Success: Location button set to SUCCESS state. Coordinates found: " + initialCoords, "color: #10b981; font-weight: bold; border-left: 4px solid #10b981; padding-left: 8px;");
             if (els.coordsInput) els.coordsInput.value = initialCoords;
             if (els.locationBtn) els.locationBtn.classList.add("is-success");
 
@@ -159,6 +158,8 @@ function profileInitializeData() {
                     els.addressError.innerHTML = '<i class="fas fa-check-circle"></i> تم العثور على موقعك المحفوظ.<br/>يرجى الآن كتابة وصف دقيق (مثلاً: الدور أو علامة مميزة) أعلاه.';
                 }
             }
+        } else {
+            console.log("%c[Profile] Notice: Location button remains in DEFAULT state. No coordinates found.", "color: #f59e0b; font-weight: bold; border-left: 4px solid #f59e0b; padding-left: 8px;");
         }
     } catch (error) {
         console.error("خطأ في تهيئة بيانات الملف الشخصي:", error);
@@ -435,6 +436,7 @@ function profileSetupListeners() {
         if (els.locationBtn) {
             els.locationBtn.addEventListener("click", () => {
                 const existingCoords = els.coordsInput?.value || "";
+                console.log("[Parent] Opening Map from Profile. Passing coords:", existingCoords || "Default (Suez)");
                 let iframeSrc = "location/LOCATION.html";
 
                 if (existingCoords && existingCoords.includes(",")) {

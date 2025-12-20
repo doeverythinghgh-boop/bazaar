@@ -37,12 +37,14 @@ location_app.location_getSavedLocation = function () {
     const params = new URLSearchParams(window.location.search);
     const latParam = params.get('lat');
     const lngParam = params.get('lng');
+    console.log("[Storage] Checking URL Params. Lat:", latParam, "Lng:", lngParam);
 
     if (latParam !== null && lngParam !== null) {
         const lat = parseFloat(latParam);
         const lng = parseFloat(lngParam);
 
         if (!isNaN(lat) && !isNaN(lng)) {
+            console.log("[Storage] Valid coordinates extracted from URL:", lat, lng);
             this.location_currentSelection = {
                 lat: lat,
                 lng: lng,

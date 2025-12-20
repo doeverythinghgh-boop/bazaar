@@ -9,6 +9,7 @@
 
 // Initialize application when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
+    console.log("[App] DOM Loaded. Booting Location Application...");
     try {
         // Prevent multiple initializations
         if (window.location_appInitialized) {
@@ -20,6 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Start the application
         if (typeof location_app !== 'undefined' && typeof location_app.init === 'function') {
+            console.log("[App] Modules loaded. Calling location_app.init()...");
             location_app.init();
         } else {
             throw new Error('لم يتم تحميل وحدات التطبيق الأساسية بشكل صحيح.');

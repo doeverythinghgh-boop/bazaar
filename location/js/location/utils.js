@@ -73,7 +73,7 @@ location_app.resetLocation = async function () {
             cancelButtonText: 'إلغاء',
             confirmButtonColor: '#dc2626',
             cancelButtonColor: '#6b7280',
-            customClass: { popup: 'location_fullscreen-swal' }
+            customClass: { popup: 'fullscreen-swal' }
         });
 
         if (!location_confirmation.isConfirmed) return;
@@ -136,7 +136,7 @@ location_app.shareCoordinates = async function () {
             confirmButtonColor: '#2563eb',
             denyButtonColor: '#10b981',
             cancelButtonColor: '#6b7280',
-            customClass: { popup: 'location_fullscreen-swal' }
+            customClass: { popup: 'fullscreen-swal' }
         });
 
         if (location_choice.isConfirmed) {

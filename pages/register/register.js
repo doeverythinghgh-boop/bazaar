@@ -231,6 +231,7 @@ const register_locationBtn = document.getElementById("register_location-btn");
 if (register_locationBtn) {
   register_locationBtn.addEventListener("click", () => {
     const existingCoords = document.getElementById("register_coords")?.value || "";
+    console.log("[Parent] Opening Map from Registration. Passing coords:", existingCoords || "Default (Suez)");
     let iframeSrc = "location/LOCATION.html";
     if (existingCoords && existingCoords.includes(",")) {
       const [lt, ln] = existingCoords.split(",").map(c => c.trim());

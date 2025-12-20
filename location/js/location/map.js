@@ -20,6 +20,8 @@ location_app.location_initMap = function () {
             this.location_defaultCoords;
         const location_startZoom = location_savedLocation?.zoom || this.location_defaultZoom;
 
+        console.log("[Map] Initializing Leaflet at:", location_startCoords, "Zoom:", location_startZoom);
+
         this.location_map = L.map('location_map', {
             center: location_startCoords,
             zoom: location_startZoom,
@@ -34,11 +36,14 @@ location_app.location_initMap = function () {
         }).addTo(this.location_map);
 
         if (location_savedLocation) {
+            console.log("[Map] Found saved location. Setting view and marker...");
             this.location_map.setView([location_savedLocation.lat, location_savedLocation.lng], location_savedLocation.zoom);
             this.location_updateMarker(location_savedLocation.lat, location_savedLocation.lng);
+        } else {
+            console.log("[Map] No saved location. Opening at default (Suez).");
         }
 
-        console.log('Map initialized successfully');
+        console.log('[Map] Leaflet map initialized and layers added.');
     } catch (error) {
         console.error('Failed to initialize map:', error);
         throw new Error('تعذر تحميل الخريطة. تحقق من اتصال الإنترنت.');
@@ -143,7 +148,7 @@ location_app.location_handleLocationSelection = async function (lat, lng) {
                 cancelButtonText: 'إلغاء',
                 confirmButtonColor: '#2563eb',
                 cancelButtonColor: '#6b7280',
-                customClass: { popup: 'location_fullscreen-swal' }
+                customClass: { popup: 'fullscreen-swal' }
             });
 
             if (!location_confirmation.isConfirmed) return;

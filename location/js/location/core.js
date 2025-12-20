@@ -14,10 +14,16 @@
  */
 location_app.init = function () {
     try {
+        console.log("[Core] Initializing components...");
         this.location_showLoading(true);
 
+        console.log("[Core] -> Setting up Map...");
         this.location_initMap();
+
+        console.log("[Core] -> Setting up Listeners...");
         this.location_setupEventListeners();
+
+        console.log("[Core] -> Loading Initial Position...");
         this.location_loadInitialLocation();
 
         setTimeout(() => {
