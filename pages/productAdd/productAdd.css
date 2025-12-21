@@ -1,6 +1,6 @@
 /* 
   @file pages/productAdd/productAdd.css
-  @description Styles matched exactly from productAdd2.css but using add1_ prefix for productAdd.html
+  @description EXACT STYLES from productAdd2.css, converted to add1_ prefix.
 */
 
 .add1_product_modal {
@@ -11,7 +11,7 @@
     max-width: 800px;
     padding: 30px;
     position: relative;
-    margin: 20px auto;
+    font-family: 'Tajawal', sans-serif;
 }
 
 .add1_product_modal__title {
@@ -21,14 +21,11 @@
     font-size: 28px;
     border-bottom: 2px solid #f8f9fa;
     padding-bottom: 15px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 15px;
 }
 
 .add1_product_modal__title i {
     color: #3498db;
+    margin-left: 10px;
 }
 
 .add1_product_modal__form {
@@ -47,8 +44,6 @@
     margin-bottom: 8px;
     color: #34495e;
     font-size: 16px;
-    display: flex;
-    align-items: center;
 }
 
 .add1_product_modal__label i {
@@ -69,11 +64,13 @@
     background-color: #f8f9fa;
     width: 100%;
     outline: none;
+    font-family: inherit;
 }
 
 .add1_product_modal__input:focus,
 .add1_product_modal__textarea:focus,
 .add1_product_modal__select:focus {
+    outline: none;
     border-color: #3498db;
     background-color: white;
     box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
@@ -186,10 +183,6 @@
     transform: scale(0.98);
 }
 
-.add1_product_modal__preview__selected {
-    border: 3px solid #3498db;
-}
-
 .add1_product_modal__preview img {
     width: 100%;
     height: 100%;
@@ -235,8 +228,6 @@
     padding: 12px 30px;
     font-size: 18px;
     border-radius: 30px;
-    width: auto;
-    margin: 0 auto;
 }
 
 .add1_product_modal__error_message {

@@ -2,58 +2,36 @@
 
 <!--
 @file pages/productAdd.html
-@description Product Addition Page 1. Handles picking/capturing images, compression, preview, and form submission with add1_ prefix for isolation.
--->
-
-<link rel="stylesheet" href="pages/productAdd/productAdd.css">
-
-<!--
-@file pages/productAdd.html
-@description Premium Product Addition Page 1. Handles picking/capturing images, compression, preview, and form submission with add1_ prefix for isolation.
+@description Product Addition Page. Handles picking/capturing images, compression, preview, and form submission for new products.
 -->
 
 <div class="add1_product_modal" role="dialog" aria-modal="true" aria-labelledby="add1_product_title"
     id="add1_product_modal_container">
-
-    <div class="add1_product_modal__header">
-        <h2 class="add1_product_modal__title" id="add1_product_title">
-            <i class="fas fa-cart-plus" id="add1_icon_title"></i>
-            إضافة منتج جديد
-        </h2>
-    </div>
+    <h2 class="add1_product_modal__title" id="add1_product_title"><i class="fas fa-cart-plus" id="add1_icon_title"></i>
+        إضافة منتج جديد</h2>
 
     <form class="add1_product_modal__form" id="add1_product_form" novalidate>
         <!-- Image Upload Module -->
         <section class="add1_product_modal__form_group" aria-labelledby="add1_images_heading" id="add1_section_images">
-            <label id="add1_images_heading" class="add1_product_modal__label">
-                <i class="fas fa-images" id="add1_icon_images"></i>
-                صور المنتج الاحترافية
-            </label>
+            <label id="add1_images_heading" class="add1_product_modal__label"><i class="fas fa-images"
+                    id="add1_icon_images"></i> صور المنتج</label>
 
             <div class="add1_product_modal__image_uploader" id="add1_image_uploader" tabindex="0" role="group"
                 aria-label="منطقة رفع الصور">
-
-                <div class="add1_product_modal__hint" id="add1_hint_text">
-                    يرجى اختيار صورة واحدة على الأقل تعبر عن منتجك بجودة عالية
-                </div>
-
                 <div class="add1_product_modal__uploader_actions" id="add1_uploader_actions">
                     <!-- input with capture to enable camera on mobile devices -->
                     <input class="add1_product_modal__hidden_file" id="add1_file_input_00" type="file" accept="image/*"
                         multiple aria-hidden="true">
 
                     <button type="button" class="add1_btn add1_btn_ghost add1_btn_icon" id="add1_pick_files_btn"
-                        title="اختر صورًا من جهازك">
-                        <i class="fas fa-folder-open" id="add1_icon_folder"></i>
-                        <span>اختر الصور</span>
-                    </button>
-
+                        title="اختر صورًا"><i class="fas fa-folder-open" id="add1_icon_folder"></i></button>
                     <button type="button" class="add1_btn add1_btn_ghost add1_btn_icon" id="add1_take_photo_btn"
-                        title="التقاط بـ الكاميرا">
-                        <i class="fas fa-camera" id="add1_icon_camera"></i>
-                        <span>التقط صورة</span>
-                    </button>
+                        title="التقاط من الكاميرا"><i class="fas fa-camera" id="add1_icon_camera"></i></button>
+
                 </div>
+
+                <div class="add1_product_modal__hint" id="add1_hint_text">المطلوب: صورة واحدة على الأقل.
+                    الدعم: jpg, png, webp. </div>
 
                 <div class="add1_product_modal__previews" id="add1_previews" aria-live="polite" aria-atomic="false">
                 </div>
@@ -62,34 +40,29 @@
 
         <!-- Product Name Field -->
         <div class="add1_product_modal__form_group" id="add1_group_product_name">
-            <label for="add1_product_name" class="add1_product_modal__label" id="add1_label_product_name">
-                <i class="fas fa-signature" id="add1_icon_product_name"></i>
-                عنوان المنتج
-            </label>
+            <label for="add1_product_name" class="add1_product_modal__label" id="add1_label_product_name"><i
+                    class="fas fa-signature" id="add1_icon_product_name"></i> اسم المنتج</label>
             <input type="text" id="add1_product_name" name="product-name" class="add1_product_modal__input"
-                maxlength="100" placeholder="مثال: سماعات لاسلكية عالية الجودة..." required>
+                maxlength="100" placeholder="اكتب اسمًا واضحًا للمنتج..." required>
             <div id="add1_product_name_char_counter" class="add1_product_modal__char_counter">0 / 100</div>
         </div>
 
         <!-- Product Description Field -->
         <div class="add1_product_modal__form_group" id="add1_group_description">
-            <label for="add1_product_description" class="add1_product_modal__label" id="add1_label_description">
-                <i class="fas fa-file-alt" id="add1_icon_description"></i>
-                تفاصيل المنتج
-            </label>
+            <label for="add1_product_description" class="add1_product_modal__label" id="add1_label_description"><i
+                    class="fas fa-file-alt" id="add1_icon_description"></i>
+                وصف المنتج</label>
             <textarea id="add1_product_description" name="product-description" class="add1_product_modal__textarea"
-                rows="4" maxlength="400" placeholder="أخبر المشتري عن أهم مميزات منتجك..."></textarea>
+                rows="4" maxlength="400" placeholder="اكتب وصفًا جذابًا للمنتج..."></textarea>
             <div id="add1_description_char_counter" class="add1_product_modal__char_counter">0 / 400</div>
         </div>
 
         <!-- Seller Message Field -->
         <div class="add1_product_modal__form_group" id="add1_group_seller_message">
-            <label for="add1_seller_message" class="add1_product_modal__label" id="add1_label_seller_message">
-                <i class="fas fa-comment-dots" id="add1_icon_seller_message"></i>
-                رسالة ترحيبية
-            </label>
+            <label for="add1_seller_message" class="add1_product_modal__label" id="add1_label_seller_message"><i
+                    class="fas fa-comment-dots" id="add1_icon_seller_message"></i> رسالة ترحيبية</label>
             <input type="text" id="add1_seller_message" name="seller-message" class="add1_product_modal__input"
-                maxlength="100" placeholder="عبارة سريعة تجذب المشتري لمنتجك...">
+                maxlength="100" placeholder="رسالة قصيرة تظهر للعميل...">
             <div id="add1_seller_message_char_counter" class="add1_product_modal__char_counter">0 / 100</div>
         </div>
 
@@ -97,9 +70,9 @@
         <div class="add1_product_modal__form_group" id="add1_group_notes">
             <label for="add1_product_notes" class="add1_product_modal__label" id="add1_label_notes"><i
                     class="fas fa-sticky-note" id="add1_icon_notes"></i>
-                ملاحظات خاصة (سرية)</label>
+                ملاحظات</label>
             <input type="text" id="add1_product_notes" name="product-notes" class="add1_product_modal__input"
-                maxlength="100" placeholder="اكتب هنا ما يساعدك في تنظيم مخزونك (لا تظهر للمشتري)">
+                maxlength="100" placeholder="هذا النص لا يظهر للمشتري">
             <div id="add1_notes_char_counter" class="add1_product_modal__char_counter">0 / 100</div>
         </div>
 
@@ -108,8 +81,7 @@
             <!-- Quantity Field -->
             <div class="add1_product_modal__form_group" id="add1_group_quantity">
                 <label for="add1_product_quantity" class="add1_product_modal__label" id="add1_label_quantity">
-                    <i class="fas fa-boxes-stacked" id="add1_icon_quantity"></i>
-                    الكمية
+                    <i class="fas fa-boxes-stacked" id="add1_icon_quantity"></i> الكمية
                 </label>
                 <input type="number" id="add1_product_quantity" name="product-quantity"
                     class="add1_product_modal__input" placeholder="0" required min="1">
@@ -117,8 +89,7 @@
             <!-- Price Field -->
             <div class="add1_product_modal__form_group" id="add1_group_price">
                 <label for="add1_product_price" class="add1_product_modal__label" id="add1_label_price">
-                    <i class="fas fa-dollar-sign" id="add1_icon_price"></i>
-                    السعر الحالي
+                    <i class="fas fa-dollar-sign" id="add1_icon_price"></i> السعر الحالي
                 </label>
                 <input type="text" inputmode="decimal" id="add1_product_price" name="product-price"
                     class="add1_product_modal__input" placeholder="0.00" required>
@@ -126,8 +97,7 @@
             <!-- Original Price Field -->
             <div class="add1_product_modal__form_group" id="add1_group_original_price">
                 <label for="add1_original_price" class="add1_product_modal__label" id="add1_label_original_price">
-                    <i class="fas fa-tag" id="add1_icon_original_price"></i>
-                    السعر قبل الخصم
+                    <i class="fas fa-tag" id="add1_icon_original_price"></i> السعر القديم
                 </label>
                 <input type="text" inputmode="decimal" id="add1_original_price" name="original-price"
                     class="add1_product_modal__input" placeholder="اختياري">
@@ -136,10 +106,7 @@
 
         <!-- Submit Button -->
         <div class="add1_product_modal__submit_container" id="add1_submit_container">
-            <button type="submit" class="add1_btn add1_btn_primary" id="add1_btn_submit">
-                <span>حفظ ونشر المنتج الآن</span>
-                <i class="fas fa-arrow-left"></i>
-            </button>
+            <button type="submit" class="add1_btn add1_btn_primary" id="add1_btn_submit">اضف المنتج الآن</button>
         </div>
     </form>
 </div>
