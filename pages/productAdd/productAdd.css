@@ -1,7 +1,14 @@
 /* 
   @file pages/productAdd/productAdd.css
   @description EXACT STYLES from productAdd2.css, converted to add1_ prefix.
+  Ensures box-sizing is handled to prevent overflow.
 */
+
+.add1_product_modal,
+.add1_product_modal * {
+    box-sizing: border-box;
+    /* CRITICAL: Prevent input overflow */
+}
 
 .add1_product_modal {
     background: white;
@@ -11,7 +18,9 @@
     max-width: 800px;
     padding: 30px;
     position: relative;
+    margin: 20px auto;
     font-family: 'Tajawal', sans-serif;
+    direction: rtl;
 }
 
 .add1_product_modal__title {
@@ -21,6 +30,8 @@
     font-size: 28px;
     border-bottom: 2px solid #f8f9fa;
     padding-bottom: 15px;
+    display: block;
+    /* Ensure it behaves like a block */
 }
 
 .add1_product_modal__title i {
@@ -44,6 +55,8 @@
     margin-bottom: 8px;
     color: #34495e;
     font-size: 16px;
+    display: flex;
+    align-items: center;
 }
 
 .add1_product_modal__label i {
@@ -63,6 +76,7 @@
     transition: all 0.3s ease;
     background-color: #f8f9fa;
     width: 100%;
+    /* Force full width within parent */
     outline: none;
     font-family: inherit;
 }
