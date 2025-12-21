@@ -614,6 +614,11 @@ add2_form.addEventListener('submit', async (e) => {
             throw new Error(`Failed to save product data: ${dbResult.error}`);
         }
 
+        // إشعار الإدارة بالإضافة الجديدة
+        if (typeof notifyAdminOnNewItem === 'function') {
+            await notifyAdminOnNewItem(productData);
+        }
+
         console.log('%c[Add2] تم حفظ الخدمة بنجاح.', 'color: green; font-weight: bold;');
         Swal.fire('تم بنجاح!', 'تم إضافة الخدمة بنجاح.', 'success').then(() => {
             add2_form.reset();

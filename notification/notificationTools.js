@@ -1013,3 +1013,42 @@ async function notifyOnSubStepActivation({
     }
 }
 
+
+/**
+ * @description إرسال إشعار للإدارة عند إضافة منتج أو خدمة جديدة.
+ * @function notifyAdminOnNewItem
+ * @param {Object} productData - بيانات المنتج أو الخدمة المضافة.
+ * @returns {Promise<void>}
+ * @async
+ */
+async function notifyAdminOnNewItem(productData) {
+    try {
+        if (!(await shouldNotify('new-item-added', 'admin'))) {
+            return;
+        }
+
+        const adminTokens = await getAdminTokens();
+        if (adminTokens.length === 0) {
+            console.warn('[Notifications] لا يوجد توكنات للأدمن لإرسال إشعار الإضافة الجديدة');
+            return;
+        }
+
+        await loadNotificationMessages();
+
+        const itemType = productData.serviceType === 'service' ? 'خدمة' : 'منتج';
+        const itemName = productData.productName || 'غير مسمى';
+        const userName = userSession?.user_name || 'مستخدم';
+
+        const { title, body } = getMessageTemplate('new-item-added.admin', {
+            itemType,
+            itemName,
+            userName
+        });
+
+        await sendNotificationsToTokens(adminTokens, title, body);
+        console.log(`[Notifications] تم إرسال إشعار للإدارة عن إضافة ${itemType}: ${itemName}`);
+
+    } catch (error) {
+        console.error('[Notifications] فشل إرسال إشعار إضافة مادة جديدة للإدارة:', error);
+    }
+}

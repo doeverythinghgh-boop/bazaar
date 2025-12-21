@@ -568,6 +568,11 @@ add1_form.addEventListener('submit', async (e) => {
         const dbResult = await addProduct(productData);
         if (dbResult && dbResult.error) throw new Error(dbResult.error);
 
+        // إشعار الإدارة بالإضافة الجديدة
+        if (typeof notifyAdminOnNewItem === 'function') {
+            await notifyAdminOnNewItem(productData);
+        }
+
         console.log('%c[Add1] تم حفظ المنتج بنجاح.', 'color: green; font-weight: bold;');
         Swal.fire('تم بنجاح!', 'تم إضافة المنتج بنجاح.', 'success').then(() => {
             add1_setSubmitLoading(false);
