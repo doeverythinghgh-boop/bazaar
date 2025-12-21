@@ -1,45 +1,26 @@
 /* 
   @file pages/productAdd/productAdd.css
-  @description Premium Responsive Styles for Product Addition Page 1 with add1_ isolation prefix.
-  @author Antigravity
+  @description Styles matched exactly from productAdd2.css but using add1_ prefix for productAdd.html
 */
 
-:root {
-    /* Premium Local Variables */
-    --add1-glass-bg: rgba(255, 255, 255, 0.95);
-    --add1-glass-border: rgba(255, 255, 255, 0.2);
-    --add1-soft-shadow: 0 10px 30px rgba(0, 0, 0, 0.05), 0 1px 8px rgba(0, 0, 0, 0.02);
-    --add1-focus-shadow: 0 0 0 4px rgba(0, 102, 255, 0.1);
-    --add1-input-bg: #f8fafc;
-    --add1-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.add1_product_modal * {
-    box-sizing: border-box;
-}
-
 .add1_product_modal {
-    background: var(--add1-glass-bg);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border: 1px solid var(--add1-glass-border);
-    border-radius: 24px;
-    box-shadow: var(--add1-soft-shadow);
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
     width: 100%;
-    max-width: 850px;
-    padding: 40px;
+    max-width: 800px;
+    padding: 30px;
     position: relative;
-    margin: 30px auto;
-    transition: var(--add1-transition);
+    margin: 20px auto;
 }
 
 .add1_product_modal__title {
-    color: var(--text-color-dark);
+    color: #2c3e50;
     text-align: center;
-    margin-bottom: 40px;
+    margin-bottom: 30px;
     font-size: 28px;
-    font-weight: 800;
-    letter-spacing: -0.5px;
+    border-bottom: 2px solid #f8f9fa;
+    padding-bottom: 15px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -47,43 +28,32 @@
 }
 
 .add1_product_modal__title i {
-    color: var(--primary-color);
-    background: var(--bg-color-light);
-    width: 50px;
-    height: 50px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 14px;
-    font-size: 22px;
+    color: #3498db;
 }
 
 .add1_product_modal__form {
     display: flex;
     flex-direction: column;
-    gap: 25px;
+    gap: 20px;
 }
 
 .add1_product_modal__form_group {
     display: flex;
     flex-direction: column;
-    position: relative;
 }
 
 .add1_product_modal__label {
-    font-weight: 700;
-    margin-bottom: 10px;
-    color: var(--text-color-dark);
-    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #34495e;
+    font-size: 16px;
     display: flex;
     align-items: center;
-    opacity: 0.9;
 }
 
 .add1_product_modal__label i {
-    color: var(--primary-color);
-    margin-left: 10px;
-    font-size: 16px;
+    color: #3498db;
+    margin-left: 8px;
     width: 20px;
     text-align: center;
 }
@@ -91,160 +61,133 @@
 .add1_product_modal__input,
 .add1_product_modal__textarea,
 .add1_product_modal__select {
-    padding: 16px 20px;
-    border: 1.5px solid #e2e8f0;
-    border-radius: 16px;
+    padding: 12px 15px;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
     font-size: 16px;
-    transition: var(--add1-transition);
-    background-color: var(--add1-input-bg);
+    transition: all 0.3s ease;
+    background-color: #f8f9fa;
     width: 100%;
-    color: var(--text-color-dark);
-    font-family: inherit;
+    outline: none;
 }
 
-/* No hover per rules, only active/focus */
 .add1_product_modal__input:focus,
 .add1_product_modal__textarea:focus,
 .add1_product_modal__select:focus {
-    outline: none;
-    border-color: var(--primary-color);
-    background-color: var(--bg-color-white);
-    box-shadow: var(--add1-focus-shadow);
-    transform: translateY(-1px);
+    border-color: #3498db;
+    background-color: white;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
 }
 
 .add1_product_modal__textarea {
     resize: vertical;
     min-height: 120px;
-    line-height: 1.6;
+    font-family: inherit;
 }
 
 .add1_product_modal__char_counter {
-    position: absolute;
-    bottom: -20px;
-    left: 5px;
-    font-size: 11px;
-    font-weight: 600;
-    color: var(--text-color-light);
-    transition: var(--add1-transition);
+    text-align: left;
+    font-size: 12px;
+    color: #7f8c8d;
+    margin-top: 5px;
 }
 
 .add1_product_modal__form_row {
     display: flex;
-    gap: 20px;
-    flex-wrap: wrap;
+    gap: 15px;
 }
 
 .add1_product_modal__form_row .add1_product_modal__form_group {
     flex: 1;
-    min-width: 200px;
 }
 
-/* Premium Image Uploader */
+/* Image Upload Styles */
 .add1_product_modal__image_uploader {
-    border: 2px dashed #cbd5e1;
-    border-radius: 20px;
-    padding: 30px;
-    background-color: var(--add1-input-bg);
-    transition: var(--add1-transition);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    border: 2px dashed #bdc3c7;
+    border-radius: 10px;
+    padding: 20px;
+    background-color: #f8f9fa;
+    transition: all 0.3s ease;
 }
 
 .add1_product_modal__image_uploader:active {
-    border-color: var(--primary-color);
-    background-color: rgba(0, 102, 255, 0.05);
+    border-color: #3498db;
+    background-color: #f1f8ff;
 }
 
 .add1_product_modal__uploader_actions {
     display: flex;
-    gap: 15px;
-    margin-bottom: 25px;
+    gap: 10px;
+    margin-bottom: 15px;
     flex-wrap: wrap;
-    justify-content: center;
 }
 
 .add1_btn {
-    padding: 12px 24px;
+    padding: 10px 15px;
     border: none;
-    border-radius: 16px;
-    font-size: 15px;
-    font-weight: 700;
+    border-radius: 6px;
+    font-size: 14px;
     cursor: pointer;
-    transition: var(--add1-transition);
+    transition: all 0.3s ease;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
-    min-height: 54px;
-    font-family: var(--font-primary);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    gap: 8px;
 }
 
 .add1_btn_primary {
-    background-color: var(--primary-color);
+    background-color: #3498db;
     color: white;
 }
 
 .add1_btn_primary:active {
-    transform: scale(0.96);
-    filter: brightness(0.9);
+    background-color: #2980b9;
+    transform: translateY(2px);
 }
 
 .add1_btn_ghost {
-    background-color: var(--bg-color-white);
-    border: 1.5px solid #e2e8f0;
-    color: var(--text-color-dark);
+    background-color: transparent;
+    border: 1px solid #bdc3c7;
+    color: #34495e;
 }
 
 .add1_btn_ghost:active {
-    background-color: #f1f5f9;
-    border-color: var(--primary-color);
-    color: var(--primary-color);
-    transform: scale(0.96);
+    background-color: #ecf0f1;
+    border-color: #3498db;
+    color: #3498db;
 }
 
 .add1_btn_icon {
-    padding: 12px 20px;
-    font-size: 18px;
+    padding: 8px 12px;
 }
 
 .add1_product_modal__hint {
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--text-color-medium);
-    margin-bottom: 20px;
-    text-align: center;
-    max-width: 80%;
-    line-height: 1.5;
+    font-size: 14px;
+    color: #7f8c8d;
+    margin-bottom: 15px;
 }
 
 .add1_product_modal__previews {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
     gap: 15px;
-    width: 100%;
 }
 
 .add1_product_modal__preview {
     position: relative;
-    border-radius: 16px;
+    border-radius: 8px;
     overflow: hidden;
-    box-shadow: var(--shadow-soft);
-    transition: var(--add1-transition);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
     aspect-ratio: 1;
-    border: 2px solid transparent;
-    background: #fff;
 }
 
 .add1_product_modal__preview:active {
-    transform: scale(0.94);
+    transform: scale(0.98);
 }
 
 .add1_product_modal__preview__selected {
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 4px rgba(0, 102, 255, 0.2);
+    border: 3px solid #3498db;
 }
 
 .add1_product_modal__preview img {
@@ -255,21 +198,20 @@
 
 .add1_product_modal__preview_remove {
     position: absolute;
-    top: 8px;
-    left: 8px;
-    background: rgba(239, 68, 68, 0.9);
-    backdrop-filter: blur(4px);
+    top: 5px;
+    left: 5px;
+    background: rgba(231, 76, 60, 0.9);
     color: white;
     border: none;
-    border-radius: 10px;
-    width: 32px;
-    height: 32px;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3);
-    z-index: 2;
+    opacity: 1;
+    transition: opacity 0.3s ease;
 }
 
 .add1_product_modal__preview_meta {
@@ -277,154 +219,119 @@
     bottom: 0;
     left: 0;
     right: 0;
-    background: rgba(255, 255, 255, 0.9);
-    backdrop-filter: blur(4px);
-    color: var(--text-color-dark);
-    padding: 6px;
-    font-size: 11px;
-    font-weight: 700;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 5px;
+    font-size: 12px;
     text-align: center;
-    border-top: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .add1_product_modal__submit_container {
     text-align: center;
     margin-top: 20px;
-    padding-top: 20px;
-    border-top: 1.5px solid #f1f5f9;
 }
 
 .add1_product_modal__submit_container .add1_btn {
-    padding: 16px 40px;
+    padding: 12px 30px;
     font-size: 18px;
-    border-radius: 18px;
-    width: 100%;
-    max-width: 450px;
+    border-radius: 30px;
+    width: auto;
     margin: 0 auto;
-    letter-spacing: 0.5px;
 }
 
 .add1_product_modal__error_message {
-    color: var(--danger-color);
-    font-size: 12px;
-    font-weight: 700;
-    margin-top: 8px;
+    color: #e74c3c;
+    font-size: 14px;
+    margin-top: 5px;
     text-align: right;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-}
-
-.add1_product_modal__error_message::before {
-    content: "\f06a";
-    font-family: "Font Awesome 5 Free";
-    font-weight: 900;
 }
 
 .add1_product_modal__hidden_file {
     display: none;
 }
 
-/* Premium Camera Modal */
+/* Desktop Camera */
 .add1_camera_modal_content {
     position: relative;
-    background: var(--add1-glass-bg);
-    backdrop-filter: blur(15px);
-    border-radius: 24px;
+    background: white;
+    border-radius: 10px;
     padding: 20px;
-    max-width: 550px;
-    width: 95%;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-    border: 1px solid var(--add1-glass-border);
+    max-width: 500px;
+    width: 90%;
 }
 
 .add1_camera_modal_content video {
     width: 100%;
-    border-radius: 18px;
-    margin-bottom: 20px;
-    max-height: 60vh;
-    object-fit: cover;
-    background: #1a1a1a;
-    box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    margin-bottom: 15px;
 }
 
 .add1_camera_controls {
     text-align: center;
-    display: flex;
-    justify-content: center;
-    gap: 20px;
 }
 
 .add1_close_button {
     position: absolute;
-    top: -12px;
-    left: -12px;
-    background: #fff;
+    top: 15px;
+    left: 15px;
+    background: none;
     border: none;
-    border-radius: 12px;
-    width: 40px;
-    height: 40px;
-    font-size: 18px;
-    color: var(--text-color-dark);
+    font-size: 20px;
+    color: #7f8c8d;
     cursor: pointer;
-    z-index: 1001;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    z-index: 10;
 }
 
 .add1_close_button:active {
-    color: var(--danger-color);
-    transform: scale(0.9);
+    color: #e74c3c;
 }
 
-/* Responsive Design Overrides */
-
+/* Responsive Design */
 @media (max-width: 768px) {
     .add1_product_modal {
-        padding: 30px 20px;
-        margin: 15px auto;
-        width: 94%;
-        border-radius: 20px;
+        padding: 20px 15px;
+        border-radius: 12px;
+        margin: 10px;
+        width: auto;
     }
 
     .add1_product_modal__title {
-        font-size: 24px;
-        margin-bottom: 30px;
+        font-size: 22px;
+        margin-bottom: 20px;
     }
 
-    .add1_product_modal__form_row .add1_product_modal__form_group {
-        min-width: 100%;
+    .add1_product_modal__form_row {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .add1_product_modal__submit_container .add1_btn {
+        width: 100%;
+        padding: 14px;
+        font-size: 16px;
     }
 }
 
 @media (max-width: 480px) {
-    .add1_product_modal {
-        padding: 25px 15px;
+    .add1_product_modal__uploader_actions {
+        justify-content: center;
     }
 
-    .add1_product_modal__title {
-        font-size: 20px;
-    }
-
-    .add1_product_modal__title i {
-        width: 40px;
-        height: 40px;
-        font-size: 18px;
+    .add1_product_modal__image_uploader {
+        padding: 15px 10px;
     }
 
     .add1_product_modal__previews {
-        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
         gap: 10px;
     }
 
     .add1_btn {
-        width: 100%;
-        min-height: 58px;
+        padding: 10px;
+        font-size: 13px;
     }
 
-    .add1_product_modal__image_uploader {
-        padding: 20px 15px;
+    .add1_product_modal__label {
+        font-size: 14px;
     }
 }
