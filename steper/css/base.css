@@ -28,8 +28,7 @@ body::before {
     left: 0;
     width: 100%;
     height: 100%;
-    background: radial-gradient(circle at 20% 80%, rgba(255, 179, 102, 0.15) 0%, transparent 50%),
-                radial-gradient(circle at 80% 20%, rgba(102, 126, 234, 0.1) 0%, transparent 50%);
+    background: transparent;
     pointer-events: none;
     z-index: 1000;
 }
