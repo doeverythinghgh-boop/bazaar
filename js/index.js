@@ -238,7 +238,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         mainLoader(
           "pages/login/login.html",
           "index-user-container",
-          0,
+          300,
           undefined,
           "showHomeIcon",
           true

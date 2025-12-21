@@ -41,9 +41,11 @@ function profileHandleRegistry(containerId, reload) {
         // If container is already registered
         if (existingIndex !== -1) {
             const container = document.getElementById(containerId);
-            if (container) container.style.display = "block";
 
-            if (container) container.style.display = "block";
+            // Only show immediately if we ARE NOT reloading
+            if (container && !reload) {
+                container.style.display = "block";
+            }
 
             // Move container to end of array to become most recent
             LOADER_REGISTRY.splice(existingIndex, 1);
@@ -185,17 +187,19 @@ function profileExecuteCallback(callbackName) {
  */
 function profileClearOldContent(containerId) {
     try {
+        // 0. Hide container immediately to prevent flashing unstyled content
+        const container = document.getElementById(containerId);
+        if (container) {
+            container.style.display = "none";
+            container.innerHTML = ''; // Clear HTML content
+            container.classList.remove('main-loader-active'); // Reset loader state
+        }
+
         // 1. Clear custom CSS automatically added to container
         // Search using custom attribute data-loader-id to ensure precise selection
         document.querySelectorAll(`style[data-loader-id="${containerId}"]`).forEach(styleTag => {
             styleTag.remove();
         });
-
-        // 2. Clear HTML content of container
-        const container = document.getElementById(containerId);
-        if (container) {
-            container.innerHTML = '';
-        }
 
         console.log(`✔ تم مسح المحتوى والـ CSS القديم المتعلق بالحاوية: ${containerId}`);
 
@@ -247,25 +251,22 @@ async function mainLoader(
             return;
         }
 
-        // 3. Show loading spinner before fetching
-        container.innerHTML = '<div class="loader"></div>';
+        // 3. Preparation: Show only loader, hide any other accidental content
         container.style.display = "block";
+        container.innerHTML = '<div class="loader"></div>';
+        container.classList.add('main-loader-active');
 
         // 4. Fetch HTML content
         const html = await profileFetchContent(pageUrl);
 
         if (html === null) {
-            container.innerHTML = ""; // Clear loader if fetch failed
+            container.innerHTML = "";
+            container.classList.remove('main-loader-active');
             return;
         }
 
-        // Insert content and show container
-        container.innerHTML = html;
-        container.style.display = "block";
-
-        // 4. Apply CSS automatically (SoC)
+        // 5. Apply CSS rules immediately (SoC) - BEFORE inserting HTML
         const styleTag = document.createElement("style");
-        // Add custom attribute to distinguish loader-created styles
         styleTag.setAttribute('data-loader-id', containerId);
         styleTag.innerHTML = `
             #${containerId} {
@@ -274,19 +275,43 @@ async function mainLoader(
         `;
         document.head.appendChild(styleTag);
 
-        // 5. Restart scripts (Saved method: hgh_sec)
-        await profileRestartScripts(container);
+        // 6. Double Buffering Logic:
+        // Create a temporary hidden container inside the main container to hold and process the new content
+        const buffer = document.createElement('div');
+        buffer.className = 'main-loader-buffer';
+        buffer.style.display = 'none'; // Ensure it's invisible to the eye
+        buffer.innerHTML = html;
+        container.appendChild(buffer);
 
-        // 6. Wait
+        // 7. Restart scripts inside the buffer
+        // Note: they will execute because they are in the document tree (even if hidden)
+        await profileRestartScripts(buffer);
+
+        // 8. Wait (Ensure smooth transition and allow scripts/styles to settle)
         await new Promise((r) => setTimeout(r, waitMs));
+
+        // 9. Final Swap:
+        // Move all processed children from buffer directly to the main container
+        while (buffer.firstChild) {
+            container.appendChild(buffer.firstChild);
+        }
+
+        // 9.1 Wait for one frame to ensure DOM is updated and styles are ready
+        await new Promise((r) => requestAnimationFrame(r));
+
+        // 10. Cleanup
+        const currentLoader = container.querySelector('.loader');
+        if (currentLoader) currentLoader.remove();
+        buffer.remove(); // Remove the now-empty buffer
+        container.classList.remove('main-loader-active');
 
         // Final output log of load process
         console.log(
-            `%c✔✔✔✔✔✔✔ تم التحميل ✔✔✔✔✔✔✔\n` +
+            `%c✔✔✔✔✔✔✔ تم التحميل والظهور الموحد ✔✔✔✔✔✔✔\n` +
             `pageUrl: ${pageUrl}\n` +
             `containerId: ${containerId}\n` +
             `reload: ${reload}`,
-            "color: #0a4902ff; font-size: 12px; font-weight: bold; font-family: 'Tahoma';"
+            "color: #0d47a1; font-size: 12px; font-weight: bold; font-family: 'Tahoma';"
         );
 
         // 7. Execute callback

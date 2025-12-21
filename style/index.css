@@ -206,6 +206,20 @@
     }
   }
 
+  /* ✅ NEW: Hide container content while main-loader is active */
+  .main-loader-active>*:not(.loader) {
+    display: none !important;
+  }
+
+  /* ✅ NEW: Global Loading Spinner Buffer - Extremely important to prevent flashing */
+  .main-loader-buffer {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    height: 0 !important;
+    overflow: hidden !important;
+  }
+
   /* SweetAlert2 Maps Refinement */
   .fullscreen-swal .swal2-html-container {
     padding: 0 !important;
