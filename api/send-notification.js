@@ -133,6 +133,15 @@ export default async function handler(req, res) {
     res.status(200).json({ success: true });
   } catch (error) {
     console.error(`[API: /api/send-notification] فشل: حدث خطأ أثناء إرسال الإشعار:`, error);
+
+    // إذا كان الخطأ هو أن التوكن غير مسجل (منتهي)
+    if (error.code === 'messaging/registration-token-not-registered') {
+      return res.status(410).json({
+        error: "التوكن غير مسجل أو منتهي الصلاحية",
+        code: error.code
+      });
+    }
+
     // إرسال تفاصيل الخطأ للعميل للمساعدة في التشخيص
     res.status(500).json({
       error: error.message,
