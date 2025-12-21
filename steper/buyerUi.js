@@ -7,7 +7,7 @@
 
 import { loadItemStatus } from "./stateManagement.js";
 import { ITEM_STATUS } from "./config.js";
-import { getProductName } from "./commonUtils.js";
+import { getProductName, translateStatus } from "./commonUtils.js";
 
 /**
  * Generates HTML for the product review list.
@@ -19,7 +19,7 @@ import { getProductName } from "./commonUtils.js";
  */
 export function generateReviewListHtml(productKeys, ordersData, isOverallLocked) {
     if (!productKeys || productKeys.length === 0) {
-        return '<div style="text-align: center; padding: 20px; color: #666;">لا توجد منتجات للمراجعة حالياً (No products found).</div>';
+        return '<div style="text-align: center; padding: 20px; color: #666;">لا توجد منتجات للمراجعة حالياً.</div>';
     }
 
     return productKeys.map((productKey) => {
@@ -39,7 +39,7 @@ export function generateReviewListHtml(productKeys, ordersData, isOverallLocked)
                     <input type="checkbox" id="review-checkbox-${productKey}" name="productKeys" value="${productKey}" 
                         ${isChecked ? "checked" : ""} 
                         ${isItemLocked ? "disabled" : ""}>
-                    <label for="review-checkbox-${productKey}" style="margin-right: 8px;">${productName} <small>(${status})</small></label>
+                    <label for="review-checkbox-${productKey}" style="margin-right: 8px;">${productName} <small>(${translateStatus(status)})</small></label>
                 </div>
                 <button type="button" class="btn-show-key" data-key="${productKey}" style="padding: 2px 6px; font-size: 0.8em; cursor: pointer; border: 1px solid #ccc; background: #f0f0f0; border-radius: 4px;"><i class="fas fa-eye"></i></button>
             </div>
@@ -143,7 +143,7 @@ export function generateReturnedListHtml(returnedKeys, ordersData) {
             </li>
         `;
     }).join("");
-    return `<div id="returned-products-container"><p>Returned products:</p><ul id="returned-products-list" style="text-align: right; margin-top: 1rem; padding-right: 2rem; width: 100%;">${itemsHtml}</ul></div>`;
+    return `<div id="returned-products-container"><p>المنتجات المرجعة:</p><ul id="returned-products-list" style="text-align: right; margin-top: 1rem; padding-right: 2rem; width: 100%;">${itemsHtml}</ul></div>`;
 }
 
 /**

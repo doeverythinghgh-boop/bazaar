@@ -24,6 +24,20 @@ export const ITEM_STATUS = {
 };
 
 /**
+ * @constant {Object<string, string>} ITEM_STATUS_ARABIC
+ * @description Mapping of status keys to their Arabic display names.
+ */
+export const ITEM_STATUS_ARABIC = {
+    [ITEM_STATUS.PENDING]: "معلق",
+    [ITEM_STATUS.CONFIRMED]: "مؤكد",
+    [ITEM_STATUS.SHIPPED]: "مشحون",
+    [ITEM_STATUS.DELIVERED]: "تم التسليم",
+    [ITEM_STATUS.RETURNED]: "مرتجع",
+    [ITEM_STATUS.CANCELLED]: "ملغي",
+    [ITEM_STATUS.REJECTED]: "مرفوض"
+};
+
+/**
  * @type {object}
  * @description Runtime application control configuration.
  */

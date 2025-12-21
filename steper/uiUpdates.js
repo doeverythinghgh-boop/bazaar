@@ -30,7 +30,7 @@ function formatDate(dateInput) {
     let hours = date.getHours();
     const minutes = pad(date.getMinutes());
     const seconds = pad(date.getSeconds());
-    const ampm = hours >= 12 ? 'PM' : 'AM';
+    const ampm = hours >= 12 ? 'م' : 'ص';
 
     hours = hours % 12;
     hours = hours ? hours : 12;

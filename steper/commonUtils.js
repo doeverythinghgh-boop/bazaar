@@ -4,6 +4,17 @@
  * This file contains helper functions used across multiple files in the steper module.
  * Adheres to DRY (Don't Repeat Yourself) principle.
  */
+import { ITEM_STATUS_ARABIC } from "./config.js";
+
+/**
+ * Translates a status key to its Arabic equivalent.
+ * @function translateStatus
+ * @param {string} status - The status key (e.g., "pending").
+ * @returns {string} The Arabic translation or the original string if not found.
+ */
+export function translateStatus(status) {
+    return ITEM_STATUS_ARABIC[status] || status;
+}
 
 /**
  * Helper to get product name from orders data.
