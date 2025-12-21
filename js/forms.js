@@ -241,14 +241,21 @@ async function mainLoader(
             profileClearOldContent(containerId);
         }
 
-        // 3. Fetch HTML content
-        const html = await profileFetchContent(pageUrl);
-
-        if (html === null) return; // Load failed
-
         const container = document.getElementById(containerId);
         if (!container) {
             console.error("لم يتم العثور على العنصر: " + containerId);
+            return;
+        }
+
+        // 3. Show loading spinner before fetching
+        container.innerHTML = '<div class="loader"></div>';
+        container.style.display = "block";
+
+        // 4. Fetch HTML content
+        const html = await profileFetchContent(pageUrl);
+
+        if (html === null) {
+            container.innerHTML = ""; // Clear loader if fetch failed
             return;
         }
 
@@ -321,7 +328,7 @@ function containerGoBack() {
         // Get previous container (now last in array)
         const previousContainerId = LOADER_REGISTRY[LOADER_REGISTRY.length - 1];
 
-                                                                                        // Hide current container
+        // Hide current container
         const currentContainer = document.getElementById(currentContainerId);
         if (currentContainer) {
             currentContainer.style.display = "none";
