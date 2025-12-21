@@ -113,7 +113,7 @@ async function shouldNotify(eventKey, role) {
 
                 // محاولة جلب التكوين محلياً إذا فشل R2 (إضافة منطق أمان إضافي)
                 if (!config) {
-                    const localRes = await fetch(`notification/notification_config.json?t=${timestamp}`);
+                    const localRes = await fetch(`/notification/notification_config.json?t=${timestamp}`);
                     if (localRes.ok) {
                         cachedDefaultConfig = await localRes.json();
                         config = cachedDefaultConfig;
