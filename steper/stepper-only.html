@@ -377,23 +377,4 @@
             console.error('[Tutorial] Error in auto-scroll tutorial:', error);
         }
     }
-
-    /**
-     * Report content height to parent window to adjust iframe height.
-     */
-    function reportHeight() {
-        if (window.parent && window.parent !== window) {
-            const height = document.body.scrollHeight;
-            window.parent.postMessage({ type: 'setHeight', height: height }, '*');
-            console.log('[StepperOnly] Reporting height:', height);
-        }
-    }
-
-    // Report height on load and after any DOM changes
-    window.addEventListener('load', reportHeight);
-    const observer = new MutationObserver(reportHeight);
-    observer.observe(document.body, { attributes: true, childList: true, subtree: true });
-
-    // Also report height when SweetAlert might be open/closed
-    setInterval(reportHeight, 500);
 </script>

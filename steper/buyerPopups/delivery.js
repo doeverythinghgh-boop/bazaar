@@ -11,7 +11,6 @@ import { getDeliveryProducts, getUserDetailsForDelivery } from "../buyerLogic.js
 import { generateDeliveryUserInfoHtml, generateDeliveryItemsHtml } from "../buyerUi.js";
 import { extractNotificationMetadata, extractRelevantSellerKeys, extractRelevantDeliveryKeys } from "../steperNotificationLogic.js";
 import { attachLogButtonListeners } from "./utils.js";
-import SwalProxy from "../swalProxy.js";
 
 /**
  * Handles saving delivery confirmation.
@@ -70,7 +69,7 @@ export async function handleDeliverySave(data, ordersData) {
     htmlContent += '</div>';
 
     // Show confirmation dialog
-    SwalProxy.fire({
+    Swal.fire({
         title: 'تأكيد الحفظ النهائي',
         html: htmlContent,
         showCancelButton: true,
@@ -98,11 +97,11 @@ export async function handleDeliverySave(data, ordersData) {
 
             if (updates.length > 0) {
                 // Show loading
-                SwalProxy.fire({
+                Swal.fire({
                     title: 'جاري الحفظ...',
                     text: 'يتم حفظ التسليم والقفل...',
                     allowOutsideClick: false,
-                    didOpen: () => SwalProxy.showLoading()
+                    didOpen: () => Swal.showLoading()
                 });
 
                 try {
@@ -117,7 +116,7 @@ export async function handleDeliverySave(data, ordersData) {
                         console.log('[BuyerPopups] Delivery permanently locked for order:', orderKey, 'User:', userId);
                     }
 
-                    SwalProxy.fire({
+                    Swal.fire({
                         title: 'تم الحفظ بنجاح',
                         text: 'تم حفظ التسليم بشكل نهائي.',
                         timer: 1500,
@@ -142,14 +141,14 @@ export async function handleDeliverySave(data, ordersData) {
                     });
                 } catch (error) {
                     console.error("Save failed", error);
-                    SwalProxy.fire({
+                    Swal.fire({
                         title: 'فشل الحفظ',
                         text: 'حدث خطأ أثناء حفظ البيانات.',
                         confirmButtonText: 'حسنًا'
                     });
                 }
             } else {
-                SwalProxy.close();
+                Swal.close();
             }
         }
     });
@@ -170,7 +169,7 @@ export function showDeliveryConfirmationAlert(data, ordersData) {
         const productsToDeliver = getDeliveryProducts(ordersData, userId, userType);
 
         if (productsToDeliver.length === 0) {
-            SwalProxy.fire({
+            Swal.fire({
                 title: "لا توجد منتجات لتأكيد استلامها",
                 text: "بانتظار شحن المنتجات.",
                 confirmButtonText: "حسنًا",
@@ -195,7 +194,7 @@ export function showDeliveryConfirmationAlert(data, ordersData) {
         const userInfoHtml = generateDeliveryUserInfoHtml(userDetails);
         const checkboxesHtml = generateDeliveryItemsHtml(productsToDeliver);
 
-        SwalProxy.fire({
+        Swal.fire({
             title: canEdit ? "تأكيد استلام المنتجات" : "تأكيد استلام المنتجات (قراءة فقط)",
             html: `<div id="delivery-confirmation-container" style="display: flex; flex-direction: column; align-items: start; width: 100%;">
                     ${userInfoHtml}
@@ -226,13 +225,13 @@ export function showDeliveryConfirmationAlert(data, ordersData) {
                 }
 
                 // إضافة مستمع لحدث النقر على زر خريطة المشتري
-                const popup = SwalProxy.getPopup();
+                const popup = Swal.getPopup();
                 popup.querySelectorAll('.btn-view-buyer-map').forEach(btn => {
                     btn.addEventListener('click', () => {
                         const lat = btn.dataset.lat;
                         const lng = btn.dataset.lng;
 
-                        SwalProxy.fire({
+                        Swal.fire({
                             html: `<iframe src="/location/LOCATION.html?lat=${lat}&lng=${lng}&viewOnly=true" style="width: 100%; height: 75vh; border: none; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);"></iframe>`,
                             showConfirmButton: false,
                             showCloseButton: false,
@@ -242,7 +241,7 @@ export function showDeliveryConfirmationAlert(data, ordersData) {
                             didOpen: () => {
                                 const handleMapMsg = (event) => {
                                     if (event.data && event.data.type === 'CLOSE_LOCATION_MODAL') {
-                                        SwalProxy.close();
+                                        Swal.close();
                                         window.removeEventListener('message', handleMapMsg);
                                     }
                                 };

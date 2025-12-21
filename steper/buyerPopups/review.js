@@ -10,7 +10,6 @@ import { getProductsForReview } from "../buyerLogic.js";
 import { generateReviewListHtml } from "../buyerUi.js";
 import { extractNotificationMetadata, extractRelevantSellerKeys } from "../steperNotificationLogic.js";
 import { attachLogButtonListeners } from "./utils.js";
-import SwalProxy from "../swalProxy.js";
 
 /**
  * Handles saving review changes.
@@ -37,12 +36,12 @@ export async function handleReviewSave(data, ordersData) {
 
     if (updates.length > 0) {
         // Show loading state
-        SwalProxy.fire({
+        Swal.fire({
             title: 'جاري الحفظ...',
             text: 'برجاء الانتظار بينما يتم حفظ التغييرات.',
             allowOutsideClick: false,
             didOpen: () => {
-                SwalProxy.showLoading();
+                Swal.showLoading();
             }
         });
 
@@ -50,7 +49,7 @@ export async function handleReviewSave(data, ordersData) {
             // Execute all updates (Blocking)
             await Promise.all(updates.map(u => saveItemStatus(u.key, u.status)));
 
-            SwalProxy.fire({
+            Swal.fire({
                 title: 'تم التحديث',
                 text: 'تم تحديث اختيار المنتجات بنجاح.',
                 timer: 1500,
@@ -77,14 +76,14 @@ export async function handleReviewSave(data, ordersData) {
                 }
             });
         } catch (error) {
-            SwalProxy.fire({
+            Swal.fire({
                 title: 'فشل الحفظ',
                 text: 'حدث خطأ أثناء حفظ البيانات. برجاء المحاولة مرة أخرى.',
                 confirmButtonText: 'حسنًا'
             });
         }
     } else {
-        SwalProxy.close();
+        Swal.close();
     }
 }
 
@@ -110,7 +109,7 @@ export function showProductKeysAlert(data, ordersData, isModificationLocked) {
         // Use UI module to generate HTML
         const htmlContent = generateReviewListHtml(productKeys, ordersData, isOverallLocked);
 
-        SwalProxy.fire({
+        Swal.fire({
             title: isOverallLocked ? "عرض المنتجات" : "اختر المنتجات:",
             html: `<div id="buyer-review-products-container" style="display: flex; flex-direction: column; align-items: start; width: 100%;">${htmlContent}</div>`,
             footer: isOverallLocked

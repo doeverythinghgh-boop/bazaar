@@ -8,7 +8,6 @@ import { generateCancelledListHtml, generateReturnedListHtml, generateConfirmedL
 import { getShippableProducts, getRejectedProducts } from "../sellerLogic.js";
 import { generateShippingTableHtml, generateRejectedListHtml } from "../sellerUi.js";
 import { attachLogButtonListeners } from "./utils.js";
-import SwalProxy from "../swalProxy.js";
 
 /**
  * Displays products rejected by the seller to the buyer (Read-Only).
@@ -26,7 +25,7 @@ export function showBuyerRejectedProductsAlert(data, ordersData) {
         // Use seller UI generator as it fits the need
         const htmlContent = generateRejectedListHtml(rejectedProducts);
 
-        SwalProxy.fire({
+        Swal.fire({
             title: "المنتجات المرفوضة",
             html: `<div id="buyer-rejected-container">${htmlContent}</div>`,
             confirmButtonText: "إغلاق",
@@ -54,7 +53,7 @@ export function showUnselectedProductsAlert(data, ordersData) {
         const cancelledKeys = getCancelledProducts(ordersData, userId, userType);
         const htmlContent = generateCancelledListHtml(cancelledKeys, ordersData);
 
-        SwalProxy.fire({
+        Swal.fire({
             title: "المنتجات الملغاة",
             html: `<div id="cancelled-products-container">${htmlContent}</div>`,
             confirmButtonText: "حسنًا",
@@ -82,7 +81,7 @@ export function showReturnedProductsAlert(data, ordersData) {
         const returnedKeys = getReturnedProducts(ordersData, userId, userType);
         const htmlContent = generateReturnedListHtml(returnedKeys, ordersData);
 
-        SwalProxy.fire({
+        Swal.fire({
             title: "المنتجات المرتجعة",
             html: `<div id="buyer-returned-container">${htmlContent}</div>`,
             confirmButtonText: "حسنًا",
@@ -110,7 +109,7 @@ export function showBuyerConfirmedProductsAlert(data, ordersData) {
         const confirmedKeys = getConfirmedProducts(ordersData, userId, userType);
         const htmlContent = generateConfirmedListHtml(confirmedKeys, ordersData);
 
-        SwalProxy.fire({
+        Swal.fire({
             title: "المنتجات المؤكدة",
             html: `<div id="buyer-confirmed-container">${htmlContent}</div>`,
             confirmButtonText: "حسنًا",
@@ -138,7 +137,7 @@ export function showBuyerShippingInfoAlert(data, ordersData) {
         const shippableProducts = getShippableProducts(ordersData, userId, userType);
         const htmlContent = generateShippingTableHtml(shippableProducts);
 
-        SwalProxy.fire({
+        Swal.fire({
             title: "منتجات قيد الشحن",
             html: `<div id="buyer-shipping-container">${htmlContent}</div>`,
             confirmButtonText: "إغلاق",
@@ -146,7 +145,7 @@ export function showBuyerShippingInfoAlert(data, ordersData) {
             didOpen: () => {
                 attachLogButtonListeners();
                 // Disable all inputs to make it read-only
-                const popup = SwalProxy.getPopup();
+                const popup = Swal.getPopup();
                 const inputs = popup.querySelectorAll('input, select, textarea');
                 inputs.forEach(input => input.disabled = true);
             }
@@ -171,7 +170,7 @@ export async function showCourierConfirmedProductsAlert(data, ordersData) {
         const confirmedKeys = getConfirmedProducts(ordersData, userId, userType);
 
         if (confirmedKeys.length === 0) {
-            SwalProxy.fire({
+            Swal.fire({
                 title: "المنتجات المؤكدة",
                 text: "لا توجد منتجات مؤكدة حالياً.",
                 icon: "info",
@@ -186,7 +185,7 @@ export async function showCourierConfirmedProductsAlert(data, ordersData) {
 
         // Try using window.apiFetch which is available from network.js in stepper-only.html
         if (typeof window.apiFetch === 'function') {
-            SwalProxy.showLoading();
+            Swal.showLoading();
             if (typeof baseURL === 'undefined' && data.baseURL) {
                 window.baseURL = data.baseURL;
             }
@@ -199,7 +198,7 @@ export async function showCourierConfirmedProductsAlert(data, ordersData) {
             } else {
                 console.warn("[BuyerPopups] apiFetch for users failed:", result);
             }
-            if (SwalProxy.isVisible()) SwalProxy.close();
+            if (Swal.isVisible()) Swal.close();
         } else {
             console.warn("[BuyerPopups] window.apiFetch is not available.");
         }
@@ -215,7 +214,7 @@ export async function showCourierConfirmedProductsAlert(data, ordersData) {
         // 4. Generate UI
         const htmlContent = generateSellerGroupedHtml(groupedData);
 
-        SwalProxy.fire({
+        Swal.fire({
             title: "المنتجات المطلوب توصيلها",
             html: `<div id="courier-confirmed-container">${htmlContent}</div>`,
             confirmButtonText: "إغلاق",
@@ -224,14 +223,14 @@ export async function showCourierConfirmedProductsAlert(data, ordersData) {
                 attachLogButtonListeners();
 
                 // إضافة مستمع لحدث النقر على زر الخريطة لموقع البائع
-                const popup = SwalProxy.getPopup();
+                const popup = Swal.getPopup();
                 popup.querySelectorAll('.btn-view-seller-map').forEach(btn => {
                     btn.addEventListener('click', () => {
                         const lat = btn.dataset.lat;
                         const lng = btn.dataset.lng;
                         const sellerName = btn.dataset.name;
 
-                        SwalProxy.fire({
+                        Swal.fire({
                             html: `<iframe src="/location/LOCATION.html?lat=${lat}&lng=${lng}&viewOnly=true" style="width: 100%; height: 75vh; border: none; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);"></iframe>`,
                             showConfirmButton: false,
                             showCloseButton: false,
@@ -242,7 +241,7 @@ export async function showCourierConfirmedProductsAlert(data, ordersData) {
                                 // استماع لرسالة الإغلاق القادمة من نافذة الخريطة
                                 const handleMapMsg = (event) => {
                                     if (event.data && event.data.type === 'CLOSE_LOCATION_MODAL') {
-                                        SwalProxy.close();
+                                        Swal.close();
                                         window.removeEventListener('message', handleMapMsg);
                                     }
                                 };
