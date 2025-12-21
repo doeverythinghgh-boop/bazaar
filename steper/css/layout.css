@@ -1,7 +1,7 @@
 /* ============================================
    الحاوية الرئيسية (Main Container)
    ============================================ */
-.container {
+.step_container {
     max-width: 1200px;
     margin: 0 auto;
     background: linear-gradient(135deg, #ffffff 0%, #f8f9ff 100%);
@@ -12,8 +12,7 @@
     /* تأثير الزجاج */
     border: none;
     height: auto;
-    min-height: 100vh;
+    min-height: auto;
     display: flex;
     flex-direction: column;
-    justify-content: center;
 }
