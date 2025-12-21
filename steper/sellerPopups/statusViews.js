@@ -8,6 +8,7 @@ import { generateRejectedListHtml } from "../sellerUi.js";
 import { getDeliveryProducts, getReturnedProducts, getUserDetailsForDelivery } from "../buyerLogic.js";
 import { generateDeliveryUserInfoHtml, generateDeliveryItemsHtml, generateReturnedListHtml } from "../buyerUi.js";
 import { attachLogButtonListeners } from "./utils.js";
+import SwalProxy from "../swalProxy.js";
 
 /**
  * Displays products rejected by the seller.
@@ -20,7 +21,7 @@ export function showSellerRejectedProductsAlert(data, ordersData) {
         const rejectedProducts = getRejectedProducts(ordersData, data.currentUser.idUser, data.currentUser.type);
         const htmlContent = generateRejectedListHtml(rejectedProducts);
 
-        Swal.fire({
+        SwalProxy.fire({
             title: "المنتجات المرفوضة",
             html: `<div id="seller-rejected-container">${htmlContent}</div>`,
             confirmButtonText: "حسنًا",
@@ -47,7 +48,7 @@ export function showSellerDeliveryConfirmationAlert(data, ordersData) {
         const productsToDeliver = getDeliveryProducts(ordersData, userId, userType);
 
         if (productsToDeliver.length === 0) {
-            Swal.fire({
+            SwalProxy.fire({
                 title: "لا توجد منتجات تم توصيلها/شحنها",
                 text: "لا توجد منتجات في مرحلة التوصيل.",
                 confirmButtonText: "إغلاق",
@@ -63,7 +64,7 @@ export function showSellerDeliveryConfirmationAlert(data, ordersData) {
         }
         const checkboxesHtml = generateDeliveryItemsHtml(productsToDeliver);
 
-        Swal.fire({
+        SwalProxy.fire({
             title: "تأكيد استلام المنتجات (قراءة فقط)",
             html: `<div id="seller-delivery-container" style="display: flex; flex-direction: column; align-items: start; width: 100%;">
                     ${userInfoHtml}
@@ -74,7 +75,7 @@ export function showSellerDeliveryConfirmationAlert(data, ordersData) {
             didOpen: () => {
                 attachLogButtonListeners();
                 // Disable all inputs to make it read-only
-                const popup = Swal.getPopup();
+                const popup = SwalProxy.getPopup();
                 const inputs = popup.querySelectorAll('input, select, textarea');
                 inputs.forEach(input => input.disabled = true);
             },
@@ -98,7 +99,7 @@ export function showSellerReturnedProductsAlert(data, ordersData) {
         const returnedKeys = getReturnedProducts(ordersData, userId, userType);
         const htmlContent = generateReturnedListHtml(returnedKeys, ordersData);
 
-        Swal.fire({
+        SwalProxy.fire({
             title: "المنتجات المرتجعة (قراءة فقط)",
             html: `<div id="seller-returned-container">${htmlContent}</div>`,
             confirmButtonText: "إغلاق",

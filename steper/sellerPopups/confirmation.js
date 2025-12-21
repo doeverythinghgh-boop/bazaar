@@ -11,6 +11,7 @@ import { getConfirmationProducts } from "../sellerLogic.js";
 import { generateConfirmationTableHtml } from "../sellerUi.js";
 import { extractNotificationMetadata } from "../steperNotificationLogic.js";
 import { attachLogButtonListeners } from "./utils.js";
+import SwalProxy from "../swalProxy.js";
 
 /**
  * Handles the save action for confirmation.
@@ -69,7 +70,7 @@ export function handleConfirmationSave(data, ordersData) {
     htmlContent += '</div>';
 
     // Show confirmation dialog
-    Swal.fire({
+    SwalProxy.fire({
         title: 'تأكيد الحفظ النهائي',
         html: htmlContent,
         showCancelButton: true,
@@ -96,11 +97,11 @@ export function handleConfirmationSave(data, ordersData) {
 
             if (updates.length > 0) {
                 // Show loading
-                Swal.fire({
+                SwalProxy.fire({
                     title: 'جاري الحفظ...',
                     text: 'يتم حفظ التأكيد والقفل...',
                     allowOutsideClick: false,
-                    didOpen: () => Swal.showLoading()
+                    didOpen: () => SwalProxy.showLoading()
                 });
 
                 try {
@@ -115,7 +116,7 @@ export function handleConfirmationSave(data, ordersData) {
                         console.log('[SellerPopups] Confirmation permanently locked for order:', orderKey, 'Seller:', sellerId);
                     }
 
-                    Swal.fire({
+                    SwalProxy.fire({
                         title: 'تم الحفظ بنجاح',
                         text: 'تم حفظ التأكيد بشكل نهائي.',
                         timer: 1500,
@@ -165,14 +166,14 @@ export function handleConfirmationSave(data, ordersData) {
                     });
                 } catch (error) {
                     console.error("Save failed", error);
-                    Swal.fire({
+                    SwalProxy.fire({
                         title: 'فشل الحفظ',
                         text: 'حدث خطأ أثناء الاتصال بالسيرفر.',
                         confirmButtonText: 'حسنًا'
                     });
                 }
             } else {
-                Swal.close();
+                SwalProxy.close();
             }
         }
     });
@@ -203,7 +204,7 @@ export function showSellerConfirmationProductsAlert(data, ordersData) {
 
         console.log(`[SellerPopups] Opening confirmation | User: ${userType} | Locked: ${isLocked} | CanEdit: ${canEdit}`);
 
-        Swal.fire({
+        SwalProxy.fire({
             title: canEdit ? "تأكيد المنتجات" : "تأكيد المنتجات (قراءة فقط)",
             html: `<div id="seller-confirmation-container" style="display: flex; flex-direction: column; align-items: start; width: 100%; max-height: 300px; overflow: auto;">
                     ${htmlContent}

@@ -17,6 +17,7 @@ import {
 
 import { validateStepSequence, createNewStepState } from "./workflowLogic.js";
 import { extractNotificationMetadata, checkSubStepConditions } from "./steperNotificationLogic.js";
+import SwalProxy from "./swalProxy.js";
 
 // =============================================================================
 // CONTROLLER LOGIC
@@ -70,7 +71,7 @@ function handleStepActivationAttempt(checkboxElement, controlData, ordersData) {
         const validation = validateStepSequence(requestedStepNo, currentActiveStepNo);
 
         if (!validation.isValid) {
-            Swal.fire({
+            SwalProxy.fire({
                 title: "تنبيه",
                 text: validation.errorMessage,
 
@@ -83,7 +84,7 @@ function handleStepActivationAttempt(checkboxElement, controlData, ordersData) {
     }
 
     // Confirmation Logic
-    Swal.fire({
+    SwalProxy.fire({
         title: "تأكيد تفعيل المرحلة",
         text: "بمجرد تفعيل هذه المرحلة، لا يمكنك التراجع. هل أنت متأكد؟",
 
@@ -96,7 +97,7 @@ function handleStepActivationAttempt(checkboxElement, controlData, ordersData) {
     }).then((result) => {
         if (result.isConfirmed) {
             executeStepActivation(currentStep, controlData, ordersData);
-            Swal.close();
+            SwalProxy.close();
         } else {
             checkboxElement.checked = false;
         }

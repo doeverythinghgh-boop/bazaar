@@ -11,6 +11,7 @@ import { getShippableProducts } from "../sellerLogic.js";
 import { generateShippingTableHtml } from "../sellerUi.js";
 import { extractNotificationMetadata, extractRelevantDeliveryKeys } from "../steperNotificationLogic.js";
 import { attachLogButtonListeners } from "./utils.js";
+import SwalProxy from "../swalProxy.js";
 
 /**
  * Handles the save action for shipping updates.
@@ -69,7 +70,7 @@ export async function handleShippingSave(data, ordersData) {
     htmlContent += '</div>';
 
     // Show confirmation dialog
-    Swal.fire({
+    SwalProxy.fire({
         title: 'تأكيد الحفظ النهائي',
         html: htmlContent,
         showCancelButton: true,
@@ -99,11 +100,11 @@ export async function handleShippingSave(data, ordersData) {
 
             if (updates.length > 0) {
                 // Show loading
-                Swal.fire({
+                SwalProxy.fire({
                     title: 'جاري الحفظ...',
                     text: 'يتم حفظ الشحن والقفل...',
                     allowOutsideClick: false,
-                    didOpen: () => Swal.showLoading()
+                    didOpen: () => SwalProxy.showLoading()
                 });
 
                 try {
@@ -118,7 +119,7 @@ export async function handleShippingSave(data, ordersData) {
                         console.log('[SellerPopups] Shipping permanently locked for order:', orderKey, 'User:', userId);
                     }
 
-                    Swal.fire({
+                    SwalProxy.fire({
                         title: 'تم الحفظ بنجاح',
                         text: 'تم حفظ الشحن بشكل نهائي.',
                         timer: 1500,
@@ -164,14 +165,14 @@ export async function handleShippingSave(data, ordersData) {
                     });
                 } catch (error) {
                     console.error("Save failed", error);
-                    Swal.fire({
+                    SwalProxy.fire({
                         title: 'فشل الحفظ',
                         text: 'حدث خطأ أثناء الاتصال بالسيرفر.',
                         confirmButtonText: 'حسنًا'
                     });
                 }
             } else {
-                Swal.close();
+                SwalProxy.close();
             }
         }
     });
@@ -189,7 +190,7 @@ export function showShippingInfoAlert(data, ordersData) {
         const shippableProducts = getShippableProducts(ordersData, data.currentUser.idUser, data.currentUser.type);
 
         if (shippableProducts.length === 0) {
-            Swal.fire({
+            SwalProxy.fire({
                 title: "لا توجد منتجات للشحن",
                 text: "يجب تأكيد المنتجات أولاً.",
                 confirmButtonText: "حسنًا",
@@ -214,7 +215,7 @@ export function showShippingInfoAlert(data, ordersData) {
 
         const htmlContent = generateShippingTableHtml(shippableProducts);
 
-        Swal.fire({
+        SwalProxy.fire({
             title: canEdit ? "شحن المنتجات" : "شحن المنتجات (قراءة فقط)",
             html: `<div id="seller-shipping-container">${htmlContent}</div>`,
             footer: canEdit

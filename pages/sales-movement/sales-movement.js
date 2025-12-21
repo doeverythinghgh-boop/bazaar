@@ -431,6 +431,16 @@ function salesMovement_showOrderDetails(salesMovement_orderData) {
     }
 }
 
+// Listen for messages from Stepper iframe to adjust height
+window.addEventListener('message', function(event) {
+    if (event.data && event.data.type === 'setHeight') {
+        const iframe = document.getElementById('salesMovement_stepperIframe');
+        if (iframe) {
+            iframe.style.height = event.data.height + 'px';
+        }
+    }
+});
+
 // دالة لإظهار حالة التحميل
 function salesMovement_showLoading() {
     try {
