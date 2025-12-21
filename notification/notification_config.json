@@ -31,5 +31,8 @@
     "step-returned": {
         "seller": true,
         "admin": true
+    },
+    "new-item-added": {
+        "admin": true
     }
 }

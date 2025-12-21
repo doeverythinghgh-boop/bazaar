@@ -616,7 +616,10 @@ add2_form.addEventListener('submit', async (e) => {
 
         // إشعار الإدارة بالإضافة الجديدة
         if (typeof notifyAdminOnNewItem === 'function') {
+            console.log('[Dev-Add2] استدعاء دالة إخطار الإدارة...');
             await notifyAdminOnNewItem(productData);
+        } else {
+            console.error('[Dev-Add2] ❌ دالة notifyAdminOnNewItem غير معرفة في هذا السياق!');
         }
 
         console.log('%c[Add2] تم حفظ الخدمة بنجاح.', 'color: green; font-weight: bold;');

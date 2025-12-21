@@ -570,7 +570,10 @@ add1_form.addEventListener('submit', async (e) => {
 
         // إشعار الإدارة بالإضافة الجديدة
         if (typeof notifyAdminOnNewItem === 'function') {
+            console.log('[Dev-Add1] استدعاء دالة إخطار الإدارة...');
             await notifyAdminOnNewItem(productData);
+        } else {
+            console.error('[Dev-Add1] ❌ دالة notifyAdminOnNewItem غير معرفة في هذا السياق!');
         }
 
         console.log('%c[Add1] تم حفظ المنتج بنجاح.', 'color: green; font-weight: bold;');

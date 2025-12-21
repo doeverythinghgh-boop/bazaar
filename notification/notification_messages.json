@@ -93,5 +93,11 @@
     },
     "admin_manual": {
         "title": "إشعار من الإدارة"
+    },
+    "new-item-added": {
+        "admin": {
+            "title": "إضافة جديدة في المتجر",
+            "body": "تم إضافة ${itemType} جديد: ${itemName} بواسطة ${userName}."
+        }
     }
 }
