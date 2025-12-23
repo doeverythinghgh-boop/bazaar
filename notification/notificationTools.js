@@ -263,7 +263,7 @@ async function sendNotificationsToTokens(allTokens, title, body) {
     for (const token of allTokens) {
         // التأكد من أن التوكن ليس قيمة باطلة (null/undefined/empty string) قبل الإنشاء
         if (token) {
-            if (window.Android && typeof window.sendNotificationsToTokensP2P === 'function') {
+            if (window.Android && typeof window.Android.sendNotificationsToTokensP2P === 'function') {
                 console.log(`[JS] سيتم استدعاء الدالة الأصلية لإرسال ${tokens.length} إشعار...`);
                 // تحويل مصفوفة التوكنات إلى سلسلة JSON
                 const tokensJsonString = JSON.stringify(tokens);
