@@ -266,7 +266,7 @@ async function sendNotificationsToTokens(allTokens, title, body) {
             if (window.Android && typeof window.Android.sendNotificationsToTokensP2P === 'function') {
                 console.log(`notification send from android`);
                 // تحويل مصفوفة التوكنات إلى سلسلة JSON
-                const tokensJsonString = JSON.stringify(tokens);
+                const tokensJsonString = JSON.stringify(token);
                 // استدعاء دالة Kotlin من خلال الجسر
                 window.Android.sendNotificationsToTokensP2P(tokensJsonString, title, body);
                 console.log(`[JS] تم استدعاء الدالة sendNotificationsToTokensP2P في Kotlin.`);
