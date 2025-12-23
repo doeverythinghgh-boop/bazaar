@@ -27,6 +27,7 @@ var add1_notesInput = document.getElementById('add1_product_notes');
 var add1_quantityInput = document.getElementById('add1_product_quantity');
 var add1_priceInput = document.getElementById('add1_product_price');
 var add1_originalPriceInput = document.getElementById('add1_original_price');
+var add1_realPriceInput = document.getElementById('add1_real_price');
 var add1_btnSubmit = document.getElementById('add1_btn_submit');
 
 var add1_images = [];
@@ -435,6 +436,18 @@ add1_originalPriceInput.addEventListener('input', () => {
     }
 });
 
+add1_realPriceInput.addEventListener('input', () => {
+    try {
+        let value = normalizeDigits(add1_realPriceInput.value);
+        value = value.replace(/[^0-9.]/g, '');
+        const parts = value.split('.');
+        if (parts.length > 2) value = parts[0] + '.' + parts.slice(1).join('');
+        add1_realPriceInput.value = value;
+    } catch (error) {
+        console.error('[Add1] Error on real price input:', error);
+    }
+});
+
 // Capture photo via camera
 add1_takePhotoBtn.addEventListener('click', () => {
     try {
@@ -556,6 +569,7 @@ add1_form.addEventListener('submit', async (e) => {
             product_price: parseFloat(add1_priceInput.value) || 0,
             product_quantity: parseInt(add1_quantityInput.value, 10) || 0,
             original_price: parseFloat(add1_originalPriceInput.value) || null,
+            realPrice: parseFloat(add1_realPriceInput.value) || null,
             user_message: normalizeArabicText(add1_sellerMessageTextarea.value.trim()),
             user_note: normalizeArabicText(add1_notesInput.value.trim()),
             ImageName: uploadedImageUrls.join(','),

@@ -102,8 +102,8 @@ export default async function handler(request) {
 
         // ✅ FIX: Filter by user_key if provided (Search within User's products)
         if (user_key) {
-           whereClauses.push("p.user_key = ?");
-           args.push(user_key);
+          whereClauses.push("p.user_key = ?");
+          args.push(user_key);
         }
 
         if (searchTerm) {
@@ -201,7 +201,8 @@ export default async function handler(request) {
         MainCategory,
         SubCategory,
         ImageIndex,
-        serviceType // جديد: استقبال نوع الخدمة
+        serviceType, // جديد: استقبال نوع الخدمة
+        realPrice // جديد
       } = await request.json();
 
       // تحقق بسيط من وجود البيانات الأساسية
@@ -213,8 +214,8 @@ export default async function handler(request) {
       }
 
       await db.execute({
-        sql: "INSERT INTO marketplace_products (productName, user_key, product_key, product_description, product_price, original_price, product_quantity, user_message, user_note, ImageName, MainCategory, SubCategory, ImageIndex, serviceType, is_approved) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-        args: [productName, user_key, product_key, product_description, parseFloat(product_price), original_price ? parseFloat(original_price) : null, parseInt(product_quantity), user_message, user_note, ImageName, parseInt(MainCategory), SubCategory ? parseInt(SubCategory) : null, parseInt(ImageIndex), serviceType || 0, 0]
+        sql: "INSERT INTO marketplace_products (productName, user_key, product_key, product_description, product_price, original_price, realPrice, product_quantity, user_message, user_note, ImageName, MainCategory, SubCategory, ImageIndex, serviceType, is_approved) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        args: [productName, user_key, product_key, product_description, parseFloat(product_price), original_price ? parseFloat(original_price) : null, realPrice ? parseFloat(realPrice) : null, parseInt(product_quantity), user_message, user_note, ImageName, parseInt(MainCategory), SubCategory ? parseInt(SubCategory) : null, parseInt(ImageIndex), serviceType || 0, 0]
       });
 
       return new Response(JSON.stringify({ message: "تم إضافة المنتج إلى قاعدة البيانات بنجاح." }), {
@@ -247,7 +248,8 @@ export default async function handler(request) {
         SubCategory,
         ImageIndex,
         serviceType, // جديد: استقبال نوع الخدمة
-        is_approved // ✅ إضافة: استقبال حالة الموافقة
+        is_approved, // ✅ إضافة: استقبال حالة الموافقة
+        realPrice // جديد
       } = await request.json();
 
       // التحقق من وجود مفتاح المنتج
@@ -272,7 +274,8 @@ export default async function handler(request) {
         SubCategory: SubCategory !== undefined ? parseInt(SubCategory) || null : undefined,
         ImageIndex: ImageIndex !== undefined ? parseInt(ImageIndex) : undefined,
         serviceType: serviceType !== undefined ? parseInt(serviceType) : undefined, // جديد: استقبال نوع الخدمة
-        is_approved: is_approved !== undefined ? parseInt(is_approved) : undefined // ✅ إضافة: السماح بتحديث حالة الموافقة
+        is_approved: is_approved !== undefined ? parseInt(is_approved) : undefined, // ✅ إضافة: السماح بتحديث حالة الموافقة
+        realPrice: realPrice !== undefined ? (realPrice ? parseFloat(realPrice) : null) : undefined
       };
 
       const updateEntries = Object.entries(fieldsToUpdate).filter(([key, value]) => value !== undefined);
