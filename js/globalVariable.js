@@ -162,7 +162,7 @@ function productAddSetType(editMode = false) {
   } else {
     if (productTypeToAdd == 2) {
       mainLoader(
-        "./pages/productEdit2.html",
+        "./pages/productEdit2/productEdit2.html",
         "index-product-container",
         0,
         undefined,
@@ -171,7 +171,7 @@ function productAddSetType(editMode = false) {
       );
     } else if (productTypeToAdd == 0) {
       mainLoader(
-        "./pages/productEdit.html",
+        "./pages/productEdit/productEdit.html",
         "index-product-container",
         0,
         undefined,

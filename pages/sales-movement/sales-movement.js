@@ -537,6 +537,7 @@ async function salesMovement_checkProductKeyChanges() {
                     sellerPhone: product.seller_phone,
                     MainCategory: product.MainCategory,
                     SubCategory: product.SubCategory,
+                    realPrice: product.realPrice,
                     type: product.serviceType,
                 };
 
