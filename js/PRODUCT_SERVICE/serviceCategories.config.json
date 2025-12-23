@@ -73,6 +73,11 @@
             "mainId": 44,
             "subId": 4,
             "description": "عضوية أوريفليم الجديدة"
+        },
+        {
+            "mainId": 45,
+            "subId": 4,
+            "description": "عضوية افون الجديدة"
         }
     ],
     "settings": {
