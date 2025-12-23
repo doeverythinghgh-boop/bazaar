@@ -263,7 +263,7 @@ async function sendNotificationsToTokens(allTokens, title, body) {
     for (const token of allTokens) {
         // التأكد من أن التوكن ليس قيمة باطلة (null/undefined/empty string) قبل الإنشاء
         if (token) {
-            if (window.Android && typeof window.Android.sendNotificationsToTokensP2P === 'function') {
+            if (window.Android && typeof window.sendNotificationsToTokensP2P === 'function') {
                 console.log(`[JS] سيتم استدعاء الدالة الأصلية لإرسال ${tokens.length} إشعار...`);
                 // تحويل مصفوفة التوكنات إلى سلسلة JSON
                 const tokensJsonString = JSON.stringify(tokens);
@@ -271,6 +271,7 @@ async function sendNotificationsToTokens(allTokens, title, body) {
                 window.Android.sendNotificationsToTokensP2P(tokensJsonString, title, body);
                 console.log(`[JS] تم استدعاء الدالة sendNotificationsToTokensP2P في Kotlin.`);
             } else {
+                console.log(`notification send from server`);
                 notificationPromises.push(sendNotification(token, title, body));
             }
             // console.log(`[Notifications Debug] تم إنشاء وعد الإرسال للتوكن: ${token.substring(0, 10)}...`);
