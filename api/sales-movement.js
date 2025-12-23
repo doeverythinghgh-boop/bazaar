@@ -128,7 +128,7 @@ export default async function handler(request) {
           u.Address AS customer_address,
           p.productName,
           p.product_price,
-          p.realPrice,
+          p.realPrice AS realPrice,
           oi.product_key AS item_product_key,
           oi.quantity,
           oi.seller_key -- ✅ إصلاح: إضافة حقل مفتاح البائع من جدول عناصر الطلب

@@ -202,8 +202,14 @@ export function groupConfirmedProductsBySeller(productKeys, ordersData, allUsers
                 };
             }
             const product_price = parseFloat(foundItem.product_price) || 0;
-            const realPrice = parseFloat(foundItem.real_price || foundItem.realPrice) || product_price;
+            // التحقق من وجود سعر التطبيق بشكل مرن يدعم المسميين مع إعطاء الأولوية للقيم غير الصفرية
+            let rawRealPrice = foundItem.realPrice !== undefined ? foundItem.realPrice : foundItem.real_price;
+
+            // إذا كانت القيمة null أو undefined أو نص فارغ، نستخدم سعر المنتج
+            const realPrice = (rawRealPrice !== null && rawRealPrice !== undefined && rawRealPrice !== '') ? parseFloat(rawRealPrice) : product_price;
             const quantity = parseInt(foundItem.quantity) || 1;
+
+            console.log(`[BuyerLogic] Item: ${foundItem.product_name}, Price: ${product_price}, RealPrice: ${realPrice}`);
 
             grouped[sellerKey].products.push({
                 name: foundItem.product_name || "منتج",
