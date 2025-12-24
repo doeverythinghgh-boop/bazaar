@@ -258,18 +258,17 @@ function productView_viewDetails(productData, options = {}) {
         if (description) description.textContent = productData.description || "لا يوجد وصف متاح.";
         if (sellerMessage) sellerMessage.textContent = productData.sellerMessage || "لا توجد رسالة من البائع.";
 
-        // Configure display based on showAddToCart option
+        // Configure display: Always show basic data, hide cart actions if requested
+        if (quantityContainer) quantityContainer.style.display = "flex";
+        if (priceContainer) priceContainer.style.display = "flex";
+        if (quantityValue) quantityValue.textContent = productData.availableQuantity || "0";
+        if (price) price.textContent = `${productData.pricePerItem || 0} جنيه`;
+
         if (showAddToCart) {
-            if (quantityContainer) quantityContainer.style.display = "flex";
-            if (priceContainer) priceContainer.style.display = "flex";
             if (cartActionsContainer) cartActionsContainer.style.display = "block";
-            if (quantityValue) quantityValue.textContent = productData.availableQuantity;
-            if (price) price.textContent = `${productData.pricePerItem} جنيه`;
             productView_setupQuantityControls(productData, dom);
             productView_setupAddToCart(productData, dom);
         } else {
-            if (quantityContainer) quantityContainer.style.display = "none";
-            if (priceContainer) priceContainer.style.display = "none";
             if (cartActionsContainer) cartActionsContainer.style.display = "none";
         }
 
