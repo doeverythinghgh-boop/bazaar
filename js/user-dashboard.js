@@ -143,12 +143,31 @@ function updateViewForLoggedInUser() {
       "dash-edit-profile-btn",
       "dash-admin-panel-btn",
       "dash-view-sales-movement-btn",
+      "dash-add-product-btn",
+      "dash-view-my-products-btn",
     ].forEach((id) => {
       const btn = document.getElementById(id);
       if (btn) btn.style.display = "none";
     });
 
-    // [Step 3.2] Bind Logout
+    // [Step 3.2] Bind Buttons (Gifts & Contact still available for guests if allowed, but usually gifts need login)
+    const giftsBtn = document.getElementById("index-gifts-btn");
+    if (giftsBtn) {
+      giftsBtn.addEventListener("click", () => {
+        if (showLoginAlert()) {
+          handleProtectedLinkClick("./pages/gifts.html");
+        }
+      });
+    }
+
+    const contactBtn = document.getElementById("index-contact-btn");
+    if (contactBtn) {
+      contactBtn.addEventListener("click", () => {
+        mainLoader("pages/contact.html", "index-contact-container", 0, undefined, "showHomeIcon", true);
+      });
+    }
+
+    // [Step 3.3] Bind Logout
     const logoutBtn = document.getElementById("dash-logout-btn-alt");
     if (logoutBtn) {
       logoutBtn.addEventListener("click", () => {
@@ -162,8 +181,30 @@ function updateViewForLoggedInUser() {
   } else {
     // [Step 4] Logged-in User (Non-Guest)
 
-    // [Step 4.1] Seller/Admin Permissions (Product Management)
-    // Buttons visible by default in HTML.
+    // [Step 4.1] Setup new buttons
+    const giftsBtn = document.getElementById("index-gifts-btn");
+    if (giftsBtn) {
+      giftsBtn.addEventListener("click", () => handleProtectedLinkClick("./pages/gifts.html"));
+    }
+
+    const addProductBtn = document.getElementById("dash-add-product-btn");
+    if (addProductBtn) {
+      addProductBtn.addEventListener("click", () => showAddProductModal());
+    }
+
+    const viewMyProductsBtn = document.getElementById("dash-view-my-products-btn");
+    if (viewMyProductsBtn) {
+      viewMyProductsBtn.addEventListener("click", async () => {
+        mainLoader("pages/product2Me/product2Me.html", "index-myProducts-container", 0, undefined, "showHomeIcon", true);
+      });
+    }
+
+    const contactBtn = document.getElementById("index-contact-btn");
+    if (contactBtn) {
+      contactBtn.addEventListener("click", () => {
+        mainLoader("pages/contact.html", "index-contact-container", 0, undefined, "showHomeIcon", true);
+      });
+    }
 
     // [Step 4.2] Admin Panel Button
     const adminBtn = document.getElementById("dash-admin-panel-btn");

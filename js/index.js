@@ -129,9 +129,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
     });
 
-  document
-    .getElementById("index-contact-btn")
-    .addEventListener("click", handleContactButtonClick);
+  // document.getElementById("index-contact-btn").addEventListener("click", handleContactButtonClick);
 
 
   // [Step 5.5] Bind "Cart" button.
@@ -168,19 +166,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
     });
 
-  // [Step 5.6] Bind "Gifts" button.
-  /**
-   * @event click
-   * @description Handles the "Gifts" button click. Navigates to the gifts page via a protected link handler.
-   */
-  document
-    .getElementById("index-gifts-btn")
-    .addEventListener("click", () => {
-      if (showLoginAlert()) {
-        handleProtectedLinkClick("./pages/gifts.html")
-      }
-    }
-    );
+  // Gifts logic moved to dashboard
 
 
 
@@ -277,83 +263,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
-  /**
-   * @function handleContactButtonClick
-   * @description Handles the "Contact Us" button click. Loads the contact page.
-   * @returns {void}
-   */
-  function handleContactButtonClick() {
-    const container = document.getElementById("index-contact-btn");
-    mainLoader(
-      "pages/contact.html",
-      "index-contact-container",
-      0,
-      undefined,
-      "showHomeIcon",
-      true
-    );
+  // handleContactButtonClick moved to dashboard logic
 
-  }
-
-  // [Step 5.7] Bind "Add Product" button.
-  /**
-   * @constant {HTMLElement} addProductBtn
-   * @description Button element for adding a new product.
-   */
-  const addProductBtn = document.getElementById("dash-add-product-btn");
-  if (addProductBtn) {
-    addProductBtn.addEventListener("click",
-      function () {
-        if (showLoginAlert()) {
-          showAddProductModal();
-        }
-      });
-  }
-  // [Step 5.8] Bind "My Products" button.
-  /**
-   * @constant {HTMLElement} viewMyProductsBtn
-   * @description Button element for viewing the user's products.
-   */
-  const viewMyProductsBtn = document.getElementById(
-    "dash-view-my-products-btn"
-  );
-  if (viewMyProductsBtn) {
-    /**
-     * @event click
-     * @description Handles "My Products" button click. Loads the user's products page.
-     * @async
-     */
-    viewMyProductsBtn.addEventListener("click", async () => {
-      if (showLoginAlert()) {
-        console.log(myProducts);
-        const container = document.getElementById(
-          "index-myProducts-container"
-        );
-        if (container.innerHTML == "") {
-          mainLoader(
-            "pages/product2Me/product2Me.html",
-            "index-myProducts-container",
-            0,
-            undefined,
-            "showHomeIcon",
-            true
-          );
-        }
-        else {
-          mainLoader(
-            "pages/product2Me/product2Me.html",
-            "index-myProducts-container",
-            0,
-            undefined,
-            "showHomeIcon",
-            false
-          );
-        }
-
-      }
-    });
-
-  }
+  // Add/My Products logic moved to dashboard
   //#endregion
 
   // [Step 6] Validation logic for active button in navigation bar.
