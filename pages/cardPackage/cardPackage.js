@@ -134,10 +134,16 @@ try {
  */
 function cartPage_loadCart() {
     try {
-        const cartPage_cart = getCart();
         const cartPage_cartItemsContainer = document.getElementById('cartPage_cartItemsContainer');
         const cartPage_emptyCart = document.getElementById('cartPage_emptyCart');
         const cartPage_cartSummary = document.getElementById('cartPage_cartSummary');
+
+        // فحص دفاعي: إذا لم تكن العناصر موجودة، فهذا يعني أننا لسنا في صفحة السلة
+        if (!cartPage_cartItemsContainer || !cartPage_emptyCart || !cartPage_cartSummary) {
+            return;
+        }
+
+        const cartPage_cart = getCart();
 
         if (cartPage_cart.length === 0) {
             cartPage_cartItemsContainer.innerHTML = '';

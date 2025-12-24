@@ -256,11 +256,11 @@ export function generateSellerGroupedHtml(groupedData) {
                     </tbody>
                     <tfoot style="background: #f1f1f1; font-weight: bold;">
                         <tr>
-                            <td colspan="4" style="padding: 8px; text-align: left;">إجمالي الحساب للبائع (سعر البيع):</td>
+                            <td colspan="4" style="padding: 8px; text-align: right;">إجمالي الحساب للبائع (سعر البيع):</td>
                             <td style="padding: 8px;">${group.products.reduce((sum, p) => sum + (p.price * p.quantity), 0).toFixed(2)} جنيه</td>
                         </tr>
                         <tr>
-                            <td colspan="4" style="padding: 8px; text-align: left; color: #d97706;">إجمالي سعر التطبيق:</td>
+                            <td colspan="4" style="padding: 8px; text-align: right; color: #d97706;">إجمالي سعر التطبيق:</td>
                             <td style="padding: 8px; color: #d97706;">${group.products.reduce((sum, p) => sum + (p.realPrice * p.quantity), 0).toFixed(2)} جنيه</td>
                         </tr>
                     </tfoot>
