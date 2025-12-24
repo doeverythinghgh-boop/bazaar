@@ -542,19 +542,9 @@ async function salesMovement_checkProductKeyChanges() {
                     type: product.serviceType,
                 };
 
-                // تحديث الجلسة
-                if (typeof productSession !== 'undefined') {
-                    productSession = [productDataForModal, { showAddToCart: false }];
-                    console.log('✅ تم تحديث productSession من salesMovement');
-                }
-
-                // عرض المنتج
-                if (typeof productViewLayout === 'function') {
-                    productViewLayout(productDataForModal.type);
-                    console.log('✅ تم استدعاء productViewLayout');
-                } else {
-                    console.warn('⚠️ الدالة productViewLayout غير موجودة');
-                }
+                // تحديث الجلسة وعرض المنتج باستخدام النظام الحديث
+                loadProductView(productDataForModal, { showAddToCart: false });
+                console.log('✅ تم استدعاء loadProductView بنجاح');
 
             } catch (fetchError) {
                 console.error('❌ خطأ في جلب بيانات المنتج:', fetchError);
