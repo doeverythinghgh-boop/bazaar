@@ -57,70 +57,104 @@ function showCustomInstallModal() {
   Swal.fire({
     title: '<span style="font-family: var(--font-primary); font-size: 1.2rem; color: var(--dark-blue);">اختر الطريقة المناسبة لك</span>',
     html: `
-      <div style="display: flex; flex-direction: column; gap: 15px; padding: 10px;">
+      <div class="install-modal-container">
         
         <!-- Option 1: Google Play -->
         <a href="${PLAY_STORE_URL}" target="_blank" class="install-btn google-play-style" onclick="handleInstallChoice('google')">
-          <i class="fab fa-google-play fa-2x"></i>
+          <i class="fab fa-google-play"></i>
           <div class="btn-text">
-            <span>GET IT ON</span>
+            <span class="small-text">GET IT ON</span>
             <span class="store-name">Google Play</span>
           </div>
         </a>
 
         <!-- Option 2: PWA Install (Styled as generic App Store / Apple Style) -->
         <div class="install-btn apple-store-style" onclick="triggerPWAInstall()">
-          <i class="fab fa-apple fa-2x"></i>
+          <i class="fab fa-apple"></i>
           <div class="btn-text">
-            <span>Download on the</span>
+            <span class="small-text">Download on the</span>
             <span class="store-name">App Store</span>
           </div>
         </div>
 
       </div>
       <style>
+        .install-modal-container {
+          display: flex;
+          flex-direction: column;
+          gap: 15px;
+          padding: 10px;
+          align-items: center;
+          width: 100%;
+        }
         .install-btn {
           display: flex;
           align-items: center;
-          background-color: #000;
+          justify-content: flex-start;
+          background-color: #1a1a1a;
           color: #fff;
-          border-radius: 10px;
-          padding: 8px 15px;
+          border-radius: 12px;
+          padding: 10px 20px;
           text-decoration: none;
           cursor: pointer;
-          transition: transform 0.2s, opacity 0.2s;
-          box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-          width: 240px;
-          margin: 0 auto;
+          transition: transform 0.2s, background-color 0.2s, box-shadow 0.2s;
+          box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+          width: 100%;
+          max-width: 280px; /* Max width for larger screens */
+          border: 1px solid rgba(255,255,255,0.1);
+        }
+        .install-btn:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 6px 14px rgba(0,0,0,0.2);
         }
         .install-btn:active {
-          transform: scale(0.98);
+          transform: scale(0.97);
         }
         .google-play-style {
-          background-color: #000; /* or standard dark grey/green if preferred, user said "Store Icon" */
+          background-color: #202124; /* Google Dark Grey */
         }
         .apple-store-style {
-          background-color: #000;
+          background-color: #000000; /* Apple Black */
         }
         .install-btn i {
-          margin-right: 15px; /* RTL flip might be needed if dir=rtl, keeping logic general */
-          width: 30px;
+          margin-right: 15px;
+          font-size: 28px;
+          width: 35px;
           text-align: center;
+        }
+        /* Mobile adjustments for RTL */
+        [dir="rtl"] .install-btn i {
+          margin-right: 0;
+          margin-left: 15px;
         }
         .btn-text {
           display: flex;
           flex-direction: column;
           align-items: flex-start;
-          line-height: 1.1;
+          line-height: 1.2;
         }
-        .btn-text span:first-child {
-          font-size: 0.7rem;
+        .small-text {
+          font-size: 0.75rem;
           font-weight: 300;
+          opacity: 0.9;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
         }
-        .btn-text .store-name {
-          font-size: 1.2rem;
+        .store-name {
+          font-size: 1.3rem;
           font-weight: 600;
-          font-family: -apple-system, BlinkMacSystemFont, sans-serif; /* Store fonts look usually generic sans */
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        @media (max-width: 360px) {
+            .install-btn {
+                padding: 8px 15px;
+            }
+            .store-name {
+                font-size: 1.1rem;
+            }
+            .install-btn i {
+                font-size: 24px;
+            }
         }
       </style>
     `,
