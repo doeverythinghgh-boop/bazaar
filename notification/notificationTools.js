@@ -1064,7 +1064,7 @@ async function notifyAdminOnNewItem(productData) {
         const itemName = productData.productName || 'غير مسمى';
         const itemKey = productData.product_key || 'N/A';
         const userKey = productData.user_key || 'N/A';
-        const userName = userSession?.user_name || 'مستخدم مجهول';
+        const userName = userSession?.username || 'مستخدم مجهول';
 
         console.log(`[Dev-Notification] 🛠️ تجهيز القالب: new-item-added.admin | المادة: ${itemName} | المفتاح: ${itemKey} | بواسطة: ${userName} | المستخدم: ${userKey}`);
         const { title, body } = getMessageTemplate('new-item-added.admin', {

@@ -391,7 +391,7 @@
                             <button class="btn-approve" onclick="window.updateStatus('${p.product_key}', '${p.productName}', 1)">
                                 <i class="fas fa-check"></i> موافقة
                             </button>
-                             <button class="btn-reject" onclick="window.deleteProduct('${p.product_key}', '${p.productName}')">
+                             <button class="btn-reject" onclick="window.deleteProduct('${p.product_key}', '${p.productName}', '${p.ImageName || ''}')">
                                 <i class="fas fa-times"></i> رفض
                             </button>
                              <button class="btn-view" onclick="window.previewProduct('${p.product_key}')">
@@ -456,7 +456,7 @@
                                 <i class="fas fa-ban"></i> إلغاء النشر
                             </button>
                             <div style="height:5px"></div>
-                             <button class="btn-reject" style="width:100%" onclick="window.deleteProduct('${p.product_key}', '${p.productName}')">
+                             <button class="btn-reject" style="width:100%" onclick="window.deleteProduct('${p.product_key}', '${p.productName}', '${p.ImageName || ''}')">
                                 <i class="fas fa-trash"></i> حذف
                             </button>
                         </td>
@@ -537,36 +537,52 @@
      * @param {string} name - The product name.
      * @returns {Promise<void>}
      */
-    async function deleteProduct(key, name) {
+    async function deleteProduct(key, name, imageNamesStr) {
         const confirm = await Swal.fire({
             title: 'حذف المنتج',
-            text: `هل أنت متأكد من حذف "${name}" نهائياً؟`,
+            text: `هل أنت متأكد من حذف "${name}" نهائياً؟ سيتم أيضاً حذف جميع صور المنتج من التخزين السحابي.`,
             icon: 'warning',
             showCancelButton: true,
             confirmButtonText: 'نعم، حذف',
             confirmButtonColor: '#dc3545',
-            cancelButtonText: 'إلغاء'
+            cancelButtonText: 'إلغاء',
+            showLoaderOnConfirm: true,
+            preConfirm: async () => {
+                try {
+                    // 1. Delete images from Cloudflare R2
+                    if (imageNamesStr) {
+                        const imageNames = imageNamesStr.split(',').map(s => s.trim()).filter(s => s);
+                        if (imageNames.length > 0) {
+                            console.log(`[Admin] Deleting ${imageNames.length} images from R2...`);
+                            await Promise.all(imageNames.map(img =>
+                                deleteFile2cf(img).catch(err => console.error(`[Delete] فشل حذف الصورة ${img}:`, err))
+                            ));
+                        }
+                    }
+
+                    // 2. Delete from database
+                    const res = await fetch(`${baseURL}/api/products?product_key=${key}`, { method: 'DELETE' });
+                    if (!res.ok) throw new Error('فشل حذف المنتج من قاعدة البيانات');
+
+                    return true;
+                } catch (e) {
+                    Swal.showValidationMessage(`خطأ: ${e.message}`);
+                    return false;
+                }
+            },
+            allowOutsideClick: () => !Swal.isLoading()
         });
 
-        if (!confirm.isConfirmed) return;
-
-        try {
-            Swal.showLoading();
-            const res = await fetch(`${baseURL}/api/products?product_key=${key}`, { method: 'DELETE' });
-            if (!res.ok) throw new Error('فشل الحذف');
-
+        if (confirm.isConfirmed) {
             Swal.fire({
                 icon: 'success',
                 title: 'تم الحذف',
-                text: 'تم حذف المنتج بنجاح',
+                text: 'تم حذف المنتج وصوره بنجاح',
                 timer: 1500,
                 showConfirmButton: false
             });
 
             fetchAllData();
-
-        } catch (e) {
-            Swal.fire('خطأ', e.message, 'error');
         }
     }
     // Attach to window

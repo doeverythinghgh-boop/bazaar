@@ -5,7 +5,7 @@
    */
 
   // Product Data
-  let myProducts = []; // To be populated from actual source
+  var myProducts = []; // To be populated from actual source
 
   // Main DOM Elements
   const productsGrid = document.getElementById("products-grid");
