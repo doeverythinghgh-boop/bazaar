@@ -1,5 +1,5 @@
 {
-  "version": "1.1.3",
-  "notes": "Fix for notification display and service category",
-  "lastUpdated": "2025-12-26T23:25:35Z"
+  "version": "1.1.5",
+  "notes": "الجسر النهائي للبيانات وإصلاح تذييل الخدمة في الـ Stepper",
+  "lastUpdated": "2025-12-26T23:45:00Z"
 }

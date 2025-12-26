@@ -377,6 +377,7 @@ function salesMovement_showOrderDetails(salesMovement_orderData) {
                     product_price: salesMovement_item.product_price,
                     realPrice: salesMovement_item.realPrice,
                     item_status: salesMovement_item.item_status || null, // Pass Item Status
+                    serviceType: salesMovement_item.serviceType, // ✅ جلب نوع الخدمة لكل عنصر
                     supplier_delivery: null
                 };
 

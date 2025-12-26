@@ -192,6 +192,10 @@
 
             // Inject data into the app
             window.initializeStepperData(control, orders);
+
+            // ✅ استدعاء فوري بعد الحقن لضمان الموثوقية
+            console.log("🛠️ [StepperOnly] Data injected, performing UI checks...");
+            initPhotoLink();
         } else {
             console.warn("⚠️ [StepperOnly] No parent data found or initializeStepperData missing.");
         }
@@ -199,51 +203,77 @@
         // 2. Auto-Scroll Tutorial (New)
         runStepperScrollTutorial();
 
-        // 3. Photo Link Logic (Existing)
+        // 3. Photo Link Logic (Robust Recovery)
+        let initRetries = 0;
         const checkData = setInterval(() => {
-            // Need to check the exported ordersData, or wait for initialization
-            if (ordersData && ordersData.length > 0) {
-                clearInterval(checkData);
-                initPhotoLink();
-            }
-        }, 500);
+            // Priority 1: Check internal data
+            // Priority 2: Fallback to parent bridge directly
+            const currentOrders = (ordersData && ordersData.length > 0) ? ordersData :
+                (window.parent && window.parent.globalStepperAppData && window.parent.globalStepperAppData.ordersData);
 
-        function initPhotoLink() {
+            if (currentOrders && currentOrders.length > 0) {
+                initPhotoLink(currentOrders);
+                initRetries++;
+                // We keep checking for a few times even after success in case of UI flickering
+                if (initRetries > 5) clearInterval(checkData);
+            }
+        }, 1000);
+
+        function initPhotoLink(activeOrders) {
+            const data = activeOrders || ordersData;
+            console.log("🔍 [StepperOnly] initPhotoLink checking visibility...", {
+                dataLength: data.length,
+                retry: initRetries
+            });
+
             const linkContainer = document.getElementById('orderPhotoLinkContainer');
             const link = document.getElementById('orderPhotoLink');
+            const serviceFooter = document.getElementById('orderServiceFooter');
+            const valueInput = document.getElementById('orderValueInput');
 
-            if (ordersData.length > 0) {
-                const order = ordersData[0];
+            if (!serviceFooter) {
+                console.warn("⚠️ [StepperOnly] orderServiceFooter not found yet.");
+                return;
+            }
+
+            if (data.length > 0) {
+                const order = data[0];
                 const item = order.order_items && order.order_items[0];
 
-                // Double Check: Explicit orderType OR any item having serviceType === 1
+                // Comprehensive Service Check
                 const isServiceOrder = Number(order.orderType) === 1 ||
                     (order.order_items && order.order_items.some(i => Number(i.serviceType) === 1));
 
-                console.log("[StepperOnly] Checking order type:", {
+                console.log("[StepperOnly] Service Detection:", {
+                    id: order.order_key,
+                    isService: isServiceOrder,
                     orderType: order.orderType,
-                    isServiceOrder: isServiceOrder,
-                    itemsWithServiceType: order.order_items ? order.order_items.map(i => i.serviceType) : []
                 });
 
-                // Only show for special orders (Services)
-                if (item && isServiceOrder) {
-                    const u = order.user_key;
-                    const s = item.seller_key;
-                    const p = item.product_key;
-                    const o = order.order_key;
+                if (isServiceOrder) {
+                    // Show Footer
+                    serviceFooter.style.setProperty('display', 'flex', 'important');
 
-                    link.onclick = (e) => {
-                        e.preventDefault();
-                        window.parent.orderPhotoParams = { u, s, p, o };
-                        window.parent.mainLoader(`pages/orderPhoto.html?u=${u}&s=${s}&p=${p}&o=${o}`, "index-orderPhoto-container", 0, undefined, "showHomeIcon", true);
-                    };
+                    // Set Price if available and input is empty
+                    if (valueInput && (!valueInput.value || valueInput.value == "0")) {
+                        valueInput.value = order.total_amount || "";
+                    }
 
-                    const serviceFooter = document.getElementById('orderServiceFooter');
-                    if (serviceFooter) serviceFooter.style.display = 'flex';
+                    // Setup Image Link if item exists
+                    if (item && link) {
+                        const u = order.user_key;
+                        const s = item.seller_key;
+                        const p = item.product_key;
+                        const o = order.order_key;
+
+                        link.onclick = (e) => {
+                            e.preventDefault();
+                            window.parent.orderPhotoParams = { u, s, p, o };
+                            window.parent.mainLoader(`pages/orderPhoto.html?u=${u}&s=${s}&p=${p}&o=${o}`, "index-orderPhoto-container", 0, undefined, "showHomeIcon", true);
+                        };
+                    }
                 } else {
-                    const serviceFooter = document.getElementById('orderServiceFooter');
-                    if (serviceFooter) serviceFooter.style.display = 'none';
+                    serviceFooter.style.display = 'none';
                 }
             }
         }
