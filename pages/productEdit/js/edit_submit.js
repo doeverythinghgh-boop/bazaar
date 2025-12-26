@@ -112,10 +112,13 @@ if (EDIT_form) {
             // 3. Assemble Final Content
             const allImageNames = [...remainingExistingImageNames, ...uploadedImageUrls];
 
+            const currentProduct = (typeof ProductStateManager !== 'undefined') ? ProductStateManager.getCurrentProduct() : null;
+            if (!currentProduct) throw new Error("بيانات المنتج غير متوفرة في مدير الحالة");
+
             // 4. Assemble Product Data
             const productData = {
                 productName: normalizeArabicText(productNameInput.value.trim()),
-                user_key: productSession.user_key,
+                user_key: currentProduct.user_key,
                 product_key: productKey,
                 product_description: normalizeArabicText(descriptionTextarea.value.trim()),
                 product_price: parseFloat(priceInput.value) || 0,
@@ -125,24 +128,24 @@ if (EDIT_form) {
                 user_message: normalizeArabicText(sellerMessageTextarea.value.trim()),
                 user_note: normalizeArabicText(notesInput.value.trim()),
                 ImageName: allImageNames.join(','),
-                MainCategory: productSession.MainCategory || 2,
-                SubCategory: productSession.SubCategory || 3,
+                MainCategory: currentProduct.MainCategory || 2,
+                SubCategory: currentProduct.SubCategory || 3,
                 ImageIndex: allImageNames.length,
-                serviceType: (productSession.MainCategory == 6) ? 2 : 0,
+                serviceType: (currentProduct.MainCategory == 6) ? 2 : 0,
                 is_approved: 0 // Reset approval status to pending on edit
             };
 
             // 5. Check if any data has actually changed
             const hasDataChanged =
-                productData.productName !== (productSession.productName || '') ||
-                productData.product_description !== (productSession.product_description || '') ||
-                productData.product_price !== (productSession.product_price || 0) ||
-                productData.product_quantity !== (productSession.product_quantity || 0) ||
-                productData.original_price !== (productSession.original_price || null) ||
-                productData.realPrice !== (productSession.realPrice || null) ||
-                productData.user_message !== (productSession.user_message || '') ||
-                productData.user_note !== (productSession.user_note || '') ||
-                productData.ImageName !== (productSession.ImageName || '');
+                productData.productName !== (currentProduct.productName || '') ||
+                productData.product_description !== (currentProduct.product_description || '') ||
+                productData.product_price !== (currentProduct.product_price || 0) ||
+                productData.product_quantity !== (currentProduct.product_quantity || 0) ||
+                productData.original_price !== (currentProduct.original_price || null) ||
+                productData.realPrice !== (currentProduct.realPrice || null) ||
+                productData.user_message !== (currentProduct.user_message || '') ||
+                productData.user_note !== (currentProduct.user_note || '') ||
+                productData.ImageName !== (currentProduct.ImageName || '');
 
             if (!hasDataChanged) {
                 Swal.fire({

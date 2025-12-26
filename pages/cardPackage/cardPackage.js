@@ -57,6 +57,7 @@ async function sendOrder2Excution() {
             order_key: orderKey,
             user_key: userSession.user_key,
             total_amount: totalAmount,
+            orderType: 0, // 0 = Product
             items: cart.map((item) => ({
                 product_key: item.product_key,
                 quantity: item.quantity,

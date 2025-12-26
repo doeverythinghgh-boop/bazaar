@@ -115,9 +115,7 @@ function productView_viewDetails(productData, options = {}) {
         if (productData) {
             productView_viewDetails(productData, viewOptions);
         } else {
-            if (typeof productSession !== 'undefined' && productSession) {
-                productView_viewDetails(productSession[0], productSession[1]);
-            }
+            console.warn("[ProductView] لا توجد بيانات منتج في مدير الحالة");
         }
     } catch (error) {
         console.error("خطأ في تهيئة نافذة عرض المنتج:", error);

@@ -40,12 +40,6 @@
         <main id="main-content">
             <!-- الشريط الرئيسي للحالات الأساسية -->
 
-            <!-- ✅ جديد: رابط عرض صور الطلب الخاص -->
-            <div class="order-photo-link-container" id="orderPhotoLinkContainer">
-                <a href="#" id="orderPhotoLink" class="order-photo-link">
-                    <i class="fas fa-images"></i> عرض صور الطلب الخاص
-                </a>
-            </div>
 
             <div class="stepper-container" id="primary-stepper-container">
                 <div class="stepper-wrapper" id="primary-stepper-wrapper">
@@ -122,6 +116,19 @@
 
             <!-- حاوية وصف الخطوات النهائية (5-7) -->
             <div id="secondary-step-description-container" class="step-description secondary-description">
+            </div>
+
+            <!-- ✅ جديد: الحاوية السفلية لطلبات الخدمات -->
+            <div class="order-service-footer" id="orderServiceFooter">
+                <div class="order-photo-link-container" id="orderPhotoLinkContainer">
+                    <a href="#" id="orderPhotoLink" class="order-photo-link">
+                        <i class="fas fa-images"></i> عرض صور الطلب الخاص
+                    </a>
+                </div>
+                <div class="order-value-input-container">
+                    <label for="orderValueInput">قيمة الطلب:</label>
+                    <input type="number" id="orderValueInput" class="order-value-input" step="0.01" placeholder="0.00">
+                </div>
             </div>
         </main>
     </div>
@@ -211,12 +218,12 @@
 
                 console.log("[StepperOnly] Checking order for photo link:", {
                     total_amount: order.total_amount,
-                    type: typeof order.total_amount,
-                    condition: (order.total_amount == 0)
+                    orderType: order.orderType,
+                    condition: (order.orderType === 1)
                 });
 
-                // Only show for special orders where total_amount is 0
-                if (item && order.total_amount == 0) {
+                // Only show for special orders where orderType is 1 (Service)
+                if (item && order.orderType === 1) {
                     const u = order.user_key;
                     const s = item.seller_key;
                     const p = item.product_key;
@@ -228,9 +235,11 @@
                         window.parent.mainLoader(`pages/orderPhoto.html?u=${u}&s=${s}&p=${p}&o=${o}`, "index-orderPhoto-container", 0, undefined, "showHomeIcon", true);
                     };
 
-                    linkContainer.style.display = 'block';
+                    const serviceFooter = document.getElementById('orderServiceFooter');
+                    if (serviceFooter) serviceFooter.style.display = 'flex';
                 } else {
-                    linkContainer.style.display = 'none';
+                    const serviceFooter = document.getElementById('orderServiceFooter');
+                    if (serviceFooter) serviceFooter.style.display = 'none';
                 }
             }
         }

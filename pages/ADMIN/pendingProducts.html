@@ -629,14 +629,11 @@
                 type: p.serviceType,
             };
 
-            // Set Global Session
-            window.productSession = [productDataForModal, true];
-
-            // Call Layout View
-            if (typeof productViewLayout === 'function') {
-                productViewLayout(productDataForModal.type);
+            // Use new loadProductView function
+            if (typeof loadProductView === 'function') {
+                loadProductView(productDataForModal, true);
             } else {
-                console.error("productViewLayout function is missing!");
+                console.error("loadProductView function is missing!");
                 // Fallback
                 Swal.fire({
                     title: p.productName,

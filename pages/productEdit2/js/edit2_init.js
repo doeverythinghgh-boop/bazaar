@@ -5,16 +5,18 @@
 
 /**
  * @function initializeEditProductForm
- * @description Initializes the service edit form by populating it with data from `productSession`.
+ * @description Initializes the service edit form by populating it with data from `ProductStateManager`.
  */
 async function initializeEditProductForm() {
     console.log('%c[ProductForm] تهيئة نموذج تعديل الخدمة...', 'color: blue;');
 
-    if (!productSession) {
-        console.error('%c[ProductForm] لم يتم العثور على productSession!', 'color: red;');
+    const currentProduct = (typeof ProductStateManager !== 'undefined') ? ProductStateManager.getCurrentProduct() : null;
+
+    if (!currentProduct) {
+        console.error('%c[ProductForm] لم يتم العثور على بيانات الخدمة في مدير الحالة!', 'color: red;');
         return;
     } else {
-        console.log('%c[ProductForm] تم العثور على productSession!', 'color: green;');
+        console.log('%c[ProductForm] تم العثور على بيانات الخدمة!', 'color: green;');
     }
 
     const form = document.getElementById('edit-product-form');
@@ -24,17 +26,17 @@ async function initializeEditProductForm() {
     // Set edit mode data
     if (form) {
         form.dataset.mode = 'edit';
-        form.dataset.productKey = productSession.product_key;
+        form.dataset.productKey = currentProduct.product_key;
     }
 
-    console.log(`[ProductForm] تعديل الخدمة: ${productSession.product_key}`);
+    console.log(`[ProductForm] تعديل الخدمة: ${currentProduct.product_key}`);
 
     // Populate text fields
     const fields = {
-        'product-name': productSession.productName,
-        'product-description': productSession.product_description,
-        'seller-message': productSession.user_message,
-        'product-notes': productSession.user_note
+        'product-name': currentProduct.productName,
+        'product-description': currentProduct.product_description,
+        'seller-message': currentProduct.user_message,
+        'product-notes': currentProduct.user_note
     };
 
     for (const [id, value] of Object.entries(fields)) {
@@ -57,7 +59,7 @@ window.initializeEditProductForm = initializeEditProductForm;
 
 // Auto-initialize on load
 document.addEventListener('DOMContentLoaded', () => {
-    if (typeof productSession !== 'undefined') {
+    if (typeof ProductStateManager !== 'undefined' && ProductStateManager.getCurrentProduct()) {
         initializeEditProductForm();
     }
 });

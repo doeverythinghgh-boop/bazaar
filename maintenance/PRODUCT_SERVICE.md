@@ -17,7 +17,8 @@
   "serviceMainCategories": [6, 20],
   "serviceSubCategories": [
     { "mainId": 3, "subId": 5, "description": "خدمات تطوير المواقع" },
-    { "mainId": 6, "subId": 9, "description": "خدمات تعليمية" }
+    { "mainId": 44, "subId": 4, "description": "عضوية أوريفليم" },
+    { "mainId": 7, "subId": 3, "description": "خدمات الشحن والتوصيل" }
   ],
   "settings": {
     "hidePrice": true,
@@ -72,7 +73,14 @@ isServiceCategory(1, 1);         // false (منتج عادي)
 function getServiceType(mainId, subId = null)
 ```
 - **الوظيفة:** الحصول على نوع العنصر كنص
-- **الإرجاع:** `'2'` للخدمات، `'0'` للمنتجات
+- **الإرجاع:** `'2'` للخدمات، `'0'` للمنتجات (أو حسب القيم المعرفة في `settings`)
+
+##### `getServiceSettings()`
+```javascript
+function getServiceSettings()
+```
+- **الوظيفة:** الحصول على جميع إعدادات الخدمات العامة
+- **الإرجاع:** كائن يحتوي على `hidePrice`, `serviceType`, `productType`
 
 ---
 
@@ -95,8 +103,15 @@ ProductStateManager.setProductForView(productData, options = {})
 ```javascript
 ProductStateManager.getCurrentProduct()
 ```
-- **الوظيفة:** الحصول على بيانات المنتج/الخدمة الحالي
+- **الوظيفة:** الحصول على بيانات المنتج/الخدمة الحالي المخزن
 - **الإرجاع:** `object|null`
+
+##### `getViewOptions()`
+```javascript
+ProductStateManager.getViewOptions()
+```
+- **الوظيفة:** الحصول على خيارات العرض المخزنة (مثل `showAddToCart`)
+- **الإرجاع:** `object` (يكون فارغاً `{}` كقيمة افتراضية)
 
 ##### `setSelectedCategories(mainId, subId)`
 ```javascript
@@ -111,8 +126,20 @@ ProductStateManager.setSelectedCategories(mainId, subId)
 ```javascript
 ProductStateManager.getSelectedCategories()
 ```
-- **الوظيفة:** الحصول على الفئات المختارة
+- **الوظيفة:** الحصول على الفئات المختارة حالياً
 - **الإرجاع:** `{mainId, subId}|null`
+
+##### `clear()`
+```javascript
+ProductStateManager.clear()
+```
+- **الوظيفة:** مسح كافة البيانات المخزنة في الـ State (المنتج الحالي، الخيارات، الفئات)
+
+##### `getState()`
+```javascript
+ProductStateManager.getState()
+```
+- **الوظيفة:** الحصول على نسخة كاملة من الحالة الداخلية (أغراض التطوير وتصحيح الأخطاء)
 
 ---
 
@@ -352,39 +379,52 @@ function generateSearchResultHTML(product) {
 3. **احفظ الملف** - لا حاجة لتعديل أي كود!
 
 4. **أعد تحميل الصفحة** - سيتم تحميل التكوين الجديد تلقائياً
+## 🔄 تكامل حالة البيانات (State Integration)
+
+يعتمد المشروع الآن كلياً على **نظام إدارة الحالة المركزي** لضمان ثبات البيانات وسهولة الصيانة:
+
+1. **الاعتماد الأساسي**: يتم استخدام `ProductStateManager.getCurrentProduct()` و `ProductStateManager.getSelectedCategories()` في كافة مراحل (العرض، التعديل، الإضافة).
+2. **التوجيه الذكي**: يتم استخدام `loadProductView()` و `loadProductForm()` للتحكم في التنقل بين الصفحات بناءً على نوع العنصر المكتشف تلقائياً.
 
 ---
 
-## الدوال القديمة (للتوافق فقط)
+## الدوال والمتغيرات المهجورة (Deprecated)
 
-> [!WARNING]
-> **الدوال التالية محفوظة للتوافق مع الكود القديم فقط. استخدم الدوال الجديدة في الكود الجديد.**
+> [!CAUTION]
+> **يُمنع استخدام العناصر التالية في أي تطوير جديد.** تم الإبقاء على تعريفاتها في `globalVariable.js` فقط لمنع تعطل الأجزاء القديمة من المشروع التي لم يتم تحديثها بعد، وسيتم إزالتها نهائياً في التحديثات القادمة.
 
-- `productViewLayout(View)` → استخدم `loadProductView(productData, options)`
-- `productAddSetType(editMode)` → استخدم `loadProductForm(options)`
+### الدوال المهجورة:
+- `productViewLayout(View)` → **البديل**: `loadProductView(productData, options)`
+- `productAddSetType(editMode)` → **البديل**: `loadProductForm(options)`
 
----
-
-## المتغيرات العامة (للتوافق فقط)
-
-> [!WARNING]
-> **المتغيرات التالية محفوظة للتوافق فقط. استخدم `ProductStateManager` في الكود الجديد.**
-
-- `window.productSession` → استخدم `ProductStateManager.getCurrentProduct()`
-- `window.mainCategorySelectToAdd` → استخدم `ProductStateManager.getSelectedCategories()`
-- `window.subCategorySelectToAdd` → استخدم `ProductStateManager.getSelectedCategories()`
-- `window.productTypeToAdd` → استخدم `isServiceCategory()`
+### المتغيرات العامة المهجورة:
+- `window.productSession` → **البديل**: `ProductStateManager.getCurrentProduct()`
+- `window.mainCategorySelectToAdd` → **البديل**: `ProductStateManager.getSelectedCategories()`
+- `window.subCategorySelectToAdd` → **البديل**: `ProductStateManager.getSelectedCategories()`
+- `window.productTypeToAdd` → **البديل**: `isServiceCategory()` أو `getServiceType()`
 
 ---
 
-## الخلاصة
+## نظام تمييز الطلبات (Order Identification System)
 
-| العملية | الدالة المستخدمة | الصفحة المحملة |
-|---------|-------------------|-----------------|
-| **عرض منتج** | `loadProductView(data, options)` | `productView/productView.html` |
-| **عرض خدمة** | `loadProductView(data, options)` | `productView2/productView2.html` |
-| **إضافة منتج** | `loadProductForm({editMode: false})` | `productAdd/productAdd.html` |
-| **إضافة خدمة** | `loadProductForm({editMode: false})` | `productAdd2/productAdd2.html` |
-| **تعديل منتج** | `loadProductForm({editMode: true, productData})` | `productEdit/productEdit.html` |
-| **تعديل خدمة** | `loadProductForm({editMode: true, productData})` | `productEdit2/productEdit2.html` |
-| **التحقق من النوع** | `isServiceCategory(mainId, subId)` | - |
+يستخدم المشروع حقل `orderType` في جدول `orders` للفصل التقني بين أنواع الطلبات، مما يضمن ظهور الواجهة الصحيحة في شريط التقدم (Stepper).
+
+### قيم حقل `orderType`:
+| القيمة | النوع | المصدر | السلوك في الـ Stepper |
+| :--- | :--- | :--- | :--- |
+| **`0`** | **منتج (Product)** | `cardPackage.js` | عرض تقليدي للكميات والأسعار |
+| **`1`** | **خدمة (Service)** | `view2_submit.js` | إظهار أدوات التسعير وصور الطلب المرفقة |
+
+---
+
+## الخلاصة النهائية
+
+| العملية | الدالة المقترحة | النظام المستخدم | القيمة الرقمية (`orderType`) |
+| :--- | :--- | :--- | :--- |
+| **عرض منتج/خدمة** | `loadProductView()` | `ProductStateManager` | - |
+| **إضافة/تعديل** | `loadProductForm()` | `ProductStateManager` | - |
+| **إرسال طلب منتج** | `fetch('/api/orders')` | سلة المشتريات | `0` |
+| **إرسال طلب خدمة** | `fetch('/api/orders')` | واجهة الخدمات | `1` |
+
+---
+*آخر تحديث للوثيقة: ديسمبر 2025 - توحيد نظام إدارة الحالة*

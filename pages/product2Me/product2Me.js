@@ -218,11 +218,6 @@ async function editProduct(productId) {
     // Store in new state manager
     ProductStateManager.setSelectedCategories(result.mainId, result.subId);
 
-    // Also update old global variables for backward compatibility
-    mainCategorySelectToAdd = result.mainId;
-    subCategorySelectToAdd = result.subId;
-    productSession = product;
-
     // Use new function
     loadProductForm({ editMode: true, productData: product });
 

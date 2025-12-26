@@ -91,6 +91,9 @@ add1_form.addEventListener('submit', async (e) => {
             uploadedImageUrls.push(result.file);
         }
 
+        const categories = (typeof ProductStateManager !== 'undefined') ? ProductStateManager.getSelectedCategories() : { mainId: null, subId: null };
+        const serviceType = (typeof getServiceType === 'function') ? getServiceType(categories.mainId, categories.subId) : 0;
+
         const productData = {
             productName: normalizeArabicText(add1_productNameInput.value.trim()),
             user_key: userSession.user_key,
@@ -103,10 +106,10 @@ add1_form.addEventListener('submit', async (e) => {
             user_message: normalizeArabicText(add1_sellerMessageTextarea.value.trim()),
             user_note: normalizeArabicText(add1_notesInput.value.trim()),
             ImageName: uploadedImageUrls.join(','),
-            MainCategory: mainCategorySelectToAdd,
-            SubCategory: subCategorySelectToAdd,
+            MainCategory: categories.mainId,
+            SubCategory: categories.subId,
             ImageIndex: uploadedImageUrls.length,
-            serviceType: productTypeToAdd
+            serviceType: serviceType
         };
 
         const dbResult = await addProduct(productData);

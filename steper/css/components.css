@@ -158,24 +158,103 @@ div:where(.swal2-container) .fullscreen-swal .swal2-title {
    New Components (Extracted from inline styles)
    ============================================ */
 
-/* Order Photo Link Container */
+/* Order Service Footer - Modern & Responsive */
+.order-service-footer {
+    margin: 2rem auto;
+    background: #ffffff;
+    padding: 1.5rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    display: none;
+    /* Managed by JS */
+    flex-direction: column;
+    align-items: center;
+    gap: 1.25rem;
+    border: 1px solid #edf2f7;
+    border-radius: 16px;
+    width: 95%;
+    max-width: 450px;
+    box-sizing: border-box;
+    transition: all 0.3s ease;
+}
+
+.order-service-footer .order-photo-link-container {
+    margin-bottom: 0;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.order-photo-link {
+    color: #4a5568;
+    font-weight: 700;
+    text-decoration: none;
+    font-size: 0.95rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 20px;
+    background: #f7fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    transition: all 0.2s;
+    width: 100%;
+    justify-content: center;
+    box-sizing: border-box;
+}
+
+.order-photo-link:active {
+    background: #edf2f7;
+    transform: scale(0.98);
+}
+
+.order-photo-link i {
+    color: var(--color-primary);
+}
+
+.order-value-input-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.order-value-input-container label {
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: #718096;
+}
+
+.order-value-input {
+    width: 100%;
+    max-width: 100%;
+    /* Fix: prevent overflow */
+    padding: 14px;
+    border: 2px solid #edf2f7;
+    border-radius: 12px;
+    font-size: 1.25rem;
+    font-weight: 800;
+    outline: none;
+    text-align: center;
+    background: #fdfdfd;
+    box-sizing: border-box;
+    /* Fix: ensure padding doesn't add to width */
+    color: var(--color-primary);
+    transition: all 0.2s;
+}
+
+.order-value-input:focus {
+    border-color: var(--color-primary);
+    background: #fff;
+    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+}
+
+/* Order Photo Link Container - Hidden by default */
 .order-photo-link-container {
     text-align: center;
     margin-bottom: 15px;
     display: none;
-}
-
-.order-photo-link {
-    color: #007bff;
-    font-weight: bold;
-    text-decoration: underline;
-    font-size: 1rem;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 5px 10px;
-    background: #eef2f7;
-    border-radius: 20px;
 }
 
 /* Primary Step Description */

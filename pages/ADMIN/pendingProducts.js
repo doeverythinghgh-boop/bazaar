@@ -284,14 +284,11 @@ async function previewProduct(key) {
             type: p.serviceType,
         };
 
-        // Set Global Session variable used by productViewLayout
-        window.productSession = [productDataForModal, true];
-
-        // Call Layout View function if available
-        if (typeof productViewLayout === 'function') {
-            productViewLayout(productDataForModal.type);
+        // Use modern loadProductView which handles state and layout
+        if (typeof loadProductView === 'function') {
+            loadProductView(productDataForModal, { showAddToCart: true });
         } else {
-            console.error("productViewLayout function is missing!");
+            console.error("loadProductView function is missing!");
             // Fallback to simple alert
             Swal.fire({
                 title: p.productName,

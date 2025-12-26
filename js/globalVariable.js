@@ -15,6 +15,7 @@ window.userSession = null;
  * @description Currently displayed product data (for details or editing).
  * @type {Array|object|null}
  * @global
+ * @deprecated Use ProductStateManager.getCurrentProduct() instead.
  */
 window.productSession = null;
 
@@ -22,6 +23,7 @@ window.productSession = null;
  * @description ID of the main category selected when adding a product.
  * @type {string|number|null}
  * @global
+ * @deprecated Use ProductStateManager.getSelectedCategories() instead.
  */
 window.mainCategorySelectToAdd = null;
 
@@ -29,6 +31,7 @@ window.mainCategorySelectToAdd = null;
  * @description ID of the sub-category selected when adding a product.
  * @type {string|number|null}
  * @global
+ * @deprecated Use ProductStateManager.getSelectedCategories() instead.
  */
 window.subCategorySelectToAdd = null;
 
@@ -36,53 +39,17 @@ window.subCategorySelectToAdd = null;
  * @description Product type selected when adding (0 = default, 2 = service, etc).
  * @type {number|null}
  * @global
+ * @deprecated Use serviceCategoryHelper functions instead.
  */
 window.productTypeToAdd = null;
 
 /**
- * @description List of current user's products (for display in "My Products" page).
+ * @description List of current user's products.
  * @type {Array|null}
  * @global
+ * @deprecated Local variables in pages should be preferred.
  */
 window.myProducts = null;
-
-/**
- * @description Loads and displays the product details page based on the requested view type.
- * @function productViewLayout
- * @param {string} View - View type ('0' for normal view, '2' for alternate view).
- * @returns {void}
- * @see mainLoader
- * @deprecated Use loadProductView() instead for better flexibility.
- */
-function productViewLayout(View) {
-  console.log('-----------نوع الخدمه-----------', View);
-  //In sending
-  //productSession = [productDataForModal,{showAddToCart:true}];
-  //In receiving
-  //(productSession[0],  productSession[1] )
-  //function productView_viewDetails(productData, options = {})--->options.showAddToCart
-  if (View == '0') {
-    //option = t/f ==> view or hidden pasket option
-    mainLoader(
-      "pages/productView/productView.html",
-      "index-product-container",
-      0,
-      undefined,
-      "showHomeIcon",
-      true
-    );
-  }
-  if (View == '2') {
-    mainLoader(
-      "pages/productView2/productView2.html",
-      "index-product-container",
-      0,
-      undefined,
-      "showHomeIcon",
-      true
-    );
-  }
-}
 
 /**
  * @description Load appropriate product view page based on product data.
@@ -123,75 +90,9 @@ function loadProductView(productData, options = {}) {
   );
 }
 
-
-/**
- * @description Directs the user to the add new product page, setting the product type based on the selected category.
- * @function productAddSetType
- * @param {boolean} [editMode=false] - Is it edit existing product mode? (Currently not fully used in this logic).
- * @returns {void}
- * @see mainLoader
- * @deprecated Use loadProductForm() instead for better flexibility.
- */
-function productAddSetType(editMode = false) {
-  if (mainCategorySelectToAdd == 6) {
-    productTypeToAdd = 2; // Product type: Service
-  } else {
-    productTypeToAdd = 0; // Product type: Default
-  }
-  if (editMode == false) {
-    if (productTypeToAdd == 2) {
-      mainLoader(
-        "./pages/productAdd2/productAdd2.html",
-        "index-product-container",
-        0,
-        undefined,
-        "showHomeIcon",
-        true
-      );
-    } else if (productTypeToAdd == 0) {
-      mainLoader(
-        "./pages/productAdd/productAdd.html",
-        "index-product-container",
-        0,
-        undefined,
-        "showHomeIcon",
-        true
-      );
-    }
-
-  } else {
-    if (productTypeToAdd == 2) {
-      mainLoader(
-        "./pages/productEdit2/productEdit2.html",
-        "index-product-container",
-        0,
-        undefined,
-        "showHomeIcon",
-        true
-      );
-    } else if (productTypeToAdd == 0) {
-      mainLoader(
-        "./pages/productEdit/productEdit.html",
-        "index-product-container",
-        0,
-        undefined,
-        "showHomeIcon",
-        true
-      );
-    }
-  }
-
-}
-
 /**
  * @description Load appropriate add/edit page based on selected categories.
- * @function loadProductForm
- * @param {object} [options={}] - Options object.
- * @param {boolean} [options.editMode=false] - Is edit mode?
- * @param {object} [options.productData=null] - Product data (for edit mode).
- * @returns {void}
- * @see ProductStateManager
- * @see isServiceCategory
+... (loadProductForm content is kept as is in replace block)
  */
 function loadProductForm(options = {}) {
   const { editMode = false, productData = null } = options;
@@ -231,18 +132,9 @@ function loadProductForm(options = {}) {
   );
 }
 
-
-
-
 /**
  * @description Displays a modal to select the main and sub-category before adding a new product.
- * @async
- * @function showAddProductModal
- * @returns {Promise<void>}
- * @throws {Error} - If there's an error displaying the category modal or setting product layout.
- * @see CategoryModal.show
- * @see ProductStateManager
- * @see loadProductForm
+...
  */
 async function showAddProductModal() {
   try {
@@ -254,17 +146,11 @@ async function showAddProductModal() {
       // Store in new state manager
       ProductStateManager.setSelectedCategories(result.mainId, result.subId);
 
-      // Also update old global variables for backward compatibility
-      mainCategorySelectToAdd = result.mainId;
-      subCategorySelectToAdd = result.subId;
-
       // Use new function
       loadProductForm({ editMode: false });
     }
 
-
   } catch (error) {
     console.error("[AddProduct] خطأ في عرض نافذة إضافة المنتج:", error);
-
   }
 }

@@ -13,7 +13,7 @@ async function pv2_sendOrder() {
             return;
         }
 
-        const productData = (typeof ProductStateManager !== 'undefined') ? ProductStateManager.getCurrentProduct() : (typeof productSession !== 'undefined' ? productSession[0] : null);
+        const productData = (typeof ProductStateManager !== 'undefined') ? ProductStateManager.getCurrentProduct() : null;
         if (!productData) {
             Swal.fire('خطأ', 'لم يتم العثور على بيانات المنتج', 'error');
             return;
@@ -48,6 +48,7 @@ async function pv2_sendOrder() {
                 order_key: order_key,
                 user_key: user_key,
                 total_amount: 0,
+                orderType: 1, // 1 = Service
                 items: [
                     {
                         product_key: product_key,

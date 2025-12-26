@@ -5,13 +5,15 @@
 
 /**
  * @function initializeEditProductForm
- * @description Initializes the product edit form by populating it with data from `productSession`.
+ * @description Initializes the product edit form by populating it with data from `ProductStateManager`.
  */
 async function initializeEditProductForm() {
     console.log('%c[ProductEdit] تهيئة نموذج التعديل...', 'color: blue;');
 
-    if (!productSession) {
-        console.error('%c[ProductEdit] لم يتم العثور على productSession!', 'color: red;');
+    const currentProduct = (typeof ProductStateManager !== 'undefined') ? ProductStateManager.getCurrentProduct() : null;
+
+    if (!currentProduct) {
+        console.error('%c[ProductEdit] لم يتم العثور على بيانات المنتج في مدير الحالة!', 'color: red;');
         return;
     }
 
@@ -22,23 +24,23 @@ async function initializeEditProductForm() {
     // Set edit mode data
     if (form) {
         form.dataset.mode = 'edit';
-        form.dataset.productKey = productSession.product_key;
+        form.dataset.productKey = currentProduct.product_key;
     }
 
-    console.log(`[ProductEdit] تعديل المنتج: ${productSession.product_key}`);
+    console.log(`[ProductEdit] تعديل المنتج: ${currentProduct.product_key}`);
 
     // Populate text fields
     const fields = {
-        'product-name': productSession.productName,
-        'product-description': productSession.product_description,
-        'seller-message': productSession.user_message,
-        'product-notes': productSession.user_note,
-        'product-quantity': productSession.product_quantity,
-        'product-price': productSession.product_price,
-        'original-price': productSession.original_price,
-        'real-price': productSession.realPrice
+        'product-name': currentProduct.productName,
+        'product-description': currentProduct.product_description,
+        'seller-message': currentProduct.user_message,
+        'product-notes': currentProduct.user_note,
+        'product-quantity': currentProduct.product_quantity,
+        'product-price': currentProduct.product_price,
+        'original-price': currentProduct.original_price,
+        'real-price': currentProduct.realPrice
     };
-
+    // ... (omitting loop for brevity in instruction, will include in ReplacementContent)
     for (const [id, value] of Object.entries(fields)) {
         const el = document.getElementById(id);
         if (el) {
@@ -59,9 +61,8 @@ window.initializeEditProductForm = initializeEditProductForm;
 
 // Auto-initialize on load
 document.addEventListener('DOMContentLoaded', () => {
-    // Wait a bit to ensure all scripts are loaded if called directly, 
-    // but usually this is called by the parent window/router.
-    if (typeof productSession !== 'undefined') {
+    // Check if we have state to initialize
+    if (typeof ProductStateManager !== 'undefined' && ProductStateManager.getCurrentProduct()) {
         initializeEditProductForm();
     }
 });

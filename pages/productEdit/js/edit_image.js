@@ -53,12 +53,14 @@ async function EDIT_compressImage(file) {
  */
 async function EDIT_loadExistingImages() {
     const imagesLoadingEl = document.getElementById('images-loading');
-    if (!productSession || !productSession.ImageName) {
+    const currentProduct = (typeof ProductStateManager !== 'undefined') ? ProductStateManager.getCurrentProduct() : null;
+
+    if (!currentProduct || !currentProduct.ImageName) {
         if (imagesLoadingEl) imagesLoadingEl.style.display = 'none';
         return;
     }
 
-    const imageNames = productSession.ImageName.split(',').filter(name => name.trim());
+    const imageNames = currentProduct.ImageName.split(',').filter(name => name.trim());
     EDIT_originalImageNames = [...imageNames];
 
     console.log(`[ProductEdit] تحميل ${imageNames.length} صور موجودة`);

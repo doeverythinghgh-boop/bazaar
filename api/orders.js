@@ -106,13 +106,13 @@ export default async function handler(request) {
   if (request.method === 'POST') {
     try {
       console.log('[API: /api/orders] بدء معالجة طلب إنشاء طلب جديد...');
-      const { order_key, user_key, total_amount, items } = await request.json();
-      console.log('[API: /api/orders] البيانات المستلمة:', { order_key, user_key, total_amount, items_count: items?.length });
+      const { order_key, user_key, total_amount, items, orderType } = await request.json();
+      console.log('[API: /api/orders] البيانات المستلمة:', { order_key, user_key, total_amount, items_count: items?.length, orderType });
 
       // التحقق من وجود البيانات الأساسية
       // التحقق من وجود البيانات الأساسية
       // Fixed: Checked total_amount against undefined/null allowing 0
-      if (!order_key || !user_key || total_amount === undefined || total_amount === null || !items || items.length === 0) {
+      if (!order_key || !user_key || total_amount === undefined || total_amount === null || !items || items.length === 0 || orderType === undefined) {
         console.error('[API: /api/orders] خطأ: بيانات الطلب غير مكتملة.');
         return new Response(JSON.stringify({ error: 'بيانات الطلب غير مكتملة.' }), {
           status: 400,
@@ -135,9 +135,10 @@ export default async function handler(request) {
       const initialOrderStatus = `0#${new Date().toISOString()}`;
 
       // 1. إضافة الطلب الرئيسي إلى جدول `orders`
+      // 1. إضافة الطلب الرئيسي إلى جدول `orders`
       statements.push({
-        sql: "INSERT INTO orders (order_key, user_key, total_amount, order_status) VALUES (?, ?, ?, ?)",
-        args: [order_key, user_key, total_amount, initialOrderStatus],
+        sql: "INSERT INTO orders (order_key, user_key, total_amount, order_status, orderType) VALUES (?, ?, ?, ?, ?)",
+        args: [order_key, user_key, total_amount, initialOrderStatus, orderType],
       });
 
       // 2. إضافة كل عنصر من عناصر السلة إلى جدول `order_items`

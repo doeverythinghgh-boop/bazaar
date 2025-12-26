@@ -77,9 +77,7 @@ function pv2_initOrderLogic() {
         if (productData) {
             pv2_viewDetails(productData, viewOptions);
         } else {
-            if (typeof productSession !== 'undefined' && productSession) {
-                pv2_viewDetails(productSession[0], productSession[1]);
-            }
+            console.warn("[PV2] لا توجد بيانات خدمة في مدير الحالة");
         }
 
         pv2_initOrderLogic();
