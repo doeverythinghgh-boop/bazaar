@@ -9,51 +9,47 @@ let deferredPrompt;
 
 // 1. Capture the PWA install prompt event
 window.addEventListener('beforeinstallprompt', (e) => {
-    // Prevent the mini-infobar from appearing on mobile
-    e.preventDefault();
-    // Stash the event so it can be triggered later.
-    deferredPrompt = e;
-    // Log
-    console.log('[InstallPrompt] captured beforeinstallprompt event');
+  // Prevent the mini-infobar from appearing on mobile
+  e.preventDefault();
+  // Stash the event so it can be triggered later.
+  deferredPrompt = e;
+  // Log
+  console.log('[InstallPrompt] captured beforeinstallprompt event');
 
-    // Attempt to show the custom prompt
-    checkAndShowInstallPrompt();
+  // Attempt to show the custom prompt
+  checkAndShowInstallPrompt();
 });
 
 // 2. Check conditions and show modal
 function checkAndShowInstallPrompt() {
-    // A. Check if already installed (standalone)
-    if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
-        console.log('[InstallPrompt] App is already running in standalone mode.');
-        return;
-    }
+  // A. Check if already installed (standalone)
+  if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
+    console.log('[InstallPrompt] App is already running in standalone mode.');
+    return;
+  }
 
-    // B. Check if Mobile (Simple User Agent check)
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    if (!isMobile) {
-        console.log('[InstallPrompt] Not a mobile device, skipping prompt.');
-        return;
-    }
+  // B. Check if Mobile (Simple User Agent check)
+  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  if (!isMobile) {
+    console.log('[InstallPrompt] Not a mobile device, skipping prompt.');
+    return;
+  }
 
-    // C. Check LocalStorage (Don't show if dismissed recently)
-    // Logic: Show once per session or use a flag. User requested "First time".
-    // Let's use a flag 'installPromptShown_v1'.
-    if (localStorage.getItem('installPromptShown_v1')) {
-        console.log('[InstallPrompt] Prompt already shown previously.');
-        return;
-    }
+  // C. Check LocalStorage (Don't show if dismissed recently)
+  // REMOVED: User requested to show always on mobile.
+  // if (localStorage.getItem('installPromptShown_v1')) { ... }
 
-    // D. Show the SweetAlert2 Modal
-    showCustomInstallModal();
+  // D. Show the SweetAlert2 Modal
+  showCustomInstallModal();
 }
 
 function showCustomInstallModal() {
-    // Google Play Link
-    const PLAY_STORE_URL = "https://play.google.com/store/apps/details?id=hgh.hgh.suezbazaar&pcampaignid=web_share";
+  // Google Play Link
+  const PLAY_STORE_URL = "https://play.google.com/store/apps/details?id=hgh.hgh.suezbazaar&pcampaignid=web_share";
 
-    Swal.fire({
-        title: '<span style="font-family: var(--font-primary); font-size: 1.2rem; color: var(--dark-blue);">اختر الطريقة المناسبة لك</span>',
-        html: `
+  Swal.fire({
+    title: '<span style="font-family: var(--font-primary); font-size: 1.2rem; color: var(--dark-blue);">اختر الطريقة المناسبة لك</span>',
+    html: `
       <div style="display: flex; flex-direction: column; gap: 15px; padding: 10px;">
         
         <!-- Option 1: Google Play -->
@@ -121,50 +117,50 @@ function showCustomInstallModal() {
         }
       </style>
     `,
-        showConfirmButton: false,
-        showCloseButton: true,
-        background: '#fff',
-        didOpen: () => {
-            // Mark as shown so it doesn't pop up again this session/ever depending on requirement
-            localStorage.setItem('installPromptShown_v1', 'true');
-        }
-    });
+    showConfirmButton: false,
+    showCloseButton: true,
+    background: '#fff',
+    didOpen: () => {
+      // REMOVED: User requested to show always.
+      // localStorage.setItem('installPromptShown_v1', 'true');
+    }
+  });
 }
 
 // 3. Trigger PWA Logic
 window.triggerPWAInstall = async () => {
-    console.log('[InstallPrompt] Apple/PWA button clicked');
+  console.log('[InstallPrompt] Apple/PWA button clicked');
 
-    if (deferredPrompt) {
-        // Show the install prompt
-        deferredPrompt.prompt();
-        // Wait for the user to respond to the prompt
-        const { outcome } = await deferredPrompt.userChoice;
-        console.log(`[InstallPrompt] User response to install prompt: ${outcome}`);
-        // We've used the prompt, and can't use it again, throw it away
-        deferredPrompt = null;
-        Swal.close(); // Close our modal
+  if (deferredPrompt) {
+    // Show the install prompt
+    deferredPrompt.prompt();
+    // Wait for the user to respond to the prompt
+    const { outcome } = await deferredPrompt.userChoice;
+    console.log(`[InstallPrompt] User response to install prompt: ${outcome}`);
+    // We've used the prompt, and can't use it again, throw it away
+    deferredPrompt = null;
+    Swal.close(); // Close our modal
+  } else {
+    // Fallback for iOS or if prompt unavailable (e.g. fired too early/late or not supported)
+    // Show instruction for iOS
+    const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+    if (isIOS) {
+      Swal.fire({
+        icon: 'info',
+        title: 'تثبيت التطبيق',
+        html: 'لتثبيت التطبيق على الآيفون:<br><br>1. اضغط على زر <b>مشاركة</b> <i class="fas fa-share-square"></i><br>2. اختر <b>إضافة إلى الصفحة الرئيسية</b> <i class="fas fa-plus-square"></i>',
+        confirmButtonText: 'حسناً'
+      });
     } else {
-        // Fallback for iOS or if prompt unavailable (e.g. fired too early/late or not supported)
-        // Show instruction for iOS
-        const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-        if (isIOS) {
-            Swal.fire({
-                icon: 'info',
-                title: 'تثبيت التطبيق',
-                html: 'لتثبيت التطبيق على الآيفون:<br><br>1. اضغط على زر <b>مشاركة</b> <i class="fas fa-share-square"></i><br>2. اختر <b>إضافة إلى الصفحة الرئيسية</b> <i class="fas fa-plus-square"></i>',
-                confirmButtonText: 'حسناً'
-            });
-        } else {
-            // Fallback generic
-            console.warn('[InstallPrompt] No deferred prompt available.');
-            Swal.close();
-            // Maybe reload page?
-        }
+      // Fallback generic
+      console.warn('[InstallPrompt] No deferred prompt available.');
+      Swal.close();
+      // Maybe reload page?
     }
+  }
 };
 
 window.handleInstallChoice = (choice) => {
-    console.log('[InstallPrompt] User chose:', choice);
-    Swal.close();
+  console.log('[InstallPrompt] User chose:', choice);
+  Swal.close();
 };
