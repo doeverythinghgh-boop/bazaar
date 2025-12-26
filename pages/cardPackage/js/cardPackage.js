@@ -1,5 +1,5 @@
 /**
- * @file pages\cardPackage\cardPackage.js
+ * @file pages\cardPackage\js\cardPackage.js
  * @description Shopping Cart management module.
  *
  * This module provides functions to handle the shopping cart stored in LocalStorage.
@@ -240,17 +240,6 @@ function getCartTotalSavings() {
   }, 0);
 }
 
-/**
- * @description Finds a product in the cart.
- * @function findInCart
- * @param {string} productKey - Unique product key.
- * @returns {Object|null} - The product if found, otherwise null.
- * @see getCart
- */
-function findInCart(productKey) {
-  const cart = getCart();
-  return cart.find((item) => item.product_key === productKey) || null;
-}
 
 /**
  * @description Updates the cart item count badge in the UI.
