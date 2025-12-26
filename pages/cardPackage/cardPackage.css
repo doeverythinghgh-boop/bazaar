@@ -401,19 +401,35 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(0, 0, 0, 0.6);
     z-index: 1000;
     align-items: center;
     justify-content: center;
+    padding: 20px;
 }
 
 .cartPage_note-modal-content {
     background: var(--bg-color-white);
-    width: 90%;
+    width: 100%;
     max-width: 500px;
-    border-radius: var(--border-radius);
-    padding: 30px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    border-radius: 16px;
+    padding: 25px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: modalSlideIn 0.3s ease-out;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-30px) scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
 }
 
 .cartPage_note-modal-header {
@@ -421,19 +437,35 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid var(--border-color);
 }
 
 .cartPage_note-modal-header h3 {
     font-size: 1.3rem;
     color: var(--text-color-dark);
+    margin: 0;
 }
 
 .cartPage_close-modal {
-    background: none;
+    background: var(--border-color);
     border: none;
     font-size: 1.5rem;
     cursor: pointer;
     color: var(--secondary-color);
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition);
+}
+
+.cartPage_close-modal:hover {
+    background: var(--danger-color);
+    color: var(--bg-color-white);
+    transform: rotate(90deg);
 }
 
 .cartPage_note-modal-body textarea {
@@ -441,41 +473,135 @@
     min-height: 150px;
     padding: 15px;
     border: 2px solid var(--border-color);
-    border-radius: 10px;
+    border-radius: 12px;
     font-size: 1rem;
+    font-family: inherit;
     resize: vertical;
     margin-bottom: 20px;
+    transition: var(--transition);
 }
 
 .cartPage_note-modal-body textarea:focus {
     outline: none;
     border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
 }
 
 .cartPage_note-modal-actions {
     display: flex;
-    gap: 15px;
+    gap: 12px;
     justify-content: flex-end;
+    flex-wrap: wrap;
 }
 
 .cartPage_save-note-btn {
     background: var(--primary-color);
     color: var(--bg-color-white);
     border: none;
-    padding: 10px 25px;
+    padding: 12px 30px;
     border-radius: 30px;
     font-weight: 600;
+    font-size: 1rem;
     cursor: pointer;
+    transition: var(--transition);
+    flex: 1;
+    min-width: 120px;
+}
+
+.cartPage_save-note-btn:hover {
+    background: var(--dark-blue);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3);
 }
 
 .cartPage_cancel-note-btn {
     background: var(--border-color);
     color: var(--text-color-dark);
     border: none;
-    padding: 10px 25px;
+    padding: 12px 30px;
     border-radius: 30px;
     font-weight: 600;
+    font-size: 1rem;
     cursor: pointer;
+    transition: var(--transition);
+    flex: 1;
+    min-width: 120px;
+}
+
+.cartPage_cancel-note-btn:hover {
+    background: var(--secondary-color);
+    color: var(--bg-color-white);
+    transform: translateY(-2px);
+}
+
+/* Responsive Design for Modal */
+@media (max-width: 768px) {
+    .cartPage_note-modal {
+        padding: 15px;
+    }
+
+    .cartPage_note-modal-content {
+        padding: 20px;
+        max-width: 100%;
+        border-radius: 12px;
+    }
+
+    .cartPage_note-modal-header h3 {
+        font-size: 1.2rem;
+    }
+
+    .cartPage_note-modal-body textarea {
+        min-height: 120px;
+        font-size: 0.95rem;
+    }
+
+    .cartPage_note-modal-actions {
+        flex-direction: column;
+    }
+
+    .cartPage_save-note-btn,
+    .cartPage_cancel-note-btn {
+        width: 100%;
+        min-width: auto;
+    }
+}
+
+@media (max-width: 480px) {
+    .cartPage_note-modal {
+        padding: 10px;
+    }
+
+    .cartPage_note-modal-content {
+        padding: 18px;
+        border-radius: 10px;
+    }
+
+    .cartPage_note-modal-header {
+        margin-bottom: 15px;
+        padding-bottom: 12px;
+    }
+
+    .cartPage_note-modal-header h3 {
+        font-size: 1.1rem;
+    }
+
+    .cartPage_close-modal {
+        width: 32px;
+        height: 32px;
+        font-size: 1.3rem;
+    }
+
+    .cartPage_note-modal-body textarea {
+        min-height: 100px;
+        padding: 12px;
+        font-size: 0.9rem;
+    }
+
+    .cartPage_save-note-btn,
+    .cartPage_cancel-note-btn {
+        padding: 10px 20px;
+        font-size: 0.95rem;
+    }
 }
 
 /* Additional Responsive Design */
