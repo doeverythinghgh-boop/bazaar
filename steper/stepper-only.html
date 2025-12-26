@@ -219,11 +219,12 @@
                 console.log("[StepperOnly] Checking order for photo link:", {
                     total_amount: order.total_amount,
                     orderType: order.orderType,
-                    condition: (order.orderType === 1)
+                    typeOfOrderType: typeof order.orderType,
+                    condition: (Number(order.orderType) === 1)
                 });
 
                 // Only show for special orders where orderType is 1 (Service)
-                if (item && order.orderType === 1) {
+                if (item && Number(order.orderType) === 1) {
                     const u = order.user_key;
                     const s = item.seller_key;
                     const p = item.product_key;

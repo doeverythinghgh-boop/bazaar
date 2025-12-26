@@ -360,7 +360,8 @@ function salesMovement_showOrderDetails(salesMovement_orderData) {
             user_location: salesMovement_orderData.user_location || '',
             order_status: salesMovement_orderData.order_status || '',
             created_at: salesMovement_orderData.created_at,
-            total_amount: salesMovement_orderData.total_amount, // Added missing field
+            total_amount: salesMovement_orderData.total_amount,
+            orderType: salesMovement_orderData.orderType, // ✅ تم إضافة نوع الطلب (0 للمنتجات، 1 للخدمات)
             order_items: []
         };
 

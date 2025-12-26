@@ -165,29 +165,30 @@
 
 يوضح هذا القسم الرحلة الكاملة للبيانات من قاعدة البيانات حتى وصولها إلى واجهة الـ Stepper.
 
-### 9.1. الجلب والتحضير في النافذة الأم (Parent Window Fetch & Prepare)
-المصدر: `pages/sales-movement/sales-movement.js`
+### 9.1. المسؤولية الأساسية وحقن البيانات (Primary Responsibility & Data Injection)
 
-1.  **الجلب (Fetching):**
-    *   يتم استدعاء API: `/api/user-all-orders`.
-    *   يتم تمرير المعاملات: `user_key` (معرف المستخدم) و `role` (الدور المحدد: purchaser, seller, delivery, admin).
-    *   يتم جلب بيانات الطلب "الطازجة" لضمان دقة الحالة قبل العرض.
+تُعد صفحة [`pages/sales-movement/sales-movement.js`](file:///c:/Users/hesham/bazaar/pages/sales-movement/sales-movement.js) هي **المسؤول الأساسي والمحرك الأول** لدورة حياة البيانات داخل الـ Stepper. لا يقوم نظام الـ Stepper بجلب بيانات الطلبات من السيرفر بشكل مستقل عند البدء، بل يعتمد كلياً على البيانات التي يتم تحضيرها وحقنها من صفحة حركة المبيعات.
 
-2.  **التحويل (Transformation):**
-    *   تقوم دالة `salesMovement_showOrderDetails` بمعالجة البيانات الخام.
-    *   يتم تسطيح (Flattening) كائن الطلب ليتوافق مع بنية الـ Stepper.
-    *   يتم معالجة حقل `supplier_delivery` المعقد (الذي قد يكون `null`، كائن، أو مصفوفة) وتوحيده لضمان استقرار الكود.
+#### المهام الرئيسية التي تقوم بها `sales-movement.js`:
 
-3.  **الحقن (Injection):**
-    *   قبل إنشاء الـ Iframe، يتم إنشاء كائن عالمي في النافذة الأم:
-        ```javascript
-        window.globalStepperAppData = {
-            idUser: userSession.user_key,
-            ordersData: [convertedOrder], // مصفوفة تحتوي الطلب المحول
-            baseURL: baseURL
-        };
-        ```
-    *   هذا الكائن هو "الجسر" الذي سينقل البيانات إلى الـ Iframe.
+1.  **الجلب الطازج (Fresh Fetching):**
+    *   عند النقر على أي طلب، تقوم الصفحة بجلب أحدث نسخة من البيانات عبر API: `/api/user-all-orders`.
+    *   تضمن هذه الخطوة أن الـ Stepper سيعرض الحالة الحقيقية والنهائية للطلب (Real-time Sync).
+
+2.  **تحديد نوع الطلب (Order Type Identification):**
+    *   تقوم الصفحة بتمرير حقل `orderType` (0 للمنتجات، 1 للخدمات).
+    *   هذا الحقل هو المسؤول عن تغيير سلوك الـ Stepper برمجياً (مثل إظهار أو إخفاء رابط الصور وأدوات التسعير).
+
+3.  **التحويل والتوحيد (Data Transformation):**
+    *   تقوم دالة `salesMovement_showOrderDetails` بتجهيز كائن `convertedOrder`.
+    *   يتم معالجة التناقضات في البيانات (مثل حقل `supplier_delivery`) لضمان وصول بيانات موحدة لا تسبب أعطالاً داخل الـ Iframe.
+
+4.  **إنشاء الجسر التقني (Technical Bridging):**
+    *   يتم حقن البيانات عبر الكائن العالمي `window.globalStepperAppData` في النافذة الأب (Parent Window).
+    *   يحتوي هذا الكائن على معرف المستخدم (`idUser`) ومصفوفة الطلبات (`ordersData`) والرابط الأساسي (`baseURL`).
+
+> [!IMPORTANT]
+> أي خلل في إرسال البيانات من صفحة حركة المبيعات سيؤدي مباشرة إلى توقف الـ Stepper عن العمل أو عرضه لبيانات غير دقيقة، حيث أنه يعمل كمستقبل (Receiver) سلبي للبيانات.
 
 ### 9.2. الجسر والتهيئة في الـ Iframe (Iframe Bridging & Init)
 المصدر: `steper/stepper-only.html` و `steper/config.js`
