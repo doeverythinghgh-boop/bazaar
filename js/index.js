@@ -41,14 +41,40 @@ document.addEventListener("DOMContentLoaded", async () => {
     const r2Url = getPublicR2FileUrl('notification_config.json');
     const timestamp = new Date().getTime();
     const response = await fetch(`${r2Url}?t=${timestamp}`);
+
     if (response.ok) {
       window.globalNotificationConfig = await response.json();
-      console.log('✅ تم تحميل إعدادات الإشعارات من السيرفر بنجاح:', window.globalNotificationConfig);
+      console.log('✅ تم تحميل إعدادات الإشعارات من R2 بنجاح:', window.globalNotificationConfig);
     } else {
-      console.error('❌ فشل تحميل إعدادات الإشعارات من السيرفر:', response.status);
+      // Fallback to local file if R2 fails
+      console.warn('⚠️ فشل تحميل إعدادات الإشعارات من R2 (', response.status, ')، محاولة التحميل من الملف المحلي...');
+      try {
+        const localResponse = await fetch(`/notification/notification_config.json?t=${timestamp}`);
+        if (localResponse.ok) {
+          window.globalNotificationConfig = await localResponse.json();
+          console.log('✅ تم تحميل إعدادات الإشعارات من الملف المحلي بنجاح:', window.globalNotificationConfig);
+        } else {
+          console.error('❌ فشل تحميل إعدادات الإشعارات من الملف المحلي أيضاً:', localResponse.status);
+        }
+      } catch (localError) {
+        console.error('❌ خطأ في تحميل إعدادات الإشعارات من الملف المحلي:', localError);
+      }
     }
   } catch (error) {
-    console.error('❌ خطأ في الاتصال أثناء تحميل إعدادات الإشعارات:', error);
+    // Fallback to local file if R2 connection fails
+    console.warn('⚠️ خطأ في الاتصال بـ R2:', error.message, '- محاولة التحميل من الملف المحلي...');
+    try {
+      const timestamp = new Date().getTime();
+      const localResponse = await fetch(`/notification/notification_config.json?t=${timestamp}`);
+      if (localResponse.ok) {
+        window.globalNotificationConfig = await localResponse.json();
+        console.log('✅ تم تحميل إعدادات الإشعارات من الملف المحلي بنجاح:', window.globalNotificationConfig);
+      } else {
+        console.error('❌ فشل تحميل إعدادات الإشعارات من الملف المحلي:', localResponse.status);
+      }
+    } catch (localError) {
+      console.error('❌ خطأ في تحميل إعدادات الإشعارات من الملف المحلي:', localError);
+    }
   }
 
   // [Step 1] Read logged-in user data from storage using SessionManager.
