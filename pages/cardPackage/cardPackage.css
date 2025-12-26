@@ -403,21 +403,27 @@
     height: 100%;
     background-color: rgba(0, 0, 0, 0.6);
     z-index: 1000;
+    padding: 20px;
+}
+
+/* When modal is shown, use flex to center */
+.cartPage_note-modal[style*="display: flex"] {
+    display: flex !important;
     align-items: center;
     justify-content: center;
-    padding: 20px;
 }
 
 .cartPage_note-modal-content {
     background: var(--bg-color-white);
-    width: 100%;
-    max-width: 500px;
+    width: 90%;
+    max-width: 400px;
     border-radius: 16px;
-    padding: 25px;
+    padding: 20px;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
     animation: modalSlideIn 0.3s ease-out;
-    max-height: 90vh;
+    max-height: 85vh;
     overflow-y: auto;
+    box-sizing: border-box;
 }
 
 @keyframes modalSlideIn {
@@ -436,13 +442,13 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
-    padding-bottom: 15px;
+    margin-bottom: 15px;
+    padding-bottom: 12px;
     border-bottom: 2px solid var(--border-color);
 }
 
 .cartPage_note-modal-header h3 {
-    font-size: 1.3rem;
+    font-size: 1.1rem;
     color: var(--text-color-dark);
     margin: 0;
 }
@@ -450,11 +456,11 @@
 .cartPage_close-modal {
     background: var(--border-color);
     border: none;
-    font-size: 1.5rem;
+    font-size: 1.3rem;
     cursor: pointer;
     color: var(--secondary-color);
-    width: 35px;
-    height: 35px;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -470,15 +476,16 @@
 
 .cartPage_note-modal-body textarea {
     width: 100%;
-    min-height: 150px;
-    padding: 15px;
+    min-height: 120px;
+    padding: 12px;
     border: 2px solid var(--border-color);
     border-radius: 12px;
-    font-size: 1rem;
+    font-size: 0.95rem;
     font-family: inherit;
     resize: vertical;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
     transition: var(--transition);
+    box-sizing: border-box;
 }
 
 .cartPage_note-modal-body textarea:focus {
@@ -498,14 +505,14 @@
     background: var(--primary-color);
     color: var(--bg-color-white);
     border: none;
-    padding: 12px 30px;
+    padding: 10px 24px;
     border-radius: 30px;
     font-weight: 600;
-    font-size: 1rem;
+    font-size: 0.95rem;
     cursor: pointer;
     transition: var(--transition);
     flex: 1;
-    min-width: 120px;
+    min-width: 100px;
 }
 
 .cartPage_save-note-btn:hover {
@@ -518,14 +525,14 @@
     background: var(--border-color);
     color: var(--text-color-dark);
     border: none;
-    padding: 12px 30px;
+    padding: 10px 24px;
     border-radius: 30px;
     font-weight: 600;
-    font-size: 1rem;
+    font-size: 0.95rem;
     cursor: pointer;
     transition: var(--transition);
     flex: 1;
-    min-width: 120px;
+    min-width: 100px;
 }
 
 .cartPage_cancel-note-btn:hover {
