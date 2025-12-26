@@ -99,7 +99,7 @@ add2_form.addEventListener('submit', async (e) => {
         }
 
         console.log('%c[Add2] تم حفظ الخدمة بنجاح.', 'color: green; font-weight: bold;');
-        Swal.fire('تم بنجاح!', 'تم إضافة الخدمة بنجاح.', 'success').then(() => {
+        Swal.fire('تم بنجاح!', 'تم حفظ الخدمة وإرسالها للإدارة بنجاح لمراجعتها ونشرها.', 'success').then(() => {
             add2_form.reset();
             add2_previewsEl.innerHTML = '';
             add2_images.length = 0;
@@ -109,6 +109,11 @@ add2_form.addEventListener('submit', async (e) => {
                 const el = document.getElementById(id);
                 if (el) el.textContent = (id.includes('description') ? '0 / 400' : '0 / 100');
             });
+
+            // العودة للصفحة السابقة
+            if (typeof containerGoBack === 'function') {
+                containerGoBack();
+            }
         });
 
     } catch (error) {

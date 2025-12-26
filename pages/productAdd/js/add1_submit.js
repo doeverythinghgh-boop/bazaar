@@ -121,7 +121,7 @@ add1_form.addEventListener('submit', async (e) => {
         }
 
         console.log('%c[Add1] تم حفظ المنتج بنجاح.', 'color: green; font-weight: bold;');
-        Swal.fire('تم بنجاح!', 'تم إضافة المنتج بنجاح.', 'success').then(() => {
+        Swal.fire('تم بنجاح!', 'تم حفظ المنتج وإرساله للإدارة بنجاح لمراجعته ونشره.', 'success').then(() => {
             add1_setSubmitLoading(false);
             add1_form.reset();
             add1_previewsEl.innerHTML = '';
@@ -131,6 +131,11 @@ add1_form.addEventListener('submit', async (e) => {
                 const el = document.getElementById(id);
                 if (el) el.textContent = (id.includes('description') ? '0 / 400' : '0 / 100');
             });
+
+            // العودة للصفحة السابقة (غالباً لوحة التحكم)
+            if (typeof containerGoBack === 'function') {
+                containerGoBack();
+            }
         });
 
     } catch (error) {
