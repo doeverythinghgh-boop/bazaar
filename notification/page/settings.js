@@ -74,7 +74,7 @@ const notifiSetting_Controller = {
         } catch (error) {
             console.warn('فشل تحميل الإعدادات من السحابة، العودة للملف المحلي:', error);
             try {
-                const localResponse = await fetch('/notification_config.json');
+                const localResponse = await fetch('/notification/notification_config.json');
                 notifiSetting_DEFAULT_CONFIG = await localResponse.json();
                 this.notifiSetting_config = JSON.parse(JSON.stringify(notifiSetting_DEFAULT_CONFIG));
                 console.log('تم تحميل الإعدادات الافتراضية المحلية.');
