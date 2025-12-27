@@ -135,18 +135,6 @@ function profileInitializeData() {
                 els.locationIframe.src = `location/LOCATION.html?lat=${lat}&lng=${lng}&embedded=true&hideSave=true&v=${timestamp}`;
             }
 
-            if (els.addressError) {
-                const addressInput = document.getElementById("profile-address");
-                const hasDetails = addressInput && addressInput.value.trim() !== "";
-                els.addressError.style.color = "#10b981";
-                els.addressError.style.display = "block";
-
-                if (hasDetails) {
-                    els.addressError.innerHTML = '<i class="fas fa-check-circle"></i> تم ربط موقعك المحفوظ بنجاح!';
-                } else {
-                    els.addressError.innerHTML = '<i class="fas fa-check-circle"></i> تم العثور على موقعك المحفوظ.<br/>يرجى الآن كتابة وصف دقيق لحقيبة التوصيل.';
-                }
-            }
         }
     } catch (error) {
         console.error("خطأ في تهيئة بيانات الملف الشخصي:", error);
@@ -428,7 +416,6 @@ function profileSetupListeners() {
             } else if (event.data && event.data.type === 'LOCATION_RESET') {
                 if (coordsInput) coordsInput.value = "";
                 if (mapStatus) {
-                    mapStatus.style.color = "";
                     mapStatus.innerHTML = "";
                 }
             }
