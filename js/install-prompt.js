@@ -53,8 +53,8 @@ function checkAndShowInstallPrompt() {
 function showCustomInstallModal() {
   // Google Play Link
   const PLAY_STORE_URL = "https://play.google.com/store/apps/details?id=hgh.hgh.suezbazaar&pcampaignid=web_share";
-
-  Swal.fire({
+  if (!window.Android) {
+    Swal.fire({
     title: '<span style="font-family: var(--font-primary); font-size: 1.2rem; color: var(--dark-blue);">اختر الطريقة المناسبة لك</span>',
     html: `
       <div class="install-modal-container">
@@ -166,6 +166,7 @@ function showCustomInstallModal() {
       // localStorage.setItem('installPromptShown_v1', 'true');
     }
   });
+}
 }
 
 // 3. Trigger PWA Logic
