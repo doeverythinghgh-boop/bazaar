@@ -80,7 +80,7 @@ const AuthValidators = {
                 // Return generic message, the UI will show the detailed thanks
                 return { isValid: false, message: "يرجى كتابة وصف دقيق (مثل الدور أو علامة مميزة)." };
             }
-            return { isValid: false, message: "العنوان مطلوب لتسهيل عملية التوصيل." };
+            return { isValid: false, message: "يرجي ادخال التفصيل لتسهيل عملية التوصيل." };
         }
         if (address.trim().length < 5) {
             return { isValid: false, message: "يرجى إدخال عنوان أكثر تفصيلاً (5 أحرف على الأقل)." };

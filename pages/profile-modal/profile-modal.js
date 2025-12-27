@@ -270,6 +270,21 @@ async function profileHandleSaveChanges() {
 
     console.log("[Profile] Comparing coordinates:", { currentCoords, newCoords });
 
+    // Mandatory Location Validation
+    const mapError = document.getElementById("profile-map-error");
+    if (!newCoords) {
+        console.warn("[Profile] Attempted save without coordinates.");
+        if (mapError) {
+            mapError.textContent = "يرجى تحديد موقعك على الخريطة أولاً لضمان سرعة التوصيل.";
+            mapError.style.display = "block";
+            mapError.style.color = "#dc2626"; // Red color
+            mapError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        return;
+    } else {
+        if (mapError) mapError.style.display = "none";
+    }
+
     if (newCoords && newCoords !== currentCoords) {
         console.log("[Profile] Location changed detected!");
         updatedData.location = newCoords.includes(',') ? newCoords.replace(',', ', ') : newCoords;

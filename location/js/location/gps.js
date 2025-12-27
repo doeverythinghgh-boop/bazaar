@@ -28,6 +28,7 @@ location_app.getLocationByGPS = function () {
             }
 
             this.location_isBusy = true;
+            this.location_gpsAborted = false; // Reset abortion flag
             this.location_map.dragging.disable();
 
             Swal.fire({
@@ -35,21 +36,34 @@ location_app.getLocationByGPS = function () {
                 text: 'يرجى السماح بالوصول إلى بيانات الموقع',
                 allowOutsideClick: false,
                 allowEscapeKey: false,
+                showCancelButton: true,
+                cancelButtonText: 'إلغاء',
                 didOpen: () => Swal.showLoading(),
                 customClass: { popup: 'fullscreen-swal' }
+            }).then((result) => {
+                if (result.isDismissed || result.dismiss === Swal.DismissReason.cancel) {
+                    console.log("[GPS] User cancelled location retrieval.");
+                    this.location_gpsAborted = true;
+                    this.location_isBusy = false;
+                    this.location_map.dragging.enable();
+                }
             });
 
             console.log("[GPS] Starting Priority 1 (High Accuracy)...");
 
             const attemptPosition = (options, isFallback = false) => {
+                if (this.location_gpsAborted) return; // Stop if user cancelled
+
                 console.log(`[GPS] Calling getCurrentPosition (${isFallback ? "Fallback" : "Primary"})...`, options);
 
                 navigator.geolocation.getCurrentPosition(
                     (position) => {
+                        if (this.location_gpsAborted) return;
                         console.log("[GPS] Success callback triggered.");
                         this.location_onGPSSuccess(position, resolve);
                     },
                     (error) => {
+                        if (this.location_gpsAborted) return;
                         console.warn(`[GPS] Error callback (${isFallback ? "Fallback" : "Primary"}). Code:`, error.code, "Msg:", error.message);
 
                         // If primary HighAccuracy failed with Timeout (3) or Position Unavailable (2), try LowAccuracy
