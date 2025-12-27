@@ -307,7 +307,7 @@ async function previewProduct(key) {
 
         // Use modern loadProductView which handles state and layout
         if (typeof loadProductView === 'function') {
-            loadProductView(productDataForModal, { showAddToCart: true });
+            loadProductView(productDataForModal, { showAddToCart: false });
         } else {
             console.error("دالة loadProductView مفقودة!");
             Swal.fire({
