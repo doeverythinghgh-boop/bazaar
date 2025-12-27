@@ -14,12 +14,13 @@
  * @returns {Promise<void>}
  */
 async function fetchAllData() {
-    console.log("Fetching all data...");
+    console.log("جاري جلب جميع البيانات...");
     await Promise.all([fetchPendingItems(), fetchPublishedItems()]);
 }
 
 // Attach to window to ensure global access for onclick handlers
 window.fetchAllData = fetchAllData;
+window.adminFetchAllData = fetchAllData;
 
 /**
  * Fetches pending products (status = 0) from the API and renders them as cards.
@@ -38,7 +39,7 @@ async function fetchPendingItems() {
         const products = await response.json();
 
         if (!products || products.length === 0) {
-            container.innerHTML = '<div class="no-data-msg">No pending products found.</div>';
+            container.innerHTML = '<div class="no-data-msg">لم يتم العثور على منتجات معلقة.</div>';
             return;
         }
 
@@ -52,19 +53,19 @@ async function fetchPendingItems() {
                     <img src="${imgUrl}" class="pending-product-image" alt="${p.productName}">
                     <div class="pending-product-details">
                         <div class="pending-product-title">${p.productName}</div>
-                        <div class="pending-product-info"><strong>Seller:</strong> ${p.seller_username || 'Unknown'} (${p.seller_phone || '-'})</div>
-                        <div class="pending-product-info"><strong>Price:</strong> ${p.product_price} EGP</div>
+                        <div class="pending-product-info"><strong>البائع:</strong> ${p.seller_username || 'غير معروف'} (${p.seller_phone || '-'})</div>
+                        <div class="pending-product-info"><strong>السعر:</strong> ${p.product_price} جنيه</div>
                         <div class="pending-product-info">${p.product_description.substring(0, 80)}...</div>
                     </div>
                     <div class="pending-product-actions">
                         <button class="btn-approve" onclick="window.adminUpdateStatus('${p.product_key}', '${p.productName}', 1)">
-                            <i class="fas fa-check"></i> Approve
+                            <i class="fas fa-check"></i> موافقة
                         </button>
                          <button class="btn-reject" onclick="window.adminDeleteProduct('${p.product_key}', '${p.productName}', '${p.ImageName || ''}')">
-                            <i class="fas fa-times"></i> Reject
+                            <i class="fas fa-times"></i> رفض
                         </button>
                          <button class="btn-view" onclick="window.adminPreviewProduct('${p.product_key}')">
-                            <i class="fas fa-eye"></i> Preview
+                            <i class="fas fa-eye"></i> معاينة
                         </button>
                     </div>
                 </div>
@@ -73,8 +74,8 @@ async function fetchPendingItems() {
         container.innerHTML = html;
 
     } catch (e) {
-        console.error("Error fetching pending items:", e);
-        container.innerHTML = '<div class="no-data-msg" style="color:red">Error loading data</div>';
+        console.error("خطأ في جلب المنتجات المعلقة:", e);
+        container.innerHTML = '<div class="no-data-msg" style="color:red">خطأ في تحميل البيانات</div>';
     }
 }
 
@@ -95,7 +96,7 @@ async function fetchPublishedItems() {
         const products = await response.json();
 
         if (!products || products.length === 0) {
-            container.innerHTML = '<div class="no-data-msg">No published products found.</div>';
+            container.innerHTML = '<div class="no-data-msg">لم يتم العثور على منتجات منشورة.</div>';
             return;
         }
 
@@ -103,9 +104,9 @@ async function fetchPublishedItems() {
             <table class="pending-products-table">
                 <thead>
                     <tr>
-                        <th>Product Name</th>
-                        <th>Seller</th>
-                        <th>Actions</th>
+                        <th>اسم المنتج</th>
+                        <th>البائع</th>
+                        <th>الإجراءات</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -123,12 +124,12 @@ async function fetchPublishedItems() {
                         <span style="color:#777; font-size:0.85em">${p.seller_phone || '-'}</span>
                     </td>
                     <td>
-                         <button class="btn-unpublish" onclick="window.adminUpdateStatus('${p.product_key}', '${p.productName}', 0)" title="Unpublish">
-                            <i class="fas fa-ban"></i> Unpublish
+                         <button class="btn-unpublish" onclick="window.adminUpdateStatus('${p.product_key}', '${p.productName}', 0)" title="إلغاء النشر">
+                            <i class="fas fa-ban"></i> إلغاء النشر
                         </button>
                         <div style="height:5px"></div>
                          <button class="btn-reject" style="width:100%" onclick="window.adminDeleteProduct('${p.product_key}', '${p.productName}', '${p.ImageName || ''}')">
-                            <i class="fas fa-trash"></i> Delete
+                            <i class="fas fa-trash"></i> حذف
                         </button>
                     </td>
                 </tr>
@@ -155,16 +156,16 @@ async function fetchPublishedItems() {
  * @returns {Promise<void>}
  */
 async function updateStatus(key, name, newStatus) {
-    const actionName = newStatus === 1 ? 'Approve & Publish' : 'Unpublish';
+    const actionName = newStatus === 1 ? 'موافقة ونشر' : 'إلغاء نشر';
     const color = newStatus === 1 ? '#28a745' : '#ffc107';
 
     const confirm = await Swal.fire({
-        title: `Confirm ${actionName}`,
-        text: `Are you sure you want to ${actionName} product "${name}"?`,
+        title: `تأكيد ${actionName}`,
+        text: `هل أنت متأكد من ${actionName} المنتج "${name}"؟`,
         icon: 'question',
         showCancelButton: true,
-        confirmButtonText: 'Yes',
-        cancelButtonText: 'No',
+        confirmButtonText: 'نعم',
+        cancelButtonText: 'لا',
         confirmButtonColor: color
     });
 
@@ -178,12 +179,12 @@ async function updateStatus(key, name, newStatus) {
             body: JSON.stringify({ product_key: key, is_approved: newStatus })
         });
 
-        if (!res.ok) throw new Error('Update failed');
+        if (!res.ok) throw new Error('فشل التحديث');
 
         Swal.fire({
             icon: 'success',
-            title: 'Success',
-            text: `${actionName} successful`,
+            title: 'تم بنجاح',
+            text: `تمت عملية ${actionName} بنجاح`,
             timer: 1500,
             showConfirmButton: false
         });
@@ -198,6 +199,7 @@ async function updateStatus(key, name, newStatus) {
 
 // Attach to window
 window.updateStatus = updateStatus;
+window.adminUpdateStatus = updateStatus;
 
 /**
  * Permanently deletes a product from the database.
@@ -211,13 +213,13 @@ window.updateStatus = updateStatus;
  */
 async function deleteProduct(key, name, imageNamesStr) {
     const confirm = await Swal.fire({
-        title: 'Delete Product',
-        text: `Are you sure you want to permanently delete "${name}"? All associated images will also be deleted from the cloud.`,
+        title: 'حذف المنتج',
+        text: `هل أنت متأكد من حذف "${name}" نهائياً؟ سيتم حذف جميع الصور المرتبطة أيضاً من السحابة.`,
         icon: 'warning',
         showCancelButton: true,
-        confirmButtonText: 'Yes, Delete',
+        confirmButtonText: 'نعم، احذف نهائياً',
         confirmButtonColor: '#dc3545',
-        cancelButtonText: 'Cancel',
+        cancelButtonText: 'إلغاء',
         showLoaderOnConfirm: true,
         preConfirm: async () => {
             try {
@@ -238,7 +240,7 @@ async function deleteProduct(key, name, imageNamesStr) {
 
                 return true;
             } catch (e) {
-                Swal.showValidationMessage(`Error: ${e.message}`);
+                Swal.showValidationMessage(`خطأ: ${e.message}`);
                 return false;
             }
         },
@@ -248,8 +250,8 @@ async function deleteProduct(key, name, imageNamesStr) {
     if (confirm.isConfirmed) {
         Swal.fire({
             icon: 'success',
-            title: 'Deleted',
-            text: 'Product and images deleted successfully',
+            title: 'تم الحذف',
+            text: 'تم حذف المنتج والصور بنجاح',
             timer: 1500,
             showConfirmButton: false
         });
@@ -259,6 +261,7 @@ async function deleteProduct(key, name, imageNamesStr) {
 }
 // Attach to window
 window.deleteProduct = deleteProduct;
+window.adminDeleteProduct = deleteProduct;
 
 /**
  * Opens a full product preview modal using the same layout as the main product view.
@@ -274,7 +277,7 @@ async function previewProduct(key) {
         const p = await response.json();
 
         if (!p) {
-            console.error("Product not found");
+            console.error("المنتج غير موجود");
             return;
         }
 
@@ -306,7 +309,7 @@ async function previewProduct(key) {
         if (typeof loadProductView === 'function') {
             loadProductView(productDataForModal, { showAddToCart: true });
         } else {
-            console.error("loadProductView function is missing!");
+            console.error("دالة loadProductView مفقودة!");
             Swal.fire({
                 title: p.productName,
                 text: p.product_description,
@@ -315,9 +318,17 @@ async function previewProduct(key) {
         }
 
     } catch (e) {
-        console.error("Error previewing product:", e);
+        console.error("خطأ أثناء معاينة المنتج:", e);
     }
 }
 
 // Attach to window
 window.previewProduct = previewProduct;
+
+window.adminPreviewProduct = previewProduct;
+
+// Auto-initialize if any of the target containers are present in the DOM
+if (document.getElementById('pending-list-container') || document.getElementById('published-list-container')) {
+    console.log("[Admin] جاري تشغيل سكربت المنتجات المعلقة تلقائياً...");
+    fetchAllData();
+}

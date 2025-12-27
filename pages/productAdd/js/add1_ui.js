@@ -18,6 +18,7 @@ var add1_quantityInput = document.getElementById('add1_product_quantity');
 var add1_priceInput = document.getElementById('add1_product_price');
 var add1_originalPriceInput = document.getElementById('add1_original_price');
 var add1_realPriceInput = document.getElementById('add1_real_price');
+var add1_heavyLoadCheckbox = document.getElementById('add1_heavy_load');
 var add1_btnSubmit = document.getElementById('add1_btn_submit');
 
 

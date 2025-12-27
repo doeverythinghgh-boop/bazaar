@@ -109,7 +109,8 @@ add1_form.addEventListener('submit', async (e) => {
             MainCategory: categories.mainId,
             SubCategory: categories.subId,
             ImageIndex: uploadedImageUrls.length,
-            serviceType: serviceType
+            serviceType: serviceType,
+            heavyLoad: add1_heavyLoadCheckbox?.checked ? 1 : 0
         };
 
         const dbResult = await addProduct(productData);
